@@ -1,0 +1,78 @@
+Alice owns Grin
+Bob owns Bitcoin
+
+INPUTS
+Alice and Bob need to 
+settle on amounts they want to exchange
+v_B (the amount of Bitcoin)
+v_G (the amount of Grin)
+They also agree on timelocks for refund
+t = 24h
+
+GEN_KEYS 
+Create sk,pk for Alice and Bob 
+Alice needs to send her pk to Bob
+Bob generates a secret preimage x used later
+sk_A, pk_A
+sk_B, pk_B
+x_B
+Alice sends pk_A to Bob
+
+LOCK_BTC
+Bob creates a Bitcoin P2SH output with amount v_B 
+OP_CHECKMULTISIG pk_A AND x_B*G
+OP_IF t pk_B
+Bob can spend it after t blocks or
+Alice can spend it if she learns x
+
+LOCK_GRIN_2
+Alice and Bob create blinding factors
+r_A, r_B
+Alice creates a Grin output with 
+O_multi = r_A*G + r_B*G + v_G*H
+This transaction is not signed yet!
+
+REFUND_GRIN
+Alice and Bob create a tx_ref spending
+O_multi and sending it back to Alice O_ref
+with timelock t
+Alice creates rangeproof for refund output pr_ref
+Alic and Bob cooperate to compute signature sig_ref
+tx_ref (O_ref, sig_ref, p_ref) is broadcast
+
+MULTI_RANGEPROOF
+Alice and Bob interact to create the Bulletproof for
+pr_multi for = O_multi
+
+LOCK_GRIN_2
+Alice and Bob both create their partial signatures
+sig_multi_a and sig_multi_b for O_multi and exchange them to compute
+sig_multi.
+Alice and Bob participate in MULTI_RANGEPROOF to get 
+pr_multi for O_multi
+tx_multi (O_multi, sig_multi, pr_multi) is broadcast
+
+EXEC_SWAP
+Alice creates tx_spend with a change output O_change with v_inp - v_G and blinding factor r_A
+and sends it's r_A*G and randomness k_A*G and pr_change to Bob
+Bob creates his output O_bob with v_G and blinding factor r_B and proof pr_bob
+Bob creates a adaptable partial sig apt_sig_b = k_B + x + e * r_B with e = SHA256(M|k_A*G+k_B*G|r_A*G+r_B*G)
+Bob sends apt_sig_b, k_B*G, r_B*G and x*G to Alice
+Alice CHECK apt_sig_b*G == k_B*G + x*G + r_B*G
+Alice CHECK xG pk_A Btc Output has v_B in it
+??? How does alice check apt_sig_b - sig_b == x ???
+Alice sig_a = k_A + e * r_A with e = SHA256(M|k_A*G+k_B*G|r_A*G+r_B*G)
+Alice sends sig_a to Bob
+Bob sig_b = k_B + e * r_B 
+sig_swap = sig_a + sig_b
+publish tx_swap (O_bob, O_change, sig_swap, pr_bob, pr_change)
+Alice calcualtes
+sig_b = sig_swap - sig_a
+x = apt_sig_b - sig_b
+Alice spends pk_A, x*G Bitcoin output with sk_A and x
+
+
+
+
+
+ 
