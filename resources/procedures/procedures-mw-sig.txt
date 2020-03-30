@@ -1,0 +1,47 @@
+TWO PARTY MIMBLEWIMBLE SIGNATURES:
+
+# Exectued by each party to initialize her random values
+INIT():
+1: k <- Zp
+2: r <- Zp
+3: return (k, r)
+
+
+# Create a partial signature with parameters
+# M ... Agreed apon message to sign (f.ex. tx fee)
+# k ... randomness from INIT()
+# r ... blinding factor from INIT()
+# k'*G ... randomness to G from other party
+# r'*G ... blinding fact to G from other party
+CREATE_PARTIAL_SIG(M, k, r, k'*G, r'*G):
+3: e = SHA256(M | k*G + r*G | k'*G + r'*G) (should i be more generic here instead of SHA256?)
+4: sig_part = k + e * r with e
+5: return (sig_part, k*G, r*G)
+
+
+# Verify a partial signature
+# M ... Agreed apon message to sign (f.ex. tx fee)
+# k ... randomness from INIT()
+# r ... blinding factor from INIT()
+# k'*G ... randomness to G from other party
+# r'*G ... blinding fact to G from other party
+# sig_part partial signature received from other party
+VERF_PART_SIG(M, k, r, k'*G, r'*G, sig_part):
+1: e = SHA256(M | k*G + r*G | k'*G + r'*G)
+2: return sig_part*G == k'*G + e * r'*G
+
+
+# Create a final signature for a partial one
+# sig_part partial signature
+# sig_part' partial signature
+# k*G ... randomness for one party
+# k'*G ... randomness from other party
+FINALIZE_SIG(sig_part, sig_part', k*G, k*'G):
+1: return (sig_part + sig_part', k*G + k'*G)
+
+
+
+
+
+
+ 

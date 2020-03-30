@@ -1,0 +1,30 @@
+TWO PARTY MIMBLEWIMBLE APT SIGNATURES:
+# Adapt a partial signature
+# sig_part is a valid partial signature
+# x is the secret wittness to be hidden in the sig
+
+ADAPT_PARTIAL_SIG(sig_part, x):
+1: sig_part_apt = sig_part + x;
+2: return (sig_part_apt, x*G)
+
+
+# Verify a adapted signature
+# M ... Agreed apon message to sign (f.ex. tx fee)
+# k ... randomness from INIT()
+# r ... blinding factor from INIT()
+# k'*G ... randomness to G from other party
+# r'*G ... blinding fact to G from other party
+# sig_part_apt' adapted partial signature received from other party
+VERF_APT_PARTIAL_SIG(M, k, r, k'*G, r'*G, x*G, sig_part_apt')
+1: e = SHA256(M | k*G + r*G | k'*G + r'*G)
+2: return sig_part_apt'*G = k'*G + e * r'*G + x*G
+
+
+# Extract witness
+# sig_final is the final signature
+# sig_part is my partial signature
+# sig_part_apt' is the adapted partial signature of the other party
+EXTRACT_WIT(sig_final, sig_part, sig_part_apt'):
+1: sig_part' = sig_final - sig_part
+2: x = sig_part_apt' - sig_part'
+3: return (x)
