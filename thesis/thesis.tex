@@ -22,6 +22,24 @@
 \usepackage{todonotes} % Provides tooltip-like todo notes.
 \usepackage{hyperref}  % Enables cross linking in the electronic document version. This package has to be included second to last.
 \usepackage[acronym,toc]{glossaries} % Enables the generation of glossaries and lists fo acronyms. This package has to be included last.
+\usepackage[
+    n,
+    advantage,
+    operators,
+    sets,
+    adversary,
+    landau,
+    probability,
+    notions,
+    logic,
+    ff,
+    mm,
+    primitives,
+    events,
+    complexity,
+    asymptotics,
+    keys
+]{cryptocode}
 
 % Define convenience functions to use the author name and the thesis title in the PDF document properties.
 \newcommand{\authorname}{Jakob Abfalter} % The author name without titles.
@@ -152,6 +170,48 @@
 \section{General Notation}
 \section{Cryptographic Primitives}
 \section{Generalized Multiparty Adaptor Signature}
+We define a Generalized Multiparty Adaptor Signature Scheme from the standard construction of multiparty Schnorr signatures which
+are defined as follows:\\
+\fbox{
+    \parbox{\textwidth}{
+        \procedure[linenumbering, syntaxhighlight=auto]{$GEN()$} {
+            k \sample \ZZ_q \\
+            r \sample \ZZ_q \\
+            \pcreturn (k, r)
+        }
+        \procedure[linenumbering, syntaxhighlight=auto]{$GEN\_PART\_SIG(M, k, r, g^{k'}, g^{r'}$)} {
+            e = h (M || g^{k} + g^{k'} || g^{r} + g^{r'}) \\
+            sig\_part = k + e * r \\
+            \pcreturn (sig_part, g^{k}, g^{r'})
+        }\\
+        \procedure[linenumbering, syntaxhighlight=auto]{$VERF\_PART\_SIG(M, k, r, g^{k'}, g^{r'}, sig\_part$)} {
+            e = h (M || g^{k} + g^{k'} || g^{r} + g^{r'}) \\
+            \pcreturn g^{sig\_part} = g^{k'} + g^{e * r}
+        }\\
+        \procedure[linenumbering, syntaxhighlight=auto]{$FINALIZE\_SIG(sig\_part, sig\_part', g^{k}, g^{k'})$)} {
+            \pcreturn (sig\_part + sig\_part', g^{k} + g^{k'})
+        }
+    }
+}
+In order to have adaptable partial signature we add the following procedures\\
+\fbox{
+\parbox{\textwidth} {
+    \procedure[linenumbering, syntaxhighlight=auto]{$ADAPT\_PART\_SIG(sig\_part, x)$} {
+        sig\_part\_apt = sig_part + x \\
+        \pcreturn (sig\_part\_apt, g^{x})
+    }
+    \procedure[linenumbering, syntaxhighlight=auto]{$EXT\_WIT(sig\_final, sig\_part, sig\_part\_apt')$}{
+        sig\_part' = sig\_final - sig\_part \\
+        x = sig\_part\_apt' - sig\_part ' \\
+        \pcreturn (x)
+    }\\
+    \procedure[linenumbering, syntaxhighlight=auto]{$VERF\_APT\_SIG(M, k, r, g^{k'}, g^{r'}, g^{x}, sig\_part\_apt')$} {
+        e = h (M || g^{k} + g^{k'} || g^{r} + g^{r'}) \\
+        \pcreturn g^{sig\_part\_apt'} = g^{k'} + g^{e * r} + g^{x}
+    }
+}
+}
+
 \section{Atomic Swap Construction}
 \subsection{Construction Bitcoin side}
 \subsection{Construction Grin side}
