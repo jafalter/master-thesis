@@ -1,0 +1,26 @@
+#  -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+IP = '192.168.155.199'
+
+unless Vagrant.has_plugin?('vagrant-vbguest')
+  raise 'run "vagrant plugin install vagrant-vbguest" in the Vagrantfile\'s directory first'
+end
+
+Vagrant.configure(2) do |config|
+  # For a complete reference, please see the online documentation at: https://docs.vagrantup.com.
+
+  config.vm.box = 'ubuntu/xenial64'
+  config.vm.network :private_network, ip: IP
+
+  config.vm.provider 'virtualbox' do |vb|
+    vb.gui = false
+    vb.memory = '1024'
+    vb.auto_nat_dns_proxy = false
+    vb.customize ["modifyvm", :id, "--natdnsproxy1", "off" ]
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "off" ]
+  end
+
+  config.vm.provision 'shell', path: 'provisioning/shell/provision.sh'
+
+end
