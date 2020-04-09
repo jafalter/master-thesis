@@ -105,12 +105,11 @@
 %\setthesis{phd-school} % Deactivate non-English title pages (see below)
 
 % For bachelor and master:
-\setcurriculum{Software Engineering & Internet Computing}{Software Engineering & Internet Computing} % Sets the English and German name of the curriculum.
+\setcurriculum{Software Engineering \& Internet Computing}{Software Engineering \& Internet Computing} % Sets the English and German name of the curriculum.
 
 % For dissertations at the PhD School:
 %\setfirstreviewerdata{Affiliation, Country}
 %\setsecondreviewerdata{Affiliation, Country}
-
 
 \begin{document}
 
@@ -172,42 +171,82 @@
 \section{Generalized Multiparty Adaptor Signature}
 We define a Generalized Multiparty Adaptor Signature Scheme from the standard construction of multiparty Schnorr signatures which
 are defined as follows:\\
+
+\newcommand{\funH}[1]{h (#1)}
+\newcommand{\funGen}[1]{g^{#1}}
+
+\newcommand{\varM}{m}
+\newcommand{\varK}{k}
+\newcommand{\varKSt}{k'}
+\newcommand{\varR}{r}
+\newcommand{\varRSt}{r'}
+\newcommand{\varGk}{\funGen{\varK}}
+\newcommand{\varGkSt}{\funGen{\varKSt}}
+\newcommand{\varGr}{\funGen{\varR}}
+\newcommand{\varGrSt}{\funGen{\varRSt}}
+\newcommand{\varSigPart}{sig\_prt}
+\newcommand{\varSigPartSt}{sig\_prt'}
+\newcommand{\varE}{e}
+\newcommand{\varGSigPart}{\funGen{\varSigPart}}
+
+\newcommand{\cnstZq}{\ZZ_q}
+
+\newcommand{\opConc}{||}
+
+\newcommand{\procGen}{$GEN()$}
+\newcommand{\procGenPartSig}{$GEN\_PT\_SIG(\varM, \varK, \varR, \varGkSt, \varGrSt)$}
+\newcommand{\procVerfPartSig}{$VRF\_PT\_SIG(\varM, \varK, \varR, \varGkSt, \varGrSt, \varSigPart)$}
+\newcommand{\procFinSig}{$FIN\_SIG(\varSigPart, \varSigPartSt, \varGk, \varGkSt, \varGr, \varGrSt)$}
+
 \fbox{
     \parbox{\textwidth}{
-        \procedure[linenumbering, syntaxhighlight=auto]{$GEN()$} {
-            k \sample \ZZ_q \\
-            r \sample \ZZ_q \\
-            \pcreturn (k, r)
+        \procedure[linenumbering, syntaxhighlight=auto]{\procGen} {
+            \varK \sample \cnstZq \\
+            \varR \sample \cnstZq \\
+            \pcreturn (\varK, \varR)
         }
-        \procedure[linenumbering, syntaxhighlight=auto]{$GEN\_PART\_SIG(M, k, r, g^{k'}, g^{r'}$)} {
-            e = h (M || g^{k} + g^{k'} || g^{r} + g^{r'}) \\
-            sig\_part = k + e * r \\
-            \pcreturn (sig_part, g^{k}, g^{r'})
+        \procedure[linenumbering, syntaxhighlight=auto]{\procGenPartSig} {
+            \varE = \funH{(\varM \opConc \varGk + \varGkSt \opConc \varGr + \varGrSt)} \\
+            \varSigPart = \varK + \varE + \varR \\
+            \pcreturn (\varSigPart, \varGk, \varGr)
         }\\
-        \procedure[linenumbering, syntaxhighlight=auto]{$VERF\_PART\_SIG(M, k, r, g^{k'}, g^{r'}, sig\_part$)} {
-            e = h (M || g^{k} + g^{k'} || g^{r} + g^{r'}) \\
-            \pcreturn g^{sig\_part} = g^{k'} + g^{e * r}
+        \procedure[linenumbering, syntaxhighlight=auto]{\procVerfPartSig} {
+            \varE = \funH{((\varM \opConc \varGk + \varGkSt \opConc \varGr + \varGrSt)} \\
+            \pcreturn \varGSigPart = \varGkSt + \funGen{\varE * \varR}
         }\\
-        \procedure[linenumbering, syntaxhighlight=auto]{$FINALIZE\_SIG(sig\_part, sig\_part', g^{k}, g^{k'})$)} {
-            \pcreturn (sig\_part + sig\_part', g^{k} + g^{k'})
+        \procedure[linenumbering, syntaxhighlight=auto]{\procFinSig} {
+            \pcreturn (\varSigPart + \varSigPartSt, \varGk + \varGkSt, \varGr + \varGrSt)
         }
     }
 }
 In order to have adaptable partial signature we add the following procedures\\
+
+\newcommand{\varSigPartApt}{sig\_part\_apt}
+\newcommand{\varSigPartAptSt}{sig\_part\_apt'}
+\newcommand{\varGSigPartAptSt}{\funGen{\varSigPartAptSt}}
+\newcommand{\varX}{x}
+\newcommand{\varGx}{\funGen{\varX}}
+\newcommand{\varSigFin}{sig\_final}
+
+\newcommand{\procAptSig}{$APT\_PT\_SIG(\varSigPart, \varX)$}
+\newcommand{\procExtWit}{$EXT\_WIT(\varSigFin, \varSigPart, \varSigPartAptSt)$}
+\newcommand{\procVrfApt}{$VRF\_APT\_SIG(\varM, \varK, \varR, \varGkSt, \varGrSt, \varGx, \varSigPartAptSt)$}
+
+
 \fbox{
 \parbox{\textwidth} {
-    \procedure[linenumbering, syntaxhighlight=auto]{$ADAPT\_PART\_SIG(sig\_part, x)$} {
-        sig\_part\_apt = sig_part + x \\
-        \pcreturn (sig\_part\_apt, g^{x})
+    \procedure[linenumbering, syntaxhighlight=auto]{\procAptSig} {
+        \varSigPartApt = \varSigPart + \varX \\
+        \pcreturn (\varSigPartApt, \varGx)
     }
-    \procedure[linenumbering, syntaxhighlight=auto]{$EXT\_WIT(sig\_final, sig\_part, sig\_part\_apt')$}{
-        sig\_part' = sig\_final - sig\_part \\
-        x = sig\_part\_apt' - sig\_part ' \\
-        \pcreturn (x)
+    \procedure[linenumbering, syntaxhighlight=auto]{\procExtWit}{
+        \varSigPartSt = \varSigFin - \varSigPart \\
+        \varX = \varSigPartAptSt - \varSigPartSt \\
+        \pcreturn (\varX)
     }\\
-    \procedure[linenumbering, syntaxhighlight=auto]{$VERF\_APT\_SIG(M, k, r, g^{k'}, g^{r'}, g^{x}, sig\_part\_apt')$} {
-        e = h (M || g^{k} + g^{k'} || g^{r} + g^{r'}) \\
-        \pcreturn g^{sig\_part\_apt'} = g^{k'} + g^{e * r} + g^{x}
+    \procedure[linenumbering, syntaxhighlight=auto]{\procAptSig} {
+        \varE = \funH{(\varM \opConc \varGk + \varGkSt \opConc \varGr + \varGrSt)} \\
+        \pcreturn \varGSigPartAptSt = \varGkSt + \funGen{\varE * \varR} + \varGx
     }
 }
 }
