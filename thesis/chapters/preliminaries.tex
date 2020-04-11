@@ -1,0 +1,69 @@
+\section{Bitcoin}\label{secBitcoin}
+\subsection{Bitcoin Transaction Protocol}\label{secBitcoinTx}
+\subsection{Bitcoin Scaling and Layer Two Solutions}\label{secBitcoinScaling}
+\section{Privacy-enhancing Cryptocurrencies}\label{secPrivacy}
+\subsection{Zero Knowledge Proofs}\label{secZero}
+\subsection{Range Proofs}\label{secRange}
+\subsection{Mimblewimble}\label{secMimble}
+
+\urldef\urlharrypotter\url{https://harrypotter.fandom.com/wiki/Tongue-Tying_Curse}
+\urldef\urlgrin\url{https://grin.mw/}
+\urldef\urlbeam\url{https://beam.mw/}
+
+The Mimblewimble protocol was introduced in 2016 by an anonymous entity named Jedusor, Tom Elvis~\cite{jedusor2016mimblewimble}. The author's name, as well as the protocols name,
+are references to the Harry Potter franchise. \footnote{\urlharrypotter} In Harry Potter, Mimblewimble is a tongue-typing curse which reflects
+the goal of the protocol's design,which is improving the user's privacy.
+Later, Andrew Poelstra took up the ideas from the original writing and published his understanding of the protocol in his paper~\cite{poelstra2016mimblewimble}.
+The protocol gained increasing interest in the community and was implemented in the Grin \footnote{\urlgrin} and Beam \footnote{\urlbeam} Cryptocurrencies, which both launched in early 2019. In the same year,
+two papers were published, which successfully defined and proved security properties for Mimblewimble~\cite{fuchsbauer2019aggregate,betarte2019towards}. In this section, we will explain the fundamental properties of the
+protocols which are relevant for this thesis. The section is ba
+\\
+Compared to Bitcoin, there are some differences in Mimblewimble:~\cite{fuchsbauer2019aggregate}
+\begin{itemize}
+    \item Use of Pedersen commitments instead of plaintext transaction values
+    \item No addresses. Coin ownership is given by the knowledge of the opening of the coins Pedersen commitment.
+    \item Spend outputs are purged from the ledger such that only unspent transaction outputs remain.
+    \item No scripting features.
+\end{itemize}
+By utilizing Pedersen commitments in the transactions, we hide the amounts transferred in a transaction,
+improving the systems user privacy, but also requiring additional range proofs, attesting to the fact that actual amounts transferred are in between a valid range.\\
+Not having any addresses enables transaction merging and transaction cut through, which we will explain a bit later.
+However, this comes with the consequence that building transactions require active interaction between the sender and receiver,
+which is different than in constructions more similar to Bitcoin, where a sender can transfer funds to any address without requiring active participation by the receiver.\\
+Through transaction merging and cut-through and some further protocol features, which we will see later in this section, we gain the third mentioned property of being able
+to delete transaction outputs from the Blockchain, which have already been spent before. This ongoing purging in the Blockchain makes it particularly space-efficient as the
+space required by the ledger only grows in the number of UTXOs, in contrast to Bitcoin, in which space requirement increases with the number of overall mined transactions.
+Saving space is especially relevant for Cryptocurrencies employing confidential transactions because the size of the range proofs attached to outputs can be significant.
+Another advantage of this property is that new nodes joining the system do not have to verify the whole history of the Blockchain to validate the current state, making it much easier to join the network. \\
+Another limitation of Mimblewimble- based Cryptocurrencies is that at least the current construction does not allow scripts, such as they are available in Bitcoin or similar systems.
+Transaction validity is given solely by a single valid signature plus the balancedness of inputs and outputs.
+This shortcoming makes it challenging to realize concepts such as multi signatures or conditional transactions which are required for Atomic Swap protocols. However,
+as we will see in~\ref{secScriptless} there are ways we can still construct the necessary transactions by merely relying on cryptographic primitives.
+
+\subsubsection{Mimblewimble Transaction}
+Transaction Struction:
+\begin{itemize}
+    \item For two adjacent elliptic curve generators $\varG$ and $\varH$. A coin in Mimblewimble is of the form $\varC = \funGen{\varV} + \funGenH{\varR}, \varpi$, $\varC$ is a so called Pedersen Commitment
+    to the value $\varV$ with blinding factor $\varR$. $\varpi$ is a range proof attesting to the fact that $\varV$ is in a valid range.
+    \item As already pointed out, there are now addresses in Mimblewimble. Ownership of a coin is equivalent to the knowledge of its opening, so the blinding factor takes the role of the secret key.
+    \item A transaction consists of $\varCinp = (\varC_1, \dots, \varC_n)$ input coins and $\varCout = (\varC'_1, \dots, \varC'_n)$ output coins.
+\end{itemize}
+A transaction is considered valid iff $\sum{\varV'_i} - \sum{\varV_i} = 0$ so the sum of all input values has to be 0. (Not taking transaction fees into account)\\
+From that we can derive the following equation:
+\[ \sum{\varCout} - \sum{\varCinp} = \sum{\funGenH{\varV'_i} + \funGen{\varR'_i}} - \sum{\funGenH{\varV_i} + \funGen{\varR_i}} \]
+So if we assume that a transaction is valid then we are left with the following so called excess value:
+\[ \varEx = \funGen{(\sum{\varR'_i} - \sum{\varR_i})} \]
+Knowledge of the opening of all coins and the validity of the transaction implies knowledge of $\varEx$.
+Directly revealing the opening to $\varEx$ would leak too much information, an adversary knowing the openings for input coins and all but one output coin, could easily calculate the unknown opening given $\varEx$.
+Therefore knowledge of $\varEx$ instead is proven by providing a valid signature for $\varEx$ as public key.
+Coinbase transactions (transactions creating new money as part of a miners reward) additionally include the newly minted money as supply $\varSupply$ in the excess equation:
+\[ \varEx = \funGen{(\sum{\varR'_i} - \sum{\varR_i})} - \funGenH{\varSupply} \]
+Finally a Mimblewimble transaction is of form:
+\[ \varTx = (\varSupply, \varCinp, \varCout, \varKernel)~\text{with}~\varKernel = (\funList{\varpi}, \funList{\varEx}, \funList{\varsigma}) \]
+where $\varSupply$ is the transaction supply amount, $\varCinp$ is the list of input coins, $\varCout$ is the list of output coins and $\varKernel$ is the transaction Kernel. The Kernel consists of $\funList{\varpi}$
+which is a list of all output coin range proofs, $\funList{\varEx}$ a list of excess values and finally $\funList{\varsigma}$ a list of signatures.
+
+\section{Scriptless Scripts}\label{secScriptless}
+\section{Adaptor Signatures}\label{secApt}
+\subsection{Schnorr Signature Construction}\label{secAptSchnorr}
+\subsection{ECDSA Signature Construction}\label{secAptECDSA}

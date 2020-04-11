@@ -1,0 +1,47 @@
+\section{General Notation}\label{secGenNot}
+\section{Cryptographic Primitives}\label{secCrypPrim}
+\section{Mulitparty Fixed Witness Adaptor Signature Scheme} \label{secScheme}
+
+We define a Generalized Multiparty Adaptor Signature Scheme from the standard construction of multiparty Schnorr signatures which
+are defined as follows:\\
+
+\fbox{
+    \parbox{\textwidth}{
+        \procedure[linenumbering, syntaxhighlight=auto]{\procGen} {
+            \varK \sample \cnstZq \\
+            \varR \sample \cnstZq \\
+            \pcreturn (\varK, \varR)
+        }
+        \procedure[linenumbering, syntaxhighlight=auto]{\procGenPartSig} {
+            \varE = \funH{(\varM \opConc \varGk + \varGkSt \opConc \varGr + \varGrSt)} \\
+            \varSigPart = \varK + \varE + \varR \\
+            \pcreturn (\varSigPart, \varGk, \varGr)
+        }\\
+        \procedure[linenumbering, syntaxhighlight=auto]{\procVerfPartSig} {
+            \varE = \funH{((\varM \opConc \varGk + \varGkSt \opConc \varGr + \varGrSt)} \\
+            \pcreturn \varGSigPart = \varGkSt + \funGen{\varE * \varR}
+        }\\
+        \procedure[linenumbering, syntaxhighlight=auto]{\procFinSig} {
+            \pcreturn (\varSigPart + \varSigPartSt, \varGk + \varGkSt, \varGr + \varGrSt)
+        }
+    }
+}
+In order to have adaptable partial signature we add the following procedures\\
+
+\fbox{
+    \parbox{\textwidth} {
+        \procedure[linenumbering, syntaxhighlight=auto]{\procAptSig} {
+            \varSigPartApt = \varSigPart + \varX \\
+            \pcreturn (\varSigPartApt, \varGx)
+        }
+        \procedure[linenumbering, syntaxhighlight=auto]{\procExtWit}{
+            \varSigPartSt = \varSigFin - \varSigPart \\
+            \varX = \varSigPartAptSt - \varSigPartSt \\
+            \pcreturn (\varX)
+        }\\
+        \procedure[linenumbering, syntaxhighlight=auto]{\procAptSig} {
+            \varE = \funH{(\varM \opConc \varGk + \varGkSt \opConc \varGr + \varGrSt)} \\
+            \pcreturn \varGSigPartAptSt = \varGkSt + \funGen{\varE * \varR} + \varGx
+        }
+    }
+}

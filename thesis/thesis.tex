@@ -40,10 +40,63 @@
     asymptotics,
     keys
 ]{cryptocode}
+\usepackage{subfiles}
 
-% Define convenience functions to use the author name and the thesis title in the PDF document properties.
 \newcommand{\authorname}{Jakob Abfalter} % The author name without titles.
 \newcommand{\thesistitle}{Adaptor Signature Based Atomic Swaps Between Bitcoin and a Mimblewimble Based Cryptocurrency} % The title of the thesis. The English version should be used, if it exists.
+
+% functions
+\newcommand{\funH}[1]{h (#1)}
+\newcommand{\funGen}[1]{g^{#1}}
+\newcommand{\funGenH}[1]{g^{#1}}
+\newcommand{\funList}[1]{l(#1)}
+
+% variables
+\newcommand{\varTx}{tx}
+\newcommand{\varEx}{\mathcal{E}}
+\newcommand{\varKernel}{\mathcal{K}}
+\newcommand{\varG}{g}
+\newcommand{\varSupply}{s}
+\newcommand{\varH}{h}
+\newcommand{\varC}{C}
+\newcommand{\varCinp}{C_{inp}}
+\newcommand{\varCout}{C_{out}}
+\newcommand{\varV}{v}
+\newcommand{\varM}{m}
+\newcommand{\varK}{k}
+\newcommand{\varKSt}{k'}
+\newcommand{\varR}{r}
+\newcommand{\varRSt}{r'}
+\newcommand{\varGk}{\funGen{\varK}}
+\newcommand{\varGkSt}{\funGen{\varKSt}}
+\newcommand{\varGr}{\funGen{\varR}}
+\newcommand{\varGrSt}{\funGen{\varRSt}}
+\newcommand{\varSigPart}{sig\_prt}
+\newcommand{\varSigPartSt}{sig\_prt'}
+\newcommand{\varE}{e}
+\newcommand{\varGSigPart}{\funGen{\varSigPart}}
+\newcommand{\varSigPartApt}{sig\_part\_apt}
+\newcommand{\varSigPartAptSt}{sig\_part\_apt'}
+\newcommand{\varGSigPartAptSt}{\funGen{\varSigPartAptSt}}
+\newcommand{\varX}{x}
+\newcommand{\varGx}{\funGen{\varX}}
+\newcommand{\varSigFin}{sig\_final}
+
+% constants
+\newcommand{\cnstZq}{\ZZ_q}
+
+% operators
+\newcommand{\opConc}{||}
+
+% procedures
+\newcommand{\procGen}{$GEN()$}
+\newcommand{\procGenPartSig}{$GEN\_PT\_SIG(\varM, \varK, \varR, \varGkSt, \varGrSt)$}
+\newcommand{\procVerfPartSig}{$VRF\_PT\_SIG(\varM, \varK, \varR, \varGkSt, \varGrSt, \varSigPart)$}
+\newcommand{\procFinSig}{$FIN\_SIG(\varSigPart, \varSigPartSt, \varGk, \varGkSt, \varGr, \varGrSt)$}
+\newcommand{\procAptSig}{$APT\_PT\_SIG(\varSigPart, \varX)$}
+\newcommand{\procExtWit}{$EXT\_WIT(\varSigFin, \varSigPart, \varSigPartAptSt)$}
+\newcommand{\procVrfApt}{$VRF\_APT\_SIG(\varM, \varK, \varR, \varGkSt, \varGrSt, \varGx, \varSigPartAptSt)$}
+
 
 % Set PDF document properties
 \hypersetup{
@@ -146,133 +199,32 @@
 % Switch to arabic numbering and start the enumeration of chapters in the table of content.
 \mainmatter
 
-\chapter{Introduction}
-\todo{TODO}
+\chapter{Introduction}\label{chapIntro}
+\subfile{chapters/introduction.tex}
 
-\chapter{Motivation \& Objectives}
-\todo{TODO}
+\chapter{Motivation \& Objectives}\label{chapMotiv}
+\subfile{chapters/motivation_objectives.tex}
 
-\chapter{Preliminaries}
-\section{Bitcoin}
-\subsection{Bitcoin Transaction Protocol}
-\subsection{Bitcoin Scaling and Layer Two Solutions}
-\section{Privacy-enhancing Cryptocurrencies}
-\subsection{Zero Knowledge Proofs}
-\subsection{Range Proofs}
-\subsection{Mimblewimble (Grin)}
-\section{Hash-time-locked Contracts}
-\section{Adaptor Signatures}
-\subsection{Schnorr Signature Construction}
-\subsection{ECDSA Signature Construction}
+\chapter{Preliminaries}\label{chapPre}
+\subfile{chapters/preliminaries.tex}
 
-\chapter{Adaptor Signature Based Atomic Swaps Between Bitcoin and Grin}
-\section{General Notation}
-\section{Cryptographic Primitives}
-\section{Generalized Multiparty Adaptor Signature}
-We define a Generalized Multiparty Adaptor Signature Scheme from the standard construction of multiparty Schnorr signatures which
-are defined as follows:\\
+\chapter{Mulitparty Fixed Witness Adaptor Signatures}\label{chapMultiApt}
+\subfile{chapters/multiparty_fixed_witness_adaptor_signatures.tex}
 
-\newcommand{\funH}[1]{h (#1)}
-\newcommand{\funGen}[1]{g^{#1}}
+\chapter{Adaptor Signature Based Atomic Swaps Between Bitcoin and a Mimblewimble Based Cryptocurrency}\label{chapAtomic}
+\subfile{chapters/adaptor_signature_based_atomic_swaps_between_bitcoin_and_mimblewimble.tex}
 
-\newcommand{\varM}{m}
-\newcommand{\varK}{k}
-\newcommand{\varKSt}{k'}
-\newcommand{\varR}{r}
-\newcommand{\varRSt}{r'}
-\newcommand{\varGk}{\funGen{\varK}}
-\newcommand{\varGkSt}{\funGen{\varKSt}}
-\newcommand{\varGr}{\funGen{\varR}}
-\newcommand{\varGrSt}{\funGen{\varRSt}}
-\newcommand{\varSigPart}{sig\_prt}
-\newcommand{\varSigPartSt}{sig\_prt'}
-\newcommand{\varE}{e}
-\newcommand{\varGSigPart}{\funGen{\varSigPart}}
+\chapter{Implementation}\label{chapImp}
+\subfile{chapters/implementation.tex}
 
-\newcommand{\cnstZq}{\ZZ_q}
+\chapter{Implementation Security and Privacy Evaluation}\label{chapImplSec}
+\subfile{chapters/evaluation.tex}
 
-\newcommand{\opConc}{||}
+\chapter{Related and Future Work}\label{chapFut}
+\subfile{chapters/related_and_future_work.tex}
 
-\newcommand{\procGen}{$GEN()$}
-\newcommand{\procGenPartSig}{$GEN\_PT\_SIG(\varM, \varK, \varR, \varGkSt, \varGrSt)$}
-\newcommand{\procVerfPartSig}{$VRF\_PT\_SIG(\varM, \varK, \varR, \varGkSt, \varGrSt, \varSigPart)$}
-\newcommand{\procFinSig}{$FIN\_SIG(\varSigPart, \varSigPartSt, \varGk, \varGkSt, \varGr, \varGrSt)$}
-
-\fbox{
-    \parbox{\textwidth}{
-        \procedure[linenumbering, syntaxhighlight=auto]{\procGen} {
-            \varK \sample \cnstZq \\
-            \varR \sample \cnstZq \\
-            \pcreturn (\varK, \varR)
-        }
-        \procedure[linenumbering, syntaxhighlight=auto]{\procGenPartSig} {
-            \varE = \funH{(\varM \opConc \varGk + \varGkSt \opConc \varGr + \varGrSt)} \\
-            \varSigPart = \varK + \varE + \varR \\
-            \pcreturn (\varSigPart, \varGk, \varGr)
-        }\\
-        \procedure[linenumbering, syntaxhighlight=auto]{\procVerfPartSig} {
-            \varE = \funH{((\varM \opConc \varGk + \varGkSt \opConc \varGr + \varGrSt)} \\
-            \pcreturn \varGSigPart = \varGkSt + \funGen{\varE * \varR}
-        }\\
-        \procedure[linenumbering, syntaxhighlight=auto]{\procFinSig} {
-            \pcreturn (\varSigPart + \varSigPartSt, \varGk + \varGkSt, \varGr + \varGrSt)
-        }
-    }
-}
-In order to have adaptable partial signature we add the following procedures\\
-
-\newcommand{\varSigPartApt}{sig\_part\_apt}
-\newcommand{\varSigPartAptSt}{sig\_part\_apt'}
-\newcommand{\varGSigPartAptSt}{\funGen{\varSigPartAptSt}}
-\newcommand{\varX}{x}
-\newcommand{\varGx}{\funGen{\varX}}
-\newcommand{\varSigFin}{sig\_final}
-
-\newcommand{\procAptSig}{$APT\_PT\_SIG(\varSigPart, \varX)$}
-\newcommand{\procExtWit}{$EXT\_WIT(\varSigFin, \varSigPart, \varSigPartAptSt)$}
-\newcommand{\procVrfApt}{$VRF\_APT\_SIG(\varM, \varK, \varR, \varGkSt, \varGrSt, \varGx, \varSigPartAptSt)$}
-
-
-\fbox{
-\parbox{\textwidth} {
-    \procedure[linenumbering, syntaxhighlight=auto]{\procAptSig} {
-        \varSigPartApt = \varSigPart + \varX \\
-        \pcreturn (\varSigPartApt, \varGx)
-    }
-    \procedure[linenumbering, syntaxhighlight=auto]{\procExtWit}{
-        \varSigPartSt = \varSigFin - \varSigPart \\
-        \varX = \varSigPartAptSt - \varSigPartSt \\
-        \pcreturn (\varX)
-    }\\
-    \procedure[linenumbering, syntaxhighlight=auto]{\procAptSig} {
-        \varE = \funH{(\varM \opConc \varGk + \varGkSt \opConc \varGr + \varGrSt)} \\
-        \pcreturn \varGSigPartAptSt = \varGkSt + \funGen{\varE * \varR} + \varGx
-    }
-}
-}
-
-\section{Atomic Swap Construction}
-\subsection{Construction Bitcoin side}
-\subsection{Construction Grin side}
-\subsection{Security Definitions}
-
-\chapter{Implementation}
-\section{Implementation Bitcoin side}
-\section{Implementation Grin side}
-\section{Performance Evaluation}
-
-\chapter{Implementation Security and Privacy Evaluation}
-\section{Security Evaluation}
-\section{Privacy Evaluation}
-
-\chapter{Related and Future Work}
-\section{Payment Channel Networks on Grin}
-\section{Payment Channel Networks on Monero}
-\section{Atomic Swaps With Related Cryptocurrencies}
-\section{Tumbler Based Atomic Swaps}
-
-\chapter{Conclusion}
-
+\chapter{Conclusion}\label{chapConc}
+\subfile{chapters/conclusion.tex}
 
 % Remove following line for the final thesis.
 %\input{intro.tex} % A short introduction to LaTeX.
@@ -298,6 +250,6 @@ In order to have adaptable partial signature we add the following procedures\\
 
 % Add a bibliography.
 \bibliographystyle{alpha}
-\bibliography{intro}
+\bibliography{thesis}
 
 \end{document}
