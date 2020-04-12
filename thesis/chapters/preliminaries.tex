@@ -40,11 +40,10 @@ Transaction validity is given solely by a single valid signature plus the balanc
 This shortcoming makes it challenging to realize concepts such as multi signatures or conditional transactions which are required for Atomic Swap protocols. However,
 as we will see in~\ref{secScriptless} there are ways we can still construct the necessary transactions by merely relying on cryptographic primitives.
 
-\subsubsection{Mimblewimble Transaction}
-Transaction Struction:
+\subsubsection{Transaction Structure}
 \begin{itemize}
-    \item For two adjacent elliptic curve generators $\varG$ and $\varH$. A coin in Mimblewimble is of the form $\varC = \funGen{\varV} + \funGenH{\varR}, \varpi$, $\varC$ is a so called Pedersen Commitment
-    to the value $\varV$ with blinding factor $\varR$. $\varpi$ is a range proof attesting to the fact that $\varV$ is in a valid range.
+    \item For two adjacent elliptic curve generators $\varG$ and $\varH$. A coin in Mimblewimble is of the form $\varC = \funGen{\varV} + \funGenH{\varR}, \varProof$, $\varC$ is a so called Pedersen Commitment
+    to the value $\varV$ with blinding factor $\varR$. $\varProof$ is a range proof attesting to the fact that $\varV$ is in a valid range.
     \item As already pointed out, there are now addresses in Mimblewimble. Ownership of a coin is equivalent to the knowledge of its opening, so the blinding factor takes the role of the secret key.
     \item A transaction consists of $\varCinp = (\varC_1, \dots, \varC_n)$ input coins and $\varCout = (\varC'_1, \dots, \varC'_n)$ output coins.
 \end{itemize}
@@ -59,9 +58,72 @@ Therefore knowledge of $\varEx$ instead is proven by providing a valid signature
 Coinbase transactions (transactions creating new money as part of a miners reward) additionally include the newly minted money as supply $\varSupply$ in the excess equation:
 \[ \varEx = \funGen{(\sum{\varR'_i} - \sum{\varR_i})} - \funGenH{\varSupply} \]
 Finally a Mimblewimble transaction is of form:
-\[ \varTx = (\varSupply, \varCinp, \varCout, \varKernel)~\text{with}~\varKernel = (\funList{\varpi}, \funList{\varEx}, \funList{\varsigma}) \]
-where $\varSupply$ is the transaction supply amount, $\varCinp$ is the list of input coins, $\varCout$ is the list of output coins and $\varKernel$ is the transaction Kernel. The Kernel consists of $\funList{\varpi}$
-which is a list of all output coin range proofs, $\funList{\varEx}$ a list of excess values and finally $\funList{\varsigma}$ a list of signatures.
+\[ \varTx = (\varSupply, \varCinp, \varCout, \varKernel)~\text{with}~\varKernel = (\funList{\varProof}, \funList{\varEx}, \funList{\varSignature}) \]
+where $\varSupply$ is the transaction supply amount, $\varCinp$ is the list of input coins, $\varCout$ is the list of output coins and $\varKernel$ is the transaction Kernel. The Kernel consists of $\funList{\varProof}$
+which is a list of all output coin range proofs, $\funList{\varEx}$ a list of excess values and finally $\funList{\varSignature}$ a list of signatures.
+
+\subsubsection{Transaction Merging}
+An essential property of the Mimblewimble protocol is that two transactions can easily be merged into one. Assume we have the following two transactions:
+\[ \varTx_0 = (\varSupply_0, \varCinp^0, \varCout^0, (\funList{\varProof_0}, \funList{\varEx_0}, \funList{\varSignature_0}) ) \]
+\[ \varTx_1 = (\varSupply_1, \varCinp^1, \varCout^1, (\funList{\varProof_1}, \funList{\varEx_1}, \funList{\varSignature_1}) ) \]
+Then we can build a single merged transaction:
+\[ \varTx_m = (\varSupply_0 + \varSupply_1, \varCinp^0 \opConc \varCinp^1, \varCout^0 \opConc \varCout^1, (\funList{\varProof_0} \opConc \funList{\varProof_1}),
+\funList{\varEx_0} \opConc \funList{\varEx_1}, \funList{\varSignature_0} \opConc \funList{\varSignature_1}) \]
+We can easily deduce that if $\varTx_0$ and $\varTx_1$ are valid, it follows that $\varTx_m$ also has to be valid:
+If $\varTx_0$ and $\varTx_1$ are valid that means $\varCinp^0 - \varCout^0 - \funGenH{\varSupply_0} = \varEx_0$, $\funList{\varProof_0}$ contains valid range proofs for the outputs
+$\varCout^0$ and $\funList{\varSignature_0}$ contains a valid signature to $\varEx_0 - \funGenH{\varSupply_0}$ as public key, the same must hold for $\varTx_1$. \\
+By the rules of arithmetic it then must also hold that $\varCinp^0 \opConc \varCinp^1 - \varCout^0 \opConc \varCout^1 - \funGenH{\varSupply_0 + \varSupply_1} = \varEx_0 + \varEx_1$, $\funList{\varProof_0} \opConc \funList{\varProof_1}$ must contain valid range proofs
+for the output coins and $\funList{\varSignature_0} \opConc \funList{\varSignature_1}$ must contain valid signatures to the respective Excess points, which makes $\varTx_m$ a valid transaction.
+
+\subsubsection{Subset Problem}
+A subtle problem arises with the way transactions are merged in Mimblewimble. From the shown construction, it is possible to reconstruct the original separate transactions from the merged one,
+which can be a privacy issue.  Given a set of inputs, outputs, and kernels, a subset of these will recombine to reconstruct one of the valid transaction which were aggregated since Kernel Excess values are not combined.
+(which would invalidate the signatures and therefore break the security of the system) This problem has been mitigated in Cryptocurrencies implementing the protocol by including an
+additional variable in the Kernel, called offset value. The offset is randomly chosen and needs to be added back to the Excess values to verify the sum of the commitments to zero.
+\[ \sum{\varCout} - \sum\varCinp - \funGenH{\varSupply} = \varEx + \varOff\]
+Every time two transactions are merged, the offset values are combined into a single value. If offsets are picked truly randomly, and the possible range of values is broad enough, the probability of recovering the
+uncombined offsets from a merged one becomes negligible, making it infeasable to recover original transactions from a merged one.
+
+\subsubsection{Cut Through}
+From the way transactions are merged together, we can now learn how to purge spent outputs securely. Let's assume $\varC_i$ appears as an output in $\varTx_0$ and as an input in $\varTx_1$,
+which are being merged. Remembering the equation for transaction balancedness, $\varCinp - \varCout = \varEx$ if $\varC_i$ appears both in the inputs and outputs, and we erase it on both sides, the equation will still hold.
+Therefore every time a transaction spends an output, it can be virtually forgotten to improve transaction unlinkability as well as yielding saving space.
+
+\subsubsection{The Ledger}
+The ledger of the Mimblewimble protocol itself is a transaction of the already discussed form. Initially, the ledger starts empty, and transactions are added and aggregated recursively.
+\begin{itemize}
+    \item Only transactions in which input coins are contained in the output coins of the ledger will be valid.
+    \item The supply of the ledger is the sum of the supplies of all transactions added so far. Therefore we can easily read the total circulating supply from the ledger state.
+    \item Due to cut through, the input coin list of the ledger is always empty, and the output list is the set of UTXOs.
+\end{itemize}
+
+\subsubsection{Transaction Building}
+As already pointed out, building transactions in Mimblewimble is an interactive process between the sender and receiver of funds. Jedusor, Tom Elvis originally envisioned the following two-step process
+to build a transaction:~\cite{jedusor2016mimblewimble}\\
+Assume Alice wants to transfer coins of value $\varP$ to Bob.
+\begin{enumerate}
+    \item Alice first selects input coins $\varCinp$ of total value $\varV \geq \varP$ that she controls. She than creates change coin outputs $\varCout^{A}$ (could be multiple) of total value $\varV - \varP$ and then
+    sends $\varCinp$, $\varCout^{A}$, a valid range proofs for $\varCout^{A}$, plus the opening $(-\varP, \varK)$ of $\sum{\varCout^{A}} - \sum{\varCinp}$ to Bob.
+    \item Bob creates himself additional output coins $\varCout^B$ plus range proofs of total value $\varP$ with keys $(\varKSt_i)$ and computes a signature $\varSignature$ with the combined secret key $\varK + \sum{\varKSt_i}$ and
+    and finalizes the transaction as
+    \[ \varTx = (0, \varCinp, \varCout^A \opConc \varCout^B, (\varProof, \varEx = \sum{\varCout^A} + \sum{\varCout^B} - \sum{\varCinp}, \varSignature)) \]
+    and publishes it to the network.
+\end{enumerate}
+Figure shows this original transaction flow.\\
+This protocol however turned out to be vulnerable. The receiver can spend the change coins $\varCout^A$ by reverting the transaction. Doing this would give the sender his coins back, however as the sender
+might not have the keys for his spent outputs anymore, the coins could then be lost.\\
+In detail this reverting transaction would look like:
+\[ \varTx_{rv} = (0, \varCout^A \opConc \varCout^B, \varCinp, (\varProof_{rv}, \varEx_{rv}, \varSignature_{rv}) ) \]
+Again remembering the construction of the Excess value of this construction would look like this:
+\[ \varEx_{rv} = \sum{\varCout^A \opConc \varCout^B - \varCinp} \]
+The key $\varK$ originally sent by Alice to Bob is a valid opening to $\sum{\varCinp} - \sum{\varCout^A}$. With the inverse of this key $\varK_{inv}$ we get the opening to $\sum{\varCout^A - \varCinp}$.
+Now all Bob has to do is add his keys $\sum{\varKSt_i}$ to get:
+\[ \varK_{rv} = -k + \sum{\varKSt_i} \]
+which is the opening to $\varEx_{rv}$. Furthermore obtaining a valid range proofs is trivial, as it once was a valid output the ledger will cointain a valid proof for this coin already. \\
+This means Bob spends the newly created outputs and sends them back to the original input coins, chosen by Alice. It might at first seem unclear why Bob would do that. An example situation could be if Alice
+pays Bob for some good which Bob is selling. Alice decides to pay in advance, but then Bob discovers that he is already out of stock of the good that Alice ordered. To return the funds to Alice, he reverses
+the transaction instead of participating in another interactive process to build a new transaction with new outputs. If Alice already deleted the keys to her initial coins, the funds are now lost.
+The problem was solved in the Grin Cryptocurrency by making the signing process itself a two-party process which will be explained in more detail in chapter \ref{chapMultiApt}. 
 
 \section{Scriptless Scripts}\label{secScriptless}
 \section{Adaptor Signatures}\label{secApt}
