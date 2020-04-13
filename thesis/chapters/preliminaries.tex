@@ -123,7 +123,18 @@ which is the opening to $\varEx_{rv}$. Furthermore obtaining a valid range proof
 This means Bob spends the newly created outputs and sends them back to the original input coins, chosen by Alice. It might at first seem unclear why Bob would do that. An example situation could be if Alice
 pays Bob for some good which Bob is selling. Alice decides to pay in advance, but then Bob discovers that he is already out of stock of the good that Alice ordered. To return the funds to Alice, he reverses
 the transaction instead of participating in another interactive process to build a new transaction with new outputs. If Alice already deleted the keys to her initial coins, the funds are now lost.
-The problem was solved in the Grin Cryptocurrency by making the signing process itself a two-party process which will be explained in more detail in chapter \ref{chapMultiApt}. 
+The problem was solved in the Grin Cryptocurrency by making the signing process itself a two-party process which will be explained in more detail in chapter \ref{chapMultiApt}. \\
+
+Fuchsbauer et al. \cite{fuchsbauer2019aggregate} proposed the following alternative way to build transactions which would not be vulnerable to this problem.
+\begin{enumerate}
+    \item Alice constructs a full-fledged transaction $\varTx_A$ spending her input coins $\varCinp$ and creates her change coins $\varCout^A$, plus a special output coin $\varCout^{sp} = \funGenH{\varP} + \funGen{\varK_{sp}}$,
+    where $\varP$ is the desired value which should be transferred to Bob and $\varK_{sp}$ is a randomly choosen key. She proceeds by sending $\varTx_A$ as well as $(\varP, \varK_{sp})$ and the necessary range
+    proofs to Bob.
+    \item Bob now creates a second transaction $\varTx_B$ spending the special coin $\varCout^{sp}$ to create an output only he controls $\varCout^{B}$ and merges $\varTx_A$ with $\varTx_B$
+    into $\varTx_m$. He then broadcasts $\varTx_m$ to the network. Note that when the two transactions are merged the intermediate special coin $\varCout^{sp}$ will be both in the coin output and input list
+    of the transaction and therfore will be discarded.
+\end{enumerate}
+The only drawback of this approach is that we have two transaction kernels instead of just one because of the merging step, making the transaction slightly bigger.
 
 \section{Scriptless Scripts}\label{secScriptless}
 \section{Adaptor Signatures}\label{secApt}
