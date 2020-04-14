@@ -8,21 +8,21 @@ are defined as follows:\\
 \fbox{
     \parbox{\textwidth}{
         \procedure[linenumbering, syntaxhighlight=auto]{\procGen} {
-            \varK \sample \cnstZq \\
-            \varR \sample \cnstZq \\
-            \pcreturn (\varK, \varR)
+            \varKey \sample \cnstZq \\
+            \varRand \sample \cnstZq \\
+            \pcreturn (\varKey \opSeperate \varRand)
         }
         \procedure[linenumbering, syntaxhighlight=auto]{\procGenPartSig} {
-            \varE = \funH{(\varM \opConc \varGk + \varGkSt \opConc \varGr + \varGrSt)} \\
-            \varSigPart = \varK + \varE + \varR \\
-            \pcreturn (\varSigPart, \varGk, \varGr)
+            \varSchnorrChallenge \opAssign \funH{(\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt)} \\
+            \varSigPart \opAssign \varKey \opAdd \varSchnorrChallenge \opAdd \varRand \\
+            \pcreturn (\varSigPart \opSeperate \varGk \opSeperate \varGr)
         }\\
         \procedure[linenumbering, syntaxhighlight=auto]{\procVerfPartSig} {
-            \varE = \funH{((\varM \opConc \varGk + \varGkSt \opConc \varGr + \varGrSt)} \\
-            \pcreturn \varGSigPart = \varGkSt + \funGen{\varE * \varR}
+            \varSchnorrChallenge \opAssign \funH{((\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt)} \\
+            \pcreturn \varGSigPart \opEq \varGkSt \opAdd \funGen{\varSchnorrChallenge \opMult \varRand}
         }\\
         \procedure[linenumbering, syntaxhighlight=auto]{\procFinSig} {
-            \pcreturn (\varSigPart + \varSigPartSt, \varGk + \varGkSt, \varGr + \varGrSt)
+            \pcreturn (\varSigPart \opAdd \varSigPartSt \opSeperate \varGk \opAdd \varGkSt \opSeperate \varGr \opAdd \varGrSt)
         }
     }
 }
@@ -31,17 +31,17 @@ In order to have adaptable partial signature we add the following procedures\\
 \fbox{
     \parbox{\textwidth} {
         \procedure[linenumbering, syntaxhighlight=auto]{\procAptSig} {
-            \varSigPartApt = \varSigPart + \varX \\
-            \pcreturn (\varSigPartApt, \varGx)
+            \varSigPartApt \opAssign \varSigPart \opAdd \varWit \\
+            \pcreturn (\varSigPartApt \opSeperate \varGWit)
         }
         \procedure[linenumbering, syntaxhighlight=auto]{\procExtWit}{
-            \varSigPartSt = \varSigFin - \varSigPart \\
-            \varX = \varSigPartAptSt - \varSigPartSt \\
-            \pcreturn (\varX)
+            \varSigPartSt \opAssign \varSigFin \opSub \varSigPart \\
+            \varWit \opAssign \varSigPartAptSt \opSub \varSigPartSt \\
+            \pcreturn (\varWit)
         }\\
-        \procedure[linenumbering, syntaxhighlight=auto]{\procAptSig} {
-            \varE = \funH{(\varM \opConc \varGk + \varGkSt \opConc \varGr + \varGrSt)} \\
-            \pcreturn \varGSigPartAptSt = \varGkSt + \funGen{\varE * \varR} + \varGx
+        \procedure[linenumbering, syntaxhighlight=auto]{\procVrfApt} {
+            \varSchnorrChallenge \opAssign \funH{\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt} \\
+            \pcreturn \varGSigPartAptSt \opEq \varGkSt \opAdd \funGen{\varSchnorrChallenge \opMult \varRand} \opAdd \varGWit
         }
     }
 }

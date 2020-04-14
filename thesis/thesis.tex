@@ -50,57 +50,63 @@
 \newcommand{\funGen}[1]{g^{#1}}
 \newcommand{\funGenH}[1]{h^{#1}}
 \newcommand{\funList}[1]{l(#1)}
+\newcommand{\funStar}[1]{#1'}
 
 % variables
 \newcommand{\varTx}{tx}
-\newcommand{\varEx}{E}
+\newcommand{\varExcess}{E}
 \newcommand{\varKernel}{K}
 \newcommand{\varProof}{\pi}
 \newcommand{\varSignature}{\sigma}
 \newcommand{\varG}{g}
-\newcommand{\varP}{p}
-\newcommand{\varOff}{of}
-\newcommand{\varSupply}{s}
 \newcommand{\varH}{h}
-\newcommand{\varC}{C}
-\newcommand{\varCinp}{C_{inp}}
-\newcommand{\varCout}{C_{out}}
-\newcommand{\varV}{v}
-\newcommand{\varM}{m}
-\newcommand{\varK}{k}
-\newcommand{\varKSt}{k'}
-\newcommand{\varR}{r}
-\newcommand{\varRSt}{r'}
-\newcommand{\varGk}{\funGen{\varK}}
-\newcommand{\varGkSt}{\funGen{\varKSt}}
-\newcommand{\varGr}{\funGen{\varR}}
-\newcommand{\varGrSt}{\funGen{\varRSt}}
-\newcommand{\varSigPart}{sig\_prt}
-\newcommand{\varSigPartSt}{sig\_prt'}
-\newcommand{\varE}{e}
+\newcommand{\varFundValue}{p}
+\newcommand{\varOffset}{o}
+\newcommand{\varSupply}{s}
+\newcommand{\varCoin}{C}
+\newcommand{\varCoinInp}{\varCoin_{inp}}
+\newcommand{\varCoinOut}{C_{out}}
+\newcommand{\varValue}{v}
+\newcommand{\varMsg}{m}
+\newcommand{\varKey}{k}
+\newcommand{\varKeySt}{\funStar{\varKey}}
+\newcommand{\varRand}{r}
+\newcommand{\varRandSt}{\funStar{r}}
+\newcommand{\varGk}{\funGen{\varKey}}
+\newcommand{\varGkSt}{\funGen{\varKeySt}}
+\newcommand{\varGr}{\funGen{\varRand}}
+\newcommand{\varGrSt}{\funGen{\varRandSt}}
+\newcommand{\varSigPart}{\varSignature_{prt}}
+\newcommand{\varSigPartSt}{\funStar{\varSignature_{prt}}}
+\newcommand{\varSchnorrChallenge}{e}
 \newcommand{\varGSigPart}{\funGen{\varSigPart}}
-\newcommand{\varSigPartApt}{sig\_part\_apt}
-\newcommand{\varSigPartAptSt}{sig\_part\_apt'}
+\newcommand{\varSigPartApt}{\varSignature_{prt\_apt}}
+\newcommand{\varSigPartAptSt}{\funStar{\varSigPartApt}}
 \newcommand{\varGSigPartAptSt}{\funGen{\varSigPartAptSt}}
-\newcommand{\varX}{x}
-\newcommand{\varGx}{\funGen{\varX}}
-\newcommand{\varSigFin}{sig\_final}
+\newcommand{\varWit}{x}
+\newcommand{\varGWit}{\funGen{\varWit}}
+\newcommand{\varSigFin}{\varSignature_{fin}}
 
 % constants
 \newcommand{\cnstZq}{\ZZ_q}
 
 % operators
-\newcommand{\opConc}{~||~
-}
+\newcommand{\opConc}{~||~}
+\newcommand{\opAdd}{~+~}
+\newcommand{\opAssign}{~:=~}
+\newcommand{\opSub}{~-~}
+\newcommand{\opMult}{~*~}
+\newcommand{\opEq}{~=~}
+\newcommand{\opSeperate}{,~}
 
 % procedures
 \newcommand{\procGen}{$GEN()$}
-\newcommand{\procGenPartSig}{$GEN\_PT\_SIG(\varM, \varK, \varR, \varGkSt, \varGrSt)$}
-\newcommand{\procVerfPartSig}{$VRF\_PT\_SIG(\varM, \varK, \varR, \varGkSt, \varGrSt, \varSigPart)$}
-\newcommand{\procFinSig}{$FIN\_SIG(\varSigPart, \varSigPartSt, \varGk, \varGkSt, \varGr, \varGrSt)$}
-\newcommand{\procAptSig}{$APT\_PT\_SIG(\varSigPart, \varX)$}
-\newcommand{\procExtWit}{$EXT\_WIT(\varSigFin, \varSigPart, \varSigPartAptSt)$}
-\newcommand{\procVrfApt}{$VRF\_APT\_SIG(\varM, \varK, \varR, \varGkSt, \varGrSt, \varGx, \varSigPartAptSt)$}
+\newcommand{\procGenPartSig}{$GEN\_PT\_SIG(\varMsg \opSeperate \varKey \opSeperate \varRand \opSeperate \varGkSt \opSeperate \varGrSt)$}
+\newcommand{\procVerfPartSig}{$VRF\_PT\_SIG(\varMsg \opSeperate \varKey \opSeperate \varRand \opSeperate \varGkSt \opSeperate \varGrSt \opSeperate \varSigPart)$}
+\newcommand{\procFinSig}{$FIN\_SIG(\varSigPart \opSeperate \varSigPartSt \opSeperate \varGk \opSeperate \varGkSt \opSeperate \varGr \opSeperate \varGrSt)$}
+\newcommand{\procAptSig}{$APT\_PT\_SIG(\varSigPart \opSeperate \varWit)$}
+\newcommand{\procExtWit}{$EXT\_WIT(\varSigFin \opSeperate \varSigPart \opSeperate \varSigPartAptSt)$}
+\newcommand{\procVrfApt}{$VRF\_APT\_SIG(\varMsg \opSeperate \varKey \opSeperate \varRand \opSeperate \varGkSt \opSeperate \varGrSt \opSeperate \varGWit \opSeperate \varSigPartAptSt)$}
 
 
 % Set PDF document properties
