@@ -1,9 +1,16 @@
 \section{Bitcoin}\label{secBitcoin}
+
 \subsection{Bitcoin Transaction Protocol}\label{secBitcoinTx}
+
 \subsection{Bitcoin Scaling and Layer Two Solutions}\label{secBitcoinScaling}
+
+
 \section{Privacy-enhancing Cryptocurrencies}\label{secPrivacy}
+
 \subsection{Zero Knowledge Proofs}\label{secZero}
+
 \subsection{Range Proofs}\label{secRange}
+
 \subsection{Mimblewimble}\label{secMimble}
 
 \urldef\urlharrypotter\url{https://harrypotter.fandom.com/wiki/Tongue-Tying_Curse}
@@ -79,7 +86,7 @@ must contain valid range proofs for the output coins and $\funList{\varSignature
 
 \subsubsection{Subset Problem}
 A subtle problem arises with the way transactions are merged in Mimblewimble. From the shown construction, it is possible to reconstruct the original separate transactions from the merged one,
-which can be a privacy issue.  Given a set of inputs, outputs, and kernels, a subset of these will recombine to reconstruct one of the valid transaction which were aggregated since Kernel Excess values are not combined.
+which can be a privacy issue. Given a set of inputs, outputs, and kernels, a subset of these will recombine to reconstruct one of the valid transaction which were aggregated since Kernel Excess values are not combined.
 (which would invalidate the signatures and therefore break the security of the system) This problem has been mitigated in Cryptocurrencies implementing the protocol by including an
 additional variable in the Kernel, called offset value. The offset is randomly chosen and needs to be added back to the Excess values to verify the sum of the commitments to zero.
 \[ \sum{\varCoinOut} \opSub \sum\varCoinInp \opSub \funGenH{\varSupply} \opAssign \varExcess \opAdd \varOffset\]
@@ -111,7 +118,27 @@ Assume Alice wants to transfer coins of value $\varFundValue$ to Bob.
     \[ \varTx \opAssign (0 \opSeperate \varCoinInp \opSeperate \varCoinOut^A \opConc \varCoinOut^B \opSeperate (\varProof \opSeperate \varExcess \opAssign \sum{\varCoinOut^A} \opAdd \sum{\varCoinOut^B} \opSub \sum{\varCoinInp} \opSeperate \varSignature)) \]
     and publishes it to the network.
 \end{enumerate}
-Figure shows this original transaction flow.\\
+Figure~\ref{fig:txorg} depicts the original transaction flow.\\
+\begin{figure}
+    \label{fig:txorg}
+    \centering
+    \pseudocode{
+        \textbf{Alice} \< \< \< \< \textbf{Bob} \\ [][\hline]
+        \< \< \< \< \\
+        \text{ Select $\varCoinInp$ of value $\varValue \geq \varFundValue$ } \< \< \< \< \\
+        \text{ Create $\varCoinOut^{A}$ of value $\varValue \opSub \varFundValue$} \< \< \< \< \\
+        \text{ $\varExcess_{A} \opAssign \sum{\varCoinOut^{A}} \opSub \sum{\varCoinInp}$ } \\
+        \text{ $(-\varFundValue \opSeperate \varKey)$ opening to $\varExcess_{A}$ } \< \< \< \< \\
+        \text{ Create range-proof $\varProof$ for $\varCoinOut^{A}$ } \< \< \< \< \\
+        \< \sendmessageright{ top=$(-\varFundValue \opSeperate \varKey) \opSeperate \varProof$ } \< \< \< \\
+        \< \< \< \< \text{Create $\varCoinOut^B$ with value $\varFundValue$ and keys $(\varKeySt_i)$ } \\
+        \< \< \< \< \text{$\varKey_{shared} \opAssign \varKey \opAdd \sum{\varKeySt_i}$ } \\
+        \< \< \< \< \text{Create $\varSignature$ with $\varKey_{shared}$} \\
+        \< \< \< \< \text{ Create range-proof $\varProof$ for $\varCoinOut^{B}$ } \\
+        \< \< \< \< \text{Finalize transaction $\varTx$} \\
+    }
+    \caption{Original transaction building process}
+\end{figure}
 This protocol however turned out to be vulnerable. The receiver can spend the change coins $\varCoinOut^A$ by reverting the transaction. Doing this would give the sender his coins back, however as the sender
 might not have the keys for his spent outputs anymore, the coins could then be lost.\\
 In detail this reverting transaction would look like:
@@ -138,7 +165,12 @@ Fuchsbauer et al. \cite{fuchsbauer2019aggregate} proposed the following alternat
 \end{enumerate}
 The only drawback of this approach is that we have two transaction kernels instead of just one because of the merging step, making the transaction slightly bigger.
 
+
 \section{Scriptless Scripts}\label{secScriptless}
+
+
 \section{Adaptor Signatures}\label{secApt}
+
 \subsection{Schnorr Signature Construction}\label{secAptSchnorr}
+
 \subsection{ECDSA Signature Construction}\label{secAptECDSA}
