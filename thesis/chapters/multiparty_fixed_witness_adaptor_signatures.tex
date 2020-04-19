@@ -1,0 +1,47 @@
+\section{General Notation}\label{secGenNot}
+\section{Cryptographic Primitives}\label{secCrypPrim}
+\section{Mulitparty Fixed Witness Adaptor Signature Scheme} \label{secScheme}
+
+We define a Generalized Multiparty Adaptor Signature Scheme from the standard construction of multiparty Schnorr signatures which
+are defined as follows:\\
+
+\fbox{
+    \parbox{\textwidth}{
+        \procedure[linenumbering, syntaxhighlight=auto]{\procGen} {
+            \varKey \sample \cnstZq \\
+            \varRand \sample \cnstZq \\
+            \pcreturn (\varKey \opSeperate \varRand)
+        }
+        \procedure[linenumbering, syntaxhighlight=auto]{\procGenPartSig} {
+            \varSchnorrChallenge \opAssign \funH{(\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt)} \\
+            \varSigPart \opAssign \varKey \opAdd \varSchnorrChallenge \opAdd \varRand \\
+            \pcreturn (\varSigPart \opSeperate \varGk \opSeperate \varGr)
+        }\\
+        \procedure[linenumbering, syntaxhighlight=auto]{\procVerfPartSig} {
+            \varSchnorrChallenge \opAssign \funH{((\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt)} \\
+            \pcreturn \varGSigPart \opEq \varGkSt \opAdd \funGen{\varSchnorrChallenge \opMult \varRand}
+        }\\
+        \procedure[linenumbering, syntaxhighlight=auto]{\procFinSig} {
+            \pcreturn (\varSigPart \opAdd \varSigPartSt \opSeperate \varGk \opAdd \varGkSt \opSeperate \varGr \opAdd \varGrSt)
+        }
+    }
+}
+In order to have adaptable partial signature we add the following procedures\\
+
+\fbox{
+    \parbox{\textwidth} {
+        \procedure[linenumbering, syntaxhighlight=auto]{\procAptSig} {
+            \varSigPartApt \opAssign \varSigPart \opAdd \varWit \\
+            \pcreturn (\varSigPartApt \opSeperate \varGWit)
+        }
+        \procedure[linenumbering, syntaxhighlight=auto]{\procExtWit}{
+            \varSigPartSt \opAssign \varSigFin \opSub \varSigPart \\
+            \varWit \opAssign \varSigPartAptSt \opSub \varSigPartSt \\
+            \pcreturn (\varWit)
+        }\\
+        \procedure[linenumbering, syntaxhighlight=auto]{\procVrfApt} {
+            \varSchnorrChallenge \opAssign \funH{\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt} \\
+            \pcreturn \varGSigPartAptSt \opEq \varGkSt \opAdd \funGen{\varSchnorrChallenge \opMult \varRand} \opAdd \varGWit
+        }
+    }
+}

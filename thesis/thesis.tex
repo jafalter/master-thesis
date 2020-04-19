@@ -22,10 +22,92 @@
 \usepackage{todonotes} % Provides tooltip-like todo notes.
 \usepackage{hyperref}  % Enables cross linking in the electronic document version. This package has to be included second to last.
 \usepackage[acronym,toc]{glossaries} % Enables the generation of glossaries and lists fo acronyms. This package has to be included last.
+\usepackage[
+    n,
+    advantage,
+    operators,
+    sets,
+    adversary,
+    landau,
+    probability,
+    notions,
+    logic,
+    ff,
+    mm,
+    primitives,
+    events,
+    complexity,
+    asymptotics,
+    keys
+]{cryptocode}
+\usepackage{subfiles}
 
-% Define convenience functions to use the author name and the thesis title in the PDF document properties.
 \newcommand{\authorname}{Jakob Abfalter} % The author name without titles.
 \newcommand{\thesistitle}{Adaptor Signature Based Atomic Swaps Between Bitcoin and a Mimblewimble Based Cryptocurrency} % The title of the thesis. The English version should be used, if it exists.
+
+% functions
+\newcommand{\funH}[1]{h (#1)}
+\newcommand{\funGen}[1]{g^{#1}}
+\newcommand{\funGenH}[1]{h^{#1}}
+\newcommand{\funList}[1]{l(#1)}
+\newcommand{\funStar}[1]{#1'}
+
+% variables
+\newcommand{\varTx}{tx}
+\newcommand{\varExcess}{E}
+\newcommand{\varKernel}{K}
+\newcommand{\varProof}{\pi}
+\newcommand{\varSignature}{\sigma}
+\newcommand{\varG}{g}
+\newcommand{\varH}{h}
+\newcommand{\varFundValue}{p}
+\newcommand{\varOffset}{o}
+\newcommand{\varSupply}{s}
+\newcommand{\varCoin}{C}
+\newcommand{\varCoinInp}{\varCoin_{inp}}
+\newcommand{\varCoinOut}{C_{out}}
+\newcommand{\varValue}{v}
+\newcommand{\varMsg}{m}
+\newcommand{\varKey}{k}
+\newcommand{\varKeySt}{\funStar{\varKey}}
+\newcommand{\varRand}{r}
+\newcommand{\varRandSt}{\funStar{r}}
+\newcommand{\varGk}{\funGen{\varKey}}
+\newcommand{\varGkSt}{\funGen{\varKeySt}}
+\newcommand{\varGr}{\funGen{\varRand}}
+\newcommand{\varGrSt}{\funGen{\varRandSt}}
+\newcommand{\varSigPart}{\varSignature_{prt}}
+\newcommand{\varSigPartSt}{\funStar{\varSignature_{prt}}}
+\newcommand{\varSchnorrChallenge}{e}
+\newcommand{\varGSigPart}{\funGen{\varSigPart}}
+\newcommand{\varSigPartApt}{\varSignature_{prt\_apt}}
+\newcommand{\varSigPartAptSt}{\funStar{\varSigPartApt}}
+\newcommand{\varGSigPartAptSt}{\funGen{\varSigPartAptSt}}
+\newcommand{\varWit}{x}
+\newcommand{\varGWit}{\funGen{\varWit}}
+\newcommand{\varSigFin}{\varSignature_{fin}}
+
+% constants
+\newcommand{\cnstZq}{\ZZ_q}
+
+% operators
+\newcommand{\opConc}{~||~}
+\newcommand{\opAdd}{~+~}
+\newcommand{\opAssign}{~:=~}
+\newcommand{\opSub}{~-~}
+\newcommand{\opMult}{~*~}
+\newcommand{\opEq}{~=~}
+\newcommand{\opSeperate}{,~}
+
+% procedures
+\newcommand{\procGen}{$GEN()$}
+\newcommand{\procGenPartSig}{$GEN\_PT\_SIG(\varMsg \opSeperate \varKey \opSeperate \varRand \opSeperate \varGkSt \opSeperate \varGrSt)$}
+\newcommand{\procVerfPartSig}{$VRF\_PT\_SIG(\varMsg \opSeperate \varKey \opSeperate \varRand \opSeperate \varGkSt \opSeperate \varGrSt \opSeperate \varSigPart)$}
+\newcommand{\procFinSig}{$FIN\_SIG(\varSigPart \opSeperate \varSigPartSt \opSeperate \varGk \opSeperate \varGkSt \opSeperate \varGr \opSeperate \varGrSt)$}
+\newcommand{\procAptSig}{$APT\_PT\_SIG(\varSigPart \opSeperate \varWit)$}
+\newcommand{\procExtWit}{$EXT\_WIT(\varSigFin \opSeperate \varSigPart \opSeperate \varSigPartAptSt)$}
+\newcommand{\procVrfApt}{$VRF\_APT\_SIG(\varMsg \opSeperate \varKey \opSeperate \varRand \opSeperate \varGkSt \opSeperate \varGrSt \opSeperate \varGWit \opSeperate \varSigPartAptSt)$}
+
 
 % Set PDF document properties
 \hypersetup{
@@ -87,12 +169,11 @@
 %\setthesis{phd-school} % Deactivate non-English title pages (see below)
 
 % For bachelor and master:
-\setcurriculum{Software Engineering & Internet Computing}{Software Engineering & Internet Computing} % Sets the English and German name of the curriculum.
+\setcurriculum{Software Engineering \& Internet Computing}{Software Engineering \& Internet Computing} % Sets the English and German name of the curriculum.
 
 % For dissertations at the PhD School:
 %\setfirstreviewerdata{Affiliation, Country}
 %\setsecondreviewerdata{Affiliation, Country}
-
 
 \begin{document}
 
@@ -129,51 +210,32 @@
 % Switch to arabic numbering and start the enumeration of chapters in the table of content.
 \mainmatter
 
-\chapter{Introduction}
-\todo{TODO}
+\chapter{Introduction}\label{chapIntro}
+\subfile{chapters/introduction.tex}
 
-\chapter{Motivation \& Objectives}
-\todo{TODO}
+\chapter{Motivation \& Objectives}\label{chapMotiv}
+\subfile{chapters/motivation_objectives.tex}
 
-\chapter{Preliminaries}
-\section{Bitcoin}
-\subsection{Bitcoin Transaction Protocol}
-\subsection{Bitcoin Scaling and Layer Two Solutions}
-\section{Privacy-enhancing Cryptocurrencies}
-\subsection{Zero Knowledge Proofs}
-\subsection{Range Proofs}
-\subsection{Mimblewimble (Grin)}
-\section{Hash-time-locked Contracts}
-\section{Adaptor Signatures}
-\subsection{Schnorr Signature Construction}
-\subsection{ECDSA Signature Construction}
+\chapter{Preliminaries}\label{chapPre}
+\subfile{chapters/preliminaries.tex}
 
-\chapter{Adaptor Signature Based Atomic Swaps Between Bitcoin and Grin}
-\section{General Notation}
-\section{Cryptographic Primitives}
-\section{Generalized Multiparty Adaptor Signature}
-\section{Atomic Swap Construction}
-\subsection{Construction Bitcoin side}
-\subsection{Construction Grin side}
-\subsection{Security Definitions}
+\chapter{Mulitparty Fixed Witness Adaptor Signatures}\label{chapMultiApt}
+\subfile{chapters/multiparty_fixed_witness_adaptor_signatures.tex}
 
-\chapter{Implementation}
-\section{Implementation Bitcoin side}
-\section{Implementation Grin side}
-\section{Performance Evaluation}
+\chapter{Adaptor Signature Based Atomic Swaps Between Bitcoin and a Mimblewimble Based Cryptocurrency}\label{chapAtomic}
+\subfile{chapters/adaptor_signature_based_atomic_swaps_between_bitcoin_and_mimblewimble.tex}
 
-\chapter{Implementation Security and Privacy Evaluation}
-\section{Security Evaluation}
-\section{Privacy Evaluation}
+\chapter{Implementation}\label{chapImp}
+\subfile{chapters/implementation.tex}
 
-\chapter{Related and Future Work}
-\section{Payment Channel Networks on Grin}
-\section{Payment Channel Networks on Monero}
-\section{Atomic Swaps With Related Cryptocurrencies}
-\section{Tumbler Based Atomic Swaps}
+\chapter{Implementation Security and Privacy Evaluation}\label{chapImplSec}
+\subfile{chapters/evaluation.tex}
 
-\chapter{Conclusion}
+\chapter{Related and Future Work}\label{chapFut}
+\subfile{chapters/related_and_future_work.tex}
 
+\chapter{Conclusion}\label{chapConc}
+\subfile{chapters/conclusion.tex}
 
 % Remove following line for the final thesis.
 %\input{intro.tex} % A short introduction to LaTeX.
@@ -199,6 +261,6 @@
 
 % Add a bibliography.
 \bibliographystyle{alpha}
-\bibliography{intro}
+\bibliography{thesis}
 
 \end{document}
