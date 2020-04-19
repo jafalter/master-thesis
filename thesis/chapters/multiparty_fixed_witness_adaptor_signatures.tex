@@ -31,11 +31,17 @@ A valid signature scheme have to fullfill two security properties
     \end{itemize}
 \end{itemize}
 
-\paragraph{Hash function}
+\paragraph{Cryptographic Hash Function}
+A cryptographic hash function is defined as $\funH{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$. A hashing function
+has to fullfill the following security properties:~\cite{al2011cryptographic}
+\begin{itemize}
+    \item Collision-Resistence (CR)
+    \item Pre-image Resistence (Pre)
+    \item 2nd Pre-image Resistence (Sec)
+\end{itemize}
+
 
 \paragraph{Zero-Knowledge}
-
-\paragraph{Hard relation}
 
 
 \fbox{
