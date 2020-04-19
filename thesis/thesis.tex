@@ -56,6 +56,10 @@
 \newcommand{\varTx}{tx}
 \newcommand{\varExcess}{E}
 \newcommand{\varKernel}{K}
+\newcommand{\varSecKey}{sk}
+\newcommand{\varPubKey}{pk}
+\newcommand{\varKeyPair}{(\varSecKey, \varPubKey)}
+\newcommand{\varSigScheme}{\Phi}
 \newcommand{\varProof}{\pi}
 \newcommand{\varSignature}{\sigma}
 \newcommand{\varG}{g}
@@ -86,6 +90,7 @@
 \newcommand{\varWit}{x}
 \newcommand{\varGWit}{\funGen{\varWit}}
 \newcommand{\varSigFin}{\varSignature_{fin}}
+\newcommand{\varSecParam}{1^n}
 
 % constants
 \newcommand{\cnstZq}{\ZZ_q}
@@ -100,13 +105,24 @@
 \newcommand{\opSeperate}{,~}
 
 % procedures
-\newcommand{\procGen}{$GEN()$}
-\newcommand{\procGenPartSig}{$GEN\_PT\_SIG(\varMsg \opSeperate \varKey \opSeperate \varRand \opSeperate \varGkSt \opSeperate \varGrSt)$}
-\newcommand{\procVerfPartSig}{$VRF\_PT\_SIG(\varMsg \opSeperate \varKey \opSeperate \varRand \opSeperate \varGkSt \opSeperate \varGrSt \opSeperate \varSigPart)$}
-\newcommand{\procFinSig}{$FIN\_SIG(\varSigPart \opSeperate \varSigPartSt \opSeperate \varGk \opSeperate \varGkSt \opSeperate \varGr \opSeperate \varGrSt)$}
-\newcommand{\procAptSig}{$APT\_PT\_SIG(\varSigPart \opSeperate \varWit)$}
-\newcommand{\procExtWit}{$EXT\_WIT(\varSigFin \opSeperate \varSigPart \opSeperate \varSigPartAptSt)$}
-\newcommand{\procVrfApt}{$VRF\_APT\_SIG(\varMsg \opSeperate \varKey \opSeperate \varRand \opSeperate \varGkSt \opSeperate \varGrSt \opSeperate \varGWit \opSeperate \varSigPartAptSt)$}
+\newcommand{\procGen}[1]{ GEN(#1) }
+\newcommand{\procGenDefault}{ \procGen{\varSecParam} }
+\newcommand{\procSign}[2]{ SIGN(#1, #2) }
+\newcommand{\procSignDefault}{ \procSign{\varSecKey}{\varMsg} }
+\newcommand{\procVerf}[3]{ VERF(#1 \opSeperate #2 \opSeperate #3) }
+\newcommand{\procVerfDefault}{ \procVerf{\varPubKey}{\varSignature}{\varMsg} }
+\newcommand{\procGenPartSig}[5]{ GEN\_PT\_SIG(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5) }
+\newcommand{\procGenPartSigDefault}{ \procGenPartSig{\varMsg}{\varKey}{\varRand}{\varGkSt}{\varGrSt} }
+\newcommand{\procVerfPartSig}[6]{ VRF\_PT\_SIG(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6) }
+\newcommand{\procVerfPartSigDefault}{ \procVerfPartSig{\varMsg}{\varKey}{\varRand}{\varGkSt}{\varGrSt}{\varSigPart} }
+\newcommand{\procFinSig}[6]{ FIN\_SIG(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6)}
+\newcommand{\procFinSigDefault}{ \procFinSig{\varSigPart}{\varSigPartSt}{\varSigPartSt}{\varGk}{\varGkSt}{\varGkSt}{\varGr}{\varGrSt} }
+\newcommand{\procAptSig}[2]{ APT\_PT\_SIG(#1 \opSeperate #2) }
+\newcommand{\procAptSigDefault}{ \procAptSig{\varSigPart}{\varWit} }
+\newcommand{\procExtWit}[3]{ EXT\_WIT(#1 \opSeperate #2 \opSeperate #3) }
+\newcommand{\procExtWitDefault}{ \procExtWit{\varSigFin}{\varSigPart}{\varSigPartAptSt} }
+\newcommand{\procVrfApt}[7]{ VRF\_APT\_SIG(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6 \opSeperate #7) }
+\newcommand{\procVrfAptDefault}{ \procVrfApt{\varMsg}{\varKey}{\varRand}{\varGkSt}{\varGrSt}{\varGWit}{\varSigPartAptSt} }
 
 
 % Set PDF document properties

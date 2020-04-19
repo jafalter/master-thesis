@@ -1,27 +1,60 @@
 \section{General Notation}\label{secGenNot}
 \section{Cryptographic Primitives}\label{secCrypPrim}
-\section{Mulitparty Fixed Witness Adaptor Signature Scheme} \label{secScheme}
+\section{Mulitparty Fixed Witness Adaptor Signature Scheme} \label{sec:secscheme}
 
-We define a Generalized Multiparty Adaptor Signature Scheme from the standard construction of multiparty Schnorr signatures which
-are defined as follows:\\
+In this chapter, we will define a variant of the Adaptor Signature scheme as seen in~\ref{sec:apt},
+which is specifically tailored for the use in an Atomic Swap scenario in which (at least one side of the swap) uses a multi-party protocol to generate transaction signatures.
+We will start by recalling some basic notation and definitions, we then explain the general multi-party signature creation protocol as it currently implemented in the Grin Cryptocurrency.
+We reduce the generated signatures to the general case~\cite{schnorr1991efficient} and thereby prove its security. From this protocol, we then derive the adapted variant, which allows hiding a fixed witness
+value in the signature, which can only be revealed by the other parties after attaining the final signature.
+We then proof it's security by showing that all security definitions defined in~\cite{sanches2020bitcoinchannels} hold.
+In chapter~\ref{chapAtomic} we will then utilize this scheme to build the Atomic Swap protocol.
+
+\section{General Notation and Definitions}
+
+\paragraph{Signature Scheme}
+A valid Signature Sccheme must provide three procedures:
+\[ \varSigScheme = (\procGenDefault \opSeperate \procSignDefault \opSeperate \procVerfDefault) \]
+$\procGenDefault$ takes as input a security parameter $\varSecParam$ and outputs a keypair $\varKeyPair$, consisting of a secret key $\varSecKey$ and a public key $\varPubKey$, whereas
+the secret key has to be kept private and the public key is shared with other parties.
+$\varSecKey$ can be used together with a message $\varMsg$ to call the $\procSignDefault$ procedure to create a signature $\varSignature$ over the message $\varMsg$.
+Parties knowing $\varPubKey$ can then test the validity of the signature by calling $\procVerfDefault$ with the same message $\varMsg$. The procedure will only output $1$ if the message was
+indeed signed with the correct secret key $\varSecKey$ of $\varPubKey$ and therefore proves the possesion of $\varSecKey$ by the signer.
+A valid signature scheme have to fullfill two security properties
+\begin{itemize}
+    \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold $\procVerf{\varPubKey}{\procSignDefault}{\varMsg} \opEq 1$
+    \item Unforgability: Note that there are different levels of Unforgability:~\cite{goldwasser1988digital}
+    \begin{itemize}
+        \item Universal Forgery: The ability to forge signatures for any message.
+        \item Selective Forgery: The ability to fogre signatures for messages of the adversary's choice.
+        \item Existential Forgery: The ability to forge a valid signature / message pair not previously known to the adversary.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{Hash function}
+
+\paragraph{Zero-Knowledge}
+
+\paragraph{Hard relation}
+
 
 \fbox{
     \parbox{\textwidth}{
-        \procedure[linenumbering, syntaxhighlight=auto]{\procGen} {
+        \procedure[linenumbering, syntaxhighlight=auto]{$\procGenDefault$} {
             \varKey \sample \cnstZq \\
             \varRand \sample \cnstZq \\
             \pcreturn (\varKey \opSeperate \varRand)
         }
-        \procedure[linenumbering, syntaxhighlight=auto]{\procGenPartSig} {
+        \procedure[linenumbering, syntaxhighlight=auto]{$\procGenPartSigDefault$} {
             \varSchnorrChallenge \opAssign \funH{(\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt)} \\
             \varSigPart \opAssign \varKey \opAdd \varSchnorrChallenge \opAdd \varRand \\
             \pcreturn (\varSigPart \opSeperate \varGk \opSeperate \varGr)
         }\\
-        \procedure[linenumbering, syntaxhighlight=auto]{\procVerfPartSig} {
+        \procedure[linenumbering, syntaxhighlight=auto]{$\procVerfPartSigDefault$} {
             \varSchnorrChallenge \opAssign \funH{((\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt)} \\
             \pcreturn \varGSigPart \opEq \varGkSt \opAdd \funGen{\varSchnorrChallenge \opMult \varRand}
         }\\
-        \procedure[linenumbering, syntaxhighlight=auto]{\procFinSig} {
+        \procedure[linenumbering, syntaxhighlight=auto]{$\procFinSigDefault$} {
             \pcreturn (\varSigPart \opAdd \varSigPartSt \opSeperate \varGk \opAdd \varGkSt \opSeperate \varGr \opAdd \varGrSt)
         }
     }
@@ -30,16 +63,16 @@ In order to have adaptable partial signature we add the following procedures\\
 
 \fbox{
     \parbox{\textwidth} {
-        \procedure[linenumbering, syntaxhighlight=auto]{\procAptSig} {
+        \procedure[linenumbering, syntaxhighlight=auto]{$\procAptSigDefault$} {
             \varSigPartApt \opAssign \varSigPart \opAdd \varWit \\
             \pcreturn (\varSigPartApt \opSeperate \varGWit)
         }
-        \procedure[linenumbering, syntaxhighlight=auto]{\procExtWit}{
+        \procedure[linenumbering, syntaxhighlight=auto]{$\procExtWitDefault$}{
             \varSigPartSt \opAssign \varSigFin \opSub \varSigPart \\
             \varWit \opAssign \varSigPartAptSt \opSub \varSigPartSt \\
             \pcreturn (\varWit)
         }\\
-        \procedure[linenumbering, syntaxhighlight=auto]{\procVrfApt} {
+        \procedure[linenumbering, syntaxhighlight=auto]{$\procVrfAptDefault$} {
             \varSchnorrChallenge \opAssign \funH{\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt} \\
             \pcreturn \varGSigPartAptSt \opEq \varGkSt \opAdd \funGen{\varSchnorrChallenge \opMult \varRand} \opAdd \varGWit
         }
