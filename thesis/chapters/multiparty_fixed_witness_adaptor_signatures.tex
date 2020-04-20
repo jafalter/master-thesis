@@ -32,12 +32,16 @@ A valid signature scheme have to fullfill two security properties
 \end{itemize}
 
 \paragraph{Cryptographic Hash Function}
-A cryptographic hash function is defined as $\funH{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$. A hashing function
+A cryptographic hash function $\cnstHash$ is defined as $\funHash{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$. A secure hashing function
 has to fullfill the following security properties:~\cite{al2011cryptographic}
 \begin{itemize}
-    \item Collision-Resistence (CR)
-    \item Pre-image Resistence (Pre)
-    \item 2nd Pre-image Resistence (Sec)
+    \item Collision-Resistence (CR): Collision-Resistance means that it is computationally infeasible to find two inputs $\varInput_1$ and $\varInput_2$ such that
+    $\funHash{\varInput_1} \opEq \funHash{\varInput_2}$ with $\varInput_1 \opNotEq \varInput_2$.
+    \item Pre-image Resistence (Pre): In a hash function $\cnstHash$ that fulfills Pre-image Resistance it is infeasible to recover the original input $\varInput$ from its hash output $\funHash{\varInput}$.
+    If this security property is achieved, the hash function is said to be non-invertible.
+    \item 2nd Pre-image Resistence (Sec):  This property is similar to Collision-Resistance and is sometimes referred to as \textit{Weak Collision-Resistance}.
+    Given such a hash function $\cnstHash$ and an input $\varInput$, it should be infeasible to find a different input $\funStar{\varInput}$ such that $\varInput \opNotEq \funStar{\varInput}$
+    and $\funHash{\varInput} \opEq \funHash{\funStar{\varInput}}$.
 \end{itemize}
 
 
@@ -52,12 +56,12 @@ has to fullfill the following security properties:~\cite{al2011cryptographic}
             \pcreturn (\varKey \opSeperate \varRand)
         }
         \procedure[linenumbering, syntaxhighlight=auto]{$\procGenPartSigDefault$} {
-            \varSchnorrChallenge \opAssign \funH{(\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt)} \\
+            \varSchnorrChallenge \opAssign \funHash{(\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt)} \\
             \varSigPart \opAssign \varKey \opAdd \varSchnorrChallenge \opAdd \varRand \\
             \pcreturn (\varSigPart \opSeperate \varGk \opSeperate \varGr)
         }\\
         \procedure[linenumbering, syntaxhighlight=auto]{$\procVerfPartSigDefault$} {
-            \varSchnorrChallenge \opAssign \funH{((\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt)} \\
+            \varSchnorrChallenge \opAssign \funHash{((\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt)} \\
             \pcreturn \varGSigPart \opEq \varGkSt \opAdd \funGen{\varSchnorrChallenge \opMult \varRand}
         }\\
         \procedure[linenumbering, syntaxhighlight=auto]{$\procFinSigDefault$} {
@@ -79,7 +83,7 @@ In order to have adaptable partial signature we add the following procedures\\
             \pcreturn (\varWit)
         }\\
         \procedure[linenumbering, syntaxhighlight=auto]{$\procVrfAptDefault$} {
-            \varSchnorrChallenge \opAssign \funH{\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt} \\
+            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt} \\
             \pcreturn \varGSigPartAptSt \opEq \varGkSt \opAdd \funGen{\varSchnorrChallenge \opMult \varRand} \opAdd \varGWit
         }
     }

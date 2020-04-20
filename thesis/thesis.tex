@@ -45,8 +45,13 @@
 \newcommand{\authorname}{Jakob Abfalter} % The author name without titles.
 \newcommand{\thesistitle}{Adaptor Signature Based Atomic Swaps Between Bitcoin and a Mimblewimble Based Cryptocurrency} % The title of the thesis. The English version should be used, if it exists.
 
+% constants
+\newcommand{\cnstZq}{\ZZ_q}
+\newcommand{\cnstBinary}[1]{\{0,1\}^{#1}}
+\newcommand{\cnstHash}{h}
+
 % functions
-\newcommand{\funH}[1]{h (#1)}
+\newcommand{\funHash}[1]{\cnstHash (#1)}
 \newcommand{\funGen}[1]{g^{#1}}
 \newcommand{\funGenH}[1]{h^{#1}}
 \newcommand{\funList}[1]{l(#1)}
@@ -94,10 +99,6 @@
 \newcommand{\varSigFin}{\varSignature_{fin}}
 \newcommand{\varSecParam}{1^n}
 
-% constants
-\newcommand{\cnstZq}{\ZZ_q}
-\newcommand{\cnstBinary}[1]{\{0,1\}^{#1}}
-
 % operators
 \newcommand{\opConc}{~||~}
 \newcommand{\opAdd}{~+~}
@@ -105,6 +106,7 @@
 \newcommand{\opSub}{~-~}
 \newcommand{\opMult}{~*~}
 \newcommand{\opEq}{~=~}
+\newcommand{\opNotEq}{~\neq~}
 \newcommand{\opSeperate}{,~}
 
 % procedures
