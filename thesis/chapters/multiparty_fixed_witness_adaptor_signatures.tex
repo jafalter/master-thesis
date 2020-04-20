@@ -12,6 +12,11 @@ In chapter~\ref{chapAtomic} we will then utilize this scheme to build the Atomic
 
 \section{General Notation and Definitions}
 
+\paragraph{Notation}
+We first define the general notation used in the following chapters to formalize procedures and protocols. Let $\cnstGroup$ denot a cyclic group of prime order $\varPrime$ and $\cnstIntegersPrime{\varPrime}$
+the ring of integers modulo $\varPrime$. $\cnstIntegersPrimeWithoutZero{\varPrime}$ is $\cnstIntegersPrime{\varPrime} \opExcluding \funList{0}$. $\varG \opSeperate \varH$ are adjacent
+generators on $\cnstGroup$, whereas adjacent means the discrete logarithm of $\varH$ in regards to $\varG$ is not known. Exponention stands for repeated application of the group operation.
+
 \paragraph{Signature Scheme}
 A valid Signature Sccheme must provide three procedures:
 \[ \varSigScheme = (\procGenDefault \opSeperate \procSignDefault \opSeperate \procVerfDefault) \]
@@ -44,32 +49,48 @@ has to fullfill the following security properties:~\cite{al2011cryptographic}
     and $\funHash{\varInput} \opEq \funHash{\funStar{\varInput}}$.
 \end{itemize}
 
+\paragraph{Commitment}
+TODO
+\paragraph{Homomorphic Commitment}
+TODO
 
-\paragraph{Zero-Knowledge}
-
+\paragraph{Definition 1}{Multiparty Signature Generation}
+We first define a multiparty Signature Scheme wrt. to a hard relation $\cnstRelation$
+\[ \varSigSchemeMP = (\procSetupPartSigId, \procGenPartSigId, \procVerfPartSigId, \procFinSigId) \]
+which allows us to distribute signature generation for a single public key between multiple parties owning parts of the key:
+\begin{itemize}
+    \item $\procSetupPartSigId$ takes as input $\varSecParam$ with $\varN$ as the security parameter and randomly generates a key $\varKey$ together with additional randomness $\varRand$ as well
+    as commitments to those. Participents are calling this algorithm once at the start of the protocol. Afterwards they collaborate to distribute commitments of their keys $\varGk$ and $\varGr$
+    with each other.
+    \item $\procGenPartSigId$ takes as input a to be signed message $\varMsg$, together with the key $\varKeyProv$ and randomness $\varRandProv$. Additionally commitments to the verifiers
+    key and randomness $\funGen{\varKeyVerf}$ and $\funGen{\varRandVerf}$ has to be provided. The procedure outputs a partial signature, which can be verified by participating parties.
+    \item $\procVerfPartSigId$ takes as input the same message $\varMsg$, the verifiers key $\varKeyVerf$ and randomness $\varRandVerf$ as well as the commitments provided by the prover
+    $\funGen{\varKeyProv}$ and $\funGen{\varRandProv}$ of the prover. The algorithm outputs $1$ iff $\varSigPart$ is a valid signature on $\varMsg$ with regards to
+    $\varKeyVerf \opSeperate \varRandVerf \opSeperate \funGen{\varKeyProv} \opSeperate \funGen{\varRandProv}$.
+    \item $\procFinSigId$ will take the partial signatures and commitments to keys and randomness of the participants and create a final composite signature.
+\end{itemize}
 
 \fbox{
     \parbox{\textwidth}{
         \procedure[linenumbering, syntaxhighlight=auto]{$\procGenDefault$} {
-            \varKey \sample \cnstZq \\
-            \varRand \sample \cnstZq \\
-            \pcreturn (\varKey \opSeperate \varRand)
+            \varKey \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \varRand \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \pcreturn (\varKey \opSeperate \varRand \opSeperate \funGen{\varKey} \opSeperate \funGen{\varRand})
         }
         \procedure[linenumbering, syntaxhighlight=auto]{$\procGenPartSigDefault$} {
-            \varSchnorrChallenge \opAssign \funHash{(\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt)} \\
-            \varSigPart \opAssign \varKey \opAdd \varSchnorrChallenge \opAdd \varRand \\
-            \pcreturn (\varSigPart \opSeperate \varGk \opSeperate \varGr)
-        }\\
+            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \funGen{\varKeyProv} \opAdd \funGen{\varKeyVerf} \opConc \funGen{\varRandProv} \opAdd \funGen{\varRandVerf}} \\
+            \varSigPart \opAssign \varKeyProv \opAdd \varSchnorrChallenge \opAdd \varRandProv \\
+            \pcreturn (\varSigPart)
+        } \\[2\baselineskip]
         \procedure[linenumbering, syntaxhighlight=auto]{$\procVerfPartSigDefault$} {
-            \varSchnorrChallenge \opAssign \funHash{((\varMsg \opConc \varGk \opAdd \varGkSt \opConc \varGr \opAdd \varGrSt)} \\
-            \pcreturn \varGSigPart \opEq \varGkSt \opAdd \funGen{\varSchnorrChallenge \opMult \varRand}
-        }\\
+            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \funGen{\varKeyProv} \opAdd \funGen{\varKeyVerf} \opConc \funGen{\varRandProv} \opAdd \funGen{\varRandVerf}} \\
+            \pcreturn \varGSigPart \opEq \funGen{\varKeyProv} \opAdd \funGen{\varSchnorrChallenge \opMult \varRandVerf}
+        } \\[2\baselineskip]
         \procedure[linenumbering, syntaxhighlight=auto]{$\procFinSigDefault$} {
             \pcreturn (\varSigPart \opAdd \varSigPartSt \opSeperate \varGk \opAdd \varGkSt \opSeperate \varGr \opAdd \varGrSt)
         }
     }
 }
-In order to have adaptable partial signature we add the following procedures\\
 
 \fbox{
     \parbox{\textwidth} {

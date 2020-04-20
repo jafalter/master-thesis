@@ -46,18 +46,22 @@
 \newcommand{\thesistitle}{Adaptor Signature Based Atomic Swaps Between Bitcoin and a Mimblewimble Based Cryptocurrency} % The title of the thesis. The English version should be used, if it exists.
 
 % constants
-\newcommand{\cnstZq}{\ZZ_q}
+\newcommand{\cnstIntegersPrime}[1]{\ZZ_{#1}}
+\newcommand{\cnstIntegersPrimeWithoutZero}[1]{\cnstIntegersPrime{#1}^{*}}
 \newcommand{\cnstBinary}[1]{\{0,1\}^{#1}}
 \newcommand{\cnstHash}{h}
+\newcommand{\cnstGroup}{\mathcal{G}}
+\newcommand{\cnstRelation}{R}
 
 % functions
 \newcommand{\funHash}[1]{\cnstHash (#1)}
 \newcommand{\funGen}[1]{g^{#1}}
 \newcommand{\funGenH}[1]{h^{#1}}
-\newcommand{\funList}[1]{l(#1)}
+\newcommand{\funList}[1]{\{#1\}}
 \newcommand{\funStar}[1]{#1'}
 
 % variables
+\newcommand{\varPrime}{p}
 \newcommand{\varN}{n}
 \newcommand{\varTx}{tx}
 \newcommand{\varExcess}{E}
@@ -66,6 +70,7 @@
 \newcommand{\varPubKey}{pk}
 \newcommand{\varKeyPair}{(\varSecKey, \varPubKey)}
 \newcommand{\varSigScheme}{\Phi}
+\newcommand{\varSigSchemeMP}{\varSigScheme_{MP}}
 \newcommand{\varProof}{\pi}
 \newcommand{\varSignature}{\sigma}
 \newcommand{\varG}{g}
@@ -80,8 +85,12 @@
 \newcommand{\varValue}{v}
 \newcommand{\varMsg}{m}
 \newcommand{\varKey}{k}
+\newcommand{\varKeyVerf}{\varKey_V}
+\newcommand{\varKeyProv}{\varKey_P}
 \newcommand{\varKeySt}{\funStar{\varKey}}
 \newcommand{\varRand}{r}
+\newcommand{\varRandProv}{\varRand_{p}}
+\newcommand{\varRandVerf}{\varRand_{v}}
 \newcommand{\varRandSt}{\funStar{r}}
 \newcommand{\varGk}{\funGen{\varKey}}
 \newcommand{\varGkSt}{\funGen{\varKeySt}}
@@ -108,25 +117,43 @@
 \newcommand{\opEq}{~=~}
 \newcommand{\opNotEq}{~\neq~}
 \newcommand{\opSeperate}{,~}
+\newcommand{\opExcluding}{~\\~}
 
 % procedures
-\newcommand{\procGen}[1]{ GEN(#1) }
+\newcommand{\procCommitId}{Commit}
+\newcommand{\procSetupId}{Setup}
+
+\newcommand{\procGenId}{Gen}
+\newcommand{\procGen}[1]{ \procGenId(#1) }
 \newcommand{\procGenDefault}{ \procGen{\varSecParam} }
-\newcommand{\procSign}[2]{ SIGN(#1, #2) }
+\newcommand{\procSignId}{Sign}
+\newcommand{\procSign}[2]{ \procSignId(#1, #2) }
 \newcommand{\procSignDefault}{ \procSign{\varSecKey}{\varMsg} }
-\newcommand{\procVerf}[3]{ VERF(#1 \opSeperate #2 \opSeperate #3) }
+\newcommand{\procVerfId}{Verf}
+\newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
 \newcommand{\procVerfDefault}{ \procVerf{\varPubKey}{\varSignature}{\varMsg} }
-\newcommand{\procGenPartSig}[5]{ GEN\_PT\_SIG(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5) }
-\newcommand{\procGenPartSigDefault}{ \procGenPartSig{\varMsg}{\varKey}{\varRand}{\varGkSt}{\varGrSt} }
-\newcommand{\procVerfPartSig}[6]{ VRF\_PT\_SIG(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6) }
-\newcommand{\procVerfPartSigDefault}{ \procVerfPartSig{\varMsg}{\varKey}{\varRand}{\varGkSt}{\varGrSt}{\varSigPart} }
-\newcommand{\procFinSig}[6]{ FIN\_SIG(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6)}
-\newcommand{\procFinSigDefault}{ \procFinSig{\varSigPart}{\varSigPartSt}{\varSigPartSt}{\varGk}{\varGkSt}{\varGkSt}{\varGr}{\varGrSt} }
-\newcommand{\procAptSig}[2]{ APT\_PT\_SIG(#1 \opSeperate #2) }
+
+\newcommand{\procSetupPartSigId}{Setup}
+\newcommand{\procSetupPartSig}[1]{\procSetupPartSigId (#1)}
+\newcommand{\procSetupPartSigDefault}{\procSetupPartSig{\varSecParam}}
+\newcommand{\procGenPartSigId}{genPtSig}
+\newcommand{\procGenPartSig}[5]{ \procGenPartSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5) }
+\newcommand{\procGenPartSigDefault}{ \procGenPartSig{\varMsg}{\varKeyProv}{\varRandProv}{\funGen{\varKeyVerf}}{\funGen{\varRandVerf}} }
+\newcommand{\procVerfPartSigId}{vrfPtSig}
+\newcommand{\procVerfPartSig}[6]{ \procVerfPartSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6) }
+\newcommand{\procVerfPartSigDefault}{ \procVerfPartSig{\varMsg}{\varKeyVerf}{\varRandVerf}{\funGen{\varKeyProv}}{\funGen{\varRandProv}}{\varSigPart} }
+\newcommand{\procFinSigId}{finSig}
+\newcommand{\procFinSig}[6]{ \procFinSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6)}
+\newcommand{\procFinSigDefault}{ \procFinSig{\varSigPart}{\varSigPartSt}{\funGen{\varKeyProv}}{\funGen{\varKeyVerf}}{\funGen{\varRandProv}}{\varRandProv} }
+
+\newcommand{\procAptSigId}{aptPtSig}
+\newcommand{\procAptSig}[2]{ \procAptSigId(#1 \opSeperate #2) }
 \newcommand{\procAptSigDefault}{ \procAptSig{\varSigPart}{\varWit} }
-\newcommand{\procExtWit}[3]{ EXT\_WIT(#1 \opSeperate #2 \opSeperate #3) }
+\newcommand{\procExtWitId}{extWit}
+\newcommand{\procExtWit}[3]{ \procExtWitId(#1 \opSeperate #2 \opSeperate #3) }
 \newcommand{\procExtWitDefault}{ \procExtWit{\varSigFin}{\varSigPart}{\varSigPartAptSt} }
-\newcommand{\procVrfApt}[7]{ VRF\_APT\_SIG(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6 \opSeperate #7) }
+\newcommand{\procVrfAptId}{vrfAptSig}
+\newcommand{\procVrfApt}[7]{ \procVrfAptId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6 \opSeperate #7) }
 \newcommand{\procVrfAptDefault}{ \procVrfApt{\varMsg}{\varKey}{\varRand}{\varGkSt}{\varGrSt}{\varGWit}{\varSigPartAptSt} }
 
 
