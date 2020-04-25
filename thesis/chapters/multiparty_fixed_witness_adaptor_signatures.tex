@@ -1,74 +1,27 @@
-\section{General Notation}\label{secGenNot}
-\section{Cryptographic Primitives}\label{secCrypPrim}
-\section{Mulitparty Fixed Witness Adaptor Signature Scheme} \label{sec:secscheme}
-
-In this chapter, we will define a variant of the Adaptor Signature scheme as seen in~\ref{sec:apt},
-which is specifically tailored for the use in an Atomic Swap scenario in which (at least one side of the swap) uses a multi-party protocol to generate transaction signatures.
-We will start by recalling some basic notation and definitions, we then explain the general multi-party signature creation protocol as it currently implemented in the Grin Cryptocurrency.
+In this chapter, we will define a variant of the Adaptor Signature scheme as seen in~\ref{sec:aptSignatures},
+which is specifically tailored for the use in an Atomic Swap scenario in which (at least one side of the swap) uses a two-party protocol to generate transaction signatures.
+We will start by explaining the general two-party signature creation protocol as it currently implemented in the Grin Cryptocurrency.
 We reduce the generated signatures to the general case~\cite{schnorr1991efficient} and thereby prove its security. From this protocol, we then derive the adapted variant, which allows hiding a fixed witness
-value in the signature, which can only be revealed by the other parties after attaining the final signature.
+value in the signature, which can only be revealed by the other party after attaining the final signature.
 We then proof it's security by showing that all security definitions defined in~\cite{sanches2020bitcoinchannels} hold.
-In chapter~\ref{chapAtomic} we will then utilize this scheme to build the Atomic Swap protocol.
+In chapter~\ref{chp:atomicSwap} we will then utilize this scheme to build the Atomic Swap protocol.
 
-\section{General Notation and Definitions}
-
-\paragraph{Notation}
-We first define the general notation used in the following chapters to formalize procedures and protocols. Let $\cnstGroup$ denot a cyclic group of prime order $\varPrime$ and $\cnstIntegersPrime{\varPrime}$
-the ring of integers modulo $\varPrime$. $\cnstIntegersPrimeWithoutZero{\varPrime}$ is $\cnstIntegersPrime{\varPrime} \opExcluding \funList{0}$. $\varG \opSeperate \varH$ are adjacent
-generators on $\cnstGroup$, whereas adjacent means the discrete logarithm of $\varH$ in regards to $\varG$ is not known. Exponention stands for repeated application of the group operation.
-
-\paragraph{Signature Scheme}
-A valid Signature Sccheme must provide three procedures:
-\[ \varSigScheme = (\procGenDefault \opSeperate \procSignDefault \opSeperate \procVerfDefault) \]
-$\procGenDefault$ takes as input a security parameter $\varSecParam$ and outputs a keypair $\varKeyPair$, consisting of a secret key $\varSecKey$ and a public key $\varPubKey$, whereas
-the secret key has to be kept private and the public key is shared with other parties.
-$\varSecKey$ can be used together with a message $\varMsg$ to call the $\procSignDefault$ procedure to create a signature $\varSignature$ over the message $\varMsg$.
-Parties knowing $\varPubKey$ can then test the validity of the signature by calling $\procVerfDefault$ with the same message $\varMsg$. The procedure will only output $1$ if the message was
-indeed signed with the correct secret key $\varSecKey$ of $\varPubKey$ and therefore proves the possesion of $\varSecKey$ by the signer.
-A valid signature scheme have to fullfill two security properties
-\begin{itemize}
-    \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold $\procVerf{\varPubKey}{\procSignDefault}{\varMsg} \opEq 1$
-    \item Unforgability: Note that there are different levels of Unforgability:~\cite{goldwasser1988digital}
+\begin{definition}{Two Party Signature Generation}\label{def:twoPartySig}
+    We first define a multiparty Signature Scheme wrt. to a hard relation $\cnstRelation$
+    \[ \varSigSchemeMP = (\procSetupPartSigId, \procGenPartSigId, \procVerfPartSigId, \procFinSigId) \]
+    which allows us to distribute signature generation for a single public key between multiple parties owning parts of the key:
     \begin{itemize}
-        \item Universal Forgery: The ability to forge signatures for any message.
-        \item Selective Forgery: The ability to fogre signatures for messages of the adversary's choice.
-        \item Existential Forgery: The ability to forge a valid signature / message pair not previously known to the adversary.
+        \item $\procSetupPartSigId$ takes as input $\varSecParam$ with $\varN$ as the security parameter and randomly generates a key $\varKey$ together with additional randomness $\varRand$ as well
+        as commitments to those. Participents are calling this algorithm once at the start of the protocol. Afterwards they collaborate to distribute commitments of their keys $\varGk$ and $\varGr$
+        with each other.
+        \item $\procGenPartSigId$ takes as input a to be signed message $\varMsg$, together with the key $\varKeyProv$ and randomness $\varRandProv$. Additionally commitments to the verifiers
+        key and randomness $\funGen{\varKeyVerf}$ and $\funGen{\varRandVerf}$ has to be provided. The procedure outputs a partial signature, which can be verified by participating parties.
+        \item $\procVerfPartSigId$ takes as input the same message $\varMsg$, the verifiers key $\varKeyVerf$ and randomness $\varRandVerf$ as well as the commitments provided by the prover
+        $\funGen{\varKeyProv}$ and $\funGen{\varRandProv}$ of the prover. The algorithm outputs $1$ iff $\varSigPart$ is a valid signature on $\varMsg$ with regards to
+        $\varKeyVerf \opSeperate \varRandVerf \opSeperate \funGen{\varKeyProv} \opSeperate \funGen{\varRandProv}$.
+        \item $\procFinSigId$ will take the partial signatures and commitments to keys and randomness of the participants and create a final composite signature.
     \end{itemize}
-\end{itemize}
-
-\paragraph{Cryptographic Hash Function}
-A cryptographic hash function $\cnstHash$ is defined as $\funHash{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$. A secure hashing function
-has to fullfill the following security properties:~\cite{al2011cryptographic}
-\begin{itemize}
-    \item Collision-Resistence (CR): Collision-Resistance means that it is computationally infeasible to find two inputs $\varInput_1$ and $\varInput_2$ such that
-    $\funHash{\varInput_1} \opEq \funHash{\varInput_2}$ with $\varInput_1 \opNotEq \varInput_2$.
-    \item Pre-image Resistence (Pre): In a hash function $\cnstHash$ that fulfills Pre-image Resistance it is infeasible to recover the original input $\varInput$ from its hash output $\funHash{\varInput}$.
-    If this security property is achieved, the hash function is said to be non-invertible.
-    \item 2nd Pre-image Resistence (Sec):  This property is similar to Collision-Resistance and is sometimes referred to as \textit{Weak Collision-Resistance}.
-    Given such a hash function $\cnstHash$ and an input $\varInput$, it should be infeasible to find a different input $\funStar{\varInput}$ such that $\varInput \opNotEq \funStar{\varInput}$
-    and $\funHash{\varInput} \opEq \funHash{\funStar{\varInput}}$.
-\end{itemize}
-
-\paragraph{Commitment}
-TODO
-\paragraph{Homomorphic Commitment}
-TODO
-
-\paragraph{Definition 1}{Multiparty Signature Generation}
-We first define a multiparty Signature Scheme wrt. to a hard relation $\cnstRelation$
-\[ \varSigSchemeMP = (\procSetupPartSigId, \procGenPartSigId, \procVerfPartSigId, \procFinSigId) \]
-which allows us to distribute signature generation for a single public key between multiple parties owning parts of the key:
-\begin{itemize}
-    \item $\procSetupPartSigId$ takes as input $\varSecParam$ with $\varN$ as the security parameter and randomly generates a key $\varKey$ together with additional randomness $\varRand$ as well
-    as commitments to those. Participents are calling this algorithm once at the start of the protocol. Afterwards they collaborate to distribute commitments of their keys $\varGk$ and $\varGr$
-    with each other.
-    \item $\procGenPartSigId$ takes as input a to be signed message $\varMsg$, together with the key $\varKeyProv$ and randomness $\varRandProv$. Additionally commitments to the verifiers
-    key and randomness $\funGen{\varKeyVerf}$ and $\funGen{\varRandVerf}$ has to be provided. The procedure outputs a partial signature, which can be verified by participating parties.
-    \item $\procVerfPartSigId$ takes as input the same message $\varMsg$, the verifiers key $\varKeyVerf$ and randomness $\varRandVerf$ as well as the commitments provided by the prover
-    $\funGen{\varKeyProv}$ and $\funGen{\varRandProv}$ of the prover. The algorithm outputs $1$ iff $\varSigPart$ is a valid signature on $\varMsg$ with regards to
-    $\varKeyVerf \opSeperate \varRandVerf \opSeperate \funGen{\varKeyProv} \opSeperate \funGen{\varRandProv}$.
-    \item $\procFinSigId$ will take the partial signatures and commitments to keys and randomness of the participants and create a final composite signature.
-\end{itemize}
+\end{definition}
 
 \fbox{
     \parbox{\textwidth}{

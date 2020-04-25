@@ -42,74 +42,87 @@
 ]{cryptocode}
 \usepackage{subfiles}
 
+\usepackage{amsthm}
+
 \newcommand{\authorname}{Jakob Abfalter} % The author name without titles.
 \newcommand{\thesistitle}{Adaptor Signature Based Atomic Swaps Between Bitcoin and a Mimblewimble Based Cryptocurrency} % The title of the thesis. The English version should be used, if it exists.
+
+\newcommand{\styleVariable}[1]{\mathit{#1}}
+\newcommand{\styleFunction}[1]{\mathsf{#1}}
+\newcommand{\stylePoint}[1]{\mathbb{#1}}
 
 % constants
 \newcommand{\cnstIntegersPrime}[1]{\ZZ_{#1}}
 \newcommand{\cnstIntegersPrimeWithoutZero}[1]{\cnstIntegersPrime{#1}^{*}}
 \newcommand{\cnstBinary}[1]{\{0,1\}^{#1}}
-\newcommand{\cnstHash}{h}
+\newcommand{\cnstHash}{\styleFunction{h}}
 \newcommand{\cnstGroup}{\mathcal{G}}
-\newcommand{\cnstRelation}{R}
+\newcommand{\cnstRelation}{\styleVariable{R}}
+\newcommand{\cnstPolyTime}{\styleVariable{PPT}}
+\newcommand{\varG}{\stylePoint{g}}
+\newcommand{\varH}{\stylePoint{h}}
+\newcommand{\cnstAdversary}{\mathcal{A}}
 
 % functions
 \newcommand{\funHash}[1]{\cnstHash (#1)}
-\newcommand{\funGen}[1]{g^{#1}}
-\newcommand{\funGenH}[1]{h^{#1}}
+\newcommand{\funGen}[1]{\varG^{#1}}
+\newcommand{\funGenH}[1]{\varH^{#1}}
 \newcommand{\funList}[1]{\{#1\}}
 \newcommand{\funStar}[1]{#1'}
 
 % variables
-\newcommand{\varPrime}{p}
-\newcommand{\varN}{n}
-\newcommand{\varTx}{tx}
-\newcommand{\varExcess}{E}
-\newcommand{\varKernel}{K}
-\newcommand{\varSecKey}{sk}
-\newcommand{\varPubKey}{pk}
+\newcommand{\varLanguage}{\styleVariable{L}_\cnstRelation}
+\newcommand{\varPrime}{\styleVariable{p}}
+\newcommand{\varN}{\styleVariable{n}}
+\newcommand{\varTx}{\styleVariable{tx}}
+\newcommand{\varExcess}{\stylePoint{E}}
+\newcommand{\varKernel}{\styleVariable{K}}
+\newcommand{\varSecKey}{\styleVariable{sk}}
+\newcommand{\varPubKey}{\styleVariable{pk}}
 \newcommand{\varKeyPair}{(\varSecKey, \varPubKey)}
 \newcommand{\varSigScheme}{\Phi}
-\newcommand{\varSigSchemeMP}{\varSigScheme_{MP}}
+\newcommand{\varSigSchemeMP}{\varSigScheme_{\styleVariable{MP}}}
 \newcommand{\varProof}{\pi}
 \newcommand{\varSignature}{\sigma}
-\newcommand{\varG}{g}
-\newcommand{\varH}{h}
-\newcommand{\varInput}{Inp}
-\newcommand{\varFundValue}{p}
-\newcommand{\varOffset}{o}
-\newcommand{\varSupply}{s}
-\newcommand{\varCoin}{C}
-\newcommand{\varCoinInp}{\varCoin_{inp}}
-\newcommand{\varCoinOut}{C_{out}}
-\newcommand{\varValue}{v}
-\newcommand{\varMsg}{m}
-\newcommand{\varKey}{k}
-\newcommand{\varKeyVerf}{\varKey_V}
-\newcommand{\varKeyProv}{\varKey_P}
+\newcommand{\varInput}{\styleVariable{Inp}}
+\newcommand{\varFundValue}{\styleVariable{p}}
+\newcommand{\varOffset}{\styleVariable{o}}
+\newcommand{\varSupply}{\styleVariable{s}}
+\newcommand{\varCoin}{\stylePoint{C}}
+\newcommand{\varCoinInp}{\varCoin_{\styleVariable{inp}}}
+\newcommand{\varCoinOut}{\varCoin_{\styleVariable{out}}}
+\newcommand{\varValue}{\styleVariable{v}}
+\newcommand{\varMsg}{\styleVariable{m}}
+\newcommand{\varKey}{\styleVariable{k}}
+\newcommand{\varKeyVerf}{\varKey_{\styleVariable{V}}}
+\newcommand{\varKeyProv}{\varKey_{\styleVariable{P}}}
 \newcommand{\varKeySt}{\funStar{\varKey}}
-\newcommand{\varRand}{r}
-\newcommand{\varRandProv}{\varRand_{p}}
-\newcommand{\varRandVerf}{\varRand_{v}}
-\newcommand{\varRandSt}{\funStar{r}}
+\newcommand{\varRand}{\styleVariable{r}}
+\newcommand{\varRandProv}{\varRand_{\styleVariable{p}}}
+\newcommand{\varRandVerf}{\varRand_{\styleVariable{v}}}
+\newcommand{\varRandSt}{\funStar{\styleVariable{r}}}
 \newcommand{\varGk}{\funGen{\varKey}}
 \newcommand{\varGkSt}{\funGen{\varKeySt}}
 \newcommand{\varGr}{\funGen{\varRand}}
 \newcommand{\varGrSt}{\funGen{\varRandSt}}
-\newcommand{\varSigPart}{\varSignature_{prt}}
-\newcommand{\varSigPartSt}{\funStar{\varSignature_{prt}}}
-\newcommand{\varSchnorrChallenge}{e}
+\newcommand{\varSigPart}{\varSignature_{\styleVariable{prt}}}
+\newcommand{\varSigPartSt}{\funStar{\varSignature_{\styleVariable{prt}}}}
+\newcommand{\varSchnorrChallenge}{\styleVariable{e}}
 \newcommand{\varGSigPart}{\funGen{\varSigPart}}
-\newcommand{\varSigPartApt}{\varSignature_{prt\_apt}}
+\newcommand{\varSigPartApt}{\varSignature_{\styleVariable{prt\_apt}}}
 \newcommand{\varSigPartAptSt}{\funStar{\varSigPartApt}}
 \newcommand{\varGSigPartAptSt}{\funGen{\varSigPartAptSt}}
-\newcommand{\varWit}{x}
+\newcommand{\varWit}{\styleVariable{x}}
 \newcommand{\varGWit}{\funGen{\varWit}}
-\newcommand{\varSigFin}{\varSignature_{fin}}
-\newcommand{\varSecParam}{1^n}
+\newcommand{\varSigFin}{\varSignature_{\styleVariable{fin}}}
+\newcommand{\varSecParam}{\styleVariable{1^n}}
+\newcommand{\varBigA}{\styleVariable{A}}
+\newcommand{\varSmallA}{\styleVariable{a}}
 
 % operators
+\newcommand{\opIn}{\in}
 \newcommand{\opConc}{~||~}
+\newcommand{\opForWhich}{~|~}
 \newcommand{\opAdd}{~+~}
 \newcommand{\opAssign}{~:=~}
 \newcommand{\opSub}{~-~}
@@ -120,42 +133,48 @@
 \newcommand{\opExcluding}{~\\~}
 
 % procedures
-\newcommand{\procCommitId}{Commit}
-\newcommand{\procSetupId}{Setup}
+\newcommand{\procGenRId}{\styleFunction{GenR}}
+\newcommand{\procGenR}[1]{\procGenRId{#1}}
 
-\newcommand{\procGenId}{Gen}
+\newcommand{\procCommitId}{\styleFunction{Commit}}
+\newcommand{\procSetupId}{\styleFunction{Setup}}
+
+\newcommand{\procGenId}{\styleFunction{\styleFunction{Gen}}}
 \newcommand{\procGen}[1]{ \procGenId(#1) }
 \newcommand{\procGenDefault}{ \procGen{\varSecParam} }
-\newcommand{\procSignId}{Sign}
+\newcommand{\procSignId}{\styleFunction{Sign}}
 \newcommand{\procSign}[2]{ \procSignId(#1, #2) }
 \newcommand{\procSignDefault}{ \procSign{\varSecKey}{\varMsg} }
-\newcommand{\procVerfId}{Verf}
+\newcommand{\procVerfId}{\styleFunction{Verf}}
 \newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
 \newcommand{\procVerfDefault}{ \procVerf{\varPubKey}{\varSignature}{\varMsg} }
 
-\newcommand{\procSetupPartSigId}{Setup}
+\newcommand{\procSetupPartSigId}{\styleFunction{Setup}}
 \newcommand{\procSetupPartSig}[1]{\procSetupPartSigId (#1)}
 \newcommand{\procSetupPartSigDefault}{\procSetupPartSig{\varSecParam}}
-\newcommand{\procGenPartSigId}{genPtSig}
+\newcommand{\procGenPartSigId}{\styleFunction{genPtSig}}
 \newcommand{\procGenPartSig}[5]{ \procGenPartSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5) }
 \newcommand{\procGenPartSigDefault}{ \procGenPartSig{\varMsg}{\varKeyProv}{\varRandProv}{\funGen{\varKeyVerf}}{\funGen{\varRandVerf}} }
-\newcommand{\procVerfPartSigId}{vrfPtSig}
+\newcommand{\procVerfPartSigId}{\styleFunction{vrfPtSig}}
 \newcommand{\procVerfPartSig}[6]{ \procVerfPartSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6) }
 \newcommand{\procVerfPartSigDefault}{ \procVerfPartSig{\varMsg}{\varKeyVerf}{\varRandVerf}{\funGen{\varKeyProv}}{\funGen{\varRandProv}}{\varSigPart} }
-\newcommand{\procFinSigId}{finSig}
+\newcommand{\procFinSigId}{\styleFunction{finSig}}
 \newcommand{\procFinSig}[6]{ \procFinSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6)}
 \newcommand{\procFinSigDefault}{ \procFinSig{\varSigPart}{\varSigPartSt}{\funGen{\varKeyProv}}{\funGen{\varKeyVerf}}{\funGen{\varRandProv}}{\varRandProv} }
 
-\newcommand{\procAptSigId}{aptPtSig}
+\newcommand{\procAptSigId}{\styleFunction{aptPtSig}}
 \newcommand{\procAptSig}[2]{ \procAptSigId(#1 \opSeperate #2) }
 \newcommand{\procAptSigDefault}{ \procAptSig{\varSigPart}{\varWit} }
-\newcommand{\procExtWitId}{extWit}
+\newcommand{\procExtWitId}{\styleFunction{extWit}}
 \newcommand{\procExtWit}[3]{ \procExtWitId(#1 \opSeperate #2 \opSeperate #3) }
 \newcommand{\procExtWitDefault}{ \procExtWit{\varSigFin}{\varSigPart}{\varSigPartAptSt} }
-\newcommand{\procVrfAptId}{vrfAptSig}
+\newcommand{\procVrfAptId}{\styleFunction{vrfAptSig}}
 \newcommand{\procVrfApt}[7]{ \procVrfAptId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6 \opSeperate #7) }
 \newcommand{\procVrfAptDefault}{ \procVrfApt{\varMsg}{\varKey}{\varRand}{\varGkSt}{\varGrSt}{\varGWit}{\varSigPartAptSt} }
 
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
 
 % Set PDF document properties
 \hypersetup{
@@ -258,31 +277,31 @@
 % Switch to arabic numbering and start the enumeration of chapters in the table of content.
 \mainmatter
 
-\chapter{Introduction}\label{chapIntro}
+\chapter{Introduction}\label{chp:introduction}
 \subfile{chapters/introduction.tex}
 
-\chapter{Motivation \& Objectives}\label{chapMotiv}
+\chapter{Motivation \& Objectives}\label{chp:motivation}
 \subfile{chapters/motivation_objectives.tex}
 
-\chapter{Preliminaries}\label{chapPre}
+\chapter{Preliminaries}\label{chp:preliminaries}
 \subfile{chapters/preliminaries.tex}
 
-\chapter{Mulitparty Fixed Witness Adaptor Signatures}\label{chapMultiApt}
+\chapter{Two Party Fixed Witness Adaptor Signatures}\label{chp:fixedWitnessSignatures}
 \subfile{chapters/multiparty_fixed_witness_adaptor_signatures.tex}
 
-\chapter{Adaptor Signature Based Atomic Swaps Between Bitcoin and a Mimblewimble Based Cryptocurrency}\label{chapAtomic}
+\chapter{Adaptor Signature Based Atomic Swaps Between Bitcoin and a Mimblewimble Based Cryptocurrency}\label{chp:atomicSwap}
 \subfile{chapters/adaptor_signature_based_atomic_swaps_between_bitcoin_and_mimblewimble.tex}
 
-\chapter{Implementation}\label{chapImp}
+\chapter{Implementation}\label{chp:implementation}
 \subfile{chapters/implementation.tex}
 
-\chapter{Implementation Security and Privacy Evaluation}\label{chapImplSec}
+\chapter{Implementation Security and Privacy Evaluation}\label{chp:evaluation}
 \subfile{chapters/evaluation.tex}
 
-\chapter{Related and Future Work}\label{chapFut}
+\chapter{Related and Future Work}\label{chp:futurework}
 \subfile{chapters/related_and_future_work.tex}
 
-\chapter{Conclusion}\label{chapConc}
+\chapter{Conclusion}\label{chp:conclusion}
 \subfile{chapters/conclusion.tex}
 
 % Remove following line for the final thesis.

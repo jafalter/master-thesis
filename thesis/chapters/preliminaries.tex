@@ -1,52 +1,83 @@
-\section{Bitcoin}\label{secBitcoin}
+\section{General Notation and Definitions}\label{sec:generalNotationDefinitions}
 
-\subsection{Bitcoin Transaction Protocol}\label{secBitcoinTx}
+\paragraph{Notation}
+We first define the general notation used in the following chapters to formalize procedures and protocols. Let $\cnstGroup$ denote a cyclic group of prime order $\varPrime$ and $\cnstIntegersPrime{\varPrime}$
+the ring of integers modulo $\varPrime$. $\cnstIntegersPrimeWithoutZero{\varPrime}$ is $\cnstIntegersPrime{\varPrime} \opExcluding \funList{0}$. $\varG \opSeperate \varH$ are adjacent
+generators in $\cnstGroup$, whereas adjacent means the discrete logarithm of $\varH$ in regards to $\varG$ is not known. Exponention stands for repeated application of the group operation.
 
-\subsection{Bitcoin Scaling and Layer Two Solutions}\label{secBitcoinScaling}
+\begin{definition}{Hard Relation}\label{def:hardRelation}
+    Given a language $\varLanguage \opEq \funList{\varBigA \opForWhich \exists\varSmallA \text{s.t.} (\varBigA, \varSmallA) \opIn \cnstRelation}$ then the relation $\cnstRelation$ is
+    considered hard if the following three properties hold:~\cite{sanches2020bitcoinchannels}
+    \begin{enumerate}
+        \item $\procGenR{\varSecParam}$ is a \cnstPolyTime sampling algorithm which outputs a statement/witness of the form $(\varBigA, \varSmallA) \opIn \cnstRelation$.
+        \item Relation $\cnstRelation$ is poly-time decidable.
+        \item For all $\cnstPolyTime$ adversaries $\cnstAdversary$ the probability of finding $\varSmallA$ given $\varBigA$ is neglible.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}{Signature Scheme}\label{def:signatureScheme}
+    A valid Signature Sccheme must provide three procedures:
+    \[ \varSigScheme = (\procGenDefault \opSeperate \procSignDefault \opSeperate \procVerfDefault) \]
+    $\procGenDefault$ takes as input a security parameter $\varSecParam$ and outputs a keypair $\varKeyPair$, consisting of a secret key $\varSecKey$ and a public key $\varPubKey$, whereas
+    the secret key has to be kept private and the public key is shared with other parties.
+    $\varSecKey$ can be used together with a message $\varMsg$ to call the $\procSignDefault$ procedure to create a signature $\varSignature$ over the message $\varMsg$.
+    Parties knowing $\varPubKey$ can then test the validity of the signature by calling $\procVerfDefault$ with the same message $\varMsg$. The procedure will only output $1$ if the message was
+    indeed signed with the correct secret key $\varSecKey$ of $\varPubKey$ and therefore proves the possesion of $\varSecKey$ by the signer.
+    A valid signature scheme have to fullfill two security properties
+    \begin{itemize}
+        \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold $\procVerf{\varPubKey}{\procSignDefault}{\varMsg} \opEq 1$
+        \item Unforgability: Note that there are different levels of Unforgability:~\cite{goldwasser1988digital}
+        \begin{itemize}
+            \item Universal Forgery: The ability to forge signatures for any message.
+            \item Selective Forgery: The ability to fogre signatures for messages of the adversary's choice.
+            \item Existential Forgery: The ability to forge a valid signature / message pair not previously known to the adversary.
+        \end{itemize}
+    \end{itemize}
+\end{definition}
+
+\begin{definition}{Cryptographic Hash Function}\label{def:hashFunction}
+    A cryptographic hash function $\cnstHash$ is defined as $\funHash{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$. A secure hashing function
+    has to fullfill the following security properties:~\cite{al2011cryptographic}
+    \begin{itemize}
+        \item Collision-Resistence (CR): Collision-Resistance means that it is computationally infeasible to find two inputs $\varInput_1$ and $\varInput_2$ such that
+        $\funHash{\varInput_1} \opEq \funHash{\varInput_2}$ with $\varInput_1 \opNotEq \varInput_2$.
+        \item Pre-image Resistence (Pre): In a hash function $\cnstHash$ that fulfills Pre-image Resistance it is infeasible to recover the original input $\varInput$ from its hash output $\funHash{\varInput}$.
+        If this security property is achieved, the hash function is said to be non-invertible.
+        \item 2nd Pre-image Resistence (Sec):  This property is similar to Collision-Resistance and is sometimes referred to as \textit{Weak Collision-Resistance}.
+        Given such a hash function $\cnstHash$ and an input $\varInput$, it should be infeasible to find a different input $\funStar{\varInput}$ such that $\varInput \opNotEq \funStar{\varInput}$
+        and $\funHash{\varInput} \opEq \funHash{\funStar{\varInput}}$.
+    \end{itemize}
+\end{definition}
+
+\begin{definition}{Commitment}\label{def:commitment}
+    TODO
+\end{definition}
+
+\begin{definition}{Homomorphic Commitment}\label{def:homomorphicCom}
+    TODO
+\end{definition}
+
+\begin{definition}{Pedersen Commitment}\label{def:pedersenCom}
+    TODO
+\end{definition}
 
 
-\section{Privacy-enhancing Cryptocurrencies}\label{secPrivacy}
+\section{Bitcoin}\label{sec:bitcoin}
 
-\subsection{Zero Knowledge Proofs}\label{secZero}
+\subsection{Bitcoin Transaction Protocol}\label{sec:bitcoinTx}
 
-\subsection{Range Proofs}\label{secRange}
+\subsection{Bitcoin Scaling and Layer Two Solutions}\label{sec:bitcoinScaling}
 
-\subsection{Mimblewimble}\label{secMimble}
 
-\urldef\urlharrypotter\url{https://harrypotter.fandom.com/wiki/Tongue-Tying_Curse}
-\urldef\urlgrin\url{https://grin.mw/}
-\urldef\urlbeam\url{https://beam.mw/}
+\section{Privacy-enhancing Cryptocurrencies}\label{sec:privacyCryptos}
 
-The Mimblewimble protocol was introduced in 2016 by an anonymous entity named Jedusor, Tom Elvis~\cite{jedusor2016mimblewimble}. The author's name, as well as the protocols name,
-are references to the Harry Potter franchise. \footnote{\urlharrypotter} In Harry Potter, Mimblewimble is a tongue-typing curse which reflects
-the goal of the protocol's design,which is improving the user's privacy.
-Later, Andrew Poelstra took up the ideas from the original writing and published his understanding of the protocol in his paper~\cite{poelstra2016mimblewimble}.
-The protocol gained increasing interest in the community and was implemented in the Grin \footnote{\urlgrin} and Beam \footnote{\urlbeam} Cryptocurrencies, which both launched in early 2019. In the same year,
-two papers were published, which successfully defined and proved security properties for Mimblewimble~\cite{fuchsbauer2019aggregate,betarte2019towards}. In this section, we will explain the fundamental properties of the
-protocols which are relevant for this thesis. The section is ba
-\\
-Compared to Bitcoin, there are some differences in Mimblewimble:
-\begin{itemize}
-    \item Use of Pedersen commitments instead of plaintext transaction values
-    \item No addresses. Coin ownership is given by the knowledge of the opening of the coins Pedersen commitment.
-    \item Spend outputs are purged from the ledger such that only unspent transaction outputs remain.
-    \item No scripting features.
-\end{itemize}
-By utilizing Pedersen commitments in the transactions, we hide the amounts transferred in a transaction,
-improving the systems user privacy, but also requiring additional range proofs, attesting to the fact that actual amounts transferred are in between a valid range.\\
-Not having any addresses enables transaction merging and transaction cut through, which we will explain a bit later.
-However, this comes with the consequence that building transactions require active interaction between the sender and receiver,
-which is different than in constructions more similar to Bitcoin, where a sender can transfer funds to any address without requiring active participation by the receiver.\\
-Through transaction merging and cut-through and some further protocol features, which we will see later in this section, we gain the third mentioned property of being able
-to delete transaction outputs from the Blockchain, which have already been spent before. This ongoing purging in the Blockchain makes it particularly space-efficient as the
-space required by the ledger only grows in the number of UTXOs, in contrast to Bitcoin, in which space requirement increases with the number of overall mined transactions.
-Saving space is especially relevant for Cryptocurrencies employing confidential transactions because the size of the range proofs attached to outputs can be significant.
-Another advantage of this property is that new nodes joining the system do not have to verify the whole history of the Blockchain to validate the current state, making it much easier to join the network. \\
-Another limitation of Mimblewimble- based Cryptocurrencies is that at least the current construction does not allow scripts, such as they are available in Bitcoin or similar systems.
-Transaction validity is given solely by a single valid signature plus the balancedness of inputs and outputs.
-This shortcoming makes it challenging to realize concepts such as multi signatures or conditional transactions which are required for Atomic Swap protocols. However,
-as we will see in~\ref{secScriptless} there are ways we can still construct the necessary transactions by merely relying on cryptographic primitives ~\cite{fuchsbauer2019aggregate}.
+\subsection{Zero Knowledge Proofs}\label{sec:zeroKnowlegde}
 
+\subsection{Range Proofs}\label{sec:rangeProof}
+
+\subsection{Mimblewimble}\label{sec:Mimblewimble}
+In this section we will outline the fundamental properties of the protocols employed in Mimblewimble which are relevant for the thesis and particularily the construction of the Atomic Swap protocol defined in
+\ref{chp:atomicSwap}.
 \subsubsection{Transaction Structure}
 \begin{itemize}
     \item For two adjacent elliptic curve generators $\varG$ and $\varH$ a coin in Mimblewimble is of the form $\varCoin \opAssign \funGen{\varValue} \opAdd \funGenH{\varRand} \opSeperate \varProof$. $\varCoin$ is a so called Pedersen Commitment \cite{pedersen1991non}
@@ -118,9 +149,9 @@ Assume Alice wants to transfer coins of value $\varFundValue$ to Bob.
     \[ \varTx \opAssign (0 \opSeperate \varCoinInp \opSeperate \varCoinOut^A \opConc \varCoinOut^B \opSeperate (\varProof \opSeperate \varExcess \opAssign \sum{\varCoinOut^A} \opAdd \sum{\varCoinOut^B} \opSub \sum{\varCoinInp} \opSeperate \varSignature)) \]
     and publishes it to the network.
 \end{enumerate}
-Figure~\ref{fig:txorg} depicts the original transaction flow.\\
+Figure~\ref{fig:txOriginal} depicts the original transaction flow.\\
 \begin{figure}
-    \label{fig:txorg}
+    \label{fig:txOriginal}
     \centering
     \pseudocode{
         \textbf{Alice} \< \< \< \< \textbf{Bob} \\ [][\hline]
@@ -152,9 +183,9 @@ which is the opening to $\varExcess_{rv}$. Furthermore obtaining a valid range p
 This means Bob spends the newly created outputs and sends them back to the original input coins, chosen by Alice. It might at first seem unclear why Bob would do that. An example situation could be if Alice
 pays Bob for some good which Bob is selling. Alice decides to pay in advance, but then Bob discovers that he is already out of stock of the good that Alice ordered. To return the funds to Alice, he reverses
 the transaction instead of participating in another interactive process to build a new transaction with new outputs. If Alice already deleted the keys to her initial coins, the funds are now lost.
-The problem was solved in the Grin Cryptocurrency by making the signing process itself a two-party process which will be explained in more detail in chapter \ref{chapMultiApt}. \\
+The problem was solved in the Grin Cryptocurrency by making the signing process itself a two-party process which will be explained in more detail in chapter~\ref{chp:fixedWitnessSignatures}. \\
 
-Fuchsbauer et al. \cite{fuchsbauer2019aggregate} proposed the following alternative way to build transactions which would not be vulnerable to this problem.
+Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} proposed the following alternative way to build transactions which would not be vulnerable to this problem.
 \begin{enumerate}
     \item Alice constructs a full-fledged transaction $\varTx_A$ spending her input coins $\varCoinInp$ and creates her change coins $\varCoinOut^A$, plus a special output coin $\varCoinOut^{sp} \opAssign \funGenH{\varFundValue} \opAdd \funGen{\varKey_{sp}}$,
     where $\varFundValue$ is the desired value which should be transferred to Bob and $\varKey_{sp}$ is a randomly choosen key. She proceeds by sending $\varTx_A$ as well as $(\varFundValue \opSeperate \varKey_{sp})$ and the necessary range
@@ -165,12 +196,10 @@ Fuchsbauer et al. \cite{fuchsbauer2019aggregate} proposed the following alternat
 \end{enumerate}
 The only drawback of this approach is that we have two transaction kernels instead of just one because of the merging step, making the transaction slightly bigger.
 
+\section{Scriptless Scripts}\label{sec:scriptlessScripts}
 
-\section{Scriptless Scripts}\label{secScriptless}
+\section{Adaptor Signatures}\label{sec:aptSignatures}
 
+\subsection{Schnorr Signature Construction}\label{sec:schnorrAptSignatures}
 
-\section{Adaptor Signatures}\label{sec:apt}
-
-\subsection{Schnorr Signature Construction}\label{secAptSchnorr}
-
-\subsection{ECDSA Signature Construction}\label{secAptECDSA}
+\subsection{ECDSA Signature Construction}\label{sec:ecdsaAptSignatures}
