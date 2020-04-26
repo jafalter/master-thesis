@@ -59,8 +59,8 @@
 \newcommand{\cnstGroup}{\mathcal{G}}
 \newcommand{\cnstRelation}{\styleVariable{R}}
 \newcommand{\cnstPolyTime}{\styleVariable{PPT}}
-\newcommand{\varG}{\stylePoint{g}}
-\newcommand{\varH}{\stylePoint{h}}
+\newcommand{\varG}{\stylePoint{G}}
+\newcommand{\varH}{\stylePoint{H}}
 \newcommand{\cnstAdversary}{\mathcal{A}}
 
 % functions
@@ -69,8 +69,10 @@
 \newcommand{\funGenH}[1]{\varH^{#1}}
 \newcommand{\funList}[1]{\{#1\}}
 \newcommand{\funStar}[1]{#1'}
+\newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
 
 % variables
+\newcommand{\varProbability}{\styleVariable{P}}
 \newcommand{\varLanguage}{\styleVariable{L}_\cnstRelation}
 \newcommand{\varPrime}{\styleVariable{p}}
 \newcommand{\varN}{\styleVariable{n}}
@@ -118,6 +120,11 @@
 \newcommand{\varSecParam}{\styleVariable{1^n}}
 \newcommand{\varBigA}{\styleVariable{A}}
 \newcommand{\varSmallA}{\styleVariable{a}}
+\newcommand{\varPublicParam}{\styleVariable{PP}}
+\newcommand{\varInputSpace}{\mathcal{I}}
+\newcommand{\varRandSpace}{\mathcal{R}}
+\newcommand{\varCommitSpace}{\mathcal{C}}
+\newcommand{\varCommitment}{\styleVariable{Com}}
 
 % operators
 \newcommand{\opIn}{\in}
@@ -137,7 +144,9 @@
 \newcommand{\procGenR}[1]{\procGenRId{#1}}
 
 \newcommand{\procCommitId}{\styleFunction{Commit}}
+\newcommand{\procCommit}[2]{\procCommitId(#1, #2)}
 \newcommand{\procSetupId}{\styleFunction{Setup}}
+\newcommand{\procSetup}[1]{\procCommitId(#1)}
 
 \newcommand{\procGenId}{\styleFunction{\styleFunction{Gen}}}
 \newcommand{\procGen}[1]{ \procGenId(#1) }
