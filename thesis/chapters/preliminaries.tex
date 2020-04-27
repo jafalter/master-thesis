@@ -13,6 +13,11 @@ generators in $\cnstGroup$, whereas adjacent means the discrete logarithm of $\v
         \item Relation $\cnstRelation$ is poly-time decidable.
         \item For all $\cnstPolyTime$ adversaries $\cnstAdversary$ the probability of finding $\varSmallA$ given $\varBigA$ is neglible.
     \end{enumerate}
+    In this thesis we find two types of hard relations:
+    \begin{enumerate}
+        \item The output of a secure hash function (as defined in~\ref{def:hashFunction}) and it's input $(\varInput, \funHash{\varInput})$.
+        \item The discrete logarithm $\varX$ of $\funGen{\varX}$ in the group $\cnstGroup$.
+    \end{enumerate}
 \end{definition}
 
 \begin{definition}{Signature Scheme}\label{def:signatureScheme}

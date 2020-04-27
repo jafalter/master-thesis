@@ -72,6 +72,9 @@
 \newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
 
 % variables
+\newcommand{\varAlice}{\styleVariable{A}}
+\newcommand{\varBob}{\styleVariable{B}}
+\newcommand{\varX}{\styleVariable{x}}
 \newcommand{\varProbability}{\styleVariable{P}}
 \newcommand{\varLanguage}{\styleVariable{L}_\cnstRelation}
 \newcommand{\varPrime}{\styleVariable{p}}
@@ -80,8 +83,15 @@
 \newcommand{\varExcess}{\stylePoint{E}}
 \newcommand{\varKernel}{\styleVariable{K}}
 \newcommand{\varSecKey}{\styleVariable{sk}}
+\newcommand{\varSecKeyAlice}{\varSecKey_{\varAlice}}
+\newcommand{\varSecKeyBob}{\varSecKey_{\varBob}}
 \newcommand{\varPubKey}{\styleVariable{pk}}
+\newcommand{\varPubKeyAlice}{\varPubKey_{\varAlice}}
+\newcommand{\varPubKeyBob}{\varPubKey_{\varBob}}
+\newcommand{\varPubKeyComp}{\varPubKey_{\styleVariable{comp}}}
 \newcommand{\varKeyPair}{(\varSecKey, \varPubKey)}
+\newcommand{\varKeyPairAlice}{(\varSecKeyAlice, \varPubKeyAlice)}
+\newcommand{\varKeyPairBob}{(\varSecKeyBob, \varPubKeyBob)}
 \newcommand{\varSigScheme}{\Phi}
 \newcommand{\varSigSchemeMP}{\varSigScheme_{\styleVariable{MP}}}
 \newcommand{\varProof}{\pi}
@@ -95,11 +105,19 @@
 \newcommand{\varCoinOut}{\varCoin_{\styleVariable{out}}}
 \newcommand{\varValue}{\styleVariable{v}}
 \newcommand{\varMsg}{\styleVariable{m}}
-\newcommand{\varKey}{\styleVariable{k}}
-\newcommand{\varKeyVerf}{\varKey_{\styleVariable{V}}}
-\newcommand{\varKeyProv}{\varKey_{\styleVariable{P}}}
+\newcommand{\varNonce}{\styleVariable{k}}
+\newcommand{\varNonceAlice}{\styleVariable{\varNonce_{\varAlice}}}
+\newcommand{\varNonceBob}{\styleVariable{\varNonce_{\varBob}}}
+\newcommand{\varS}{\styleVariable{s}}
+\newcommand{\varSAlice}{\styleVariable{s}_\varAlice}
+\newcommand{\varSBob}{\styleVariable{s}_\varBob}
+\newcommand{\varKey}{\styleVariable{x}}
+\newcommand{\varKeyVerf}{\varKey_{\styleVariable{p1}}}
+\newcommand{\varKeyProv}{\varKey_{\styleVariable{p2}}}
 \newcommand{\varKeySt}{\funStar{\varKey}}
 \newcommand{\varRand}{\styleVariable{r}}
+\newcommand{\varRandAlice}{\varRand_{\varAlice}}
+\newcommand{\varRandBob}{\varRand_{\varBob}}
 \newcommand{\varRandProv}{\varRand_{\styleVariable{p}}}
 \newcommand{\varRandVerf}{\varRand_{\styleVariable{v}}}
 \newcommand{\varRandSt}{\funStar{\styleVariable{r}}}
@@ -107,6 +125,10 @@
 \newcommand{\varGkSt}{\funGen{\varKeySt}}
 \newcommand{\varGr}{\funGen{\varRand}}
 \newcommand{\varGrSt}{\funGen{\varRandSt}}
+\newcommand{\varSigAlice}{\varSignature_{\varAlice}}
+\newcommand{\varSigAptAlice}{\varSignature^{\varAlice}_{\styleVariable{apt}}}
+\newcommand{\varSigAptBob}{\varSignature^{\varBob}_{\styleVariable{apt}}}
+\newcommand{\varSigBob}{\varSignature_{\varBob}}
 \newcommand{\varSigPart}{\varSignature_{\styleVariable{prt}}}
 \newcommand{\varSigPartSt}{\funStar{\varSignature_{\styleVariable{prt}}}}
 \newcommand{\varSchnorrChallenge}{\styleVariable{e}}
@@ -127,6 +149,7 @@
 \newcommand{\varCommitment}{\styleVariable{Com}}
 
 % operators
+\newcommand{\opAccess}[2]{#1.#2}
 \newcommand{\opIn}{\in}
 \newcommand{\opConc}{~||~}
 \newcommand{\opForWhich}{~|~}
@@ -138,6 +161,7 @@
 \newcommand{\opNotEq}{~\neq~}
 \newcommand{\opSeperate}{,~}
 \newcommand{\opExcluding}{~\\~}
+\newcommand{\opIff}{~\textit{iff}~}
 
 % procedures
 \newcommand{\procGenRId}{\styleFunction{GenR}}
@@ -168,8 +192,7 @@
 \newcommand{\procVerfPartSig}[6]{ \procVerfPartSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6) }
 \newcommand{\procVerfPartSigDefault}{ \procVerfPartSig{\varMsg}{\varKeyVerf}{\varRandVerf}{\funGen{\varKeyProv}}{\funGen{\varRandProv}}{\varSigPart} }
 \newcommand{\procFinSigId}{\styleFunction{finSig}}
-\newcommand{\procFinSig}[6]{ \procFinSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6)}
-\newcommand{\procFinSigDefault}{ \procFinSig{\varSigPart}{\varSigPartSt}{\funGen{\varKeyProv}}{\funGen{\varKeyVerf}}{\funGen{\varRandProv}}{\varRandProv} }
+\newcommand{\procFinSig}[4]{ \procFinSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
 
 \newcommand{\procAptSigId}{\styleFunction{aptPtSig}}
 \newcommand{\procAptSig}[2]{ \procAptSigId(#1 \opSeperate #2) }
