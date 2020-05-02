@@ -3,7 +3,7 @@ which is specifically tailored for the use in an Atomic Swap scenario in which (
 We will start by explaining the general two-party signature creation protocol as it currently implemented in the Grin Cryptocurrency.
 We reduce the generated signatures to the general case~\cite{schnorr1991efficient} and thereby prove its security. From this protocol, we then derive the adapted variant, which allows hiding a fixed witness
 value in the signature, which can be revealed only by the other party after attaining the final signature.
-We then proof its security by showing that all security definitions defined in~\cite{sanches2020bitcoinchannels} hold.
+We then proof its security by showing that all security definitions defined in~\cite{aumayr2020bitcoinchannels} hold.
 In chapter~\ref{chp:atomicSwap} we will then utilize this scheme to build the Atomic Swap protocol.
 
 We start by defining a instantiation of Signature Scheme (see definition~\ref{def:signatureScheme})) which is currenlty employed in Grin, a Mimblewimble based Cryptocurrency.
@@ -11,32 +11,36 @@ We assume we have a group $\cnstGroup$ with prime $\varPrime$, $\cnstHash$ is a 
 $\procGenId$ creates a keypair $\varKeyPair$, the public key can be distributed to the verifier(s) and the secret key has to be kept private. \\
 $\procSignId$ creates a signature consisting of a variable $\varS$ and generator $\varG$ raised to the nonce used during the signing process $\funGen{\varNonce}$. \\
 $\procVerfId$ allows a verifier knowing the signature $\varSignature$ and the provers public key $\varPubKey$ to verify the signatures validity. \\
-\fbox{
-    \parbox{\textwidth}{
-        \procedure[linenumbering, syntaxhighlight=auto]{$\procGen{\varSecParam}$} {
-            \varKey \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-            \pcreturn (\varSecKey \opAssign \varKey \opSeperate \varPubKey \opAssign \funGen{\varKey})
-        }
-        \procedure[linenumbering, syntaxhighlight=auto]{$\procSign{\varMsg}{\varSecKey}$}{
-            \varNonce \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-            \varRand \opAssign \funGen{\varNonce} \\
-            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKey} \\
-            \varS \opAssign \varNonce \opAdd \varSchnorrChallenge \opMult \varSecKey \\
-            \pcreturn \varSignature \opAssign (\varS, \varRand)
-        }
-        \procedure[linenumbering, syntaxhighlight=auto]{$\procVerf{\varMsg}{\varSignature}{\varPubKey}$} {
-            \varS \opAssign \opAccess{\varSignature}{\varS} \\
-            \varRand \opAssign \opAccess{\varSignature}{\varRand} \\
-            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKey} \\
-            \pcreturn \funGen{\varS} \opEq \varRand \opAdd \varSchnorrChallenge \opMult \varPubKey
+\begin{figure}
+    \label{fig:schnorr}
+    \fbox{
+        \parbox{\textwidth}{
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procGen{\varSecParam}$} {
+                \varKey \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+                \pcreturn (\varSecKey \opAssign \varKey \opSeperate \varPubKey \opAssign \funGen{\varKey})
+            }
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procSign{\varMsg}{\varSecKey}$}{
+                \varNonce \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+                \varRand \opAssign \funGen{\varNonce} \\
+                \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKey} \\
+                \varS \opAssign \varNonce \opAdd \varSchnorrChallenge \opMult \varSecKey \\
+                \pcreturn \varSignature \opAssign (\varS, \varRand)
+            }
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procVerf{\varMsg}{\varSignature}{\varPubKey}$} {
+                \varS \opAssign \opAccess{\varSignature}{\varS} \\
+                \varRand \opAssign \opAccess{\varSignature}{\varRand} \\
+                \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKey} \\
+                \pcreturn \funGen{\varS} \opEq \varRand \opAdd \varSchnorrChallenge \opMult \varPubKey
+            }
         }
     }
-}
+    \caption{Schnorr Signature Scheme as defined in~\cite{schnorr1991efficient}}
+\end{figure}
 Correctness of the Scheme is easy to derive. As $\varS$ is calculated as $\varNonce \opAdd \varSchnorrChallenge \opMult \varSecKey$, when generator $\varG$ is raised to $\varS$, we get
 $\funGen{\varNonce \opAdd \varSchnorrChallenge \opMult \varSecKey}$ which we can transform into $\funGen{\varNonce} \opAdd \varSchnorrChallenge \opMult \funGen{\varSecKey}$, and finally
 into $\varRand \opAdd \varSchnorrChallenge \opMult \varPubKey$ which is the same as the right side of the equation.
 
-\begin{definition}{Two Party Signature Generation}
+\begin{definition}[Two Party Signature Generation]
     \label{def:twoPartySig}
     We now define a multiparty Signature Scheme wrt. to a hard relation $\cnstRelation$ as an extension of the outlined Signature Scheme,
     which allows us to distribute signature generation for a single public key shared between two parties Alice and Bob. We assume both Alice and Bob generated a keypair $\varKeyPairAlice \opConc \varKeyPairBob$
@@ -46,7 +50,7 @@ into $\varRand \opAdd \varSchnorrChallenge \opMult \varPubKey$ which is the same
     \begin{itemize}
         \item $\procSetupPartSigId$ takes as input $\varSecParam$ with $\varN$ as the security parameter and randomly generates a nonce $\varNonce$ as well as $\varRand$ which has to be distributed
         between Alice and Bob.
-        \item $\procGenPartSigId$ takes as input a to be signed message $\varMsg$, Alice's key $\varKeyProv$ and nonce $\varRandProv$. as well as $\varPubKeyBob$ and $\varRandBob$ as provided
+        \item $\procGenPartSigId$ takes as input a to be signed message $\varMsg$, Alice's key $\varSecKeyAlice$ and nonce $\varNonceAlice$. as well as $\varPubKeyBob$ and $\varRandBob$ as provided
         by Bob. In contrast to the regular case we only have one output paramter instead of two, as the nonce used was already generated by the $\procSetupPartSigId$ procedure.
         Note that Bob will also call this procedure with his secrets and the parameters provided to him by Alice.
         \item $\procVerfPartSigId$ lets Alice verify Bobs partial signature and vice verca. Note that the equation the verifier checks is identical to what we have already proven to be correct in the regular
@@ -56,56 +60,71 @@ into $\varRand \opAdd \varSchnorrChallenge \opMult \varPubKey$ which is the same
     \end{itemize}
 \end{definition}
 
-\fbox{
+\begin{figure}
+    \label{fig:twoparty-schnorr}
     \parbox{\textwidth}{
-        \procedure[linenumbering, syntaxhighlight=auto]{$\procSetupPartSig{\varSecParam}$}{
-            \varNonce \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-            \varRand \opAssign \funGen{\varRand} \\
-            \pcreturn (\varNonce, \varRand)
-        }
-        \procedure[linenumbering, syntaxhighlight=auto]{$\procGenPartSig{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob}$} {
-            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRandAlice \opAdd \varRandBob \opConc \varPubKeyAlice \opAdd \varPubKeyBob} \\
-            \varS \opAssign \varSecKeyAlice \opAdd \varSchnorrChallenge \opAdd \varNonceAlice \\
-            \pcreturn \varSigAlice \opAssign (\varS
-        } \\[2\baselineskip]
-        \procedure[linenumbering, syntaxhighlight=auto]{$\procVerfPartSig{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob}{\varSigBob}$} {
-            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRandAlice \opAdd \varRandBob \opConc \varPubKeyAlice \opAdd \varPubKeyBob} \\
-            \varS \opAssign \opAccess{\varSigBob}{\varS} \\
-            \pcreturn \funGen{\varS} \opEq \varPubKeyBob \opAdd \varSchnorrChallenge \opMult \varRandBob
-        } \\[2\baselineskip]
-        \procedure[linenumbering, syntaxhighlight=auto]{$\procFinSig{\varSigAlice}{\varSigBob}{\varRandAlice}{\varRandBob}$} {
-            \varS_\varAlice \opAssign \opAccess{\varSigAlice}{\varS} \\
-            \varS_\varBob \opAssign \opAccess{\varSigBob}{\varS} \\
-            \pcreturn \varSigFin \opAssign (\varS \opAssign \varS_\varAlice \opAdd \varS_\varBob \opSeperate \varRand \opAssign \varRandAlice \opAdd \varRandBob)
+        \fbox{
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procSetupPartSig{\varSecParam}$}{
+                \varNonce \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+                \varRand \opAssign \funGen{\varRand} \\
+                \pcreturn (\varNonce, \varRand)
+            }
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procGenPartSig{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob}$} {
+                \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRandAlice \opAdd \varRandBob \opConc \varPubKeyAlice \opAdd \varPubKeyBob} \\
+                \varS \opAssign \varNonceAlice \opAdd \varSchnorrChallenge \opMult \varSecKeyAlice \\
+                \pcreturn \varSigAlice \opAssign \varS
+            } \\[2\baselineskip]
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procVerfPartSig{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob}{\varSigBob}$} {
+                \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRandAlice \opAdd \varRandBob \opConc \varPubKeyAlice \opAdd \varPubKeyBob} \\
+                \varS \opAssign \opAccess{\varSigBob}{\varS} \\
+                \pcreturn \funGen{\varS} \opEq \varRandBob \opAdd \varSchnorrChallenge \opMult \varPubKeyBob
+            } \\[2\baselineskip]
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procFinSig{\varSigAlice}{\varSigBob}{\varRandAlice}{\varRandBob}$} {
+                \varS_\varAlice \opAssign \opAccess{\varSigAlice}{\varS} \\
+                \varS_\varBob \opAssign \opAccess{\varSigBob}{\varS} \\
+                \pcreturn \varSigFin \opAssign (\varS \opAssign \varS_\varAlice \opAdd \varS_\varBob \opSeperate \varRand \opAssign \varRandAlice \opAdd \varRandBob)
+            }
         }
     }
-}
+    \caption{Two Party Schnorr Signature Scheme}
+\end{figure}
 
 The final signature is a valid signature to the message $\varMsg$ with the composite public key $\varPubKeyComp \opAssign \funGen{\varKeyVerf + \varKeyProv}$.
 A verifier knowing the signed message $\varMsg$, the final signature $\varSigFin$ and the composite public key $\varPubKeyComp$ can now verify the signature using the $\procVerfId$ procedure.
 The challenge $\varSchnorrChallenge$ will be the same because
 $\funHash{\varMsg \opConc \varRand \opConc \varPubKeyComp} \opEq \funHash{\varMsg \opConc \varRandAlice \opAdd \varRandBob \opConc \varPubKeyAlice \varPubKeyBob}$.
-Correctness of the final equality check is proven as follows:
-\[ \funGen{\varS} \]
-\[ \funGen{\varSAlice} \opAdd \funGen{\varSBob} \]
-\[ \funGen{\varSecKeyAlice} \opAdd \varSchnorrChallenge_{\varAlice} \opMult \funGen{\varNonceAlice} \opAdd \funGen{\varSecKeyBob} \opAdd \varSchnorrChallenge_\varBob \opMult \funGen{\varNonceBob} \]
-\[ \varPubKeyAlice \opAdd \varSchnorrChallenge_\varAlice \opMult \varRandAlice \opAdd \varPubKeyBob \opAdd \varSchnorrChallenge_\varBob \opMult \varRandBob \]
-\[ \varPubKeyComp \opAdd \varSchnorrChallenge \opMult \varRand \]
+Correctness of the final equality check of the $\procVerfId$ procedure is given as follows:
 
-\fbox{
-    \parbox{\textwidth} {
-        \procedure[linenumbering, syntaxhighlight=auto]{$\procAptSig{\varSigAlice}{\varWit}$} {
-            \varSigAptAlice \opAssign \varSigAlice \opAdd \varWit \\
-            \pcreturn \varSigAptAlice \opAssign (\varSigPartApt \opSeperate \funGen{\varWit})
-        }
-        \procedure[linenumbering, syntaxhighlight=auto]{$\procVrfApt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob}{\funGen{\varWit}}{\varSigAptBob}$} {
-            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varPubKeyAlice \opAdd \varPubKeyBob \opConc \varRandAlice \opAdd \varRandBob} \\
-            \pcreturn \varSigAptBob \opEq \varPubKeyBob \opAdd \varSchnorrChallenge \opMult \funGen{\varRandBob} \opAdd \funGen{\varWit}
-        } \\
-        \procedure[linenumbering, syntaxhighlight=auto]{$\procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob}$}{
-            \varSigBob \opAssign \varSigFin \opSub \varSigAlice \\
-            \varWit \opAssign \varSigAptBob \opSub \varSigBob \\
-            \pcreturn (\varWit)
+\begin{proof} \label{prf:twoparty-schnorr}
+    We proof equality by continous substitutions in the left side of the final equality check:
+    \begin{align}
+        \funGen{\varS} &\opEq \varRand \opAdd \varSchnorrChallenge \opMult \varPubKeyComp \\
+        \funGen{\varSAlice} \opAdd \funGen{\varSBob} & \\
+        \funGen{\varNonceAlice \opAdd \varSchnorrChallenge_{\varAlice} \opMult \varSecKeyAlice} \opAdd \funGen{\varNonceBob \opAdd \varSchnorrChallenge_{\varBob} \opMult \varSecKeyBob} & \\
+        \funGen{\varNonceAlice} \opAdd \varSchnorrChallenge_{\varAlice} \opMult \funGen{\varSecKeyAlice} \opAdd \funGen{\varNonceBob} \opAdd \varSchnorrChallenge_\varBob \opMult \funGen{\varSecKeyBob} & \\
+        \varRandAlice \opAdd \varSchnorrChallenge_\varAlice \opMult \varPubKeyAlice \opAdd \varRandBob \opAdd \varSchnorrChallenge_\varBob \opMult \varPubKeyBob & \\
+        \varRand \opAdd \varSchnorrChallenge \opMult \varPubKeyComp & \opEq \varRand \opAdd \varSchnorrChallenge \opMult \varPubKeyComp
+    \end{align}
+\end{proof}
+
+\begin{figure}
+    \label{fig:apt-schnorr}
+    \fbox{
+        \parbox{\textwidth} {
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procAptSig{\varSigAlice}{\varWit}$} {
+                \varSigAptAlice \opAssign \varSigAlice \opAdd \varWit \\
+                \pcreturn \varSigAptAlice \opAssign (\varSigPartApt \opSeperate \funGen{\varWit})
+            }
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procVrfApt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob}{\funGen{\varWit}}{\varSigAptBob}$} {
+                \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varPubKeyAlice \opAdd \varPubKeyBob \opConc \varRandAlice \opAdd \varRandBob} \\
+                \pcreturn \varSigAptBob \opEq \varPubKeyBob \opAdd \varSchnorrChallenge \opMult \funGen{\varRandBob} \opAdd \funGen{\varWit}
+            } \\
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob}$}{
+                \varSigBob \opAssign \varSigFin \opSub \varSigAlice \\
+                \varWit \opAssign \varSigAptBob \opSub \varSigBob \\
+                \pcreturn (\varWit)
+            }
         }
     }
-}
+    \caption{Fixed Witness Adaptor Schnorr Signature Scheme}
+\end{figure}

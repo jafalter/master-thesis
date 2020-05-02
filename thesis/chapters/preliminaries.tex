@@ -5,9 +5,9 @@ We first define the general notation used in the following chapters to formalize
 the ring of integers modulo $\varPrime$. $\cnstIntegersPrimeWithoutZero{\varPrime}$ is $\cnstIntegersPrime{\varPrime} \opExcluding \funList{0}$. $\varG \opSeperate \varH$ are adjacent
 generators in $\cnstGroup$, whereas adjacent means the discrete logarithm of $\varH$ in regards to $\varG$ is not known. Exponention stands for repeated application of the group operation.
 
-\begin{definition}{Hard Relation}\label{def:hardRelation}
+\begin{definition}[Hard Relation]\label{def:hardRelation}
     Given a language $\varLanguage \opAssign \funList{\varBigA \opForWhich \exists\varSmallA \text{ s.t. } (\varBigA, \varSmallA) \opIn \cnstRelation}$ then the relation $\cnstRelation$ is
-    considered hard if the following three properties hold:~\cite{sanches2020bitcoinchannels}
+    considered hard if the following three properties hold:~\cite{aumayr2020bitcoinchannels}
     \begin{enumerate}
         \item $\procGenR{\varSecParam}$ is a $\cnstPolyTime$ sampling algorithm which outputs a statement/witness of the form $(\varBigA, \varSmallA) \opIn \cnstRelation$.
         \item Relation $\cnstRelation$ is poly-time decidable.
@@ -20,17 +20,17 @@ generators in $\cnstGroup$, whereas adjacent means the discrete logarithm of $\v
     \end{enumerate}
 \end{definition}
 
-\begin{definition}{Signature Scheme}\label{def:signatureScheme}
-    A valid Signature Sccheme must provide three procedures:
-    \[ \varSigScheme = (\procGenDefault \opSeperate \procSignDefault \opSeperate \procVerfDefault) \]
-    $\procGenDefault$ takes as input a security parameter $\varSecParam$ and outputs a keypair $\varKeyPair$, consisting of a secret key $\varSecKey$ and a public key $\varPubKey$, whereas
+\begin{definition}[Signature Scheme]\label{def:signatureScheme}
+    A valid Signature Scheme must provide three procedures:
+    \[ \varSigScheme = (\procGenId \opSeperate \procSignId \opSeperate \procVerfId) \]
+    $\procGenId$ takes as input a security parameter $\varSecParam$ and outputs a keypair $\varKeyPair$, consisting of a secret key $\varSecKey$ and a public key $\varPubKey$, whereas
     the secret key has to be kept private and the public key is shared with other parties.
-    $\varSecKey$ can be used together with a message $\varMsg$ to call the $\procSignDefault$ procedure to create a signature $\varSignature$ over the message $\varMsg$.
-    Parties knowing $\varPubKey$ can then test the validity of the signature by calling $\procVerfDefault$ with the same message $\varMsg$. The procedure will only output $1$ if the message was
+    $\varSecKey$ can be used together with a message $\varMsg$ to call the $\procSign{\varSecKey}{\varMsg}$ procedure to create a signature $\varSignature$ over the message $\varMsg$.
+    Parties knowing $\varPubKey$ can then test the validity of the signature by calling $\procVerf{\varPubKey}{\varSignature}{\varMsg}$ with the same message $\varMsg$. The procedure will only output $1$ if the message was
     indeed signed with the correct secret key $\varSecKey$ of $\varPubKey$ and therefore proves the possesion of $\varSecKey$ by the signer.
     A valid signature scheme have to fullfill two security properties
     \begin{itemize}
-        \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold $\procVerf{\varPubKey}{\procSignDefault}{\varMsg} \opEq 1$
+        \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold $\procVerf{\varPubKey}{\procSign{\varSecKey}{\varMsg}}{\varMsg} \opEq 1$
         \item Unforgability: Note that there are different levels of Unforgability:~\cite{goldwasser1988digital}
         \begin{itemize}
             \item Universal Forgery: The ability to forge signatures for any message.
@@ -40,7 +40,7 @@ generators in $\cnstGroup$, whereas adjacent means the discrete logarithm of $\v
     \end{itemize}
 \end{definition}
 
-\begin{definition}{Cryptographic Hash Function}\label{def:hashFunction}
+\begin{definition}[Cryptographic Hash Function]\label{def:hashFunction}
     A cryptographic hash function $\cnstHash$ is defined as $\funHash{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$. A secure hashing function
     has to fullfill the following security properties:~\cite{al2011cryptographic}
     \begin{itemize}
@@ -54,7 +54,7 @@ generators in $\cnstGroup$, whereas adjacent means the discrete logarithm of $\v
     \end{itemize}
 \end{definition}
 
-\begin{definition}{Commitment Scheme}\label{def:commitment}~\cite{bunz2018bulletproofs}
+\begin{definition}[Commitment Scheme]\label{def:commitment}~\cite{bunz2018bulletproofs}
     A cryptographic Commitment is defined by a pair of functions $(\procSetup{\varSecParam} \opSeperate \procCommitId(\varInput, \varRand))$. $\procSetupId$ is the setup procedure, it takes as input a
     security parameter $\varSecParam$ and outputs public parameters $\varPublicParam$. Depending on $\varPublicParam$ we define a input space $\varInputSpace_{\varPublicParam}$,
     a randomness space $\varRandSpace_{\varPublicParam}$ and a commitment space $\varCommitSpace_{\varPublicParam}$.\\
@@ -71,12 +71,12 @@ generators in $\cnstGroup$, whereas adjacent means the discrete logarithm of $\v
     \end{itemize}
 \end{definition}
 
-\begin{definition}{Homomorphic Commitment}\label{def:homomorphicCom}
+\begin{definition}[Homomorphic Commitment]\label{def:homomorphicCom}
     If a Commitment Scheme as defined in~\ref{def:commitment} is homomorphic then the following must hold
     \[ \procCommit{\varInput_1}{\varRand_1} \opAdd \procCommit{\varInput_2}{\varRand_2} \opEq \procCommit{\varInput_1 \opAdd \varInput_2}{\varRand_1 \opAdd \varRand_2} \]
 \end{definition}
 
-\begin{definition}{Pedersen Commitment}\label{def:pedersenCom}
+\begin{definition}[Pedersen Commitment]\label{def:pedersenCom}
     A Pedersen Commitment is an instantiation of a Homomoprhic Commitment Scheme as definied in~\ref{def:homomorphicCom}:
     \[ \varCommitSpace_{\varPublicParam} \opAssign \cnstGroup\] of order $\varPrime \opSeperate \varInputSpace_{\varPublicParam} \opSeperate \varRandSpace_{\varPublicParam} \opAssign \cnstIntegersPrime{\varPrime}$.
     the procedures $(\procSetupId, \procCommitId)$ are then instantiated as:

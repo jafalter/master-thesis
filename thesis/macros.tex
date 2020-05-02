@@ -1,0 +1,144 @@
+\newcommand{\authorname}{Jakob Abfalter} % The author name without titles.
+\newcommand{\thesistitle}{Adaptor Signature Based Atomic Swaps Between Bitcoin and a Mimblewimble Based Cryptocurrency} % The title of the thesis. The English version should be used, if it exists.
+
+\newcommand{\styleVariable}[1]{\mathit{#1}}
+\newcommand{\styleFunction}[1]{\mathsf{#1}}
+\newcommand{\styleCal}[1]{\mathcal{#1}}
+\newcommand{\styleSet}[1]{\mathbb{#1}}
+
+% constants
+\newcommand{\cnstIntegersPrime}[1]{\ZZ_{#1}}
+\newcommand{\cnstIntegersPrimeWithoutZero}[1]{\cnstIntegersPrime{#1}^{*}}
+\newcommand{\cnstBinary}[1]{\{0,1\}^{#1}}
+\newcommand{\cnstHash}{\styleFunction{h}}
+\newcommand{\cnstGroup}{\styleSet{G}}
+\newcommand{\cnstRelation}{\styleVariable{R}}
+\newcommand{\cnstPolyTime}{\styleVariable{PPT}}
+\newcommand{\varG}{\styleVariable{g}}
+\newcommand{\varH}{\styleVariable{h}}
+\newcommand{\cnstAdversary}{\styleSet{A}}
+
+% functions
+\newcommand{\funHash}[1]{\cnstHash (#1)}
+\newcommand{\funGen}[1]{\varG^{#1}}
+\newcommand{\funGenH}[1]{\varH^{#1}}
+\newcommand{\funList}[1]{\{#1\}}
+\newcommand{\funStar}[1]{#1'}
+\newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
+
+% variables
+\newcommand{\varAlice}{\styleVariable{A}}
+\newcommand{\varBob}{\styleVariable{B}}
+\newcommand{\varX}{\styleVariable{x}}
+\newcommand{\varProbability}{\styleVariable{P}}
+\newcommand{\varLanguage}{\styleVariable{L}_\cnstRelation}
+\newcommand{\varPrime}{\styleVariable{p}}
+\newcommand{\varN}{\styleVariable{n}}
+\newcommand{\varTx}{\styleVariable{tx}}
+\newcommand{\varExcess}{\styleCal{E}}
+\newcommand{\varKernel}{\styleVariable{K}}
+\newcommand{\varSecKey}{\styleVariable{sk}}
+\newcommand{\varSecKeyAlice}{\varSecKey_{\varAlice}}
+\newcommand{\varSecKeyBob}{\varSecKey_{\varBob}}
+\newcommand{\varPubKey}{\styleVariable{pk}}
+\newcommand{\varPubKeyAlice}{\varPubKey_{\varAlice}}
+\newcommand{\varPubKeyBob}{\varPubKey_{\varBob}}
+\newcommand{\varPubKeyComp}{\varPubKey_{\styleVariable{comp}}}
+\newcommand{\varKeyPair}{(\varSecKey, \varPubKey)}
+\newcommand{\varKeyPairAlice}{(\varSecKeyAlice, \varPubKeyAlice)}
+\newcommand{\varKeyPairBob}{(\varSecKeyBob, \varPubKeyBob)}
+\newcommand{\varSigScheme}{\Phi}
+\newcommand{\varSigSchemeMP}{\varSigScheme_{\styleVariable{MP}}}
+\newcommand{\varProof}{\pi}
+\newcommand{\varSignature}{\sigma}
+\newcommand{\varInput}{\styleVariable{I}}
+\newcommand{\varFundValue}{\styleVariable{p}}
+\newcommand{\varOffset}{\styleVariable{o}}
+\newcommand{\varSupply}{\styleVariable{s}}
+\newcommand{\varCoin}{\styleCal{C}}
+\newcommand{\varCoinInp}{\varCoin_{\styleVariable{inp}}}
+\newcommand{\varCoinOut}{\varCoin_{\styleVariable{out}}}
+\newcommand{\varValue}{\styleVariable{v}}
+\newcommand{\varMsg}{\styleVariable{m}}
+\newcommand{\varNonce}{\styleVariable{k}}
+\newcommand{\varNonceAlice}{\styleVariable{\varNonce_{\varAlice}}}
+\newcommand{\varNonceBob}{\styleVariable{\varNonce_{\varBob}}}
+\newcommand{\varS}{\styleVariable{s}}
+\newcommand{\varSAlice}{\styleVariable{s}_\varAlice}
+\newcommand{\varSBob}{\styleVariable{s}_\varBob}
+\newcommand{\varKey}{\styleVariable{x}}
+\newcommand{\varKeyVerf}{\varKey_{\styleVariable{p1}}}
+\newcommand{\varKeyProv}{\varKey_{\styleVariable{p2}}}
+\newcommand{\varKeySt}{\funStar{\varKey}}
+\newcommand{\varRand}{\styleVariable{r}}
+\newcommand{\varRandAlice}{\varRand_{\varAlice}}
+\newcommand{\varRandBob}{\varRand_{\varBob}}
+\newcommand{\varSigAlice}{\varSignature_{\varAlice}}
+\newcommand{\varSigAptAlice}{\varSignature^{\varAlice}_{\styleVariable{apt}}}
+\newcommand{\varSigAptBob}{\varSignature^{\varBob}_{\styleVariable{apt}}}
+\newcommand{\varSigBob}{\varSignature_{\varBob}}
+\newcommand{\varSigPart}{\varSignature_{\styleVariable{prt}}}
+\newcommand{\varSigPartSt}{\funStar{\varSignature_{\styleVariable{prt}}}}
+\newcommand{\varSchnorrChallenge}{\styleVariable{e}}
+\newcommand{\varGSigPart}{\funGen{\varSigPart}}
+\newcommand{\varSigPartApt}{\varSignature_{\styleVariable{prt\_apt}}}
+\newcommand{\varSigPartAptSt}{\funStar{\varSigPartApt}}
+\newcommand{\varGSigPartAptSt}{\funGen{\varSigPartAptSt}}
+\newcommand{\varWit}{\styleVariable{x}}
+\newcommand{\varGWit}{\funGen{\varWit}}
+\newcommand{\varSigFin}{\varSignature_{\styleVariable{fin}}}
+\newcommand{\varSecParam}{\styleVariable{1^n}}
+\newcommand{\varBigA}{\styleVariable{A}}
+\newcommand{\varSmallA}{\styleVariable{a}}
+\newcommand{\varPublicParam}{\styleVariable{PP}}
+\newcommand{\varInputSpace}{\styleSet{I}}
+\newcommand{\varRandSpace}{\styleSet{R}}
+\newcommand{\varCommitSpace}{\styleSet{C}}
+\newcommand{\varCommitment}{\styleVariable{C}}
+
+% operators
+\newcommand{\opAccess}[2]{#1.#2}
+\newcommand{\opIn}{\in}
+\newcommand{\opConc}{~||~}
+\newcommand{\opForWhich}{~|~}
+\newcommand{\opAdd}{~+~}
+\newcommand{\opAssign}{~:=~}
+\newcommand{\opSub}{~-~}
+\newcommand{\opMult}{~*~}
+\newcommand{\opEq}{~=~}
+\newcommand{\opNotEq}{~\neq~}
+\newcommand{\opSeperate}{,~}
+\newcommand{\opExcluding}{~\\~}
+\newcommand{\opIff}{~\textit{iff}~}
+
+% procedures
+\newcommand{\procGenRId}{\styleFunction{GenR}}
+\newcommand{\procGenR}[1]{\procGenRId{#1}}
+
+\newcommand{\procCommitId}{\styleFunction{Commit}}
+\newcommand{\procCommit}[2]{\procCommitId(#1, #2)}
+\newcommand{\procSetupId}{\styleFunction{Setup}}
+\newcommand{\procSetup}[1]{\procCommitId(#1)}
+
+\newcommand{\procGenId}{\styleFunction{\styleFunction{Gen}}}
+\newcommand{\procGen}[1]{ \procGenId(#1) }
+\newcommand{\procSignId}{\styleFunction{Sign}}
+\newcommand{\procSign}[2]{ \procSignId(#1, #2) }
+\newcommand{\procVerfId}{\styleFunction{Verf}}
+\newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
+
+\newcommand{\procSetupPartSigId}{\styleFunction{setupPt}}
+\newcommand{\procSetupPartSig}[1]{\procSetupPartSigId (#1)}
+\newcommand{\procGenPartSigId}{\styleFunction{genPtSig}}
+\newcommand{\procGenPartSig}[5]{ \procGenPartSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5) }
+\newcommand{\procVerfPartSigId}{\styleFunction{vrfPtSig}}
+\newcommand{\procVerfPartSig}[6]{ \procVerfPartSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6) }
+\newcommand{\procFinSigId}{\styleFunction{finSig}}
+\newcommand{\procFinSig}[4]{ \procFinSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
+
+\newcommand{\procAptSigId}{\styleFunction{aptPtSig}}
+\newcommand{\procAptSig}[2]{ \procAptSigId(#1 \opSeperate #2) }
+\newcommand{\procExtWitId}{\styleFunction{extWit}}
+\newcommand{\procExtWit}[3]{ \procExtWitId(#1 \opSeperate #2 \opSeperate #3) }
+\newcommand{\procVrfAptId}{\styleFunction{vrfAptSig}}
+\newcommand{\procVrfApt}[7]{ \procVrfAptId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6 \opSeperate #7) }
