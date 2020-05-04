@@ -35,6 +35,8 @@
 \newcommand{\varPrime}{\styleVariable{p}}
 \newcommand{\varN}{\styleVariable{n}}
 \newcommand{\varTx}{\styleVariable{tx}}
+\newcommand{\varTxAlice}{\varTx_{\varAlice}}
+\newcommand{\varTxBob}{\varTx_{\varBob}}
 \newcommand{\varExcess}{\styleCal{E}}
 \newcommand{\varKernel}{\styleVariable{K}}
 \newcommand{\varSecKey}{\styleVariable{sk}}
@@ -44,11 +46,13 @@
 \newcommand{\varPubKeyAlice}{\varPubKey_{\varAlice}}
 \newcommand{\varPubKeyBob}{\varPubKey_{\varBob}}
 \newcommand{\varPubKeyComp}{\varPubKey_{\styleVariable{comp}}}
+\newcommand{\varPubKeyCompApt}{\varPubKey_{\styleVariable{comp\_apt}}}
 \newcommand{\varKeyPair}{(\varSecKey, \varPubKey)}
 \newcommand{\varKeyPairAlice}{(\varSecKeyAlice, \varPubKeyAlice)}
 \newcommand{\varKeyPairBob}{(\varSecKeyBob, \varPubKeyBob)}
 \newcommand{\varSigScheme}{\Phi}
 \newcommand{\varSigSchemeMP}{\varSigScheme_{\styleVariable{MP}}}
+\newcommand{\varSigSchemeApt}{\varSigScheme_{\styleVariable{Apt}}}
 \newcommand{\varProof}{\pi}
 \newcommand{\varSignature}{\sigma}
 \newcommand{\varInput}{\styleVariable{I}}
@@ -58,6 +62,9 @@
 \newcommand{\varCoin}{\styleCal{C}}
 \newcommand{\varCoinInp}{\varCoin_{\styleVariable{inp}}}
 \newcommand{\varCoinOut}{\varCoin_{\styleVariable{out}}}
+\newcommand{\varCoinOutAlice}{\varCoinOut^{\varAlice}}
+\newcommand{\varCoinOutBob}{\varCoinOut^{\varBob}}
+\newcommand{\varCoinSpecial}{\varCoinOut^{\styleVariable{sp}}}
 \newcommand{\varValue}{\styleVariable{v}}
 \newcommand{\varMsg}{\styleVariable{m}}
 \newcommand{\varNonce}{\styleVariable{k}}
@@ -136,8 +143,10 @@
 \newcommand{\procFinSigId}{\styleFunction{finSig}}
 \newcommand{\procFinSig}[4]{ \procFinSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
 
-\newcommand{\procAptSigId}{\styleFunction{aptPtSig}}
-\newcommand{\procAptSig}[2]{ \procAptSigId(#1 \opSeperate #2) }
+\newcommand{\procSetupAptId}{\styleFunction{setupApt}}
+\newcommand{\procSetupApt}[1]{\procSetupAptId(#1)}
+\newcommand{\procGenPtAptSigId}{\styleFunction{getAptPtSig}}
+\newcommand{\procGenPtAptSig}[6]{(\procGenPtAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6)}
 \newcommand{\procExtWitId}{\styleFunction{extWit}}
 \newcommand{\procExtWit}[3]{ \procExtWitId(#1 \opSeperate #2 \opSeperate #3) }
 \newcommand{\procVrfAptId}{\styleFunction{vrfAptSig}}

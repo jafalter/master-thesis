@@ -166,8 +166,8 @@ As already pointed out, building transactions in Mimblewimble is an interactive 
 to build a transaction:~\cite{jedusor2016mimblewimble}\\
 Assume Alice wants to transfer coins of value $\varFundValue$ to Bob.
 \begin{enumerate}
-    \item Alice first selects input coins $\varCoinInp$ of total value $\varValue \geq \varFundValue$ that she controls. She than creates change coin outputs $\varCoinOut^{A}$ (could be multiple) of total value $\varValue \opSub \varFundValue$ and then
-    sends $\varCoinInp \opSeperate \varCoinOut^{A}$, a valid range proofs for $\varCoinOut^{A}$, plus the opening $(-\varFundValue \opSeperate \varKey)$ of $\sum{\varCoinOut^{A}} \opSub \sum{\varCoinInp}$ to Bob.
+    \item Alice first selects input coins $\varCoinInp$ of total value $\varValue \geq \varFundValue$ that she controls. She than creates change coin outputs $\varCoinOutAlice$ (could be multiple) of total value $\varValue \opSub \varFundValue$ and then
+    sends $\varCoinInp \opSeperate \varCoinOutAlice$, a valid range proofs for $\varCoinOutAlice$, plus the opening $(-\varFundValue \opSeperate \varKey)$ of $\sum{\varCoinOutAlice} \opSub \sum{\varCoinInp}$ to Bob.
     \item Bob creates himself additional output coins $\varCoinOut^B$ plus range proofs of total value $\varFundValue$ with keys $(\varKeySt_i)$ and computes a signature $\varSignature$ with the combined secret key $\varKey \opAdd \sum{\varKeySt_i}$ and
     and finalizes the transaction as
     \[ \varTx \opAssign (0 \opSeperate \varCoinInp \opSeperate \varCoinOut^A \opConc \varCoinOut^B \opSeperate (\varProof \opSeperate \varExcess \opAssign \sum{\varCoinOut^A} \opAdd \sum{\varCoinOut^B} \opSub \sum{\varCoinInp} \opSeperate \varSignature)) \]
@@ -181,15 +181,15 @@ Figure~\ref{fig:txOriginal} depicts the original transaction flow.\\
         \textbf{Alice} \< \< \< \< \textbf{Bob} \\ [][\hline]
         \< \< \< \< \\
         \text{ Select $\varCoinInp$ of value $\varValue \geq \varFundValue$ } \< \< \< \< \\
-        \text{ Create $\varCoinOut^{A}$ of value $\varValue \opSub \varFundValue$} \< \< \< \< \\
-        \text{ $\varExcess_{A} \opAssign \sum{\varCoinOut^{A}} \opSub \sum{\varCoinInp}$ } \\
+        \text{ Create $\varCoinOutAlice$ of value $\varValue \opSub \varFundValue$} \< \< \< \< \\
+        \text{ $\varExcess_{A} \opAssign \sum{\varCoinOutAlice} \opSub \sum{\varCoinInp}$ } \\
         \text{ $(-\varFundValue \opSeperate \varKey)$ opening to $\varExcess_{A}$ } \< \< \< \< \\
-        \text{ Create range-proof $\varProof$ for $\varCoinOut^{A}$ } \< \< \< \< \\
+        \text{ Create range-proof $\varProof$ for $\varCoinOutAlice$ } \< \< \< \< \\
         \< \sendmessageright{ top=$(-\varFundValue \opSeperate \varKey) \opSeperate \varProof$ } \< \< \< \\
         \< \< \< \< \text{Create $\varCoinOut^B$ with value $\varFundValue$ and keys $(\varKeySt_i)$ } \\
         \< \< \< \< \text{$\varKey_{shared} \opAssign \varKey \opAdd \sum{\varKeySt_i}$ } \\
         \< \< \< \< \text{Create $\varSignature$ with $\varKey_{shared}$} \\
-        \< \< \< \< \text{ Create range-proof $\varProof$ for $\varCoinOut^{B}$ } \\
+        \< \< \< \< \text{ Create range-proof $\varProof$ for $\varCoinOutBob$ } \\
         \< \< \< \< \text{Finalize transaction $\varTx$} \\
     }
     \caption{Original transaction building process}
@@ -211,14 +211,35 @@ The problem was solved in the Grin Cryptocurrency by making the signing process 
 
 Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} proposed the following alternative way to build transactions which would not be vulnerable to this problem.
 \begin{enumerate}
-    \item Alice constructs a full-fledged transaction $\varTx_A$ spending her input coins $\varCoinInp$ and creates her change coins $\varCoinOut^A$, plus a special output coin $\varCoinOut^{sp} \opAssign \funGenH{\varFundValue} \opAdd \funGen{\varKey_{sp}}$,
+    \item Alice constructs a full-fledged transaction $\varTx_A$ spending her input coins $\varCoinInp$ and creates her change coins $\varCoinOut^A$, plus a special output coin $\varCoinSpecial \opAssign \funGenH{\varFundValue} \opAdd \funGen{\varKey_{sp}}$,
     where $\varFundValue$ is the desired value which should be transferred to Bob and $\varKey_{sp}$ is a randomly choosen key. She proceeds by sending $\varTx_A$ as well as $(\varFundValue \opSeperate \varKey_{sp})$ and the necessary range
     proofs to Bob.
-    \item Bob now creates a second transaction $\varTx_B$ spending the special coin $\varCoinOut^{sp}$ to create an output only he controls $\varCoinOut^{B}$ and merges $\varTx_A$ with $\varTx_B$
-    into $\varTx_m$. He then broadcasts $\varTx_m$ to the network. Note that when the two transactions are merged the intermediate special coin $\varCoinOut^{sp}$ will be both in the coin output and input list
+    \item Bob now creates a second transaction $\varTx_B$ spending the special coin $\varCoinSpecial$ to create an output only he controls $\varCoinOutBob$ and merges $\varTx_A$ with $\varTx_B$
+    into $\varTx_m$. He then broadcasts $\varTx_m$ to the network. Note that when the two transactions are merged the intermediate special coin $\varCoinSpecial$ will be both in the coin output and input list
     of the transaction and therfore will be discarded.
 \end{enumerate}
 The only drawback of this approach is that we have two transaction kernels instead of just one because of the merging step, making the transaction slightly bigger.
+A figure showing the protocol flow is depicted in figure~\ref{fig:txSalvaged}.
+
+\begin{figure}
+    \label{fig:txSalvaged}
+    \centering
+    \pseudocode{
+        \textbf{Alice} \< \< \< \< \textbf{Bob} \\ [][\hline]
+        \< \< \< \< \\
+        \text{ Select $\varCoinInp$ of value $\varValue \geq \varFundValue$ } \< \< \< \< \\
+        \text{ Create $\varCoinOutAlice$ of value $\varValue \opSub \varFundValue$ } \< \< \< \< \\
+        \varKey_{sp} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \< \< \\
+        \text{ Create $\varCoinSpecial \opAssign \funGenH{\varFundValue} \opAdd \funGen{\varKey_{sp}}$ } \< \< \< \< \\
+        \text{ Construct and sign $\varTxAlice$ with $\varCoinInp \opSeperate \varCoinOutAlice \opSeperate \varCoinSpecial$ } \< \< \< \< \\
+        \< \sendmessageright{ top=$\varTxAlice \opSeperate \varFundValue \opSeperate \varKey_{sp}$ } \< \< \< \\
+        \< \< \< \< \text{ Create $\varCoinOut^B$ with value $\varFundValue$ } \\
+        \< \< \< \< \text{ Create $\varTxBob$ spending $\varCoinSpecial$ to $\varCoinOut^B$ } \\
+        \< \< \< \< \text{ Merge $\varTxAlice$ and $\varTxBob$ to $\varTx_{m}$ } \\
+        \< \< \< \< \text{ Publish $\varTx_{m}$ }
+    }
+    \caption{Salvaged tranction protocol by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate}}
+\end{figure}
 
 \section{Scriptless Scripts}\label{sec:scriptlessScripts}
 

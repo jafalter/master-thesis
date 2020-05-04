@@ -1,7 +1,7 @@
 In this chapter, we will define a variant of the Adaptor Signature scheme as seen in~\ref{sec:aptSignatures},
 which is specifically tailored for the use in an Atomic Swap scenario in which (at least one side of the swap) uses a two-party protocol to generate transaction signatures.
 We will start by explaining the general two-party signature creation protocol as it currently implemented in the Grin Cryptocurrency.
-We reduce the generated signatures to the general case~\cite{schnorr1991efficient} and thereby prove its security. From this protocol, we then derive the adapted variant, which allows hiding a fixed witness
+We reduce the generated signatures to the general case~\cite{schnorr1989efficient} and thereby prove its security. From this protocol, we then derive the adapted variant, which allows hiding a fixed witness
 value in the signature, which can be revealed only by the other party after attaining the final signature.
 We then proof its security by showing that all security definitions defined in~\cite{aumayr2020bitcoinchannels} hold.
 In chapter~\ref{chp:atomicSwap} we will then utilize this scheme to build the Atomic Swap protocol.
@@ -34,7 +34,7 @@ $\procVerfId$ allows a verifier knowing the signature $\varSignature$ and the pr
             }
         }
     }
-    \caption{Schnorr Signature Scheme as defined in~\cite{schnorr1991efficient}}
+    \caption{Schnorr Signature Scheme as defined in~\cite{schnorr1989efficient}}
 \end{figure}
 Correctness of the Scheme is easy to derive. As $\varS$ is calculated as $\varNonce \opAdd \varSchnorrChallenge \opMult \varSecKey$, when generator $\varG$ is raised to $\varS$, we get
 $\funGen{\varNonce \opAdd \varSchnorrChallenge \opMult \varSecKey}$ which we can transform into $\funGen{\varNonce} \opAdd \varSchnorrChallenge \opMult \funGen{\varSecKey}$, and finally
@@ -62,8 +62,8 @@ into $\varRand \opAdd \varSchnorrChallenge \opMult \varPubKey$ which is the same
 
 \begin{figure}
     \label{fig:twoparty-schnorr}
-    \parbox{\textwidth}{
-        \fbox{
+    \fbox{
+        \parbox{\textwidth}{
             \procedure[linenumbering, syntaxhighlight=auto]{$\procSetupPartSig{\varSecParam}$}{
                 \varNonce \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
                 \varRand \opAssign \funGen{\varRand} \\
@@ -95,30 +95,57 @@ The challenge $\varSchnorrChallenge$ will be the same because
 $\funHash{\varMsg \opConc \varRand \opConc \varPubKeyComp} \opEq \funHash{\varMsg \opConc \varRandAlice \opAdd \varRandBob \opConc \varPubKeyAlice \varPubKeyBob}$.
 Correctness of the final equality check of the $\procVerfId$ procedure is given as follows:
 
-\begin{proof} \label{prf:twoparty-schnorr}
-    We proof equality by continous substitutions in the left side of the final equality check:
+\begin{proof}
+    \label{prf:twopartySchnorr}
+    The proof is by showing equality of the equation checked by the verifier by continous substitutions in the left side of equation:
     \begin{align}
         \funGen{\varS} &\opEq \varRand \opAdd \varSchnorrChallenge \opMult \varPubKeyComp \\
         \funGen{\varSAlice} \opAdd \funGen{\varSBob} & \\
-        \funGen{\varNonceAlice \opAdd \varSchnorrChallenge_{\varAlice} \opMult \varSecKeyAlice} \opAdd \funGen{\varNonceBob \opAdd \varSchnorrChallenge_{\varBob} \opMult \varSecKeyBob} & \\
-        \funGen{\varNonceAlice} \opAdd \varSchnorrChallenge_{\varAlice} \opMult \funGen{\varSecKeyAlice} \opAdd \funGen{\varNonceBob} \opAdd \varSchnorrChallenge_\varBob \opMult \funGen{\varSecKeyBob} & \\
-        \varRandAlice \opAdd \varSchnorrChallenge_\varAlice \opMult \varPubKeyAlice \opAdd \varRandBob \opAdd \varSchnorrChallenge_\varBob \opMult \varPubKeyBob & \\
+        \funGen{\varNonceAlice \opAdd \varSchnorrChallenge \opMult \varSecKeyAlice} \opAdd \funGen{\varNonceBob \opAdd \varSchnorrChallenge \opMult \varSecKeyBob} & \\
+        \funGen{\varNonceAlice} \opAdd \varSchnorrChallenge \opMult \funGen{\varSecKeyAlice} \opAdd \funGen{\varNonceBob} \opAdd \varSchnorrChallenge \opMult \funGen{\varSecKeyBob} & \\
+        \varRandAlice \opAdd \varSchnorrChallenge \opMult \varPubKeyAlice \opAdd \varRandBob \opAdd \varSchnorrChallenge \opMult \varPubKeyBob & \\
         \varRand \opAdd \varSchnorrChallenge \opMult \varPubKeyComp & \opEq \varRand \opAdd \varSchnorrChallenge \opMult \varPubKeyComp
     \end{align}
 \end{proof}
+
+\begin{definition}[Two Party Fixed Witness Adaptor Schnorr Signature Scheme]\label{def:twoPartyFixedWitAptSig}
+    From the definition~\ref{def:twoPartySig} we now derive an adapted Signature Scheme $\varSigSchemeApt$ which allows one of the participants to hide the discrete logarithm $\varWit$ of a curve point $\funGen{\varWit}$ choosen
+    at the beginning of the protocol. Again we extend our previously defined Signature Scheme with new functions:
+    \[ \varSigSchemeApt \opAssign (\varSigSchemeMP \opConc \procGenPtAptSigId, \procVrfAptId, \procExtWitId) \]
+    \begin{itemize}
+        \item $\procSetupAptId$ generates randomly a secret witness $\varWit$ which has to be kept private and is revealed to the other party by receiving the final composite signature. $\varGWit$ is distributed
+        to the other party. In a Atomic Swap scenario between Alice and Bob (which we will describe in~\ref{chp:atomicSwap}) Bob receiving $\varGWit$ can now convince himself of its validity. (For example by verifying that
+        there are indeed funds available to him if he receives the secret $\varWit$).
+        \item $\procGenPtAptSigId$ allows Alice (knowing $\varWit$) to create a adapted partial signature (as defined in~\ref{def:twoPartySig}) which hides the secret $\varWit$ without immediately revealing it.
+        It outputs the adapted partial signature, which can be verified to contain $\varWit$ by Bob (knowing $\varGWit$).
+        \item $\procVrfAptId$ makes it possible to verify the validity of an adapted partial signature plus that it indeed contains the secret witness of $\varGWit$. Assume Bob provided a adapted partial signature to Alice,
+        Alice calculates the Schnorr challenge $\varSchnorrChallenge$ as previously defined, but when comparing equality of the provided partial signature and her computed values she will add $\varGWit$ to additionally
+        verify the signature containing witness $\varWit$.
+        \item $\procExtWitId$ lets Alice extract the secret witness $\varWit$ from a final composite signature, her own partial signature $\varSigAlice$ and Bobs adapted partial signature $\varSigAptBob$. She does
+        so by first calculating Bobs partial signature without the added witness by simply substracting her partial signature from the composite one. Knowing Bobs adapted partial signature as well as the unadapted one she
+        can simply substract the two values to receive the secret $\varX$.
+    \end{itemize}
+    Figure~\ref{fig:apt-schnorr} shows the concrete construction of the functions. The final signature is created again by calling $\procFinSigId$ with the partial signatures computes by Alice and Bob. (Note that the
+    signature Bob provides is adapted)
+\end{definition}
 
 \begin{figure}
     \label{fig:apt-schnorr}
     \fbox{
         \parbox{\textwidth} {
-            \procedure[linenumbering, syntaxhighlight=auto]{$\procAptSig{\varSigAlice}{\varWit}$} {
-                \varSigAptAlice \opAssign \varSigAlice \opAdd \varWit \\
-                \pcreturn \varSigAptAlice \opAssign (\varSigPartApt \opSeperate \funGen{\varWit})
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procSetupApt{\varSecParam}$} {
+                \varWit \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+                \pcreturn (\varWit, \varGWit)
             }
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procGenPtAptSig{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob}{\varWit}$}{
+                \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRandAlice \opAdd \varRandBob \opConc \varPubKeyAlice \opAdd \varPubKeyBob} \\
+                \varS \opAssign \varNonceAlice \opAdd \varSchnorrChallenge \opMult (\varSecKeyAlice \opAdd \varWit) \\
+                \pcreturn \varSigAptAlice \opAssign (\varS)
+            } \\[2\baselineskip]
             \procedure[linenumbering, syntaxhighlight=auto]{$\procVrfApt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob}{\funGen{\varWit}}{\varSigAptBob}$} {
                 \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varPubKeyAlice \opAdd \varPubKeyBob \opConc \varRandAlice \opAdd \varRandBob} \\
                 \pcreturn \varSigAptBob \opEq \varPubKeyBob \opAdd \varSchnorrChallenge \opMult \funGen{\varRandBob} \opAdd \funGen{\varWit}
-            } \\
+            }
             \procedure[linenumbering, syntaxhighlight=auto]{$\procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob}$}{
                 \varSigBob \opAssign \varSigFin \opSub \varSigAlice \\
                 \varWit \opAssign \varSigAptBob \opSub \varSigBob \\
@@ -128,3 +155,36 @@ Correctness of the final equality check of the $\procVerfId$ procedure is given 
     }
     \caption{Fixed Witness Adaptor Schnorr Signature Scheme}
 \end{figure}
+
+We proof the correctness of this extended scheme by showing that a verifier calling $\procVerfId$ will be able to verfiy the signature under the composite adapted public key
+$\varPubKeyCompApt \opAssign \varPubKeyAlice \opAdd \varPubKeyBob \opAdd \varGWit$. We assume Alice built her partial signature using the regular $\procGenPartSigId$ and
+Bob called the adapted variant $\procGenPtAptSigId$ hiding the secret $\varWit$ in his partial signature.
+
+\begin{proof}
+    \label{prf:aptSchnorr}
+    Again the proof is by continous substitutions in the equation checked by the verifier:
+    \begin{align}
+        \funGen{\varS} &\opEq \varRand \opAdd \varSchnorrChallenge \opMult \varPubKeyCompApt \\
+        \funGen{\varSAlice} \opAdd \funGen{\varSBob} & \\
+        \funGen{\varNonceAlice \opAdd \varSchnorrChallenge \opMult \varSecKeyAlice} \opAdd \funGen{\varNonceBob \opAdd \varSchnorrChallenge \opMult (\varSecKeyAlice \opAdd \varWit)} & \\
+        \varRandAlice \opAdd \varSchnorrChallenge \opMult \varPubKeyAlice \opAdd \varRandBob \opAdd \varSchnorrChallenge \opMult (\varPubKeyAlice \opAdd \funGen{\varWit}) & \\
+        \varRandAlice \opAdd \varRandBob \opAdd \varSchnorrChallenge \opMult (\funGen{\varWit} \opAdd \varPubKeyAlice \opAdd \varPubKeyBob) & \\
+        \varRand \opAdd \varSchnorrChallenge \opMult \varPubKeyCompApt & \opEq \varRand \opAdd \varSchnorrChallenge \opMult \varPubKeyCompApt
+    \end{align}
+\end{proof}
+
+\begin{definition}[Pre-signature correctness]
+    TODO~\cite{aumayr2020bitcoinchannels}
+\end{definition}
+
+\begin{definition}[Pre-signature adaptability]
+    TODO~\cite{aumayr2020bitcoinchannels}
+\end{definition}
+
+\begin{definition}[Witness extractability]
+    TODO~\cite{aumayr2020bitcoinchannels}
+\end{definition}
+
+\begin{definition}[Secure Adaptor Signature Scheme]
+    TODO~\cite{aumayr2020bitcoinchannels}
+\end{definition}
