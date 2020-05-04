@@ -5,9 +5,9 @@ We first define the general notation used in the following chapters to formalize
 the ring of integers modulo $\varPrime$. $\cnstIntegersPrimeWithoutZero{\varPrime}$ is $\cnstIntegersPrime{\varPrime} \opExcluding \funList{0}$. $\varG \opSeperate \varH$ are adjacent
 generators in $\cnstGroup$, whereas adjacent means the discrete logarithm of $\varH$ in regards to $\varG$ is not known. Exponention stands for repeated application of the group operation.
 
-\begin{definition}{Hard Relation}\label{def:hardRelation}
+\begin{definition}[Hard Relation]\label{def:hardRelation}
     Given a language $\varLanguage \opAssign \funList{\varBigA \opForWhich \exists\varSmallA \text{ s.t. } (\varBigA, \varSmallA) \opIn \cnstRelation}$ then the relation $\cnstRelation$ is
-    considered hard if the following three properties hold:~\cite{sanches2020bitcoinchannels}
+    considered hard if the following three properties hold:~\cite{aumayr2020bitcoinchannels}
     \begin{enumerate}
         \item $\procGenR{\varSecParam}$ is a $\cnstPolyTime$ sampling algorithm which outputs a statement/witness of the form $(\varBigA, \varSmallA) \opIn \cnstRelation$.
         \item Relation $\cnstRelation$ is poly-time decidable.
@@ -20,17 +20,17 @@ generators in $\cnstGroup$, whereas adjacent means the discrete logarithm of $\v
     \end{enumerate}
 \end{definition}
 
-\begin{definition}{Signature Scheme}\label{def:signatureScheme}
-    A valid Signature Sccheme must provide three procedures:
-    \[ \varSigScheme = (\procGenDefault \opSeperate \procSignDefault \opSeperate \procVerfDefault) \]
-    $\procGenDefault$ takes as input a security parameter $\varSecParam$ and outputs a keypair $\varKeyPair$, consisting of a secret key $\varSecKey$ and a public key $\varPubKey$, whereas
+\begin{definition}[Signature Scheme]\label{def:signatureScheme}
+    A valid Signature Scheme must provide three procedures:
+    \[ \varSigScheme = (\procGenId \opSeperate \procSignId \opSeperate \procVerfId) \]
+    $\procGenId$ takes as input a security parameter $\varSecParam$ and outputs a keypair $\varKeyPair$, consisting of a secret key $\varSecKey$ and a public key $\varPubKey$, whereas
     the secret key has to be kept private and the public key is shared with other parties.
-    $\varSecKey$ can be used together with a message $\varMsg$ to call the $\procSignDefault$ procedure to create a signature $\varSignature$ over the message $\varMsg$.
-    Parties knowing $\varPubKey$ can then test the validity of the signature by calling $\procVerfDefault$ with the same message $\varMsg$. The procedure will only output $1$ if the message was
+    $\varSecKey$ can be used together with a message $\varMsg$ to call the $\procSign{\varSecKey}{\varMsg}$ procedure to create a signature $\varSignature$ over the message $\varMsg$.
+    Parties knowing $\varPubKey$ can then test the validity of the signature by calling $\procVerf{\varPubKey}{\varSignature}{\varMsg}$ with the same message $\varMsg$. The procedure will only output $1$ if the message was
     indeed signed with the correct secret key $\varSecKey$ of $\varPubKey$ and therefore proves the possesion of $\varSecKey$ by the signer.
     A valid signature scheme have to fullfill two security properties
     \begin{itemize}
-        \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold $\procVerf{\varPubKey}{\procSignDefault}{\varMsg} \opEq 1$
+        \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold $\procVerf{\varPubKey}{\procSign{\varSecKey}{\varMsg}}{\varMsg} \opEq 1$
         \item Unforgability: Note that there are different levels of Unforgability:~\cite{goldwasser1988digital}
         \begin{itemize}
             \item Universal Forgery: The ability to forge signatures for any message.
@@ -40,7 +40,7 @@ generators in $\cnstGroup$, whereas adjacent means the discrete logarithm of $\v
     \end{itemize}
 \end{definition}
 
-\begin{definition}{Cryptographic Hash Function}\label{def:hashFunction}
+\begin{definition}[Cryptographic Hash Function]\label{def:hashFunction}
     A cryptographic hash function $\cnstHash$ is defined as $\funHash{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$. A secure hashing function
     has to fullfill the following security properties:~\cite{al2011cryptographic}
     \begin{itemize}
@@ -54,7 +54,7 @@ generators in $\cnstGroup$, whereas adjacent means the discrete logarithm of $\v
     \end{itemize}
 \end{definition}
 
-\begin{definition}{Commitment Scheme}\label{def:commitment}~\cite{bunz2018bulletproofs}
+\begin{definition}[Commitment Scheme]\label{def:commitment}~\cite{bunz2018bulletproofs}
     A cryptographic Commitment is defined by a pair of functions $(\procSetup{\varSecParam} \opSeperate \procCommitId(\varInput, \varRand))$. $\procSetupId$ is the setup procedure, it takes as input a
     security parameter $\varSecParam$ and outputs public parameters $\varPublicParam$. Depending on $\varPublicParam$ we define a input space $\varInputSpace_{\varPublicParam}$,
     a randomness space $\varRandSpace_{\varPublicParam}$ and a commitment space $\varCommitSpace_{\varPublicParam}$.\\
@@ -71,12 +71,12 @@ generators in $\cnstGroup$, whereas adjacent means the discrete logarithm of $\v
     \end{itemize}
 \end{definition}
 
-\begin{definition}{Homomorphic Commitment}\label{def:homomorphicCom}
+\begin{definition}[Homomorphic Commitment]\label{def:homomorphicCom}
     If a Commitment Scheme as defined in~\ref{def:commitment} is homomorphic then the following must hold
     \[ \procCommit{\varInput_1}{\varRand_1} \opAdd \procCommit{\varInput_2}{\varRand_2} \opEq \procCommit{\varInput_1 \opAdd \varInput_2}{\varRand_1 \opAdd \varRand_2} \]
 \end{definition}
 
-\begin{definition}{Pedersen Commitment}\label{def:pedersenCom}
+\begin{definition}[Pedersen Commitment]\label{def:pedersenCom}
     A Pedersen Commitment is an instantiation of a Homomoprhic Commitment Scheme as definied in~\ref{def:homomorphicCom}:
     \[ \varCommitSpace_{\varPublicParam} \opAssign \cnstGroup\] of order $\varPrime \opSeperate \varInputSpace_{\varPublicParam} \opSeperate \varRandSpace_{\varPublicParam} \opAssign \cnstIntegersPrime{\varPrime}$.
     the procedures $(\procSetupId, \procCommitId)$ are then instantiated as:
@@ -166,8 +166,8 @@ As already pointed out, building transactions in Mimblewimble is an interactive 
 to build a transaction:~\cite{jedusor2016mimblewimble}\\
 Assume Alice wants to transfer coins of value $\varFundValue$ to Bob.
 \begin{enumerate}
-    \item Alice first selects input coins $\varCoinInp$ of total value $\varValue \geq \varFundValue$ that she controls. She than creates change coin outputs $\varCoinOut^{A}$ (could be multiple) of total value $\varValue \opSub \varFundValue$ and then
-    sends $\varCoinInp \opSeperate \varCoinOut^{A}$, a valid range proofs for $\varCoinOut^{A}$, plus the opening $(-\varFundValue \opSeperate \varKey)$ of $\sum{\varCoinOut^{A}} \opSub \sum{\varCoinInp}$ to Bob.
+    \item Alice first selects input coins $\varCoinInp$ of total value $\varValue \geq \varFundValue$ that she controls. She than creates change coin outputs $\varCoinOutAlice$ (could be multiple) of total value $\varValue \opSub \varFundValue$ and then
+    sends $\varCoinInp \opSeperate \varCoinOutAlice$, a valid range proofs for $\varCoinOutAlice$, plus the opening $(-\varFundValue \opSeperate \varKey)$ of $\sum{\varCoinOutAlice} \opSub \sum{\varCoinInp}$ to Bob.
     \item Bob creates himself additional output coins $\varCoinOut^B$ plus range proofs of total value $\varFundValue$ with keys $(\varKeySt_i)$ and computes a signature $\varSignature$ with the combined secret key $\varKey \opAdd \sum{\varKeySt_i}$ and
     and finalizes the transaction as
     \[ \varTx \opAssign (0 \opSeperate \varCoinInp \opSeperate \varCoinOut^A \opConc \varCoinOut^B \opSeperate (\varProof \opSeperate \varExcess \opAssign \sum{\varCoinOut^A} \opAdd \sum{\varCoinOut^B} \opSub \sum{\varCoinInp} \opSeperate \varSignature)) \]
@@ -181,15 +181,15 @@ Figure~\ref{fig:txOriginal} depicts the original transaction flow.\\
         \textbf{Alice} \< \< \< \< \textbf{Bob} \\ [][\hline]
         \< \< \< \< \\
         \text{ Select $\varCoinInp$ of value $\varValue \geq \varFundValue$ } \< \< \< \< \\
-        \text{ Create $\varCoinOut^{A}$ of value $\varValue \opSub \varFundValue$} \< \< \< \< \\
-        \text{ $\varExcess_{A} \opAssign \sum{\varCoinOut^{A}} \opSub \sum{\varCoinInp}$ } \\
+        \text{ Create $\varCoinOutAlice$ of value $\varValue \opSub \varFundValue$} \< \< \< \< \\
+        \text{ $\varExcess_{A} \opAssign \sum{\varCoinOutAlice} \opSub \sum{\varCoinInp}$ } \\
         \text{ $(-\varFundValue \opSeperate \varKey)$ opening to $\varExcess_{A}$ } \< \< \< \< \\
-        \text{ Create range-proof $\varProof$ for $\varCoinOut^{A}$ } \< \< \< \< \\
+        \text{ Create range-proof $\varProof$ for $\varCoinOutAlice$ } \< \< \< \< \\
         \< \sendmessageright{ top=$(-\varFundValue \opSeperate \varKey) \opSeperate \varProof$ } \< \< \< \\
         \< \< \< \< \text{Create $\varCoinOut^B$ with value $\varFundValue$ and keys $(\varKeySt_i)$ } \\
         \< \< \< \< \text{$\varKey_{shared} \opAssign \varKey \opAdd \sum{\varKeySt_i}$ } \\
         \< \< \< \< \text{Create $\varSignature$ with $\varKey_{shared}$} \\
-        \< \< \< \< \text{ Create range-proof $\varProof$ for $\varCoinOut^{B}$ } \\
+        \< \< \< \< \text{ Create range-proof $\varProof$ for $\varCoinOutBob$ } \\
         \< \< \< \< \text{Finalize transaction $\varTx$} \\
     }
     \caption{Original transaction building process}
@@ -211,14 +211,35 @@ The problem was solved in the Grin Cryptocurrency by making the signing process 
 
 Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} proposed the following alternative way to build transactions which would not be vulnerable to this problem.
 \begin{enumerate}
-    \item Alice constructs a full-fledged transaction $\varTx_A$ spending her input coins $\varCoinInp$ and creates her change coins $\varCoinOut^A$, plus a special output coin $\varCoinOut^{sp} \opAssign \funGenH{\varFundValue} \opAdd \funGen{\varKey_{sp}}$,
+    \item Alice constructs a full-fledged transaction $\varTx_A$ spending her input coins $\varCoinInp$ and creates her change coins $\varCoinOut^A$, plus a special output coin $\varCoinSpecial \opAssign \funGenH{\varFundValue} \opAdd \funGen{\varKey_{sp}}$,
     where $\varFundValue$ is the desired value which should be transferred to Bob and $\varKey_{sp}$ is a randomly choosen key. She proceeds by sending $\varTx_A$ as well as $(\varFundValue \opSeperate \varKey_{sp})$ and the necessary range
     proofs to Bob.
-    \item Bob now creates a second transaction $\varTx_B$ spending the special coin $\varCoinOut^{sp}$ to create an output only he controls $\varCoinOut^{B}$ and merges $\varTx_A$ with $\varTx_B$
-    into $\varTx_m$. He then broadcasts $\varTx_m$ to the network. Note that when the two transactions are merged the intermediate special coin $\varCoinOut^{sp}$ will be both in the coin output and input list
+    \item Bob now creates a second transaction $\varTx_B$ spending the special coin $\varCoinSpecial$ to create an output only he controls $\varCoinOutBob$ and merges $\varTx_A$ with $\varTx_B$
+    into $\varTx_m$. He then broadcasts $\varTx_m$ to the network. Note that when the two transactions are merged the intermediate special coin $\varCoinSpecial$ will be both in the coin output and input list
     of the transaction and therfore will be discarded.
 \end{enumerate}
 The only drawback of this approach is that we have two transaction kernels instead of just one because of the merging step, making the transaction slightly bigger.
+A figure showing the protocol flow is depicted in figure~\ref{fig:txSalvaged}.
+
+\begin{figure}
+    \label{fig:txSalvaged}
+    \centering
+    \pseudocode{
+        \textbf{Alice} \< \< \< \< \textbf{Bob} \\ [][\hline]
+        \< \< \< \< \\
+        \text{ Select $\varCoinInp$ of value $\varValue \geq \varFundValue$ } \< \< \< \< \\
+        \text{ Create $\varCoinOutAlice$ of value $\varValue \opSub \varFundValue$ } \< \< \< \< \\
+        \varKey_{sp} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \< \< \\
+        \text{ Create $\varCoinSpecial \opAssign \funGenH{\varFundValue} \opAdd \funGen{\varKey_{sp}}$ } \< \< \< \< \\
+        \text{ Construct and sign $\varTxAlice$ with $\varCoinInp \opSeperate \varCoinOutAlice \opSeperate \varCoinSpecial$ } \< \< \< \< \\
+        \< \sendmessageright{ top=$\varTxAlice \opSeperate \varFundValue \opSeperate \varKey_{sp}$ } \< \< \< \\
+        \< \< \< \< \text{ Create $\varCoinOut^B$ with value $\varFundValue$ } \\
+        \< \< \< \< \text{ Create $\varTxBob$ spending $\varCoinSpecial$ to $\varCoinOut^B$ } \\
+        \< \< \< \< \text{ Merge $\varTxAlice$ and $\varTxBob$ to $\varTx_{m}$ } \\
+        \< \< \< \< \text{ Publish $\varTx_{m}$ }
+    }
+    \caption{Salvaged tranction protocol by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate}}
+\end{figure}
 
 \section{Scriptless Scripts}\label{sec:scriptlessScripts}
 
