@@ -20,13 +20,16 @@
 
 % functions
 \newcommand{\funHash}[1]{\cnstHash (#1)}
-\newcommand{\funGen}[1]{\varG^{#1}}
-\newcommand{\funGenH}[1]{\varH^{#1}}
+\newcommand{\opPointScalar}[2]{#1^{#2}}
+\newcommand{\funGen}[1]{\opPointScalar{\varG}{#1}}
+\newcommand{\funGenH}[1]{\opPointScalar{\varH}{#1}}
 \newcommand{\funList}[1]{\{#1\}}
 \newcommand{\funStar}[1]{#1'}
 \newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
 
 % variables
+\newcommand{\varScA}{\styleVariable{a}}
+\newcommand{\varScB}{\styleVariable{b}}
 \newcommand{\varAlice}{\styleVariable{A}}
 \newcommand{\varBob}{\styleVariable{B}}
 \newcommand{\varX}{\styleVariable{x}}
@@ -77,7 +80,7 @@
 \newcommand{\varKeyVerf}{\varKey_{\styleVariable{p1}}}
 \newcommand{\varKeyProv}{\varKey_{\styleVariable{p2}}}
 \newcommand{\varKeySt}{\funStar{\varKey}}
-\newcommand{\varRand}{\styleVariable{r}}
+\newcommand{\varRand}{\styleVariable{R}}
 \newcommand{\varRandAlice}{\varRand_{\varAlice}}
 \newcommand{\varRandBob}{\varRand_{\varBob}}
 \newcommand{\varSigAlice}{\varSignature_{\varAlice}}
@@ -99,7 +102,7 @@
 \newcommand{\varSmallA}{\styleVariable{a}}
 \newcommand{\varPublicParam}{\styleVariable{PP}}
 \newcommand{\varInputSpace}{\styleSet{I}}
-\newcommand{\varRandSpace}{\styleSet{R}}
+\newcommand{\varRandSpace}{\styleSet{K}}
 \newcommand{\varCommitSpace}{\styleSet{C}}
 \newcommand{\varCommitment}{\styleVariable{C}}
 
@@ -108,15 +111,17 @@
 \newcommand{\opIn}{\in}
 \newcommand{\opConc}{~||~}
 \newcommand{\opForWhich}{~|~}
-\newcommand{\opAdd}{~+~}
+\newcommand{\opAddScalar}{~+~}
 \newcommand{\opAssign}{~:=~}
 \newcommand{\opSub}{~-~}
-\newcommand{\opMult}{~*~}
+\newcommand{\opTimesScalar}{~\times~}
+\newcommand{\opAddPoint}{~\cdot~}
 \newcommand{\opEq}{~=~}
 \newcommand{\opNotEq}{~\neq~}
 \newcommand{\opSeperate}{,~}
 \newcommand{\opExcluding}{~\\~}
 \newcommand{\opIff}{~\textit{iff}~}
+\newcommand{\opFunResult}{~\leftarrow~}
 
 % procedures
 \newcommand{\procGenRId}{\styleFunction{GenR}}
@@ -134,20 +139,22 @@
 \newcommand{\procVerfId}{\styleFunction{Verf}}
 \newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
 
-\newcommand{\procSetupPartSigId}{\styleFunction{setupPt}}
+\newcommand{\procSetupPartSigId}{\styleFunction{genPt}}
 \newcommand{\procSetupPartSig}[1]{\procSetupPartSigId (#1)}
 \newcommand{\procGenPartSigId}{\styleFunction{genPtSig}}
 \newcommand{\procGenPartSig}[5]{ \procGenPartSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5) }
 \newcommand{\procVerfPartSigId}{\styleFunction{vrfPtSig}}
 \newcommand{\procVerfPartSig}[6]{ \procVerfPartSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6) }
 \newcommand{\procFinSigId}{\styleFunction{finSig}}
-\newcommand{\procFinSig}[4]{ \procFinSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
+\newcommand{\procFinSig}[4]{ \procFinSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4) }
 
 \newcommand{\procSetupAptId}{\styleFunction{setupApt}}
 \newcommand{\procSetupApt}[1]{\procSetupAptId(#1)}
 \newcommand{\procGenPtAptSigId}{\styleFunction{getAptPtSig}}
-\newcommand{\procGenPtAptSig}[6]{(\procGenPtAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6)}
+\newcommand{\procGenPtAptSig}[6]{\procGenPtAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6)}
 \newcommand{\procExtWitId}{\styleFunction{extWit}}
 \newcommand{\procExtWit}[3]{ \procExtWitId(#1 \opSeperate #2 \opSeperate #3) }
 \newcommand{\procVrfAptId}{\styleFunction{vrfAptSig}}
 \newcommand{\procVrfApt}[7]{ \procVrfAptId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6 \opSeperate #7) }
+\newcommand{\procFinAptSigId}{ \styleFunction{finAptSig} }
+\newcommand{\procFinAptSig}[5]{ \procFinAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5) }
