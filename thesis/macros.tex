@@ -9,6 +9,7 @@
 % constants
 \newcommand{\cnstIntegersPrime}[1]{\ZZ_{#1}}
 \newcommand{\cnstIntegersPrimeWithoutZero}[1]{\cnstIntegersPrime{#1}^{*}}
+\newcommand{\cnstNatural}{\NN}
 \newcommand{\cnstBinary}[1]{\{0,1\}^{#1}}
 \newcommand{\cnstHash}{\styleFunction{h}}
 \newcommand{\cnstGroup}{\styleSet{G}}
@@ -95,7 +96,7 @@
 \newcommand{\varSigPartAptSt}{\funStar{\varSigPartApt}}
 \newcommand{\varGSigPartAptSt}{\funGen{\varSigPartAptSt}}
 \newcommand{\varWit}{\styleVariable{x}}
-\newcommand{\varGWit}{\funGen{\varWit}}
+\newcommand{\varGWit}{\styleVariable{X}}
 \newcommand{\varSigFin}{\varSignature_{\styleVariable{fin}}}
 \newcommand{\varSecParam}{\styleVariable{1^n}}
 \newcommand{\varBigA}{\styleVariable{A}}
@@ -122,6 +123,7 @@
 \newcommand{\opExcluding}{~\\~}
 \newcommand{\opIff}{~\textit{iff}~}
 \newcommand{\opFunResult}{~\leftarrow~}
+\newcommand{\opAnd}{~\land~}
 
 % procedures
 \newcommand{\procGenRId}{\styleFunction{GenR}}
@@ -148,13 +150,13 @@
 \newcommand{\procFinSigId}{\styleFunction{finSig}}
 \newcommand{\procFinSig}[4]{ \procFinSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4) }
 
-\newcommand{\procSetupAptId}{\styleFunction{setupApt}}
+\newcommand{\procSetupAptId}{\styleFunction{genApt}}
 \newcommand{\procSetupApt}[1]{\procSetupAptId(#1)}
-\newcommand{\procGenPtAptSigId}{\styleFunction{getAptPtSig}}
+\newcommand{\procGenPtAptSigId}{\styleFunction{genPtPreSig}}
 \newcommand{\procGenPtAptSig}[6]{\procGenPtAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6)}
 \newcommand{\procExtWitId}{\styleFunction{extWit}}
 \newcommand{\procExtWit}[3]{ \procExtWitId(#1 \opSeperate #2 \opSeperate #3) }
-\newcommand{\procVrfAptId}{\styleFunction{vrfAptSig}}
+\newcommand{\procVrfAptId}{\styleFunction{vrfPtPreSig}}
 \newcommand{\procVrfApt}[7]{ \procVrfAptId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6 \opSeperate #7) }
-\newcommand{\procFinAptSigId}{ \styleFunction{finAptSig} }
+\newcommand{\procFinAptSigId}{ \styleFunction{finAptPreSig} }
 \newcommand{\procFinAptSig}[5]{ \procFinAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5) }
