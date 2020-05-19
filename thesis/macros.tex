@@ -13,11 +13,13 @@
 \newcommand{\cnstBinary}[1]{\{0,1\}^{#1}}
 \newcommand{\cnstHash}{\styleFunction{h}}
 \newcommand{\cnstGroup}{\styleSet{G}}
+\newcommand{\cnstOracle}{\styleCal{O}}
 \newcommand{\cnstRelation}{\styleVariable{R}}
 \newcommand{\cnstPolyTime}{\styleVariable{PPT}}
 \newcommand{\varG}{\styleVariable{g}}
 \newcommand{\varH}{\styleVariable{h}}
-\newcommand{\cnstAdversary}{\styleSet{A}}
+\newcommand{\cnstAdversary}{\styleCal{A}}
+\newcommand{\cnstaEUFCMA}{\styleFunction{aEUF-CMA}}
 
 % functions
 \newcommand{\funHash}[1]{\cnstHash (#1)}
@@ -46,11 +48,13 @@
 \newcommand{\varSecKey}{\styleVariable{sk}}
 \newcommand{\varSecKeyAlice}{\varSecKey_{\varAlice}}
 \newcommand{\varSecKeyBob}{\varSecKey_{\varBob}}
+\newcommand{\varSecKeyAdv}{\varSecKey_{\cnstAdversary}}
 \newcommand{\varPubKey}{\styleVariable{pk}}
 \newcommand{\varPubKeyAlice}{\varPubKey_{\varAlice}}
 \newcommand{\varPubKeyBob}{\varPubKey_{\varBob}}
 \newcommand{\varPubKeyComp}{\varPubKey_{\styleVariable{comp}}}
 \newcommand{\varPubKeyCompApt}{\varPubKey_{\styleVariable{comp\_apt}}}
+\newcommand{\varPubKeyAdv}{\varPubKey_{\cnstAdversary}}
 \newcommand{\varKeyPair}{(\varSecKey, \varPubKey)}
 \newcommand{\varKeyPairAlice}{(\varSecKeyAlice, \varPubKeyAlice)}
 \newcommand{\varKeyPairBob}{(\varSecKeyBob, \varPubKeyBob)}
@@ -74,6 +78,7 @@
 \newcommand{\varNonce}{\styleVariable{k}}
 \newcommand{\varNonceAlice}{\styleVariable{\varNonce_{\varAlice}}}
 \newcommand{\varNonceBob}{\styleVariable{\varNonce_{\varBob}}}
+\newcommand{\varNonceAdv}{\varNonce_{\cnstAdversary}}
 \newcommand{\varS}{\styleVariable{s}}
 \newcommand{\varSAlice}{\styleVariable{s}_\varAlice}
 \newcommand{\varSBob}{\styleVariable{s}_\varBob}
@@ -84,11 +89,13 @@
 \newcommand{\varRand}{\styleVariable{R}}
 \newcommand{\varRandAlice}{\varRand_{\varAlice}}
 \newcommand{\varRandBob}{\varRand_{\varBob}}
+\newcommand{\varRandAdv}{\varRand_{\cnstAdversary}}
 \newcommand{\varSigAlice}{\varSignature_{\varAlice}}
 \newcommand{\varSigAptAlice}{\varSignature^{\varAlice}_{\styleVariable{apt}}}
 \newcommand{\varSigAptBob}{\varSignature^{\varBob}_{\styleVariable{apt}}}
 \newcommand{\varSigBob}{\varSignature_{\varBob}}
 \newcommand{\varSigPart}{\varSignature_{\styleVariable{prt}}}
+\newcommand{\varSigPartAdv}{\varSignature_{\styleVariable{prt} \opSeperate \cnstAdversary}}
 \newcommand{\varSigPartSt}{\funStar{\varSignature_{\styleVariable{prt}}}}
 \newcommand{\varSchnorrChallenge}{\styleVariable{e}}
 \newcommand{\varGSigPart}{\funGen{\varSigPart}}
@@ -97,6 +104,7 @@
 \newcommand{\varGSigPartAptSt}{\funGen{\varSigPartAptSt}}
 \newcommand{\varWit}{\styleVariable{x}}
 \newcommand{\varGWit}{\styleVariable{X}}
+\newcommand{\varStatement}{\styleVariable{X}}
 \newcommand{\varSigFin}{\varSignature_{\styleVariable{fin}}}
 \newcommand{\varSecParam}{\styleVariable{1^n}}
 \newcommand{\varBigA}{\styleVariable{A}}
@@ -160,3 +168,10 @@
 \newcommand{\procVrfApt}[7]{ \procVrfAptId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6 \opSeperate #7) }
 \newcommand{\procFinAptSigId}{ \styleFunction{finAptPreSig} }
 \newcommand{\procFinAptSig}[5]{ \procFinAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5) }
+
+\newcommand{\procExpForgId}{ \styleFunction{forgeAptSig_{\cnstAdversary}} }
+\newcommand{\procExpForg}[1]{ \procExpForgId(#1) }
+\newcommand{\procSignOracleId}{ \cnstOracle_{s} }
+\newcommand{\procSignOracle}[3]{ \procSignOracleId_(#1, #2, #3) }
+\newcommand{\procFinOracleId}{ \cnstOracle_{f} }
+\newcommand{\procFinOracle}[2]{ \procFinOracleId{#1}{#2} }
