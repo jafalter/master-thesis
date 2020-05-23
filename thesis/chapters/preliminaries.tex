@@ -24,8 +24,8 @@ $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \o
 
 \begin{definition}[Signature Scheme]\label{def:signatureScheme}
     A valid Signature Scheme must provide three procedures:
-    \[ \varSigScheme = (\procGenId \opSeperate \procSignId \opSeperate \procVerfId) \]
-    $\procGenId$ takes as input a security parameter $\varSecParam$ and outputs a keypair $\varKeyPair$, consisting of a secret key $\varSecKey$ and a public key $\varPubKey$, whereas
+    \[ \varSigScheme = (\procSetupId \opSeperate \procSignId \opSeperate \procVerfId) \]
+    $\procSetupId$ takes as input a security parameter $\varSecParam$ and outputs a keypair $\varKeyPair$, consisting of a secret key $\varSecKey$ and a public key $\varPubKey$, whereas
     the secret key has to be kept private and the public key is shared with other parties.
     $\varSecKey$ can be used together with a message $\varMsg$ to call the $\procSign{\varSecKey}{\varMsg}$ procedure to create a signature $\varSignature$ over the message $\varMsg$.
     Parties knowing $\varPubKey$ can then test the validity of the signature by calling $\procVerf{\varPubKey}{\varSignature}{\varMsg}$ with the same message $\varMsg$. The procedure will only output $1$ if the message was
