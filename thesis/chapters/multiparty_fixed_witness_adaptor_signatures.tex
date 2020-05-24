@@ -274,18 +274,23 @@ As defined by aumayr et al. in ~\cite{aumayr2020bitcoinchannels} a secure adapto
 We proceed by defining the three properties for our adapted signature scheme defined in~\ref{def:twoPartyFixedWitAptSig}.
 
 \begin{definition}[$\cnstaEUFCMA$]\label{def:aeufcma}
-        Additionally to the reuglar definition of existential unforgeability under chosen message attacks we additionally require that it is hard to produce a forged partial signature $\varSigPart$ if the
+        Additionally to the regular definition of existential unforgeability under chosen message attacks we additionally require that it is hard to produce a forged partial signature $\varSigPart$ if the
     adversary $\cnstAdversary$ gets to know a valid pre signature $\varSigPartApt$ w.r.t. some message $\varMsg$ and a statement $\varStatement$.\\
     For the definition of $\cnstaEUFCMA$-security we define the experiment $\procExpForgId$ for a $\cnstPolyTime$ adversary $\cnstAdversary$ with a fixed keypair $(\varSecKeyAdv \opSeperate \varPubKeyAdv)$ and an adapted signature scheme $\varSigSchemeApt$ as
     follows:\\
     \fbox{
         \parbox{\textwidth}{
             \procedure[linenumbering, syntaxhighlight=auto]{$\procExpForg{\varN}$} {
+                \varSet \opAssign \cnstEmptySet \\
                 (\varNonceAdv \opSeperate \varRandAdv) \opFunResult \procSetupPartSig{\varSecParam} \\
-                \varMsg \opSeperate \varSigPartApt \opFunResult \cnstAdversary^{\procSignOracleId{\varSecKey}{\varPubKey}}(\varPubKeyAdv) \\
-                \pcreturn \procVerf{\varMsg}{\varSigFin}{\varPubKeyAdv \opAddPoint \varPubKey}
+                \varMsg \opFunResult \cnstAdversary^{\procSignOracle{\cdot}{\varSecKey}{\varPubKey}}(\varPubKeyAdv \opSeperate \varRandAdv) \\
+                \varSigPartApt \opFunResult \procGenPtAptSig{\varMsg}{\varSecKey}{\varNonce}{\varPubKeyAdv}{\varRandAdv}{\varWit} \\
+                \varSigPart \opFunResult \cnstAdversary^{\procSignOracle{\cdot}{\varSecKey}{\varPubKey}}(\varSigPartApt) \\
+                \varSigFin \opFunResult \procFinAptSig{\varSigPart}{\varSigPartApt}{\varWit}{\varRand}{\varRandAdv} \\
+                \pcreturn (\varMsg \opNotIn \varSet \opAnd \procVerf{\varMsg}{\varSigFin}{\varPubKeyAdv \opAddPoint \varPubKey})
             }\\[2\baselineskip]
             \procedure[linenumbering, syntaxhighlight=auto]{$\procSignOracle{\varMsg}{\varPubKeyAdv}{\varRandAdv}$} {
+                \varSet \opAssign \varSet \opUnion {\varMsg} \\
                 (\varKeyPair \opSeperate (\varNonce \opSeperate \varRand) \opSeperate (\varWit \opSeperate \varStatement)) \opFunResult \procSetupApt{\varSecParam} \\
                 \pcreturn \procGenPtAptSig{\varMsg}{\varSecKey}{\varNonce}{\varPubKeyAdv}{\varRandAdv}{\varWit}
             }\\[2\baselineskip]

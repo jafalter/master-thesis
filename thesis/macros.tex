@@ -11,6 +11,7 @@
 \newcommand{\cnstIntegersPrimeWithoutZero}[1]{\cnstIntegersPrime{#1}^{*}}
 \newcommand{\cnstNatural}{\NN}
 \newcommand{\cnstBinary}[1]{\{0,1\}^{#1}}
+\newcommand{\cnstEmptySet}{\emptyset}
 \newcommand{\cnstHash}{\styleFunction{h}}
 \newcommand{\cnstGroup}{\styleSet{G}}
 \newcommand{\cnstOracle}{\styleCal{O}}
@@ -114,10 +115,12 @@
 \newcommand{\varRandSpace}{\styleSet{K}}
 \newcommand{\varCommitSpace}{\styleSet{C}}
 \newcommand{\varCommitment}{\styleVariable{C}}
+\newcommand{\varSet}{\styleSet{S}}
 
 % operators
 \newcommand{\opAccess}[2]{#1.#2}
 \newcommand{\opIn}{\in}
+\newcommand{\opNotIn}{\not\opIn}
 \newcommand{\opConc}{~||~}
 \newcommand{\opForWhich}{~|~}
 \newcommand{\opAddScalar}{~+~}
@@ -132,6 +135,7 @@
 \newcommand{\opIff}{~\textit{iff}~}
 \newcommand{\opFunResult}{~\leftarrow~}
 \newcommand{\opAnd}{~\land~}
+\newcommand{\opUnion}{~\cup~}
 
 % procedures
 \newcommand{\procGenRId}{\styleFunction{GenR}}
@@ -166,7 +170,7 @@
 \newcommand{\procVrfAptId}{\styleFunction{vrfPtPreSig}}
 \newcommand{\procVrfApt}[7]{ \procVrfAptId_{#2,#3,#4,#5,#6}(#1 \opSeperate #7) }
 \newcommand{\procFinAptSigId}{ \styleFunction{finAptPreSig} }
-\newcommand{\procFinAptSig}[5]{ \procFinAptSigId_{#3,#4}(#1 \opSeperate #2 \opSeperate #5) }
+\newcommand{\procFinAptSig}[5]{ \procFinAptSigId_{#3,#4,#5}(#1 \opSeperate #2) }
 
 \newcommand{\procExpForgId}{ \styleFunction{forgeAptSig_{\cnstAdversary}} }
 \newcommand{\procExpForg}[1]{ \procExpForgId(#1) }
