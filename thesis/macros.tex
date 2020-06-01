@@ -96,7 +96,7 @@
 \newcommand{\varSigAptBob}{\varSignature^{\varBob}_{\styleVariable{apt}}}
 \newcommand{\varSigBob}{\varSignature_{\varBob}}
 \newcommand{\varSigPart}{\varSignature_{\styleVariable{prt}}}
-\newcommand{\varSigPartAdv}{\varSignature_{\styleVariable{prt} \opSeperate \cnstAdversary}}
+\newcommand{\varSigPartAdv}{\varSignature_{\styleVariable{prt}}^{\cnstAdversary}}
 \newcommand{\varSigPartSt}{\funStar{\varSignature_{\styleVariable{prt}}}}
 \newcommand{\varSchnorrChallenge}{\styleVariable{e}}
 \newcommand{\varGSigPart}{\funGen{\varSigPart}}
@@ -143,7 +143,7 @@
 \newcommand{\procGenR}[1]{\procGenRId{#1}}
 
 \newcommand{\procSetupId}{\styleFunction{Setup}}
-\newcommand{\procSetup}[1]{\procCommitId(#1)}
+\newcommand{\procSetup}[1]{\procSetupId(#1)}
 
 \newcommand{\procCommitId}{\styleFunction{Commit}}
 \newcommand{\procCommit}[2]{\procCommitId(#1, #2)}
@@ -179,3 +179,10 @@
 \newcommand{\procSignOracle}[3]{ \procSignOracleId{#2}{#3}(#1) }
 \newcommand{\procFunctionId}{\styleFunction{f}}
 \newcommand{\procFunction}[1]{\procFunctionId(#1)}
+
+\newcommand{\procExpExtId}{ \styleFunction{aExtrWit_{\cnstAdversary}} }
+\newcommand{\procExpExt}[1]{ \procExpExtId(#1) }
+\newcommand{\procNonceOracleId}{ \cnstOracle_{k}}
+\newcommand{\procNonceOracle}[1]{ \procNonceOracleId(#1) }
+\newcommand{\procSignPtOracleId}[2]{ \cnstOracle_{s,#1,#2} }
+\newcommand{\procSignPtOracle}[3]{ \procSignPtOracleId{#2}{#3}(#1) }
