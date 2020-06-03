@@ -1,27 +1,26 @@
-In this chapter, we will define a variant of the Adaptor Signature scheme as seen in~\ref{sec:aptSignatures},
+In this chapter, we will define a variant of the adaptor signature scheme as defined in~\ref{sec:aptSignatures},
 which is specifically tailored for the use in an Atomic Swap scenario in which (at least one side of the swap) uses a two-party protocol to generate transaction signatures and keypairs are fixed beforehand.
-We will start by defining the general two-party signature creation protocol as it currently implemented in the Grin Cryptocurrency.
-We reduce the generated signatures to the general case~\cite{schnorr1989efficient} and thereby prove its security. From this protocol, we then derive the adapted variant, which allows hiding a fixed witness
+We will start by defining the general two-party signature creation protocol as it is currently implemented in the Grin Cryptocurrency.
+We reduce the generated signatures to the general case~\cite{schnorr1989efficient} and thereby prove its security.
+From this protocol, we then derive the adapted variant, which allows hiding a fixed witness
 value in the signature, which can be revealed only by the other party after attaining the final signature.
-We then proof its security by showing that all required security definitions as first defined in~\cite{aumayr2020bitcoinchannels} hold.
-In chapter~\ref{chp:atomicSwap} we will then utilize this scheme to build the Atomic Swap protocol.
-\\
-We start by defining our extended signature schemes:\\
+We start by defining our extended signature scheme in section~\ref{sec:definitions}, proceed by providing a schnorr-based instantiation of the protocol in~\ref{sec:schnorrInst} and finally prove its security in~\ref{sec:twopartyAptSecurity}.
 
-\section{Definitions}
+\section{Definitions}\label{sec:definitions}
 
 \begin{definition}[Two Party Signature Scheme]
     \label{def:twoPartySig}
-    A two party Signature Scheme wrt. to a hard relation $\cnstRelation$ is an extension of the Signature Scheme defined in~\ref{def:signatureScheme}, which allows us to distribute signature generation for a composite public key shared between two parties Alice and Bob.
-    Alice and Bob want to collaborate to generate a signature valid unter the composite public key $\varPubKeyComp \opAssign \varPubKeyAlice + \varPubKeyBob$ without having to reveal their secret keys to each other. For this we add three procedures to our Signature Scheme:
+    A two-party signature scheme wrt. a hard relation $\cnstRelation$ is an extension of a signature scheme as defined in~\ref{def:signatureScheme}, which allows us to distribute signature generation for a composite public key shared between two parties Alice and Bob.
+    Alice and Bob want to collaborate to generate a signature valid under the composite public key $\varPubKeyComp \opAssign \varPubKeyAlice + \varPubKeyBob$ without having to reveal their secret keys to each other. For this we add three procedures to our signature scheme:
     \[ \varSigSchemeMP = (\varSigScheme \opConc \procSetupPartSigId \opSeperate \procGenPartSigId \opSeperate \procVerfPartSigId \opSeperate \procFinSigId) \]
     \begin{itemize}
-        \item $\procSetupPartSigId$ takes as input $\varSecParam$ with $\varN$ as the security parameter and randomly generates a nonce $\varNonce$ as well as a commitment $\varRand$ to the nonce which has to be distributed between Alice and Bob.
-               Note that in this protocol we assume Alice keypair $\varKeyPairAlice$, as well as Bobs keypair $\varKeyPairBob$ to be fixed so they can't be chosen arbitrarily. This is important because otherwise the protocol might be vulnerable to a
-               Rogue-Key Attack~\cite{horster1995meta}. As we have seen in section~\ref{sec:Mimblewimble} the public keys in the Mimblewimble protocol to which the parties are signing are the so called Kernel elements $\varKernel$ which are calculated rather then choosen.
-        \item $\procGenPartSigId$ takes as input a to be signed message $\varMsg$ and generates a partial signature with Alice's key $\varSecKeyAlice$ and her nonce $\varNonceAlice$. Note that $\varPubKeyBob$ and $\varRandBob$ are also used in the protocol
-               for generating the schnorr challenge $\varSchnorrChallenge$, because our final signature should be valid under the combined public key $\varPubKeyAlice \opAddPoint \varPubKeyBob$ and combined nonce commitment $\varRandAlice \opAddPoint \varRandBob$.
-        \item $\procVerfPartSigId$ lets Alice verify Bobs partial signature and vice verca.
+        \item $\procSetupPartSigId$ takes as an input $\varSecParam$ with $\varN$ as the security parameter and randomly generates a nonce $\varNonce$ as well as a commitment $\varRand$ to the nonce which has to be distributed between Alice and Bob.
+               Note that in this protocol, we assume Alice keypair $\varKeyPairAlice$, as well as Bob's keypair $\varKeyPairBob$ to be fixed so they can't be chosen arbitrarily. This circumstance is important because otherwise, the protocol would be vulnerable to a
+               Rogue-Key Attack~\cite{horster1995meta}. As we have seen in section~\ref{sec:Mimblewimble}, the public keys in the Mimblewimble protocol to which the parties are signing are the so-called Kernel elements $\varKernel$ which are calculated from transaction elements
+               rather then chosen.
+        \item $\procGenPartSigId$ takes as input a to be signed message $\varMsg$ and generates a partial signature with Alice's key $\varSecKeyAlice$ and her nonce $\varNonceAlice$. This partial signature should only be verifiable by the second party and not necessarily
+               has to be a fully valid signature already on its own.
+        \item $\procVerfPartSigId$ lets Alice verify Bob's partial signature and vice versa.
         \item $\procFinSigId$ will take the two partial signatures as well as the randomness exchanged between the parties and create a valid signature which can be verified with the regular $\procVerfId$ function under the composite public key
         $\varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$.
     \end{itemize}
@@ -29,29 +28,41 @@ We start by defining our extended signature schemes:\\
 
 \begin{definition}[Two Party Fixed Witness Adaptor Schnorr Signature Scheme]
     \label{def:twoPartyFixedWitAptSig}
-    From the definition~\ref{def:twoPartySig} we now derive an adapted Signature Scheme $\varSigSchemeApt$ which allows one of the participants to hide the discrete logarithm $\varWit$ of a statement $\varStatement$ choosen
-    at the beginning of the protocol. Again we extend our previously defined Signature Scheme with new functions:
+    From the definition~\ref{def:twoPartySig}, we now derive an adapted signature scheme $\varSigSchemeApt$, which allows one of the participants to hide the discrete logarithm $\varWit$ of a statement $\varStatement$ chosen
+    at the beginning of the protocol. Again we extend our previously defined signature scheme with new functions:
     \[ \varSigSchemeApt \opAssign (\varSigSchemeMP \opConc \procSetupAptId \opSeperate \procGenPtAptSigId \opSeperate \procVrfAptId \opSeperate \procExtWitId) \]
     \begin{itemize}
-        \item $\procSetupAptId$ generates randomly a secret witness $\varWit$ which has to be kept private and is revealed to the other party by receiving the final composite signature. $\varStatement$ is distributed
-        to the other party. In a Atomic Swap scenario between Alice and Bob (which we will describe in~\ref{chp:atomicSwap}) Bob receiving $\varStatement$ should convince himself of its validity. (For example by verifying that
-        there are indeed funds available to him if he receives the secret $\varWit$).
+        \item $\procSetupAptId$ generates randomly a secret witness $\varWit$, which has to be kept private and is revealed to the other party by receiving the final composite signature. $\varStatement$ is distributed
+        to the other party. In an Atomic Swap scenario between Alice and Bob (which we will describe in~\ref{chp:atomicSwap}) Bob receiving $\varStatement$ should convince himself of its validity. (For example by verifying that
+        there are indeed funds available to him if he gets the secret $\varWit$).
         \item $\procGenPtAptSigId$ allows Alice (knowing $\varWit$) to create a partial pre signature (similiar to as defined in~\ref{def:twoPartySig}) which additionally hides the secret $\varWit$ without immediately revealing it.
         It outputs the partial pre signature, which can be verified to contain $\varWit$ by Bob (knowing $\varStatement$).
-        \item $\procVrfAptId$ makes it possible to verify the validity of an partial pre signature plus that it indeed contains the secret witness of $\varStatement$. Assume Bob provided a partial pre signature to Alice.
+        \item $\procVrfAptId$ makes it possible to verify the validity of a partial pre signature plus that it indeed contains the secret witness of $\varStatement$.
         \item $\procFinAptSigId$ creates a final valid signature under the composite public key $\varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ by adapting Bobs partial pre signature
         into Bobs final partial Signature which which we can then construct the final composite one.
-        \item $\procExtWitId$ lets Alice extract the secret witness $\varWit$ from the final composite signature, her own partial signature $\varSigAlice$ and Bobs partial pre signature $\varSigAptBob$. She does
-        so by first calculating Bobs adapted partial signature in which the witness is already removed. Knowing Bobs adapted partial signature as well as the presignature one she
-        can simply substract those two to receive the secret $\varX$.
+        \item $\procExtWitId$ lets Alice extract the secret witness $\varWit$ from the final composite signature, her own partial signature $\varSigAlice$ and Bob's partial pre signature $\varSigAptBob$. She does
+        so by first calculating Bob's adapted partial signature in which the witness is already removed. Knowing Bobs adapted partial signature as well as the presignature one, she
+        can subtract those two to receive the secret $\varX$.
     \end{itemize}
 \end{definition}
+
+\begin{definition}[Secure Adaptor Signature Scheme]
+    As defined by Aumayr et al. in ~\cite{aumayr2020bitcoinchannels}, a secure adaptor signature scheme needs four security properties to be fulfilled:
+    \begin{enumerate}
+        \item \textit{pre-signature correctness}
+        \item \textit{adapted existential unforgeability under choosen message attack}
+        \item \textit{pre-signature adaptability}
+        \item \textit{witness extractability}
+    \end{enumerate}
+\end{definition}
+
+We proceed by redefining these properties for our adapted two-party fixed witness signature scheme defined in~\ref{def:twoPartyFixedWitAptSig}:
 
 \begin{definition}[Pre-signature correctness]\label{def:preSigCorrectness}
 Similiar to how it is defined in~\cite{aumayr2020bitcoinchannels} additionally to \textit{correctness} require our signature scheme to satisfy \textit{pre-signature correctness}. \\
 This property is given if a presignature is generated by $\procGenPtAptSigId$ can be completed into a final (partial) signature for all pairs $(\varWit \opSeperate \varStatement)$, from which it will
 be possible to extract the witness computing $\procExtWitId$ with the required parameters.\\ \\
-More formally Pre-signature correctness is given if for every security parameter $\varN \in \cnstNatural$, message $\varMsg \in \cnstBinary{*}$, fixed public keys $\varKeyPairAlice \opSeperate \varKeyPairBob$ witth their composite public key $\varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ and every statement/witness pair $\varStatement \opSeperate \varWit)$ in a relation $\cnstRelation$ it must hold that:
+More formally \textit{pre-signature correctness} is given if for every security parameter $\varN \in \cnstNatural$, message $\varMsg \in \cnstBinary{*}$, fixed public keys $\varKeyPairAlice \opSeperate \varKeyPairBob$ witth their composite public key $\varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ and every statement/witness pair $\varStatement \opSeperate \varWit)$ in a relation $\cnstRelation$ it must hold that:
 \begin{scriptsize}
     \[
         \Pr\left[
@@ -76,19 +87,8 @@ More formally Pre-signature correctness is given if for every security parameter
 \end{scriptsize}
 \end{definition}
 
-\begin{definition}[Secure Adaptor Signature Scheme]
-    As defined by Aumayr et al. in ~\cite{aumayr2020bitcoinchannels} a secure adaptor signature scheme needs three security properties to be fullfilled:
-    \begin{enumerate}
-        \item \textit{adapted existential unforgeability under choosen message attack}
-        \item \textit{pre-signature adaptability}
-        \item \textit{witness extractability}
-    \end{enumerate}
-\end{definition}
-
-We proceed by defining the three properties for our adapted signature scheme defined in~\ref{def:twoPartyFixedWitAptSig}.
-
 \begin{definition}[$\cnstaEUFCMA$]\label{def:aeufcma}
-Additionally to the regular definition of existential unforgeability under chosen message attacks we additionally require that it is hard to produce a forged partial signature $\varSigPart$ if the
+Additionally to the regular definition of \textit{existential unforgeability under chosen message attacks} as defined for example in~\cite{vaudenay2006classical} we additionally require that it is hard to produce a forged partial signature $\varSigPart$ if the
 adversary $\cnstAdversary$ gets to know a valid pre signature $\varSigPartApt$ w.r.t. some message $\varMsg$ and a statement $\varStatement$.\\
 For the definition of $\cnstaEUFCMA$-security we define the experiment $\procExpForgId$ for a $\cnstPolyTime$ adversary $\cnstAdversary$ with a fixed keypair $(\varSecKeyAdv \opSeperate \varPubKeyAdv)$ and an adapted signature scheme $\varSigSchemeApt$ as
 follows:\\
@@ -117,9 +117,10 @@ The adapted signature scheme $\varSigSchemeApt$ is called $\cnstaEUFCMA$-secure 
 \end{definition}
 
 \begin{definition}[Pre-signature adaptability]
-    Informally Pre-signature adaptability means that any valid partial pre-signature together with an valid corresponding partial signature from the other party can
+    Informally \textit{pre-signature adaptability} means that any valid partial pre-signature together with a valid corresponding partial signature from the other party can
     always be completed into a valid final composite signature by using the $\procFinAptSigId$ procedure.\\
-    Formally for any security parameter $\varN$, message $\varMsg \opIn \cnstBinary{*}$, valid fixed keypairs $\varKeyPairAlice \opSeperate \varKeyPairBob$ and the composite publice key $\varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$, valid partial pre-signature $\varSigAptBob$ and valid partial signature $\varSigAlice$ the following must hold:
+    Formally for any security parameter $\varN$, message $\varMsg \opIn \cnstBinary{*}$, valid fixed keypairs $\varKeyPairAlice \opSeperate \varKeyPairBob$ and the composite public key $\varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$,
+    valid partial pre-signature $\varSigAptBob$ and valid partial signature $\varSigAlice$ the following must hold:
     \begin{scriptsize}
         \[
             \Pr\left[
@@ -136,13 +137,15 @@ The adapted signature scheme $\varSigSchemeApt$ is called $\cnstaEUFCMA$-secure 
             \right]=1.
         \]
     \end{scriptsize}
-    This definition might seem very similiar to the pre-signature correctness defined in definition~\ref{def:preSigCorrectness}, however it is slightly stronger as it requires that all partial signatures and partial pre-signatures can be completed into a valid signature, as long as they are valid themselfs. This would also include partial signature that were created maliciously.
+    This definition might seem very similar to \textit{pre-signature correctness} defined in definition~\ref{def:preSigCorrectness}; however it is slightly stronger as it requires that all partial signatures and partial pre-signatures can be completed
+    into a valid signature, as long as they are valid themselves. This would also include a partial signature that was created maliciously.
 \end{definition}
 
 \begin{definition}[Witness extractability]
-    Informally the witness extractability property holds for an adapted signature scheme $\varSigSchemeApt$ computed for the statement $\varStatement$ it must hold that we can extract the witness
-    $(\varWit \opSeperate \varStatement)$ given the partial presignature $\varSigPartAdv$ and corresponding partial signature $\varSigBob$. To formalize we describe and experiment $\procExpExtId$ for
-    a $\cnstPolyTime$ adversary $\cnstAdversary$ with a fixed keypair $(\varSecKeyAdv \opSeperate \varPubKeyAdv)$ and the fixed keypair $\varKeyPairBob$ of the second party.\\
+    Informally the \textit{witness extractability} property holds for an adapted signature scheme $\varSigSchemeApt$ computed for the statement $\varStatement$ when we can always extract the witness
+    $(\varWit \opSeperate \varStatement)$ from the final signature $\varSigFin$, partial presignature $\varSigPartAdv$ and corresponding partial signature $\varSigBob$.
+    To formalize this statement we describe and experiment $\procExpExtId$ for a $\cnstPolyTime$ adversary $\cnstAdversary$ with a fixed keypair $(\varSecKeyAdv \opSeperate \varPubKeyAdv)$
+    and the fixed keypair $\varKeyPairBob$ of the second party.\\
     \begin{center}
         \fbox{
             \begin{varwidth}{\textwidth}
@@ -172,16 +175,16 @@ The adapted signature scheme $\varSigSchemeApt$ is called $\cnstaEUFCMA$-secure 
     \[ \prob{\procExpExt{\varN} \opEq 1} \opSmEq \funNegl{\varN} \]
 \end{definition}
 
-\section{Schnorr-based instantiation}
+\section{Schnorr-based instantiation}\label{sec:schnorrInst}
 
-We start by defining a instantiation of Signature Scheme (see definition~\ref{def:signatureScheme})) which is currenlty employed in Grin, a Mimblewimble based Cryptocurrency.
+We start by providing a general instantiation of a signature scheme (see definition~\ref{def:signatureScheme})):
 We assume we have a group $\cnstGroup$ with prime $\varPrime$, $\cnstHash$ is a secure hash function as defined in~\ref{def:hashFunction} and $\varMsg$ is a publicly known message.\\
 \begin{itemize}
     \item $\procSetupId$ creates a keypair $\varKeyPair$, the public key can be distributed to the verifier(s) and the secret key has to be kept private. \\
     \item $\procSignId$ creates a signature consisting of a variable $\varS$ and generator $\varG$ raised to the nonce used during the signing process $\funGen{\varNonce}$. \\
     \item $\procVerfId$ allows a verifier knowing the signature $\varSignature$ and the provers public key $\varPubKey$ to verify the signatures validity. \\
 \end{itemize}
-The concrete implementation can be seen in figure \ref{fig:schnorr}.
+The concrete implementation can be seen in figure~\ref{fig:schnorr}. The signature scheme is called schnorr signature scheme, first defined in~\cite{schnorr1989efficient} and is widely employed in many cryptography systems.
 \begin{figure}
     \begin{center}
         \fbox{
@@ -209,11 +212,12 @@ The concrete implementation can be seen in figure \ref{fig:schnorr}.
     \caption{Schnorr Signature Scheme as defined in~\cite{schnorr1989efficient}}
     \label{fig:schnorr}
 \end{figure}
-\textit{Correctness} of the Scheme is easy to derive. As $\varS$ is calculated as $\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey$, when generator $\varG$ is raised to $\varS$, we get
+\textit{Correctness} of the scheme is easy to derive. As $\varS$ is calculated as $\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey$, when generator $\varG$ is raised to $\varS$, we get
 $\funGen{\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey}$ which we can transform into $\funGen{\varNonce} \opAddPoint \funGen{\varSecKey \opTimesScalar \varSchnorrChallenge}$, and finally
 into $\varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge}$ which is the same as the right side of the equation. \\
 
-From the regular schnorr signature we now provide an instantiation for the two party case defined in~\ref{def:twoPartySig} in figure~\ref{fig:twoparty-schnorr}.
+From the regular schnorr signature we now provide an instantiation for the two-party case defined in~\ref{def:twoPartySig} in figure~\ref{fig:twoparty-schnorr}. Note that this two-party variant of the scheme is what is
+currently implemented in the Grin Mimblewimble Cryptocurrency and will provide a basis from which we will build our adapted scheme.
 
 \begin{figure}
     \begin{center}
@@ -246,8 +250,8 @@ From the regular schnorr signature we now provide an instantiation for the two p
     \label{fig:twoparty-schnorr}
 \end{figure}
 
-We further explain in figure~\ref{fig:twoparty-schnorr-prot} how Alice and Bob can cooperate to produce a final signature which fullfills \textit{Correctness} as defined in~\ref{def:signatureScheme}.
-We outline an interaction between Alice and Bob using the procedures defined in figure~\ref{fig:twoparty-schnorr} to build final composite signature $\varSigFin$.
+We further explain in figure~\ref{fig:twoparty-schnorr-prot} how Alice and Bob can cooperate to produce a final signature which fulfills \textit{Correctness} as defined in~\ref{def:signatureScheme}.
+We outline an interaction between Alice and Bob using the procedures defined in figure~\ref{fig:twoparty-schnorr} to build the final composite signature $\varSigFin$.
 
 \begin{figure}
     \centering
@@ -274,10 +278,8 @@ The final signature is a valid signature to the message $\varMsg$ with the compo
 A verifier knowing the signed message $\varMsg$, the final signature $\varSigFin$ and the composite public key $\varPubKeyComp$ can now verify the signature using the $\procVerfId$ procedure.
 The challenge $\varSchnorrChallenge$ will be the same because
 \[ \funHash{\varMsg \opConc \varRand \opConc \varPubKeyComp} \opEq \funHash{\varMsg \opConc \varRandAlice \opAddPoint \varRandBob \opConc \varPubKeyAlice \opAddPoint \varPubKeyBob} \]
-\textit{Correctness} is proven in proof~\ref{prf:twopartySchnorr} by showing
-that:~
-\[ \varSigAlice \opFunResult \procGenPartSig{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob} \]
-\[ \varSigBob \opFunResult \procGenPartSig{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varPubKeyAlice}{\varRandAlice} \]
+\textit{Correctness} is proven by showing
+that for partial signatures $\varSigAlice$ and $\varSigBob$:
 \[ \procVerf{\varMsg}{\procFinSig{\varSigAlice}{\varSigBob}{\varRandAlice}{\varRandBob}}{\varPubKeyAlice \opAddPoint \varPubKeyBob} \opEq 1 \]
 
 \begin{proof}
@@ -293,7 +295,7 @@ that:~
     \end{align}
 \end{proof}
 
-Now we further provide a schnorr-based instantiation in figure \ref{fig:aptSchnorr} for the fixed witness adapted signature scheme as defined in~\ref{def:twoPartyFixedWitAptSig}:
+In figure~\ref{fig:aptSchnorr} we further provide a schnorr-based instantiation for the fixed witness adapted signature scheme as defined in~\ref{def:twoPartyFixedWitAptSig}:
 
 \begin{figure}
     \begin{center}
@@ -331,7 +333,7 @@ Now we further provide a schnorr-based instantiation in figure \ref{fig:aptSchno
 \end{figure}
 
 Again in figure~\ref{fig:aptSchnorrInteraction} we show an interaction between Alice and Bob creating a signature $\varSigFin$ for the composite public key $\varPubKeyBob \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$
-while Bob will hide his secret $\varWit$ which Alice can retrieve after the signing process has completed.
+while Bob will hide his secret $\varWit$ which Alice can extract after the signing process has completed.
 
 \begin{figure}
     \pseudocode[codesize=\scriptsize]{
@@ -353,13 +355,12 @@ while Bob will hide his secret $\varWit$ which Alice can retrieve after the sign
     \label{fig:aptSchnorrInteraction}
 \end{figure}
 
-We now proof the \textit{Correctness} of the scheme by showing that:~
-\begin{gather}
-    \varSigAlice \opFunResult \procGenPartSig{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob} \\
-    \varSigAptBob \opFunResult \procGenPtAptSig{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varPubKeyAlice}{\varRandAlice}{\varWit} \\
-    \procVerf{\varMsg}{\procFinSig{\varSigAlice}{\varSigAptBob}{\varRandAlice}{\varRandBob}{\varWit}}{\varPubKeyAlice \opAddPoint \varPubKeyBob} \opEq 1
-\end{gather}
+\section{Security}\label{sec:twopartyAptSecurity}
 
+We now show that the outlined instantiation is secure with regards to the regular signature scheme definitions~\ref{def:signatureScheme} and the adaptor signature scheme~\ref{def:twoPartyFixedWitAptSig}.
+We start by proving \textit{correctness} of the scheme by showing that for a partial signature $\varSigAlice$ and a corresponding pre-signature $\varSigAptBob$
+the following must hold
+\[ \procVerf{\varMsg}{\procFinAptSig{\varSigAlice}{\varSigAptBob}{\varRandAlice}{\varRandBob}{\varWit}}{\varPubKeyAlice \opAddPoint \varPubKeyBob} \opEq 1 \]
 \begin{proof}
     \label{prf:aptSchnorr}
     Again the proof is by continous substitutions in the equation checked by the verifier:
@@ -374,8 +375,8 @@ We now proof the \textit{Correctness} of the scheme by showing that:~
     \end{align}
 \end{proof}
 
-Note that we have 3 statements to prove, in order to prove \textit{Pre-Signature Correctness}.
-We have already proven that $\procVerf{\varMsg}{\varSigFin}{\varPubKeyAlice \opAddPoint \varPubKeyBob} \opEq 1$ holds in our instantiation of the signature scheme in the
+Next we provide a proof that in addition to regular \textit{correctness} also \textit{pre-signature correctness} holds.
+Note that we have 3 statements to prove, we have already proven that $\procVerf{\varMsg}{\varSigFin}{\varPubKeyAlice \opAddPoint \varPubKeyBob} \opEq 1$ holds in our instantiation of the signature scheme in the
 correctness proof~\ref{prf:aptSchnorr}.
 It remains to prove that $\procVrfApt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob}{\varSigBob}{\varStatement} \opEq 1$ and
 $(\varStatement \opSeperate \funStar{\varWit} \opIn \cnstRelation)$.
@@ -387,7 +388,7 @@ $(\varStatement \opSeperate \funStar{\varWit} \opIn \cnstRelation)$.
     \[
         \procVrfApt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob}{\varStatement}{\varSigAptBob} \opEq 1
     \]
-    The proof is by continous substitutions in the equation checked by the verifier:
+    The proof is by continuous substitutions in the equation checked by the verifier:
     \begin{align}
         \funGen{\varSigAptBob} &\opEq \opPointScalar{\varRandBob}{\varSchnorrChallenge} \opAddPoint \varPubKeyBob \opAddPoint \varStatement \\
         \funGen{\varSigBob \opAddScalar \varWit} & \\
@@ -405,7 +406,9 @@ $(\varStatement \opSeperate \funStar{\varWit} \opIn \cnstRelation)$.
         \varWit \opAssign & \varSigAptBob \opSub (\varSigFin \opSub \varSigAlice) \\
         & \varSigAptBob \opSub ((\varSAlice \opAddScalar \varSBob ) \opSub \varSAlice ) \\
         & \varSBob \opAddScalar \varWit \opSub (\varSBob) \\
-        \varWit & \varWit \\
+        \varWit \opAssign & \varWit \\
     \end{align}
 
 \end{proof}
+
+TODO Proof for pre-signature adaptability, $\cnstaEUFCMA$ and witness extractability.
