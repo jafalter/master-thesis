@@ -11,6 +11,7 @@
 \newcommand{\cnstIntegersPrimeWithoutZero}[1]{\cnstIntegersPrime{#1}^{*}}
 \newcommand{\cnstNatural}{\NN}
 \newcommand{\cnstBinary}[1]{\{0,1\}^{#1}}
+\newcommand{\cnstEmptySet}{\emptyset}
 \newcommand{\cnstHash}{\styleFunction{h}}
 \newcommand{\cnstGroup}{\styleSet{G}}
 \newcommand{\cnstOracle}{\styleCal{O}}
@@ -95,7 +96,7 @@
 \newcommand{\varSigAptBob}{\varSignature^{\varBob}_{\styleVariable{apt}}}
 \newcommand{\varSigBob}{\varSignature_{\varBob}}
 \newcommand{\varSigPart}{\varSignature_{\styleVariable{prt}}}
-\newcommand{\varSigPartAdv}{\varSignature_{\styleVariable{prt} \opSeperate \cnstAdversary}}
+\newcommand{\varSigPartAdv}{\varSignature_{\styleVariable{prt}}^{\cnstAdversary}}
 \newcommand{\varSigPartSt}{\funStar{\varSignature_{\styleVariable{prt}}}}
 \newcommand{\varSchnorrChallenge}{\styleVariable{e}}
 \newcommand{\varGSigPart}{\funGen{\varSigPart}}
@@ -114,16 +115,18 @@
 \newcommand{\varRandSpace}{\styleSet{K}}
 \newcommand{\varCommitSpace}{\styleSet{C}}
 \newcommand{\varCommitment}{\styleVariable{C}}
+\newcommand{\varSet}{\styleSet{S}}
 
 % operators
 \newcommand{\opAccess}[2]{#1.#2}
 \newcommand{\opIn}{\in}
+\newcommand{\opNotIn}{\not\opIn}
 \newcommand{\opConc}{~||~}
 \newcommand{\opForWhich}{~|~}
 \newcommand{\opAddScalar}{~+~}
 \newcommand{\opAssign}{~:=~}
 \newcommand{\opSub}{~-~}
-\newcommand{\opTimesScalar}{~\times~}
+\newcommand{\opTimesScalar}{~\cdot~}
 \newcommand{\opAddPoint}{~\cdot~}
 \newcommand{\opEq}{~=~}
 \newcommand{\opNotEq}{~\neq~}
@@ -132,46 +135,54 @@
 \newcommand{\opIff}{~\textit{iff}~}
 \newcommand{\opFunResult}{~\leftarrow~}
 \newcommand{\opAnd}{~\land~}
+\newcommand{\opUnion}{~\cup~}
+\newcommand{\opSmEq}{~\leq~}
 
 % procedures
 \newcommand{\procGenRId}{\styleFunction{GenR}}
 \newcommand{\procGenR}[1]{\procGenRId{#1}}
 
+\newcommand{\procSetupId}{\styleFunction{Setup}}
+\newcommand{\procSetup}[1]{\procSetupId(#1)}
+
 \newcommand{\procCommitId}{\styleFunction{Commit}}
 \newcommand{\procCommit}[2]{\procCommitId(#1, #2)}
-\newcommand{\procSetupId}{\styleFunction{Setup}}
-\newcommand{\procSetup}[1]{\procCommitId(#1)}
 
-\newcommand{\procGenId}{\styleFunction{\styleFunction{Gen}}}
-\newcommand{\procGen}[1]{ \procGenId(#1) }
 \newcommand{\procSignId}{\styleFunction{Sign}}
-\newcommand{\procSign}[2]{ \procSignId(#1, #2) }
+\newcommand{\procSign}[2]{ \procSignId_{#2}(#1) }
 \newcommand{\procVerfId}{\styleFunction{Verf}}
-\newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
+\newcommand{\procVerf}[3]{ \procVerfId_{#3}(#1 \opSeperate #2) }
 
-\newcommand{\procSetupPartSigId}{\styleFunction{genPt}}
+\newcommand{\procSetupPartSigId}{\styleFunction{setupPt}}
 \newcommand{\procSetupPartSig}[1]{\procSetupPartSigId (#1)}
-\newcommand{\procGenPartSigId}{\styleFunction{genPtSig}}
-\newcommand{\procGenPartSig}[5]{ \procGenPartSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5) }
-\newcommand{\procVerfPartSigId}{\styleFunction{vrfPtSig}}
-\newcommand{\procVerfPartSig}[6]{ \procVerfPartSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6) }
+\newcommand{\procGenPartSigId}{\styleFunction{signPt}}
+\newcommand{\procGenPartSig}[5]{ \procGenPartSigId_{#2,#3,#4,#5}(#1) }
+\newcommand{\procVerfPartSigId}{\styleFunction{vrfPt}}
+\newcommand{\procVerfPartSig}[6]{ \procVerfPartSigId_{#2,#3,#4,#5}(#1 \opSeperate #6) }
 \newcommand{\procFinSigId}{\styleFunction{finSig}}
-\newcommand{\procFinSig}[4]{ \procFinSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4) }
+\newcommand{\procFinSig}[4]{ \procFinSigId_{#3,#4}(#1 \opSeperate #2) }
 
-\newcommand{\procSetupAptId}{\styleFunction{genApt}}
+\newcommand{\procSetupAptId}{\styleFunction{setupApt}}
 \newcommand{\procSetupApt}[1]{\procSetupAptId(#1)}
-\newcommand{\procGenPtAptSigId}{\styleFunction{genPtPreSig}}
-\newcommand{\procGenPtAptSig}[6]{\procGenPtAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6)}
+\newcommand{\procGenPtAptSigId}{\styleFunction{signPtPreSig}}
+\newcommand{\procGenPtAptSig}[6]{\procGenPtAptSigId_{#2,#3,#4,#5,#6}(#1)}
 \newcommand{\procExtWitId}{\styleFunction{extWit}}
 \newcommand{\procExtWit}[3]{ \procExtWitId(#1 \opSeperate #2 \opSeperate #3) }
 \newcommand{\procVrfAptId}{\styleFunction{vrfPtPreSig}}
-\newcommand{\procVrfApt}[7]{ \procVrfAptId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5 \opSeperate #6 \opSeperate #7) }
+\newcommand{\procVrfApt}[7]{ \procVrfAptId_{#2,#3,#4,#5,#6}(#1 \opSeperate #7) }
 \newcommand{\procFinAptSigId}{ \styleFunction{finAptPreSig} }
-\newcommand{\procFinAptSig}[5]{ \procFinAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5) }
+\newcommand{\procFinAptSig}[5]{ \procFinAptSigId_{#3,#4,#5}(#1 \opSeperate #2) }
 
 \newcommand{\procExpForgId}{ \styleFunction{forgeAptSig_{\cnstAdversary}} }
 \newcommand{\procExpForg}[1]{ \procExpForgId(#1) }
-\newcommand{\procSignOracleId}{ \cnstOracle_{s} }
-\newcommand{\procSignOracle}[3]{ \procSignOracleId_(#1, #2, #3) }
-\newcommand{\procFinOracleId}{ \cnstOracle_{f} }
-\newcommand{\procFinOracle}[2]{ \procFinOracleId{#1}{#2} }
+\newcommand{\procSignOracleId}[2]{ \cnstOracle_{s,#1,#2} }
+\newcommand{\procSignOracle}[3]{ \procSignOracleId{#2}{#3}(#1) }
+\newcommand{\procFunctionId}{\styleFunction{f}}
+\newcommand{\procFunction}[1]{\procFunctionId(#1)}
+
+\newcommand{\procExpExtId}{ \styleFunction{aExtrWit_{\cnstAdversary}} }
+\newcommand{\procExpExt}[1]{ \procExpExtId(#1) }
+\newcommand{\procNonceOracleId}{ \cnstOracle_{k}}
+\newcommand{\procNonceOracle}[1]{ \procNonceOracleId(#1) }
+\newcommand{\procSignPtOracleId}[2]{ \cnstOracle_{s,#1,#2} }
+\newcommand{\procSignPtOracle}[3]{ \procSignPtOracleId{#2}{#3}(#1) }
