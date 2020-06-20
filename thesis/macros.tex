@@ -21,6 +21,9 @@
 \newcommand{\varH}{\styleVariable{h}}
 \newcommand{\cnstAdversary}{\styleCal{A}}
 \newcommand{\cnstaEUFCMA}{\styleFunction{aEUF-CMA}}
+\newcommand{\cnstPayToCoin}{\styleVariable{PayToCoin}}
+\newcommand{\cnstPayToMuSigCoin}{\styleVariable{PayToMuSigCoin}}
+\newcommand{\cnstPayToCoinHideSecret}{\styleVariable{PayToCoinHideSecret}}
 
 % functions
 \newcommand{\funHash}[1]{\cnstHash (#1)}
@@ -186,3 +189,7 @@
 \newcommand{\procNonceOracle}[1]{ \procNonceOracleId(#1) }
 \newcommand{\procSignPtOracleId}[2]{ \cnstOracle_{s,#1,#2} }
 \newcommand{\procSignPtOracle}[3]{ \procSignPtOracleId{#2}{#3}(#1) }
+
+\newcommand{\procSendPreTxId}{ \styleFunction{sendPreTx} }
+\newcommand{\procRecvTxId}{ \styleFunction{recvTx} }
+\newcommand{\procCreateRangeProofId}{ \styleFunction{createRangeProof} }

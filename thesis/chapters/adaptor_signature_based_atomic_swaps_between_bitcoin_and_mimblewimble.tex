@@ -1,2 +1,16 @@
-\subsection{Construction Bitcoin side}\label{sec:atomicBtc}
-\subsection{Construction Grin side}\label{sec:atomicGrin}
+In this section, we will define three different types of Mimblewimble transactions, each consisting of several procedures.
+We will start by defining the general case transaction in which a sender wants to transfer some value to a receiver; we denote this kind of transaction as $\cnstPayToCoin$. From this notion,
+we will build a second type of transaction $\cnstPayToMuSigCoin$, which is unique in that it creates coins which are only spendable by two (or more) parties collaborating. $\cnstPayToMuSigCoin$ is similar
+to a Mulit-signature transaction script in Bitcoin in which an UTXO, only spendable by a consortium of owners, is created.~\cite{bistarelli2018analysis}
+The third type of transaction we will introduce is a $\cnstPayToCoinHideSecret$, which utilizes the Adaptor Signature Scheme defined in definition~\ref{def:twoPartyFixedWitAptSig} to hide a secret x in a
+partial transaction signature, which can be retrieved by the other party from the finalized transaction.
+We prove that all security definitions for Mimblewimble transactions, found by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}, hold for the outlined transaction protocols.
+We then define a Atomic Swap protocol from these building blocks, which allows us to securely swap funds from a Mimblewimble blockchain with those on another Blockchain, such as Bitcoin.
+
+\section{Definitions}
+
+\begin{definition}[$\cnstPayToMuSigCoin$]
+    A Mimblewimble $\cnstPayToMuSigCoin$ transaction consists of a set of functions that allows a sender to transfer funds of the value $\varFundValue$ to a receiver.
+    As we have already discussed in section~\ref{sec:Mimblewimble} for the creation of such a transaction, it is immanent that both the sender and receiver collaborate and exchange messaged via a secure channel.
+    The transaction scheme consist of the following procedures:
+\end{definition}

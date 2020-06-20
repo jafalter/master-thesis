@@ -1,0 +1,10 @@
+SEND_TX(p)
+
+C_inp <- Set(C_inp) with v > p
+bf <- Z_rand
+C_change = Commit((v - p), bf)
+proof = proof(C_change, bf, (v -p))
+bfSum = bf_inp - bf_out
+ks <- Z_rand
+C_bfSum = g^ks
+C_ks = g^bfSum
