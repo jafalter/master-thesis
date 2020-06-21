@@ -48,6 +48,8 @@
 \newcommand{\varTxAlice}{\varTx_{\varAlice}}
 \newcommand{\varTxBob}{\varTx_{\varBob}}
 \newcommand{\varExcess}{\styleCal{E}}
+\newcommand{\varExcessAlice}{\varExcess_{\varAlice}}
+\newcommand{\varExcessBob}{\varExcess_{\varBob}}
 \newcommand{\varKernel}{\styleVariable{K}}
 \newcommand{\varSecKey}{\styleVariable{sk}}
 \newcommand{\varSecKeyAlice}{\varSecKey_{\varAlice}}
@@ -66,6 +68,8 @@
 \newcommand{\varSigSchemeMP}{\varSigScheme_{\styleVariable{MP}}}
 \newcommand{\varSigSchemeApt}{\varSigScheme_{\styleVariable{Apt}}}
 \newcommand{\varProof}{\pi}
+\newcommand{\varProofAlice}{\pi_\varAlice}
+\newcommand{\varProofBob}{\pi_\varBob}
 \newcommand{\varSignature}{\sigma}
 \newcommand{\varInput}{\styleVariable{I}}
 \newcommand{\varFundValue}{\styleVariable{p}}
@@ -79,10 +83,13 @@
 \newcommand{\varCoinSpecial}{\varCoinOut^{\styleVariable{sp}}}
 \newcommand{\varValue}{\styleVariable{v}}
 \newcommand{\varMsg}{\styleVariable{m}}
+\newcommand{\varLockHeight}{\styleVariable{h}}
 \newcommand{\varNonce}{\styleVariable{k}}
 \newcommand{\varNonceAlice}{\styleVariable{\varNonce_{\varAlice}}}
 \newcommand{\varNonceBob}{\styleVariable{\varNonce_{\varBob}}}
 \newcommand{\varNonceAdv}{\varNonce_{\cnstAdversary}}
+\newcommand{\varBlindingFactor}{\styleVariable{r}}
+\newcommand{\varBlindingFactorFor}[1]{\varBlindingFactor_{#1}}
 \newcommand{\varS}{\styleVariable{s}}
 \newcommand{\varSAlice}{\styleVariable{s}_\varAlice}
 \newcommand{\varSBob}{\styleVariable{s}_\varBob}
@@ -129,6 +136,7 @@
 \newcommand{\opAddScalar}{~+~}
 \newcommand{\opAssign}{~:=~}
 \newcommand{\opSub}{~-~}
+\newcommand{\opNegative}[1]{-#1}
 \newcommand{\opTimesScalar}{~\cdot~}
 \newcommand{\opAddPoint}{~\cdot~}
 \newcommand{\opEq}{~=~}
@@ -150,11 +158,16 @@
 
 \newcommand{\procCommitId}{\styleFunction{Commit}}
 \newcommand{\procCommit}[2]{\procCommitId(#1, #2)}
+\newcommand{\procSimpleCommitId}{\styleFunction{SimpleCommit}}
+\newcommand{\procSimpleCommit}[1]{\procSimpleCommitId(#1)}
 
 \newcommand{\procSignId}{\styleFunction{Sign}}
 \newcommand{\procSign}[2]{ \procSignId_{#2}(#1) }
 \newcommand{\procVerfId}{\styleFunction{Verf}}
 \newcommand{\procVerf}[3]{ \procVerfId_{#3}(#1 \opSeperate #2) }
+
+\newcommand{\procProofId}{\styleFunction{rproof}}
+\newcommand{\procProof}[5]{\procProofId_{#4,#5}(#1,#2,#3)}
 
 \newcommand{\procSetupPartSigId}{\styleFunction{setupPt}}
 \newcommand{\procSetupPartSig}[1]{\procSetupPartSigId (#1)}
@@ -190,6 +203,10 @@
 \newcommand{\procSignPtOracleId}[2]{ \cnstOracle_{s,#1,#2} }
 \newcommand{\procSignPtOracle}[3]{ \procSignPtOracleId{#2}{#3}(#1) }
 
-\newcommand{\procSendPreTxId}{ \styleFunction{sendPreTx} }
+\newcommand{\procCreatePreTxId}{ \styleFunction{createPreTx} }
+\newcommand{\procCreatePreTx}[6]{ \procCreatePreTxId_{#2,#3,#4,#5,#6}(#1) }
 \newcommand{\procRecvTxId}{ \styleFunction{recvTx} }
-\newcommand{\procCreateRangeProofId}{ \styleFunction{createRangeProof} }
+\newcommand{\procRecvTx}[4]{ \procRecvTxId_{#3,#4}(#1,#2) }
+\newcommand{\procFinalizeTxId}{ \styleFunction{finalizeTx} }
+\newcommand{\procFinalizeTx}[2]{ \procFinalizeTxId_{#1}(#2) }
+\newcommand{\procSpendOutputId}{ \styleFunction{spendTxOutput} }
