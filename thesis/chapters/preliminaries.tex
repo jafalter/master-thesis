@@ -182,11 +182,13 @@ uncombined offsets from a merged one becomes negligible, making it infeasable to
 
 
 \subsubsection{Cut Through}
+\todo{Pedro: This requires further explanation and maybe an example?}
 From the way transactions are merged together, we can now learn how to purge spent outputs securely. Let's assume $\varCoin_i$ appears as an output in $\varTx_0$ and as an input in $\varTx_1$,
 which are being merged. Remembering the equation for transaction balancedness, $\varCoinInp \opSub \varCoinOut \opAssign \varExcess$ if $\varCoin_i$ appears both in the inputs and outputs, and we erase it on both sides, the equation will still hold.
 Therefore every time a transaction spends an output, it can be virtually forgotten to improve transaction unlinkability as well as yielding saving space.
 
 \subsubsection{The Ledger}
+\todo[inline]{Pedro: Do we need this subsection?}
 The ledger of the Mimblewimble protocol itself is a transaction of the already discussed form. Initially, the ledger starts empty, and transactions are added and aggregated recursively.
 \begin{itemize}
     \item Only transactions in which input coins are contained in the output coins of the ledger will be valid.
@@ -199,16 +201,15 @@ As already pointed out, building transactions in Mimblewimble is an interactive 
 to build a transaction:~\cite{jedusor2016mimblewimble}\\
 Assume Alice wants to transfer coins of value $\varFundValue$ to Bob.
 \begin{enumerate}
-    \item Alice first selects input coins $\varCoinInp$ of total value $\varValue \geq \varFundValue$ that she controls. She than creates change coin outputs $\varCoinOutAlice$ (could be multiple) of total value $\varValue \opSub \varFundValue$ and then
+    \item Alice first selects input coins $\varCoinInp$ of total value $\varValue \geq \varFundValue$ \todo{Pedro: we need a way to express this clearer} that she controls. She then creates change coin outputs $\varCoinOutAlice$ (could be multiple) of total value $\varValue \opSub \varFundValue$ and then
     sends $\varCoinInp \opSeperate \varCoinOutAlice$, a valid range proofs for $\varCoinOutAlice$, plus the opening $(-\varFundValue \opSeperate \varKey)$ of $\sum{\varCoinOutAlice} \opSub \sum{\varCoinInp}$ to Bob.
-    \item Bob creates himself additional output coins $\varCoinOut^B$ plus range proofs of total value $\varFundValue$ with keys $(\varKeySt_i)$ and computes a signature $\varSignature$ with the combined secret key $\varKey \opAddScalar \sum{\varKeySt_i}$ and
+    \item Bob creates himself additional output coins $\varCoinOut^B$ plus range proofs of total value $\varFundValue$ with keys $(\varKeySt_i)$ and computes a signature $\varSignature$ with the combined secret key $\varKey \opAddScalar \sum{\varKeySt_i}$ 
     and finalizes the transaction as
     \[ \varTx \opAssign (0 \opSeperate \varCoinInp \opSeperate \varCoinOut^A \opConc \varCoinOut^B \opSeperate (\varProof \opSeperate \varExcess \opAssign \sum{\varCoinOut^A} \opAddPoint \sum{\varCoinOut^B} \opSub \sum{\varCoinInp} \opSeperate \varSignature)) \]
     and publishes it to the network.
 \end{enumerate}
 Figure~\ref{fig:txOriginal} depicts the original transaction flow.\\
 \begin{figure}
-    \label{fig:txOriginal}
     \centering
     \pseudocode[codesize=\scriptsize]{
         \textbf{Alice} \< \< \< \< \textbf{Bob} \\ [][\hline]
@@ -225,9 +226,10 @@ Figure~\ref{fig:txOriginal} depicts the original transaction flow.\\
         \< \< \< \< \text{ Create range-proof $\varProof$ for $\varCoinOutBob$ } \\
         \< \< \< \< \text{Finalize transaction $\varTx$} \\
     }
-    \caption{Original transaction building process}
+    \caption{Original transaction building process\label{fig:txOriginal}}
+    \todo[inline]{Pedro: Really nice that you created this protocol :) }
 \end{figure}
-This protocol however turned out to be vulnerable. The receiver can spend the change coins $\varCoinOut^A$ by reverting the transaction. Doing this would give the sender his coins back, however as the sender
+This protocol however turned out to be vulnerable\todo{Pedro: For security, privacy or both?}. The receiver can spend the change coins $\varCoinOut^A$ by reverting the transaction. Doing this would give the sender his coins back, however as the sender
 might not have the keys for his spent outputs anymore, the coins could then be lost.\\
 In detail this reverting transaction would look like:
 \[ \varTx_{rv} \opAssign (0 \opSeperate \varCoinOut^A \opConc \varCoinOut^B \opSeperate \varCoinInp \opSeperate (\varProof_{rv} \opSeperate \varExcess_{rv} \opSeperate \varSignature_{rv}) ) \]
@@ -236,7 +238,7 @@ Again remembering the construction of the Excess value of this construction woul
 The key $\varKey$ originally sent by Alice to Bob is a valid opening to $\sum{\varCoinInp} \opSub \sum{\varCoinOut^A}$. With the inverse of this key $\varKey_{inv}$ we get the opening to $\sum{\varCoinOut^A \opSub \varCoinInp}$.
 Now all Bob has to do is add his keys $\sum{\varKeySt_i}$ to get:
 \[ \varKey_{rv} \opAssign -\varKey \opAddScalar \sum{\varKeySt_i} \]
-which is the opening to $\varExcess_{rv}$. Furthermore obtaining a valid range proofs is trivial, as it once was a valid output the ledger will cointain a valid proof for this coin already. \\
+which is the opening to $\varExcess_{rv}$. \todo{Pedro: Why range proof is not correct here in the first place?}Furthermore obtaining a valid range proofs is trivial, as it once was a valid output the ledger will cointain a valid proof for this coin already. \\
 This means Bob spends the newly created outputs and sends them back to the original input coins, chosen by Alice. It might at first seem unclear why Bob would do that. An example situation could be if Alice
 pays Bob for some good which Bob is selling. Alice decides to pay in advance, but then Bob discovers that he is already out of stock of the good that Alice ordered. To return the funds to Alice, he reverses
 the transaction instead of participating in another interactive process to build a new transaction with new outputs. If Alice already deleted the keys to her initial coins, the funds are now lost.
@@ -252,10 +254,9 @@ Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} proposed the following alternat
     of the transaction and therfore will be discarded.
 \end{enumerate}
 The only drawback of this approach is that we have two transaction kernels instead of just one because of the merging step, making the transaction slightly bigger.
-A figure showing the protocol flow is depicted in figure~\ref{fig:txSalvaged}.
+A figure showing the protocol flow is depicted in Figure~\ref{fig:txSalvaged}.
 
 \begin{figure}
-    \label{fig:txSalvaged}
     \centering
     \pseudocode[codesize=\scriptsize]{
         \textbf{Alice} \< \< \< \< \textbf{Bob} \\ [][\hline]
@@ -271,7 +272,8 @@ A figure showing the protocol flow is depicted in figure~\ref{fig:txSalvaged}.
         \< \< \< \< \text{ Merge $\varTxAlice$ and $\varTxBob$ to $\varTx_{m}$ } \\
         \< \< \< \< \text{ Publish $\varTx_{m}$ }
     }
-    \caption{Salvaged tranction protocol by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate}}
+    \caption{Salvaged tranction protocol by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} \label{fig:txSalvaged}}
+    \todo[inline]{Pedro: put labels inside captions} 
 \end{figure}
 
 \section{Scriptless Scripts}\label{sec:scriptlessScripts}
