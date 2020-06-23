@@ -14,6 +14,8 @@
 - What do you think is an interesting future research direction?}
 
 
+
+
 \paragraph{Mimblewimble} The Mimblewimble protocol was introduced in 2016 by an anonymous entity named Jedusor, Tom Elvis~\cite{jedusor2016mimblewimble}. The author's name, as well as the protocols name,
 are references to the Harry Potter franchise. \footnote{\urlharrypotter} In Harry Potter, Mimblewimble is a tongue-typing curse which reflects
 the goal of the protocol's design, which is improving the user's privacy.
@@ -35,7 +37,7 @@ Compared to Bitcoin, there are some differences in Mimblewimble:
 
 
 By utilizing Pedersen commitments in the transactions, we \todo{Pedro: Use ``we'' for contributions that you do in the thesis and ``they'' for parts that are borrowed from other works} hide the amounts transferred in a transaction,
-improving the systems user privacy, but also requiring additional range proofs, attesting to the fact that actual amounts transferred are in between a valid range.
+improving the systems user privacy, but also requiring additional range proofs, attesting to the fact that actual amounts transferred are in between a valid range. 
 Not having any addresses enables transaction merging and transaction cut through, \todo{Pedro: An intuition of these two terms is required here} which we will explain in section \ref{sec:Mimblewimble}.
 However, this comes with the consequence that building transactions require active interaction between the sender and receiver,
 which is different than in constructions more similar to Bitcoin, where a sender can transfer funds to any address without requiring active participation by the receiver. \todo{Pedro: another sentence that shows that you need to explain before how Bitcoin works (the basics)}
