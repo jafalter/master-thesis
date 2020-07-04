@@ -232,25 +232,33 @@ currently implemented in the Grin Mimblewimble Cryptocurrency and will provide a
     \begin{center}
         \fbox{
         \begin{varwidth}{\textwidth}
-            \procedure[linenumbering]{$\procSetupPartSig{\varSecParam}$}{
-            \varNonce \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-            \varRand \opAssign \funGen{\varRand} \\
-            \pcreturn (\varNonce \opSeperate \varRand)
+            \procedure[linenumbering]{$\procSignPt{\varMsg}{\varSecKeyAlice}{\varSecKeyBob}$} {
+            \varNonceAlice \sample \cnstIntegersPrimeWithoutZero{\varSecParam} \< \< \varNonceBob \sample \cnstIntegersPrimeWithoutZero{\varSecParam} \\
+            \varRandAlice \opAssign \funGen{\varNonceAlice} \< \< \varRandBob \opAssign \funGen{\varNonceBob} \\
+            \< \sendmessageright*{\varRandAlice} \< \\
+            \< \sendmessageleft*{\varRandBob} \< \\
+            \varRand \opAssign \varRandAlice \opAddPoint \varRandBob \< \< \varRand \opAssign \varRandAlice \opAddPoint \varRandBob \\
+            \varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob \< \< \varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob \\
+            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKeyComp} \< \< \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKeyComp} \\
+            \varSAlice \opAssign \varNonceAlice \opAddScalar \varSecKeyAlice \opTimesScalar \varSchnorrChallenge \< \< \varSBob \opAssign \varNonceBob \opAddScalar \varSecKeyBob \opTimesScalar \varSchnorrChallenge \\
+            \varSigAlice \opAssign (\varSAlice, \varRandAlice) \< \< \varSigBob \opAssign (\varSBob, \varRandBob) \\
+            \< \pcreturn (\varSigAlice \opSeperate \varSigBob) \<
+            } \\
+            \procedure[linenumbering]{$\procVerfPtSig{\varSigBob}{\varMsg}{\varPubKeyBob}$} {
+            (\varSBob, \varRandBob) \opFunResult \varSigBob \\
+            \varRand \opAssign \varRandAlice \opAddPoint \varRandBob \\
+            \varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob \\
+            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKeyComp} \\
+            \pcreturn \funGen{\varSBob} \opEq \varRandBob^{\varSchnorrChallenge} \opAddPoint \varPubKeyBob
             }
-            \procedure[linenumbering]{$\procGenPartSig{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob}$} {
-            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRandAlice \opAddPoint \varRandBob \opConc \varPubKeyAlice \opAddPoint \varPubKeyBob} \\
-            \varS \opAssign \varNonceAlice \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKeyAlice \\
-            \pcreturn \varSigAlice \opAssign \varS
-            } \\
-            \procedure[linenumbering]{$\procVerfPartSig{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varPubKeyBob}{\varRandBob}{\varSigBob}$} {
-            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRandAlice \opAddPoint \varRandBob \opConc \varPubKeyAlice \opAddPoint \varPubKeyBob} \\
-            \varS \opAssign \opAccess{\varSigBob}{\varS} \\
-            \pcreturn \funGen{\varS} \opEq \opPointScalar{\varRandBob}{\varSchnorrChallenge} \opAddPoint \varPubKeyBob
-            } \\
-            \procedure[linenumbering]{$\procFinSig{\varSigAlice}{\varSigBob}{\varRandAlice}{\varRandBob}$} {
-            \varS_\varAlice \opAssign \opAccess{\varSigAlice}{\varS} \\
-            \varS_\varBob \opAssign \opAccess{\varSigBob}{\varS} \\
-            \pcreturn \varSigFin \opAssign (\varS \opAssign \varS_\varAlice \opAddScalar \varS_\varBob \opSeperate \varRand \opAssign \varRandAlice \opAddPoint \varRandBob)
+            \procedure[linenumbering]{$\procFinSig{\varSigAlice}{\varSigBob}$} {
+            (\varSAlice, \varRandAlice) \opFunResult \varSigAlice \\
+            (\varSBob, \varRandBob) \opFunResult \varSigBob \\
+            \varRand \opAssign \varRandAlice \opAddPoint \varRandBob \\
+            \varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob \\
+            \varS \opAssign \varSAlice \opAddScalar \varSBob \\
+            \varSigFin \opAssign (\varS, \varRand) \\
+            \pcreturn (\varSigFin, \varPubKeyComp)
             }
         \end{varwidth}
         }
