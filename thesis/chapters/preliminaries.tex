@@ -10,13 +10,12 @@ In this section, we first introduce the notation and definitions used hereby in 
 \paragraph{Notation}
 We first define the general notation used in the following chapters to formalize procedures and protocols. Let $\cnstGroup$ denote a cyclic group of prime order $\varPrime$ and $\cnstIntegersPrime{\varPrime}$
 the ring of integers modulo $\varPrime$. $\cnstIntegersPrimeWithoutZero{\varPrime}$ is $\cnstIntegersPrime{\varPrime} \opExcluding \funList{0}$. \todo{Pedro: I think macro $\opExcluding$ was broken here. I have updated to use $\setminus$ instead. Please check that this is what you expected} $\varG \opSeperate \varH$ are adjacent
-generators in $\cnstGroup$, where adjacent means the discrete logarithm of $\varH$ in regards to $\varG$ is not known. Exponentiation stands for repeated application of the group operation. For two scalars
-$\varScA$ and $\varScB$ multiplication is defined as $\varScA \opTimesScalar \varScB$. We define addition between two curve points \todo{Pedro: You mean here the group operation? addition/multiplication is something that we use colloquially to have a better mental map of what's happening} as
-$\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \opTimesScalar \varScB}$. \todo{Pedro: Is this correct? shouldn't it be $\funGen{\varScA} \opAddPoint \funGen{\varScB} \opEq \funGen{\varScA \opAddScalar \varScB}$ }
+generators in $\cnstGroup$, where adjacent means the discrete logarithm of $\varH$ in regards to $\varG$ is not known. Exponentiation stands for repeated application of the group operation. We define the group operation between two curve points as
+$\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \opAddScalar \varScB}$.
 
 \todo{Pedro: We normally do not use the tilde to add spaces in math mode}
 
-\begin{definition}[Hard Relation~\cite{aumayr2020bitcoinchannels}]\label{def:hardRelation}
+\begin{definition}[Hard Relation\cite{aumayr2020bitcoinchannels}]\label{def:hardRelation}
     Given a language $\varLanguage \opAssign \funList{\varBigA \opForWhich \exists\varSmallA \text{ s.t. } (\varBigA, \varSmallA) \opIn \cnstRelation}$ then the relation $\cnstRelation$ is
     considered hard if the following three properties hold:
     \begin{enumerate}
@@ -80,9 +79,11 @@ $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \o
 \begin{definition}[Commitment Scheme~\cite{bunz2018bulletproofs}]\label{def:commitment}
     A cryptographic Commitment is defined by a pair of functions $(\procSetup{\varSecParam} \opSeperate \procCommitId(\varInput, \varNonce))$. $\procSetupId$ is the setup procedure, it takes as input a
     security parameter $\varSecParam$ and outputs public parameters $\varPublicParam$. Depending on $\varPublicParam$ we define a input space $\varInputSpace_{\varPublicParam}$,
-    a randomness space $\varRandSpace_{\varPublicParam}$ and a commitment space $\varCommitSpace_{\varPublicParam}$.\\
+    a randomness space $\varRandSpace_{\varPublicParam}$ and a commitment space $\varCommitSpace_{\varPublicParam}$.
+
     The function $\procCommitId$ takes an arbitrary input $\varInput \opIn \varInputSpace_{\varPublicParam}$, and a random value $\varNonce \opIn \varRandSpace_{\varPublicParam}$ and
-    generates an output$\varCommitment \opIn \varCommitSpace_{\varPublicParam}$.\\
+    generates an output$\varCommitment \opIn \varCommitSpace_{\varPublicParam}$.
+
     Secure commitments must fullfill the \textit{Binding} and \textit{Hiding} security properties:
     \begin{itemize}
         \item \textit{Binding:} If a Commitment Scheme is binding it must hold that for all $\cnstPolyTime$ adversaries $\cnstAdversary$ given a valid input $\varInput \opIn \varInputSpace_{\varPublicParam}$
@@ -102,7 +103,7 @@ $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \o
 
 \todo[inline]{First, a Pedersen Commitment is an instance of Commitment Scheme as in Def 3.4; Second it has the homomorphic property as in 3.5. Clarify that, for instance, by explaining exactly how the algorithms are implemented, as you did below.}
 \begin{definition}[Pedersen Commitment]\label{def:pedersenCom}
-    A Pedersen Commitment is an instantiation of a Homomoprhic Commitment Scheme as definied in~\ref{def:homomorphicCom}:
+    A Pedersen Commitment is an instantiation of a Homomoprhic Commitment Scheme as defined in~\ref{def:homomorphicCom}:
     \[ \varCommitSpace_{\varPublicParam} \opAssign \cnstGroup\] of order $\varPrime \opSeperate \varInputSpace_{\varPublicParam} \opSeperate \varRandSpace_{\varPublicParam} \opAssign \cnstIntegersPrime{\varPrime}$.
     the procedures $(\procSetupId, \procCommitId)$ are then instantiated as:
     \[ \procSetup{\varSecParam} \opAssign \varG, \varH \sample \cnstGroup\]
@@ -131,7 +132,7 @@ In this section we will outline the fundamental properties of the protocols empl
 \todo[inline]{Pedro: I think that throughout this section, you have nice explanations of the different parts of the transaction. It would be also possible to add definitions for the different things that you use}
 
 \begin{itemize}
-    \item For two adjacent elliptic curve generators $\varG$ and $\varH$ a coin in Mimblewimble is a tuple of the form ($\varCoin$, $\varProof$), where $\varCoin \opAssign \funGen{\varValue} \opAddPoint \funGenH{\varNonce}$  a Pedersen Commitment \cite{pedersen1991non}
+    \item For two adjacent elliptic curve generators $\varG$ and $\varH$ a coin in Mimblewimble is a tuple of the form ($\varCoin$, $\varProof$), where $\varCoin \opAssign \funGen{\varValue} \opAddPoint \funGenH{\varNonce}$  a Pedersen Commitment~\cite{pedersen1991non}
     to the value $\varValue$ with blinding factor $\varNonce$. $\varProof$ is a range proof attesting to the fact that $\varValue$ is in a valid range \todo{Pedro: you might want to specify what range is used here. Also I rewrote some part, so please check.} in zero-knowledge.
     
     \todo[inline]{Pedro: not sure whether the point below is required}
@@ -150,21 +151,22 @@ Therefore knowledge of $\varExcess$ instead is proven by providing a valid signa
 Coinbase transactions (transactions creating new money as part of a miners reward) additionally include the newly minted money as supply $\varSupply$ in the excess equation:
 \[ \varExcess \opAssign \funGen{(\sum{\varNonce'_i} \opSub \sum{\varNonce_i})} \opSub \funGenH{\varSupply} \]
 Finally a Mimblewimble transaction is of form:
-\[ \varTx \opAssign (\varSupply \opSeperate \varCoinInp \opSeperate \varCoinOut \opSeperate \varKernel)~\text{with}~\varKernel \opAssign (\funList{\varProof} \opSeperate \funList{\varExcess} \opSeperate \funList{\varSignature}) \]
+\[ \varTx \opAssign (\varSupply \opSeperate \varCoinInp \opSeperate \varCoinOut \opSeperate \varKernel)\:\text{with}\:\varKernel \opAssign (\funList{\varProof} \opSeperate \funList{\varExcess} \opSeperate \funList{\varSignature}) \]
 where $\varSupply$ is the transaction supply amount, $\varCoinInp$ is the list of input coins, $\varCoinOut$ is the list of output coins and $\varKernel$ is the transaction Kernel. The Kernel consists of $\funList{\varProof}$
 which is a list of all output coin range proofs, $\funList{\varExcess}$ a list of excess values and finally $\funList{\varSignature}$ a list of signatures ~\cite{fuchsbauer2019aggregate}. \todo{Pedro: the $\varExcess$ is a single value? or a set?}
 
 \subsubsection{Transaction Merging}
-An essential property of the Mimblewimble protocol is that two transactions can easily be merged into one, which is essentially a non-interactive version of the CoinJoin protocol on Bitcoin \cite{maxwell2013coinjoin}
+An essential property of the Mimblewimble protocol is that two transactions can easily be merged into one, which is essentially a non-interactive version of the CoinJoin protocol on Bitcoin~\cite{maxwell2013coinjoin}
 Assume we have the following two transactions:
 \[ \varTx_0 \opAssign (\varSupply_0 \opSeperate \varCoinInp^0 \opSeperate \varCoinOut^0 \opSeperate (\funList{\varProof_0} \opSeperate \funList{\varExcess_0} \opSeperate \funList{\varSignature_0}) ) \]
 \[ \varTx_1 \opAssign (\varSupply_1 \opSeperate \varCoinInp^1 \opSeperate \varCoinOut^1 \opSeperate (\funList{\varProof_1} \opSeperate \funList{\varExcess_1} \opSeperate \funList{\varSignature_1}) ) \]
 Then we can build a single merged transaction:
-\[ \varTx_m \opAssign (\varSupply_0 \opAddScalar \varSupply_1 \opSeperate \varCoinInp^0 \opConc \varCoinInp^1,~\varCoinOut^0 \opConc \varCoinOut^1 \opSeperate (\funList{\varProof_0} \opConc \funList{\varProof_1}) \opSeperate
+\[ \varTx_m \opAssign (\varSupply_0 \opAddScalar \varSupply_1 \opSeperate \varCoinInp^0 \opConc \varCoinInp^1,\:\varCoinOut^0 \opConc \varCoinOut^1 \opSeperate (\funList{\varProof_0} \opConc \funList{\varProof_1}) \opSeperate
 \funList{\varExcess_0} \opConc \funList{\varExcess_1} \opSeperate \funList{\varSignature_0} \opConc \funList{\varSignature_1}) \]
 We can easily deduce that if $\varTx_0$ and $\varTx_1$ are valid, it follows that $\varTx_m$ also has to be valid:
 If $\varTx_0$ and $\varTx_1$ are valid that means $\varCoinInp^0 \opSub \varCoinOut^0 \opSub \funGenH{\varSupply_0} \opAssign \varExcess_0 \opSeperate \funList{\varProof_0}$ contains valid range proofs for the outputs
-$\varCoinOut^0$ and $\funList{\varSignature_0}$ contains a valid signature to $\varExcess_0 \opSub \funGenH{\varSupply_0}$ as public key, the same must hold for $\varTx_1$. \\
+$\varCoinOut^0$ and $\funList{\varSignature_0}$ contains a valid signature to $\varExcess_0 \opSub \funGenH{\varSupply_0}$ as public key, the same must hold for $\varTx_1$.
+
 By the rules of arithmetic it then must also hold that
 \[ \varCoinInp^0 \opConc \varCoinInp^1 \opSub \varCoinOut^0 \opConc \varCoinOut^1 \opSub \funGenH{\varSupply_0 \opAddScalar \varSupply_1} \opAssign \varExcess_0 \opAddPoint \varExcess_1 \opSeperate \funList{\varProof_0} \opConc \funList{\varProof_1} \]
 must contain valid range proofs for the output coins and $\funList{\varSignature_0} \opConc \funList{\varSignature_1}$ must contain valid signatures to the respective Excess points, which makes $\varTx_m$ a valid transaction.
@@ -198,7 +200,8 @@ The ledger of the Mimblewimble protocol itself is a transaction of the already d
 
 \subsubsection{Transaction Building}
 As already pointed out, building transactions in Mimblewimble is an interactive process between the sender and receiver of funds. Jedusor, Tom Elvis originally envisioned the following two-step process
-to build a transaction:~\cite{jedusor2016mimblewimble}\\
+to build a transaction:~\cite{jedusor2016mimblewimble}
+
 Assume Alice wants to transfer coins of value $\varFundValue$ to Bob.
 \begin{enumerate}
     \item Alice first selects input coins $\varCoinInp$ of total value $\varValue \geq \varFundValue$ \todo{Pedro: we need a way to express this clearer} that she controls. She then creates change coin outputs $\varCoinOutAlice$ (could be multiple) of total value $\varValue \opSub \varFundValue$ and then
@@ -230,7 +233,8 @@ Figure~\ref{fig:txOriginal} depicts the original transaction flow.\\
     \todo[inline]{Pedro: Really nice that you created this protocol :) }
 \end{figure}
 This protocol however turned out to be vulnerable\todo{Pedro: For security, privacy or both?}. The receiver can spend the change coins $\varCoinOut^A$ by reverting the transaction. Doing this would give the sender his coins back, however as the sender
-might not have the keys for his spent outputs anymore, the coins could then be lost.\\
+might not have the keys for his spent outputs anymore, the coins could then be lost.
+
 In detail this reverting transaction would look like:
 \[ \varTx_{rv} \opAssign (0 \opSeperate \varCoinOut^A \opConc \varCoinOut^B \opSeperate \varCoinInp \opSeperate (\varProof_{rv} \opSeperate \varExcess_{rv} \opSeperate \varSignature_{rv}) ) \]
 Again remembering the construction of the Excess value of this construction would look like this:
@@ -238,11 +242,12 @@ Again remembering the construction of the Excess value of this construction woul
 The key $\varKey$ originally sent by Alice to Bob is a valid opening to $\sum{\varCoinInp} \opSub \sum{\varCoinOut^A}$. With the inverse of this key $\varKey_{inv}$ we get the opening to $\sum{\varCoinOut^A \opSub \varCoinInp}$.
 Now all Bob has to do is add his keys $\sum{\varKeySt_i}$ to get:
 \[ \varKey_{rv} \opAssign -\varKey \opAddScalar \sum{\varKeySt_i} \]
-which is the opening to $\varExcess_{rv}$. \todo{Pedro: Why range proof is not correct here in the first place?}Furthermore obtaining a valid range proofs is trivial, as it once was a valid output the ledger will cointain a valid proof for this coin already. \\
+which is the opening to $\varExcess_{rv}$. \todo{Pedro: Why range proof is not correct here in the first place?}Furthermore obtaining a valid range proofs is trivial, as it once was a valid output the ledger will cointain a valid proof for this coin already.
+
 This means Bob spends the newly created outputs and sends them back to the original input coins, chosen by Alice. It might at first seem unclear why Bob would do that. An example situation could be if Alice
 pays Bob for some good which Bob is selling. Alice decides to pay in advance, but then Bob discovers that he is already out of stock of the good that Alice ordered. To return the funds to Alice, he reverses
 the transaction instead of participating in another interactive process to build a new transaction with new outputs. If Alice already deleted the keys to her initial coins, the funds are now lost.
-The problem was solved in the Grin Cryptocurrency by making the signing process itself a two-party process which will be explained in more detail in chapter~\ref{chp:fixedWitnessSignatures}. \\
+The problem was solved in the Grin Cryptocurrency by making the signing process itself a two-party process which will be explained in more detail in chapter~\ref{chp:fixedWitnessSignatures}.
 
 Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} proposed the following alternative way to build transactions which would not be vulnerable to this problem.
 \begin{enumerate}
