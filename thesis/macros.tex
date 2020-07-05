@@ -32,6 +32,8 @@
 \newcommand{\funGenH}[1]{\opPointScalar{\varH}{#1}}
 \newcommand{\funList}[1]{\{#1\}}
 \newcommand{\funStar}[1]{#1'}
+\newcommand{\funHat}[1]{\hat{#1}}
+\newcommand{\funTilde}[1]{\tilde{#1}}
 \newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
 
 % variables
@@ -91,6 +93,7 @@
 \newcommand{\varBlindingFactor}{\styleVariable{r}}
 \newcommand{\varBlindingFactorFor}[1]{\varBlindingFactor_{#1}}
 \newcommand{\varS}{\styleVariable{s}}
+\newcommand{\varSStar}{\funStar{\varS}}
 \newcommand{\varSAlice}{\styleVariable{s}_\varAlice}
 \newcommand{\varSBob}{\styleVariable{s}_\varBob}
 \newcommand{\varKey}{\styleVariable{x}}
@@ -101,11 +104,14 @@
 \newcommand{\varRandAlice}{\varRand_{\varAlice}}
 \newcommand{\varRandBob}{\varRand_{\varBob}}
 \newcommand{\varRandAdv}{\varRand_{\cnstAdversary}}
-\newcommand{\varSigPt}{\widetilde{\varSignature}}
-\newcommand{\varSigAlice}{\widetilde{\varSignature_{\varAlice}}}
-\newcommand{\varSigAptAlice}{\varSignature^{\varAlice}_{\styleVariable{apt}}}
-\newcommand{\varSigAptBob}{\varSignature^{\varBob}_{\styleVariable{apt}}}
-\newcommand{\varSigBob}{\widetilde{\varSignature_{\varBob}}}
+\newcommand{\varSigPt}{\funTilde{\varSignature}}
+\newcommand{\varSigPtAdv}{\funTilde{\varSignature_{\cnstAdversary}}}
+\newcommand{\varSigAlice}{\funTilde{\varSignature_{\varAlice}}}
+\newcommand{\varSigApt}{\funHat{\varSignature}}
+\newcommand{\varSigAptAdv}{\funHat{\varSignature_{\cnstAdversary}}}
+\newcommand{\varSigAptAlice}{\funHat{\varSignature_{\varAlice}}}
+\newcommand{\varSigAptBob}{\funHat{\varSignature_{\varBob}}}
+\newcommand{\varSigBob}{\funTilde{\varSignature_{\varBob}}}
 \newcommand{\varSigPart}{\varSignature_{\styleVariable{prt}}}
 \newcommand{\varSigPartAdv}{\varSignature_{\styleVariable{prt}}^{\cnstAdversary}}
 \newcommand{\varSigPartSt}{\funStar{\varSignature_{\styleVariable{prt}}}}
@@ -151,8 +157,8 @@
 \newcommand{\opSmEq}{~\leq~}
 
 % procedures
-\newcommand{\procGenRId}{\styleFunction{GenR}}
-\newcommand{\procGenR}[1]{\procGenRId{#1}}
+\newcommand{\procGenRId}{\styleFunction{genRel}}
+\newcommand{\procGenR}[1]{\procGenRId(#1)}
 
 \newcommand{\procSetupId}{\styleFunction{Setup}}
 \newcommand{\procSetup}[1]{\procSetupId(#1)}
@@ -175,7 +181,8 @@
 \newcommand{\procGenPartSigId}{\styleFunction{signPt}}
 \newcommand{\procGenPartSig}[5]{ \procGenPartSigId_{#2,#3,#4,#5}(#1) }
 \newcommand{\procSignPtId}{\styleFunction{signPt}}
-\newcommand{\procSignPt}[3]{\procSignPtId<(#1,#2)(#1,#3)>}
+\newcommand{\procSignPt}[3]{\procSignPtId<(#1 \opSeperate #2)(#1 \opSeperate #3)>}
+\newcommand{\procSignPtSingle}[2]{\procSignPtId(#1 \opSeperate #2)}
 \newcommand{\procVerfPtSigId}{\styleFunction{vrfPt}}
 \newcommand{\procVerfPtSig}[3]{\procVerfPtSigId(#1,#2,#3)}
 \newcommand{\procVerfPartSigId}{\styleFunction{vrfPt}}
@@ -185,10 +192,14 @@
 
 \newcommand{\procSetupAptId}{\styleFunction{setupApt}}
 \newcommand{\procSetupApt}[1]{\procSetupAptId(#1)}
+\newcommand{\procAptSigId}{\styleFunction{adaptSig}}
+\newcommand{\procAptSig}[2]{\procAptSigId(#1,#2)}
 \newcommand{\procGenPtAptSigId}{\styleFunction{signPtPreSig}}
 \newcommand{\procGenPtAptSig}[6]{\procGenPtAptSigId_{#2,#3,#4,#5,#6}(#1)}
 \newcommand{\procExtWitId}{\styleFunction{extWit}}
 \newcommand{\procExtWit}[3]{ \procExtWitId(#1 \opSeperate #2 \opSeperate #3) }
+\newcommand{\procVerifyAptSigId}{\styleFunction{verifyAptSig}}
+\newcommand{\procVerifyAptSig}[4]{\procVerifyAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
 \newcommand{\procVrfAptId}{\styleFunction{vrfPtPreSig}}
 \newcommand{\procVrfApt}[7]{ \procVrfAptId_{#2,#3,#4,#5,#6}(#1 \opSeperate #7) }
 \newcommand{\procFinAptSigId}{ \styleFunction{finAptPreSig} }
@@ -203,10 +214,8 @@
 
 \newcommand{\procExpExtId}{ \styleFunction{aExtrWit_{\cnstAdversary}} }
 \newcommand{\procExpExt}[1]{ \procExpExtId(#1) }
-\newcommand{\procNonceOracleId}{ \cnstOracle_{k}}
-\newcommand{\procNonceOracle}[1]{ \procNonceOracleId(#1) }
 \newcommand{\procSignPtOracleId}[2]{ \cnstOracle_{s,#1,#2} }
-\newcommand{\procSignPtOracle}[3]{ \procSignPtOracleId{#2}{#3}(#1) }
+\newcommand{\procSignPtOracle}[2]{ \procSignPtOracleId{#2}(#1) }
 
 \newcommand{\procCreatePreTxId}{ \styleFunction{createPreTx} }
 \newcommand{\procCreatePreTx}[6]{ \procCreatePreTxId_{#2,#3,#4,#5,#6}(#1) }
