@@ -1,2 +1,85 @@
-\subsection{Construction Bitcoin side}\label{sec:atomicBtc}
-\subsection{Construction Grin side}\label{sec:atomicGrin}
+In this section, we will define three different types of Mimblewimble transactions, each consisting of several procedures.
+We will start by defining the general case transaction in which a sender wants to transfer some value to a receiver; we denote this kind of transaction as $\cnstPayToCoin$. From this notion,
+we will build a second type of transaction $\cnstPayToMuSigCoin$, which is unique in that it creates coins which are only spendable by two (or more) parties collaborating. $\cnstPayToMuSigCoin$ is similar
+to a Mulit-signature transaction script in Bitcoin in which an UTXO, only spendable by a consortium of owners, is created.~\cite{bistarelli2018analysis}
+The third type of transaction we will introduce is a $\cnstPayToCoinHideSecret$, which utilizes the Adaptor Signature Scheme defined in definition~\ref{def:twoPartyFixedWitAptSig} to hide a secret x in a
+partial transaction signature, which can be retrieved by the other party from the finalized transaction.
+We prove that all security definitions for Mimblewimble transactions, found by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}, hold for the outlined transaction protocols.
+We then define a Atomic Swap protocol from these building blocks, which allows us to securely swap funds from a Mimblewimble blockchain with those on another Blockchain, such as Bitcoin.
+
+\section{Definitions}\label{sec:atomic-def}
+
+\begin{definition}[$\cnstPayToCoin$]
+    A Mimblewimble $\cnstPayToCoin$ transaction consists of a set of functions that allows a sender to transfer funds of the value $\varFundValue$ to a receiver.
+    As we have already discussed in section~\ref{sec:Mimblewimble} for the creation of such a transaction, it is immanent that both the sender and receiver collaborate and exchange messaged via a secure channel.
+    To construct the transaction protocol we assume that we have access to a two-party signature scheme as defined in definition~\ref{def:twoPartySig}, a zero-knowledge Rangeproofs system such as Bulletproofs, as
+    described in section~\ref{sec:rangeProof}, a homomoprhic commitment scheme as defined in definition~\ref{def:homomorphicCom} such as Pedersen Commitments~\ref{def:pedersenCom}.
+    The transaction scheme consist of the following four procedures:
+    \[ \cnstPayToCoin \opAssign (\procCreatePreTxId \opSeperate \procRecvTxId \opSeperate \procFinalizeTxId \opSeperate \procSpendOutputId) \]
+    \begin{itemize}
+        \item $\procCreatePreTxId$ creates pre-transaction which is not yet valid and can be sent to Bob (the receiver). The pre-transaction needs to contain the value transferred $\varFundValue$, the input coin which
+        is spend with the transaction $\varCoinInp$, as well as Alice (the senders) change output $\varCoinOutAlice$ holding the remainder of the input coins value and the value which should be transferred to Bob.
+        Additionally Alice needs to send commitments $\varRandAlice \opSeperate \varExcessAlice$ whereas $\varRandAlice$ is a commitment to her nonce $\varNonceAlice$ and $\varExcessAlice$ the commitment to
+        the difference of blinding factors between her input and output coins. Optionally Alice can send a message to Bob which should be included in the transaction. Addiontally if required a locktime can be
+        specified as a blockcount. This means that a transaction will only be valid after a certain number of blocks has been mined.
+        \item $\procRecvTxId$ takes as input a pre-transaction and adds Bobs output $\varCoinOutBob$ to the transaction. Bob creates a partial signature to the final Excess value $\varExcess$ which the commitment
+        to the sum of output coin blinding factors substracted from the sum of input coin blinding factors. As the signatures messages we can use the transaction fee, the optional messages as well as
+        the locktime (if given) choosen by Alice in the pre-transaction.
+        Bob sends back the partially signed transaction together with a commitment to his nonce $\varRandBob$ and commitment to his blinding factor $\varExcessBob$.
+        \item $\procFinalizeTxId$ executed again by Alice will validate Bobs partial signature, add her partial signature and thereby make the transaction valid and ready to be broadcast.
+    \end{itemize}
+\end{definition}
+
+TODO other two transaction type and security definitons
+
+\section{Grin instantiation}\label{sec:atomic-inst}
+
+In this section we describe instantiations for the transaction types defined in~\ref{sec:atomic-def} specifically tailored for the Grin cryptocurrency. We show that all of them are secure by proving the
+outlined security properties for mimblewimble transactions. In section~\ref{sec:atomic-swap} we use this transaction types as building block for the Grin side of our Atomic Swap protocol.
+
+\subsection{$\cnstPayToCoin$}
+
+As homomorphic commitment scheme we here use the Pedersen Commitment as defined in definition~\ref{def:pedersenCom}, we also need a second simple commitment which we define as follows
+$\procSimpleCommit \opEq \procCommit{0}{\varValue} \opEq \funGen{\varValue} \opAddPoint \funGenH{0} \opEq \funGen{\varValue}$. As Rangeproof scheme we use Bulletproofs as defined in
+section~\ref{sec:rangeProof} and finally as signature scheme we use the schnorr-based instantiation of the two-party signature scheme seen in~\ref{sec:schnorrInst}. The instantiation of the
+transaction protocol can be seen in~\ref{fig:payToCoin}.
+\begin{figure}
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procCreatePreTx{\varFundValue}{\varMsg}{\varLockHeight}{\varCoinInp}{\varBlindingFactorFor{i}}{\varValue}$} {
+                \varBlindingFactorFor{j} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+                \varNonceAlice \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+                \varCoinOutAlice \opFunResult \procCommit{\varValue \opSub \varFundValue}{\varBlindingFactorFor{j}} \\
+                \varProofAlice \opFunResult \procProof{\varCoinOutAlice}{\varValue \opSub \varFundValue}{\varBlindingFactorFor{j}}{1}{2^{64}} \\
+                \varBlindingFactorFor{sum} \opAssign \varBlindingFactorFor{\varBlindingFactorFor{j} \opSub \varBlindingFactorFor{i}}
+                \varExcessAlice \opFunResult \procSimpleCommit{\varBlindingFactorFor{sum}}\\
+                \varRandAlice \opFunResult \procSimpleCommit{\varNonceAlice}{\varProofAlice}{\varExcessAlice}{\varExcessAlice} \\
+                \pcreturn \varTxAlice \opAssign (\varCoinInp \opSeperate \varCoinOutAlice \opSeperate \varExcessAlice \opSeperate \varRandAlice)
+            }
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procRecvTx{\varFundValue}{\varTxAlice}{\varMsg}{\varLockHeight}$} {
+                \varBlindingFactorFor{k} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+                \varNonceBob \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+                \varCoinOutBob \opFunResult \procCommit{\varFundValue}{\varBlindingFactorFor{k}} \\
+                \varProofBob \opFunResult \procProof{\varCoinOutBob}{\varFundValue}{\varBlindingFactorFor{k}}{1}{2^{64}} \\
+                \varExcessAlice \opAssign \opAccess{\varTxAlice}{\varExcessAlice} \\
+                \varRandAlice \opAssign \opAccess{\varTxAlice}{\varRandAlice} \\
+                \varExcessBob \opFunResult \procSimpleCommit{\varBlindingFactorFor{k}} \\
+                \varRandBob \opFunResult \procSimpleCommit{\varNonceBob} \\
+                \varSigBob \opFunResult \procGenPartSig{\varMsg \opConc \varLockHeight}{\varBlindingFactorFor{k}}{\varNonceBob}{\varExcessAlice}{\varRandAlice} \\
+                \pcreturn \varTxBob \opAssign (\varCoinOutBob \opSeperate \varExcessBob \opSeperate \varRandBob \opSeperate \varSigBob)
+            }
+            \procedure[linenumbering, syntaxhighlight=auto]{$\procFinalizeTx{\varTxAlice}{\varTxBob}$} {
+                \procVerfPartSig{\varMsg \opConc \varLockHeight}{\varSigBob}{\varBlindingFactorFor{sum}}{\varNonceAlice}{\varExcessBob}{\varRandBob} \opEq 1 \\
+                \varSigAlice \opFunResult \procGenPartSig{\varMsg \opConc \varLockHeight}{\varBlindingFactorFor{sum}}{\varNonceAlice}{\varExcessBob}{\varRandBob} \\
+                \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob}{\varRandAlice}{\varRandBob} \\
+                \pcreturn (\varTxAlice \opSeperate \varTxBob \opSeperate \varSigFin)
+            }
+        \end{varwidth}
+        }
+    \end{center}
+    \caption{Instantiation of $\cnstPayToCoin$ transaction protocol.}
+    \label{fig:payToCoin}
+\end{figure}
+
+\section{Atomic Swap protocol}\label{sec:atomic-swap}
