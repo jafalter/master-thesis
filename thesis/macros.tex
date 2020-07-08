@@ -20,10 +20,13 @@
 \newcommand{\varG}{\styleVariable{g}}
 \newcommand{\varH}{\styleVariable{h}}
 \newcommand{\cnstAdversary}{\styleCal{A}}
-\newcommand{\cnstaEUFCMA}{\styleFunction{aEUF-CMA}}
+\newcommand{\cnstaEUFCMA}{\ensuremath{\styleFunction{aEUF-CMA\;}}}
 \newcommand{\cnstPayToCoin}{\styleVariable{PayToCoin}}
 \newcommand{\cnstPayToMuSigCoin}{\styleVariable{PayToMuSigCoin}}
 \newcommand{\cnstPayToCoinHideSecret}{\styleVariable{PayToCoinHideSecret}}
+\newcommand{\cnstAptSigCorrectness}{\ensuremath{\styleFunction{Adaptor\;Signature\;Correctness\;}}}
+\newcommand{\cnstWitnessExtractability}{\ensuremath{\styleFunction{Witness\;Extractability\;}}}
+\newcommand{\cnstCorrectness}{\ensuremath{\styleFunction{Correctness\;}}}
 
 % functions
 \newcommand{\funHash}[1]{\cnstHash (#1)}
@@ -176,32 +179,24 @@
 \newcommand{\procProofId}{\styleFunction{rproof}}
 \newcommand{\procProof}[5]{\procProofId_{#4,#5}(#1,#2,#3)}
 
-\newcommand{\procSetupPartSigId}{\styleFunction{setupPt}}
-\newcommand{\procSetupPartSig}[1]{\procSetupPartSigId (#1)}
 \newcommand{\procGenPartSigId}{\styleFunction{signPt}}
 \newcommand{\procGenPartSig}[5]{ \procGenPartSigId_{#2 \opSeperate #3 \opSeperate #4 \opSeperate #5}(#1) }
 \newcommand{\procSignPtId}{\styleFunction{signPt}}
 \newcommand{\procSignPt}[3]{\procSignPtId<(#1 \opSeperate #2)(#1 \opSeperate #3)>}
 \newcommand{\procSignPtSingle}[2]{\procSignPtId(#1 \opSeperate #2)}
 \newcommand{\procVerfPtSigId}{\styleFunction{vrfPt}}
-\newcommand{\procVerfPtSig}[3]{\procVerfPtSigId(#1 \opSeperate #2 \opSeperate #3)}
+\newcommand{\procVerfPtSig}[4]{\procVerfPtSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
 \newcommand{\procVerfPartSigId}{\styleFunction{vrfPt}}
 \newcommand{\procVerfPartSig}[6]{ \procVerfPartSigId_{#2 \opSeperate #3 \opSeperate #4 \opSeperate #5}(#1 \opSeperate #6) }
 \newcommand{\procFinSigId}{\styleFunction{finSig}}
 \newcommand{\procFinSig}[2]{ \procFinSigId(#1,#2) }
 
-\newcommand{\procSetupAptId}{\styleFunction{setupApt}}
-\newcommand{\procSetupApt}[1]{\procSetupAptId(#1)}
 \newcommand{\procAptSigId}{\styleFunction{adaptSig}}
 \newcommand{\procAptSig}[2]{\procAptSigId(#1 \opSeperate #2)}
-\newcommand{\procGenPtAptSigId}{\styleFunction{signPtPreSig}}
-\newcommand{\procGenPtAptSig}[6]{\procGenPtAptSigId_{#2#3,#4,#5,#6}(#1)}
 \newcommand{\procExtWitId}{\styleFunction{extWit}}
 \newcommand{\procExtWit}[3]{ \procExtWitId(#1 \opSeperate #2 \opSeperate #3) }
 \newcommand{\procVerifyAptSigId}{\styleFunction{verifyAptSig}}
-\newcommand{\procVerifyAptSig}[4]{\procVerifyAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
-\newcommand{\procVrfAptId}{\styleFunction{vrfPtPreSig}}
-\newcommand{\procVrfApt}[7]{ \procVrfAptId_{#2,#3,#4,#5,#6}(#1 \opSeperate #7) }
+\newcommand{\procVerifyAptSig}[5]{\procVerifyAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5)}
 \newcommand{\procFinAptSigId}{ \styleFunction{finAptPreSig} }
 \newcommand{\procFinAptSig}[5]{ \procFinAptSigId_{#3,#4,#5}(#1 \opSeperate #2) }
 
