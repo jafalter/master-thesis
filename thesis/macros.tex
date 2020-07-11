@@ -22,11 +22,12 @@
 \newcommand{\cnstAdversary}{\styleCal{A}}
 \newcommand{\cnstaEUFCMA}{\ensuremath{\styleFunction{aEUF-CMA\;}}}
 \newcommand{\cnstPayToCoin}{\styleVariable{PayToCoin}}
-\newcommand{\cnstPayToMuSigCoin}{\styleVariable{PayToMuSigCoin}}
+\newcommand{\cnstPayToSharedCoin}{\styleVariable{PayToMuSigCoin}}
 \newcommand{\cnstPayToCoinHideSecret}{\styleVariable{PayToCoinHideSecret}}
 \newcommand{\cnstAptSigCorrectness}{\ensuremath{\styleFunction{Adaptor\;Signature\;Correctness\;}}}
 \newcommand{\cnstWitnessExtractability}{\ensuremath{\styleFunction{Witness\;Extractability\;}}}
 \newcommand{\cnstCorrectness}{\ensuremath{\styleFunction{Correctness\;}}}
+\newcommand{\cnstTransaction}{\tau}
 
 % functions
 \newcommand{\funHash}[1]{\cnstHash (#1)}
@@ -177,7 +178,7 @@
 \newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
 
 \newcommand{\procProofId}{\styleFunction{rproof}}
-\newcommand{\procProof}[5]{\procProofId_{#4,#5}(#1,#2,#3)}
+\newcommand{\procProof}[3]{\procProofId(#1,#2,#3)}
 
 \newcommand{\procGenPartSigId}{\styleFunction{signPt}}
 \newcommand{\procGenPartSig}[5]{ \procGenPartSigId_{#2 \opSeperate #3 \opSeperate #4 \opSeperate #5}(#1) }
@@ -212,10 +213,13 @@
 \newcommand{\procSignPtOracleId}{ \cnstOracle_{sp} }
 \newcommand{\procSignPtOracle}[1]{ \procSignPtOracleId(#1) }
 
+\newcommand{\procCreateOutputId}{ \styleFunction{createOutput} }
+\newcommand{\procCreateOutput}[3]{\procCreateOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1)>}
+\newcommand{\procSpendOutputId}{ \styleFunction{spendOutput} }
+
 \newcommand{\procCreatePreTxId}{ \styleFunction{createPreTx} }
 \newcommand{\procCreatePreTx}[6]{ \procCreatePreTxId_{#2,#3,#4,#5,#6}(#1) }
 \newcommand{\procRecvTxId}{ \styleFunction{recvTx} }
 \newcommand{\procRecvTx}[4]{ \procRecvTxId_{#3,#4}(#1,#2) }
 \newcommand{\procFinalizeTxId}{ \styleFunction{finalizeTx} }
 \newcommand{\procFinalizeTx}[2]{ \procFinalizeTxId_{#1}(#2) }
-\newcommand{\procSpendOutputId}{ \styleFunction{spendTxOutput} }
