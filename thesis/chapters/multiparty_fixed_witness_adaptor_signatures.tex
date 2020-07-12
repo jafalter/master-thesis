@@ -16,8 +16,8 @@ We start by defining our extended signature scheme in section~\ref{sec:definitio
 
     \[ \varSigSchemeMP = (\varSigScheme \opConc \procSignPtId \opSeperate \procVerfPtSigId \opSeperate \procFinSigId) \]
     \begin{itemize}
-        \item $\procSignPtId$ is defined as a two-party procedure which requires both Alice and Bob to provide their secret key and a message which should be signed. The parties collaborate to both calculate their own partial signatures. These partial signatures do not need to be valid signatures yet, but the other participating parties need to be able to verify them using the $\procVerfPartSigId$ procedure.
-        \item $\procVerfPartSigId$ Is a function which lets one party verify the partial signature of the other party. As input it requires the partial signature, signed message and the participants public keys. The output will be either 1 if the verification was successfull or 0 otherwise.
+        \item $\procSignPtId$ is defined as a two-party procedure which requires both Alice and Bob to provide their secret key and a message which should be signed. The parties collaborate to both calculate their own partial signatures. These partial signatures do not need to be valid signatures yet, but the other participating parties need to be able to verify them using the $\procVerfPtSigId$ procedure.
+        \item $\procVerfPtSigId$ Is a function which lets one party verify the partial signature of the other party. As input it requires the partial signature, signed message and the participants public keys. The output will be either 1 if the verification was successfull or 0 otherwise.
         \item $\procFinSigId$ will take the two partial signatures and combine them into a final valid signature under the participants composite public key.
     \end{itemize}
 \end{definition}

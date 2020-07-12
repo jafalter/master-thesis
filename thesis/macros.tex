@@ -86,6 +86,7 @@
 \newcommand{\varCoinOut}{\varCoin_{\styleVariable{out}}}
 \newcommand{\varCoinOutAlice}{\varCoinOut^{\varAlice}}
 \newcommand{\varCoinOutBob}{\varCoinOut^{\varBob}}
+\newcommand{\varCoinShared}{\varCoinOut^{\styleVariable{sh}}}
 \newcommand{\varCoinSpecial}{\varCoinOut^{\styleVariable{sp}}}
 \newcommand{\varValue}{\styleVariable{v}}
 \newcommand{\varMsg}{\styleVariable{m}}
@@ -177,18 +178,18 @@
 \newcommand{\procVerfId}{\styleFunction{verf}}
 \newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
 
-\newcommand{\procProofId}{\styleFunction{rproof}}
+\newcommand{\procProofId}{\styleFunction{ranPrf}}
 \newcommand{\procProof}[3]{\procProofId(#1,#2,#3)}
+\newcommand{\procMuProofId}{\styleFunction{muRanPrf}}
+\newcommand{\procMuProof}[4]{\procMuProofId<(#1,#2,#3),(#1,#2,#4)>}
+\newcommand{\procVerfProofId}{\styleFunction{vrfRanPrf}}
+\newcommand{\procVerfProof}[1]{\procVerfProofId(#1)}
 
-\newcommand{\procGenPartSigId}{\styleFunction{signPt}}
-\newcommand{\procGenPartSig}[5]{ \procGenPartSigId_{#2 \opSeperate #3 \opSeperate #4 \opSeperate #5}(#1) }
 \newcommand{\procSignPtId}{\styleFunction{signPt}}
 \newcommand{\procSignPt}[3]{\procSignPtId<(#1 \opSeperate #2)(#1 \opSeperate #3)>}
 \newcommand{\procSignPtSingle}[2]{\procSignPtId(#1 \opSeperate #2)}
 \newcommand{\procVerfPtSigId}{\styleFunction{vrfPt}}
 \newcommand{\procVerfPtSig}[4]{\procVerfPtSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
-\newcommand{\procVerfPartSigId}{\styleFunction{vrfPt}}
-\newcommand{\procVerfPartSig}[6]{ \procVerfPartSigId_{#2 \opSeperate #3 \opSeperate #4 \opSeperate #5}(#1 \opSeperate #6) }
 \newcommand{\procFinSigId}{\styleFunction{finSig}}
 \newcommand{\procFinSig}[2]{ \procFinSigId(#1,#2) }
 
@@ -216,6 +217,7 @@
 \newcommand{\procCreateOutputId}{ \styleFunction{createOutput} }
 \newcommand{\procCreateOutput}[3]{\procCreateOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1)>}
 \newcommand{\procSpendOutputId}{ \styleFunction{spendOutput} }
+\newcommand{\procSpendOutput}[3]{\procSpendOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1)>}
 
 \newcommand{\procCreatePreTxId}{ \styleFunction{createPreTx} }
 \newcommand{\procCreatePreTx}[6]{ \procCreatePreTxId_{#2,#3,#4,#5,#6}(#1) }
