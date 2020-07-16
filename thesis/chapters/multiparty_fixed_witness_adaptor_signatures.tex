@@ -1,5 +1,5 @@
 In this chapter, we will define a variant of the adaptor signature scheme as explained in~\ref{sec:aptSignatures},
-which is specifically tailored for the use in an Atomic Swap scenario in which (at least one side of the swap) uses a two-party protocol to generate transaction signatures and keypairs are fixed beforehand.
+which is specifically tailored for the use in an Atomic Swap scenario in which (at least one side of the swap) uses a two-party protocol to generate transaction signatures and keypairs are fixed beforehand. \todo[inline]{Pedro: I think the main difference is that in this version of the adaptor signature, one party knows the ``secret'' part of the adaptor}
 
 First we will define the general two-party signature creation protocol as it is currently implemented for example in the Grin cryptocurrency.
 We reduce the generated signatures to the general case~\cite{schnorr1989efficient} and thereby prove its correctness.
@@ -9,12 +9,15 @@ We start by defining our extended signature scheme in section~\ref{sec:definitio
 
 \section{Definitions}\label{sec:definitions}
 
+\todo[inline]{Pedro: In the definition below, you are mixing the intuition (necessary but outside of the definition) and the definition itself.}
 \begin{definition}[Two Party Signature Scheme]
     \label{def:twoPartySig}
     A two-party signature scheme wrt. a hard relation $\cnstRelation$ is an extension of a signature scheme as defined in definition~\ref{def:signatureScheme}, which allows us to distribute signature generation for a composite public key shared between two parties Alice and Bob.
     Alice and Bob want to collaborate to generate a signature valid under the composite public key $\varPubKeyComp \opAssign \varPubKeyAlice + \varPubKeyBob$ without having to reveal their secret keys to each other. For this we add three procedures to our signature scheme definition:
 
     \[ \varSigSchemeMP = (\varSigScheme \opConc \procSignPtId \opSeperate \procVerfPtSigId \opSeperate \procFinSigId) \]
+    
+    \todo[inline]{Pedro: Add input and output to the methods}
     \begin{itemize}
         \item $\procSignPtId$ is defined as a two-party procedure which requires both Alice and Bob to provide their secret key and a message which should be signed. The parties collaborate to both calculate their own partial signatures. These partial signatures do not need to be valid signatures yet, but the other participating parties need to be able to verify them using the $\procVerfPtSigId$ procedure.
         \item $\procVerfPtSigId$ Is a function which lets one party verify the partial signature of the other party. As input it requires the partial signature, signed message and the participants public keys. The output will be either 1 if the verification was successfull or 0 otherwise.
@@ -27,6 +30,8 @@ We start by defining our extended signature scheme in section~\ref{sec:definitio
     From the definition~\ref{def:twoPartySig}, we now derive an adapted signature scheme $\varSigSchemeApt$, which allows one of the participants to hide the discrete logarithm $\varWit$ of a statement $\varStatement$ chosen
     at the beginning of the protocol. Again we extend our previously defined signature scheme with new functions:
     \[ \varSigSchemeApt \opAssign (\varSigSchemeMP \opConc \procAptSigId \opConc \procVerifyAptSigId \opConc \procExtWitId) \]
+    
+    \todo[inline]{Pedro: add the input and output for each method. For instance, the notion of ``partial signature'' should be clearer from previous definition.}
     \begin{itemize}
         \item $\procAptSigId$ takes as input a partial signature $\varSigPt$ and a secret witness value $\varWit$. The procedure will output an adapted partial signature $\varSigApt$ which can be verified to contain $\varWit$ using the $\procVerifyAptSigId$ function, without immidiately revealing $\varWit$.
         \item $\procVerifyAptSigId$ takes as input an adapted partial signature $\varSigApt$, the participants public keys and a statement $\varStatement$. The function will verify the partial signature's validity as well that it contains the secret witness $\varWit$.
@@ -35,7 +40,8 @@ We start by defining our extended signature scheme in section~\ref{sec:definitio
 \end{definition}
 
 \begin{definition}[Secure Adaptor Signature Scheme]
-    As defined by Aumayr et al. in~\cite{aumayr2020bitcoinchannels}, a secure adaptor signature scheme needs four security properties to be fulfilled:
+    As defined by Aumayr et al. in~\cite{aumayr2020bitcoinchannels}, a secure adaptor signature scheme needs four\todo{Pedro: three?} security properties to be fulfilled:
+    \todo[inline]{Pedro: correctness is not a security property}
     \begin{enumerate}
         \item \cnstAptSigCorrectness
         \item \cnstaEUFCMA
@@ -46,11 +52,11 @@ We start by defining our extended signature scheme in section~\ref{sec:definitio
 We proceed by redefining these properties for our adapted two-party fixed witness signature scheme defined in definition~\ref{def:twoPartyFixedWitAptSig}:
 
 \begin{definition}[\cnstAptSigCorrectness]\label{def:aptSigCorrectness}
-Similar to how it is defined in~\cite{aumayr2020bitcoinchannels} additionally to \textit{correctness} we require our signature scheme to satisfy \cnstAptSigCorrectness.
+Similar to how it is defined in~\cite{aumayr2020bitcoinchannels} additionally to \textit{correctness}\todo{Pedro: you might want to add a link where you define this} we require our signature scheme to satisfy \cnstAptSigCorrectness.
 This property is given when every adapted partial signature generated by $\procAptSigId$ can be completed into a final signature for all pairs $(\varWit \opSeperate \varStatement) \opIn \cnstRelation$, from which it will
 be possible to extract the witness computing $\procExtWitId$ with the required parameters.
 
-More formally \cnstAptSigCorrectness is given if for every security parameter $\varN \in \cnstNatural$, message $\varMsg \in \cnstBinary{*}$, keypairs $\varKeyPairAlice \opSeperate \varKeyPairBob$
+More formally \cnstAptSigCorrectness is given if for every security parameter $\varN \in \cnstNatural$, message $\varMsg \in \cnstBinary{*}$, keypairs $\varKeyPairAlice \opSeperate \varKeyPairBob$ \todo{Pedro: how are they generated? with KeyGen?}
 with their composite public key $\varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ and every statement/witness pair $(\varStatement \opSeperate \varWit)$ in a relation $\cnstRelation$ it must hold that:
 \[
     \Pr\left[
@@ -80,7 +86,9 @@ adversary $\cnstAdversary$ gets to know a valid adapted signature $\varSigApt$ w
 For the definition of $\cnstaEUFCMA$-security we define the experiment $\procExpForgId$ for a $\cnstPolyTime$ adversary $\cnstAdversary$ with a fixed keypair $(\varSecKeyAdv \opSeperate \varPubKeyAdv)$ and an adapted signature scheme $\varSigSchemeApt$ as
 follows:
 
+
 \begin{center}
+\todo[inline]{Pedro: here $\procSignPt{x}{y}{z}$ is a protocol, not an algorithm right? I think there are missing steps: For instance, where is $sk_B$ coming from in step 4? Shouldn't attacker know $X$ also in step 6? We should go over it again looking at definition in \url{https://eprint.iacr.org/2020/476.pdf} paper} 
     \fbox{
     \begin{varwidth}{\textwidth}
         \procedure[linenumbering]{$\procExpForg{\varN}$} {
@@ -113,6 +121,7 @@ The adapted signature scheme $\varSigSchemeApt$ is called $\cnstaEUFCMA$-secure 
     To formalize this statement we describe an experiment $\procExpExtId$ for a $\cnstPolyTime$ adversary $\cnstAdversary$ with a fixed keypair $(\varSecKeyAdv \opSeperate \varPubKeyAdv)$
     and the fixed keypair $\varKeyPairBob$ of a second party.
 
+	\todo[inline]{Pedro: as before, here the oracle run a single party function for $\procSignPt{x}{y}{z}$}
     \begin{center}
         \fbox{
         \begin{varwidth}{\textwidth}
@@ -172,6 +181,7 @@ A concrete implementation can be seen in figure~\ref{fig:schnorr}. The signature
         \end{varwidth}
         }
     \end{center}
+    \todo[inline]{Pedro: minor mistake in verify?}
     \caption{Schnorr Signature Scheme as first defined in~\cite{schnorr1989efficient}}
     \label{fig:schnorr}
 \end{figure}
@@ -307,6 +317,8 @@ We now show that the outlined instantiation is secure with regards to the regula
 We start by proving \cnstCorrectness of the scheme by showing that for two partial signatures $\varSigAlice$ and $\varSigBob$:
 \[ \procVerf{\varMsg}{\procFinSig{\varSigAlice}{\varSigBob}}{\varPubKeyAlice \opAddPoint \varPubKeyBob} \opEq 1 \]
 
+
+
 \begin{proof}
     \label{prf:aptSchnorr}
     The correctness proof is by showing equality of the equation checked by the verifier by continous substitutions in the left side of equation:
@@ -319,6 +331,7 @@ We start by proving \cnstCorrectness of the scheme by showing that for two parti
         \opPointScalar{\varRand}{\varSchnorrChallenge} \opAddPoint \varPubKeyComp & \opEq \opPointScalar{\varRand}{\varSchnorrChallenge} \opAddPoint \varPubKeyComp \\
         1 & \opEq 1
     \end{align}
+    \todo[inline]{Pedro: I am not sure about the step 4.4}
 \end{proof}
 
 Next we provide a proof that in addition to regular \cnstCorrectness also \cnstAptSigCorrectness holds.
@@ -354,7 +367,7 @@ $(\varStatement \opSeperate \funStar{\varWit}) \opIn \cnstRelation$ hold.
         & \varSBob \opAddScalar \varWit \opSub (\varSBob) \\
         \varWit \opAssign & \varWit \\
     \end{align}
-
+	\todo[inline]{Pedro: I am not sure about step 4.11. I think that having $s'_B$ and $s_B$ is confusing.}
 \end{proof}
 
 TODO Proof for pre-signature adaptability, $\cnstaEUFCMA$ and witness extractability.
