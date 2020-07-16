@@ -28,6 +28,7 @@
 \newcommand{\cnstWitnessExtractability}{\ensuremath{\styleFunction{Witness\;Extractability\;}}}
 \newcommand{\cnstCorrectness}{\ensuremath{\styleFunction{Correctness\;}}}
 \newcommand{\cnstTransaction}{\tau}
+\newcommand{\cnstTrueorFalse}{\{1,0\}}
 
 % functions
 \newcommand{\funHash}[1]{\cnstHash (#1)}
@@ -165,7 +166,7 @@
 \newcommand{\procGenRId}{\styleFunction{genRel}}
 \newcommand{\procGenR}[1]{\procGenRId(#1)}
 
-\newcommand{\procSetupId}{\styleFunction{setup}}
+\newcommand{\procSetupId}{\styleFunction{keyGen}}
 \newcommand{\procSetup}[1]{\procSetupId(#1)}
 
 \newcommand{\procCommitId}{\styleFunction{commit}}
@@ -211,8 +212,8 @@
 
 \newcommand{\procExpExtId}{ \styleFunction{aExtrWit_{\cnstAdversary}} }
 \newcommand{\procExpExt}[1]{ \procExpExtId(#1) }
-\newcommand{\procSignPtOracleId}{ \cnstOracle_{sp} }
-\newcommand{\procSignPtOracle}[1]{ \procSignPtOracleId(#1) }
+\newcommand{\procSignAptOracleId}{ \cnstOracle_{p} }
+\newcommand{\procSignAptOracle}[3]{ \procSignPtOracleId(#1,#2,#3) }
 
 \newcommand{\procCreateOutputId}{ \styleFunction{createOutput} }
 \newcommand{\procCreateOutput}[3]{\procCreateOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1)>}
