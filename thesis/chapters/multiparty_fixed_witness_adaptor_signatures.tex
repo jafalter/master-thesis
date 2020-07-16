@@ -93,15 +93,16 @@ follows:
     \begin{varwidth}{\textwidth}
         \procedure[linenumbering]{$\procExpForg{\varN}$} {
         \varSet \opAssign \cnstEmptySet \\
-        \varMsg \opFunResult \cnstAdversary^{\procSignOracle{\cdot}}(\varPubKeyAdv) \\
+        \varKeyPairBob \opFunResult \procSetup{\varSecParam} \\
+        (\varMsg \opSeperate \varSecKeyAdv) \opFunResult \cnstAdversary^{\procSignOracle{\cdot}{\cdot}}(\varPubKeyBob) \\
         (\varWit \opSeperate \varStatement) \opFunResult \procGenR{\varSecParam} \\
-        \varSigBob \opFunResult \procSignPtSingle{\varMsg}{\varSecKeyBob} \\
+        (\varSigPtAdv \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varSecKeyAdv}{\varSecKeyBob} \\
         \varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit} \\
-        \varSigPt_{\cnstAdversary} \opFunResult \cnstAdversary^{\procSignOracle{\cdot}}(\varSigApt) \\
-        \varSigFin \opFunResult \procFinSig{\varSigPt_{\cnstAdversary}}{\varSigBob} \\
-        \pcreturn (\varMsg \opNotIn \varSet \opAnd \procVerf{\varMsg}{\varSigFin}{\varPubKeyAdv \opAddPoint \varPubKey})
+        \funStar{\varSigPtAdv} \opFunResult \cnstAdversary^{\procSignOracle{\cdot}{\cdot}}(\varSigBob) \\
+        \varSigFin \opFunResult \procFinSig{\funStar{\varSigPtAdv}}{\varSigBob} \\
+        \pcreturn (\varMsg \opNotIn \varSet \opAnd \procVerf{\varMsg}{\varSigFin}{\varPubKeyAdv \opAddPoint \varPubKeyBob})
         }\\[2\baselineskip]
-        \procedure[linenumbering]{$\procSignOracle{\varMsg}$} {
+        \procedure[linenumbering]{$\procSignOracle{\varMsg}{\varSecKeyAdv}$} {
         \varSet \opAssign \varSet \opUnion {\varMsg} \\
         (\varWit \opSeperate \varStatement) \opFunResult \procGenR{\varSecParam} \\
         \varSigPt \opFunResult \procSignPtSingle{\varMsg}{\varSecKey} \\

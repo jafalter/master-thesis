@@ -35,7 +35,7 @@
 \newcommand{\funGen}[1]{\opPointScalar{\varG}{#1}}
 \newcommand{\funGenH}[1]{\opPointScalar{\varH}{#1}}
 \newcommand{\funList}[1]{\{#1\}}
-\newcommand{\funStar}[1]{#1'}
+\newcommand{\funStar}[1]{#1*}
 \newcommand{\funHat}[1]{\hat{#1}}
 \newcommand{\funTilde}[1]{\tilde{#1}}
 \newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
@@ -205,7 +205,7 @@
 \newcommand{\procExpForgId}{ \styleFunction{forgeAptSig_{\cnstAdversary}} }
 \newcommand{\procExpForg}[1]{ \procExpForgId(#1) }
 \newcommand{\procSignOracleId}{ \cnstOracle_{sa} }
-\newcommand{\procSignOracle}[1]{ \procSignOracleId(#1) }
+\newcommand{\procSignOracle}[2]{ \procSignOracleId(#1,#2) }
 \newcommand{\procFunctionId}{\styleFunction{f}}
 \newcommand{\procFunction}[1]{\procFunctionId(#1)}
 
