@@ -150,9 +150,11 @@ We start by providing a general instantiation of a signature scheme (see definit
 We assume we have a group $\cnstGroup$ with prime $\varPrime$, $\cnstHash$ is a secure hash function as defined in definition~\ref{def:hashFunction} and $\varMsg \opIn \cnstBinary{*}$ is a message.
 
 \begin{itemize}
-    \item $\procSetupId$ creates a keypair $\varKeyPair$, the public key can be distributed to the verifier(s) and the secret key has to be kept private. \\
-    \item $\procSignId$ creates a signature consisting of a variable $\varS$ and $\varRand$ which is a commitment to the secret nonce $\varNonce$ used during the signing process.
-    \item $\procVerfId$ allows a verifier knowing the signature $\varSignature$, message $\varMsg$ and the provers public key $\varPubKey$ to verify the signatures validity. \\
+    \item $\varKeyPair \opFunResult \procSetup{\varSecParam}$ creates a keypair $\varKeyPair$, the public key can be distributed to the verifier(s) and the secret key has to be kept private. \\
+    \item $\varSignature \opFunResult \procSign{\varMsg}{\varSecKey}$ creates a signature consisting of a variable $\varS$ and $\varRand$ which is a commitment to the secret nonce $\varNonce$ used during the signing process.
+    As an input it takes a message $\varMsg$ and the secret key $\varSecKey$ of the signer.
+    \item $\cnstTrueorFalse \opFunResult \procVerf{\varMsg}{\varSignature}{\varPubKey}$ allows a verifier knowing the signature $\varSignature$, message $\varMsg$ and the provers public key $\varPubKey$ to verify the signatures
+    validity. \\
 \end{itemize}
 A concrete implementation can be seen in figure~\ref{fig:schnorr}. The signature scheme is called schnorr signature scheme, first defined in~\cite{schnorr1989efficient} and is widely employed in many cryptography systems.
 \begin{figure}
@@ -193,6 +195,7 @@ currently implemented in the Grin mimblewimble cryptocurrency and will provide a
         \fbox{
         \begin{varwidth}{\textwidth}
             \procedure[linenumbering]{$\procSignPt{\varMsg}{\varSecKeyAlice}{\varSecKeyBob}$} {
+            \textbf{Alice} \< \< \textbf{Bob} \\
             \varNonceAlice \sample \cnstIntegersPrimeWithoutZero{\varSecParam} \< \< \varNonceBob \sample \cnstIntegersPrimeWithoutZero{\varSecParam} \\
             \varRandAlice \opAssign \funGen{\varNonceAlice} \< \< \varRandBob \opAssign \funGen{\varNonceBob} \\
             \< \sendmessageright*{\varRandAlice} \< \\
@@ -271,9 +274,9 @@ In figure~\ref{fig:aptSchnorr} we further provide a schnorr-based instantiation 
             \procedure[linenumbering]{$\procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob}$}{
             (\varS \opSeperate \varRand) \opFunResult \varSigFin \\
             (\varSAlice \opSeperate \varRandAlice \opSeperate \varRandBob) \opFunResult \varSigAlice \\
-            (\funStar{\varSBob} \opSeperate \varRandAlice \opSeperate \varRandBob) \opFunResult \varSigAptBob \\
+            (\varSAptBob \opSeperate \varRandAlice \opSeperate \varRandBob) \opFunResult \varSigAptBob \\
             \varSBob \opAssign \varS \opSub \varSAlice \\
-            \varWit \opAssign \funStar{\varSBob} \opSub \varSBob \\
+            \varWit \opAssign \varSAptBob \opSub \varSBob \\
             \pcreturn (\varWit)
             }
         \end{varwidth}
@@ -317,17 +320,16 @@ We start by proving \cnstCorrectness of the scheme by showing that for two parti
 
 \begin{proof}
     \label{prf:aptSchnorr}
-    The correctness proof is by showing equality of the equation checked by the verifier by continous substitutions in the left side of equation:
+    The \cnstCorrectness proof is by showing equality of the equation checked by the verifier by continous substitutions in the left side of equation:
     \begin{align}
-        \funGen{\varS} &\opEq \opPointScalar{\varRand}{\varSchnorrChallenge} \opAddPoint \varPubKeyComp \\
+        \funGen{\varS} &\opEq \varRand \opAddPoint \opPointScalar{\varPubKeyComp}{\varSchnorrChallenge} \\
         \funGen{\varSAlice} \opAddPoint \funGen{\varSBob} & \\
         \funGen{\varNonceAlice \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKeyAlice} \opAddPoint \funGen{\varNonceBob \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKeyBob} & \\
-        \funGen{\varNonceAlice \opTimesScalar \varSchnorrChallenge} \opAddPoint \funGen{\varSecKeyAlice} \opAddPoint \funGen{\varNonceBob \opTimesScalar \varSchnorrChallenge} \opAddPoint \funGen{\varSecKeyBob} & \\
-        \opPointScalar{\varRandAlice}{\varSchnorrChallenge} \opAddPoint \varPubKeyAlice \opAddPoint \opPointScalar{\varRandBob}{\varSchnorrChallenge} \opAddPoint \varPubKeyBob & \\
-        \opPointScalar{\varRand}{\varSchnorrChallenge} \opAddPoint \varPubKeyComp & \opEq \opPointScalar{\varRand}{\varSchnorrChallenge} \opAddPoint \varPubKeyComp \\
+        \funGen{\varNonceAlice} \opAddPoint \opPointScalar{\varPubKeyAlice}{\varSchnorrChallenge} \opAddPoint \funGen{\varNonceBob} \opAddPoint \opPointScalar{\varPubKeyBob}{\varSchnorrChallenge} & \\
+        \varRandAlice \opAddPoint \varPubKeyAlice \opAddPoint \varRandBob \opAddPoint \varPubKeyBob & \\
+        \varRand \opAddPoint \opPointScalar{\varPubKeyComp}{\varSchnorrChallenge} & \opEq \varRand \opAddPoint \opPointScalar{\varPubKeyComp}{\varSchnorrChallenge} \\
         1 & \opEq 1
     \end{align}
-    \todo[inline]{Pedro: I am not sure about the step 4.4}
 \end{proof}
 
 Next we provide a proof that in addition to regular \cnstCorrectness also \cnstAptSigCorrectness holds.
@@ -345,25 +347,24 @@ $(\varStatement \opSeperate \funStar{\varWit}) \opIn \cnstRelation$ hold.
     \]
     The proof is by continuous substitutions in the equation checked by the verifier:
     \begin{align}
-        \funGen{\varSigAptBob} &\opEq \opPointScalar{\varRandBob}{\varSchnorrChallenge} \opAddPoint \varPubKeyBob \opAddPoint \varStatement \\
+        \funGen{\varSigAptBob} &\opEq \varRandBob \opAddPoint \opPointScalar{\varPubKeyBob}{\varSchnorrChallenge} \opAddPoint \varStatement \\
         \funGen{\varSigBob \opAddScalar \varWit} & \\
         \funGen{\varNonceBob \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKeyBob \opAddScalar \varWit} & \\
-        \funGen{\varNonceBob \opTimesScalar \varSchnorrChallenge} \opAddPoint \funGen{\varSecKeyBob} \opAddScalar \funGen{\varWit} & \\
-        \opPointScalar{\varRandBob}{\varSchnorrChallenge} \opAddPoint \varPubKeyBob \opAddPoint \varStatement &\opEq \opPointScalar{\varRandBob}{\varSchnorrChallenge} \opAddPoint \varPubKeyBob \opAddPoint \varStatement \\
+        \funGen{\varNonceBob} \opAddPoint \funGen{\varSecKeyBob \opTimesScalar \varSchnorrChallenge} \opAddScalar \funGen{\varWit} & \\
+        \varRandBob \opAddPoint \opPointScalar{\varPubKeyBob}{\varSchnorrChallenge} \opAddPoint \varStatement &\opEq \varRandBob \opAddPoint \opPointScalar{\varPubKeyBob}{\varSchnorrChallenge} \opAddPoint \varStatement \\
         1 &\opEq 1
     \end{align}
     We now continue to prove the last equation required:
     \[
-        (\varStatement \opSeperate \funStar{\varWit} \opIn \cnstRelation)
+        ((\varStatement \opSeperate \funStar{\varWit}) \opIn \cnstRelation)
     \]
     To prove correctness we show that $\varWit$ is calculated correctly in $\procExtWitId$:
     \begin{align}
-        \varWit \opAssign & \funStar{\varSBob} \opSub (\varS \opSub \varSAlice) \\
-        & \funStar{\varSBob} \opSub ((\varSAlice \opAddScalar \varSBob ) \opSub \varSAlice ) \\
+        \varWit \opAssign & \varSApt \opSub (\varS \opSub \varSAlice) \\
+        & \varSApt \opSub ((\varSAlice \opAddScalar \varSBob ) \opSub \varSAlice ) \\
         & \varSBob \opAddScalar \varWit \opSub (\varSBob) \\
         \varWit \opAssign & \varWit \\
     \end{align}
-	\todo[inline]{Pedro: I am not sure about step 4.11. I think that having $s'_B$ and $s_B$ is confusing.}
 \end{proof}
 
 TODO Proof for pre-signature adaptability, $\cnstaEUFCMA$ and witness extractability.
