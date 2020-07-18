@@ -21,10 +21,12 @@
 \newcommand{\varH}{\styleVariable{h}}
 \newcommand{\cnstAdversary}{\styleCal{A}}
 \newcommand{\cnstaEUFCMA}{\ensuremath{\styleFunction{aEUF-CMA\;}}}
+\newcommand{\cnstEUFCMA}{\ensuremath{\styleFunction{EUF-CMA\;}}}
 \newcommand{\cnstPayToCoin}{\styleVariable{PayToCoin}}
 \newcommand{\cnstPayToSharedCoin}{\styleVariable{PayToMuSigCoin}}
 \newcommand{\cnstPayToCoinHideSecret}{\styleVariable{PayToCoinHideSecret}}
 \newcommand{\cnstAptSigCorrectness}{\ensuremath{\styleFunction{Adaptor\;Signature\;Correctness\;}}}
+\newcommand{\cnstSecureAptScheme}{\ensuremath{\styleFunction{Secure\;Adaptor\;Signature\;Scheme\;}}}
 \newcommand{\cnstWitnessExtractability}{\ensuremath{\styleFunction{Witness\;Extractability\;}}}
 \newcommand{\cnstCorrectness}{\ensuremath{\styleFunction{Correctness\;}}}
 \newcommand{\cnstTransaction}{\tau}
@@ -154,7 +156,8 @@
 \newcommand{\opNegative}[1]{-#1}
 \newcommand{\opTimesScalar}{~\cdot~}
 \newcommand{\opAddPoint}{~\cdot~}
-\newcommand{\opEq}{~=~}
+\newcommand{\opEq}{~\stackrel{?}{=}~}
+\newcommand{\opEqNoQ}{~=~}
 \newcommand{\opNotEq}{~\neq~}
 \newcommand{\opSeperate}{,~}
 \newcommand{\opExcluding}{\ensuremath{\setminus}}
@@ -207,14 +210,16 @@
 
 \newcommand{\procExpForgId}{ \styleFunction{forgeAptSig_{\cnstAdversary}} }
 \newcommand{\procExpForg}[1]{ \procExpForgId(#1) }
-\newcommand{\procSignOracleId}{ \cnstOracle_{sa} }
+\newcommand{\procExpForgeSimpleId}{ \styleFunction{forgeSig_{\cnstAdversary}}}
+\newcommand{\procExpForgeSimple}[1]{ \procExpForgeSimpleId(#1) }
+\newcommand{\procSignOracleId}{ \cnstOracle_{s} }
 \newcommand{\procSignOracle}[2]{ \procSignOracleId(#1,#2) }
 \newcommand{\procFunctionId}{\styleFunction{f}}
 \newcommand{\procFunction}[1]{\procFunctionId(#1)}
 
 \newcommand{\procExpExtId}{ \styleFunction{aExtrWit_{\cnstAdversary}} }
 \newcommand{\procExpExt}[1]{ \procExpExtId(#1) }
-\newcommand{\procSignAptOracleId}{ \cnstOracle_{p} }
+\newcommand{\procSignAptOracleId}{ \cnstOracle_{s} }
 \newcommand{\procSignAptOracle}[3]{ \procSignPtOracleId(#1,#2,#3) }
 
 \newcommand{\procCreateOutputId}{ \styleFunction{createOutput} }
