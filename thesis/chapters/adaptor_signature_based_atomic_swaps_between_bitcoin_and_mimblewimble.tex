@@ -1,9 +1,9 @@
 In this section, we will formalize Mimblewimble transactions and define security properties, first found by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate} which have to hold for a valid transaction protocol.
-We later provide two instantionons of the transaction protocol, $\cnstPayToCoin$ which is the general case transaction in which a sender wants to transfer some value to a receiver
-and $\cnstPayToSharedCoin$, which is unique in that it creates coins which are only spendable by two (or more) parties collaborating. $\cnstPayToSharedCoin$ is similar
-to a Mulit-signature transaction script in Bitcoin in which an UTXO, only spendable by a consortium of owners, is created.~\cite{bistarelli2018analysis}
-We then prove that all security definitions for Mimblewimble transactions, hold for the outlined transaction protocols.
-Finally we define a Atomic Swap protocol from these building blocks, which allows us to securely swap funds from a Mimblewimble blockchain with those on another Blockchain, such as Bitcoin.
+We then provide four different types of the transaction protocol, we separate between output coins which are controlled by a single party (denominated as $\cnstSoloCoin$) and a coin which is controlled by multiple parties owning a share of the blinding key, denominated as $\cnstMultiCoin$. These multiparty outputs can only spend by the two owners collaborating and are therefore semantically similiar to multisignature outputs in Bitcoin.~\cite{bistarelli2018analysis}
+From this we can then derive the different types of transactions $\cnstSoToMuTx$, $\cnstSoToMuTx$, $\cnstMuToSoTx$ and $\cnstMuToMuTx$. Note that in our case we restrict ourselfs to $\cnstMultiCoin$ outputs which are controlled by two parties, as those are the ones needed to construct the Atomic Swap protocol.
+Proving the security for coins controlled by n participants would be an interesting topic for future research.
+We then prove that all security definitions for Mimblewimble transactions, hold for all four types of transactions.
+Finally, we define an Atomic Swap protocol from these building blocks, which allows us to securely swap funds from a Mimblewimble blockchain with those on another Blockchain, such as Bitcoin.
 
 \section{Definitions}\label{sec:atomic-def}
 
@@ -11,15 +11,11 @@ Finally we define a Atomic Swap protocol from these building blocks, which allow
     \label{def:tx}
     As we have already discussed in section~\ref{sec:Mimblewimble} for the creation of a transaction, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
     To construct the transaction protocol we assume that we have access to a two-party signature scheme as defined in definition~\ref{def:twoPartySig}, a zero-knowledge Rangeproofs system such as Bulletproofs, as
-    described in section~\ref{sec:rangeProof}, a homomoprhic commitment scheme as defined in definition~\ref{def:homomorphicCom} such as Pedersen Commitments~\ref{def:pedersenCom}.
-    A transaction scheme consist of the following two procedures:
-    \[ \cnstTransaction \opAssign ( \procCreateOutputId \opSeperate \procSpendOutputId ) \]
+    described in section~\ref{sec:rangeProof} and a homomorphic commitment scheme as defined in definition~\ref{def:homomorphicCom} such as Pedersen Commitments~\ref{def:pedersenCom}.
+    A transaction scheme consist of the following procedure:
+    \[ \cnstTransaction \opAssign ( \procSpendOutputId ) \]
     \begin{itemize}
-        \item $\procCreateOutputId$ defines the creation of a new spendable output. It is defined as a two party protocol between a sender and a receiver. As an input the
-        sender has to provide the funds which should be transfered to the receiver as well as the input coins he or she would like to spend, together with its blinding factor. The procedure
-        outputs a transaction which can be broadcast to the network and transfers the agreed on value from the sender to the receiver.
-        \item $\procSpendOutputId$ defines how we can spend the output created by $\procCreateOutputId$. In the simplest case this can be done by just calling $\procCreateOutputId$ again.
-        However for more advanced transaction protocols such as $\cnstPayToSharedCoin$ the way to spend the create coin will be slightly different.
+        \item $\procSpendOutput{\varFundValue}{\varCoinInp}{\varBlindingFactorAlice}{\varBlindingFactorBob}$ Takes a fund value $\varFundValue$ which should be transferred to a new output, an input coin $\varCoinInp$ and the coins blinding factor $\varBlindingFactor$. If the input coin is $\cnstMultiCoin$ we require the blinding factor of both owners. The protocol is constructed between a sender and a receiver. For simplicity we assume that if we spend a $\cnstMultiCoin$ that one of the owners will also be the transaction receiver, as this will be the case in the Atomic Swaps. However the procedure could easily be generalized to the case where a shared coin is sent to a third party.
     \end{itemize}
 \end{definition}
 
@@ -27,79 +23,80 @@ TODO security definitons
 
 \section{Grin instantiation}\label{sec:atomic-inst}
 
-In this section we describe instantiations for the transaction protocol defined in~\ref{def:tx} specifically tailored for the Grin cryptocurrency. We show that all of them are secure by proving the
-outlined security properties for mimblewimble transactions. In section~\ref{sec:atomic-swap} we use this transaction types as building block for the Grin side of our Atomic Swap protocol.
+In this section we describe instantiations for the four transaction types defined in~\ref{def:tx} specifically tailored for the Grin cryptocurrency. In section~\ref{sec:atomic-swap} we use this transaction types as building block for the Mimblewimble side of our Atomic Swap protocol.
 
-\subsection{$\cnstPayToCoin$}
+\subsection{$\cnstSoToSoTx$}
 
 We assume to have access to a homomorphic commitment scheme such as Pedersen Commitment as defined in definition~\ref{def:pedersenCom}. Furthermore we require a Rangeproof system as defined in
-~\ref{sec:rangeProof} and a two-party signature scheme as defined in~\ref{def:twoPartySig}. The instantiation of the transaction protocol can be found in figure~\ref{fig:payToCoin}.
+~\ref{sec:rangeProof} and a two-party signature scheme as defined in~\ref{def:twoPartySig}. The instantiation of the transaction protocol can be found in figure~\ref{fig:solo2solotx}.
 \begin{figure}
     \begin{center}
         \fbox{
         \begin{varwidth}{\textwidth}
-            \procedure[linenumbering]{$\procCreateOutput{\varFundValue}{\varCoinInp}{\varBlindingFactorFor{i}}$} {
+            \procedure[linenumbering]{$\procSpendOutput{\varFundValue}{\varCoinInp}{\varBlindingFactor}{\cdot}$} {
             \varMsg \opAssign \cnstBinary{*} \< \< \\
-            \varBlindingFactorFor{o} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \\
-            \varCoinOutAlice \opFunResult \procCommit{\varValue \opSub \varFundValue}{\varBlindingFactorFor{o}} \< \< \\
-            \varProofAlice \opFunResult \procProof{\varCoinOutAlice}{\varValue \opSub \varFundValue}{\varBlindingFactorFor{o}} \< \< \\
-            \varBlindingFactorFor{a} \opAssign \varBlindingFactorFor{\varBlindingFactorFor{o} \opSub \varBlindingFactorFor{i}} \< \< \\
-            \< \sendmessageright*{\varTx \opAssign (\varMsg \opSeperate \varCoinInp \opSeperate \varCoinOutAlice \opSeperate \varProofAlice \opSeperate \funGen{\varBlindingFactorFor{a}})} \< \\
+            \funStar{\varBlindingFactor} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \\
+            \varCoinOutAlice \opFunResult \procCommit{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactor}} \< \< \\
+            \varProofAlice \opFunResult \procProof{\varCoinOutAlice}{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactor}} \< \< \\
+            \varBlindingFactorFor{s} \opAssign \funStar{\varBlindingFactor} \opSub \varBlindingFactor \< \< \\
+            \< \sendmessageright*{\varTx \opAssign (\varMsg \opSeperate \varCoinInp \opSeperate \varCoinOutAlice \opSeperate \varProofAlice \opSeperate \funGen{\varBlindingFactorFor{s}})} \< \\
             \< \< \procVerfProof{\varProofAlice} \opEq 1 \\
-            \< \< \varBlindingFactorFor{b} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-            \< \< \varCoinOutBob \opFunResult \procCommit{\varFundValue}{\varBlindingFactorFor{b}} \\
-            \< \< \varSigBob \opFunResult \procSignPtSingle{\varMsg}{\varBlindingFactorFor{b}} \\
-            \< \< \varProofBob \opFunResult \procProof{\varCoinOutBob}{\varFundValue}{\varBlindingFactorFor{b}} \\
-            \< \sendmessageleft*{\varTx \opAssign \varTx \opConc (\varCoinOutBob \opSeperate \funGen{\varBlindingFactorFor{b}} \opSeperate \varSigBob \opSeperate \varProofBob)} \< \\
-            \procVerfPtSig{\varSigBob}{\varMsg}{\funGen{\varBlindingFactorFor{a}}}{\funGen{\varBlindingFactorFor{b}}} \opEq 1 \< \< \\
+            \< \< \varBlindingFactorFor{r} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \< \< \varCoinOutBob \opFunResult \procCommit{\varFundValue}{\varBlindingFactorFor{r}} \\
+            \< \< \varSigBob \opFunResult \procSignPtSingle{\varMsg}{\varBlindingFactorFor{r}} \\
+            \< \< \varProofBob \opFunResult \procProof{\varCoinOutBob}{\varFundValue}{\varBlindingFactorFor{r}} \\
+            \< \sendmessageleft*{\varTx \opAssign \varTx \opUnion (\varCoinOutBob \opSeperate \funGen{\varBlindingFactorFor{r}} \opSeperate \varSigBob \opSeperate \varProofBob)} \< \\
+            \procVerfPtSig{\varSigBob}{\varMsg}{\funGen{\varBlindingFactorFor{s}}}{\funGen{\varBlindingFactorFor{r}}} \opEq 1 \< \< \\
             \procVerfProof{\varProofBob} \opEq 1 \< \< \\
-            \varSigAlice \opFunResult \procSignPtSingle{\varMsg}{\varBlindingFactorFor{a}} \< \< \\
+            \varSigAlice \opFunResult \procSignPtSingle{\varMsg}{\varBlindingFactorFor{s}} \< \< \\
             \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \\
-            \varExcess \opAssign \funGen{\varBlindingFactorFor{a}} \opAddPoint \funGen{\varBlindingFactorFor{b}} \< \< \\
-            \pcreturn \varTx \opAssign \varTx \opConc (\varExcess \opSeperate \varSigFin)
-            }
-            \procedure[linenumbering]{$\procSpendOutput{\varFundValue}{\varCoinOut}{\varBlindingFactorFor{o}}$}{
-            \pcreturn \procCreateOutput{\varFundValue}{\varCoinOut}{\varBlindingFactorFor{o}}
+            \varExcess \opAssign \funGen{\varBlindingFactorFor{s}} \opAddPoint \funGen{\varBlindingFactorFor{r}} \< \< \\
+            \pcreturn \varTx \opAssign \varTx \opUnion (\varExcess \opSeperate \varSigFin)
             }
         \end{varwidth}
         }
     \end{center}
-    \caption{Instantiation of $\cnstPayToCoin$ transaction protocol. \label{fig:payToCoin}}
+    \caption{Instantiation of $\cnstSoToSoTx$ transaction protocol. \label{fig:solo2solotx}}
 \end{figure}
 
-\subsection{$\cnstPayToSharedCoin$}
+\subsection{$\cnstSoToMuTx$}
 
 Again we assume that we have access to a homomorphic commitment scheme, a rangeproof protocol and two-party signature scheme. The rangeproof protocol needs to support creation
-of multiparty rangeproofs for this protocol to be executeable. The concrete instantiation can be found in figure~\ref{fig:payToSharedCoin}.
+of multiparty rangeproofs for this protocol to be executeable. The concrete instantiation can be found in figure~\ref{fig:Mu2SoTx}.
 \begin{figure}
     \begin{center}
         \fbox{
         \begin{varwidth}{\textwidth}
-            \procedure[linenumbering]{$\procCreateOutput{\varFundValue}{\varCoinInp}{\varBlindingFactorFor{i}}$} {
+            \procedure[linenumbering]{$\procSpendOutput{\varFundValue}{\varCoinInp}{\varBlindingFactorAlice}{\varBlindingFactorBob}$} {
             \varMsg \opAssign \cnstBinary{*} \< \< \\
-            \varBlindingFactorFor{o} \opSeperate \varBlindingFactorFor{sa} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \\
-            \varCoinOutAlice \opFunResult \procCommit{\varValue \opSub \varFundValue}{\varBlindingFactorFor{o}} \< \< \\
-            \scriptstyle \varProofAlice \opFunResult \procProof{\varCoinOutAlice}{\varValue \opSub \varFundValue}{\varBlindingFactorFor{o1}} \< \< \\
-            \varBlindingFactorFor{a} \opAssign \varBlindingFactorFor{\varBlindingFactorFor{o}} \opAddScalar \varBlindingFactorFor{\varBlindingFactorFor{sa}  \opSub \varBlindingFactorFor{i}} \< \< \\
-            \< \sendmessageright*{ \scriptstyle \varTx \opAssign (\varMsg \opSeperate \varCoinInp \opSeperate \varCoinOutAlice \opSeperate \varProofAlice \opSeperate \funGen{\varBlindingFactorFor{a}} \opSeperate \funGen{\varBlindingFactorFor{sa}})} \< \\
+            \funStar{\varBlindingFactorAlice} \opSeperate \varBlindingFactorFor{1} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \\
+            \varCoinOutAlice \opFunResult \procCommit{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactorAlice}} \< \< \\
+            \scriptstyle \varProofAlice \opFunResult \procProof{\varCoinOutAlice}{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactorAlice}} \< \< \\
+            \varBlindingFactorFor{s} \opAssign \funStar{\varBlindingFactorAlice} \opAddScalar \varBlindingFactorFor{1}  \opSub \varBlindingFactorAlice \< \< \\
+            \< \sendmessageright*{ \scriptstyle \varTx \opAssign (\varMsg \opSeperate \varCoinInp \opSeperate \varCoinOutAlice \opSeperate \varProofAlice \opSeperate \funGen{\varBlindingFactorFor{s}} \opSeperate \funGen{\varBlindingFactorFor{1}})} \< \\
             \< \< \procVerfProof{\varProofAlice} \opEq 1 \\
-            \< \< \varBlindingFactorFor{sb} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-            \< \< \varCoinShared \opFunResult \procCommit{\varFundValue}{\varBlindingFactorFor{sb}} \opAddPoint \funGen{\varBlindingFactorFor{sa}} \\
-            \< \< \varSigBob \opFunResult \procSignPtSingle{\varMsg}{\varBlindingFactorFor{sb}} \\
-            \< \sendmessageleft*{ \scriptstyle \varTx \opAssign \varTx \opConc (\varCoinShared \opSeperate \funGen{\varBlindingFactorFor{sb}} \opSeperate \varSigBob)} \< \\
-            \< \scriptscriptstyle \varProof \opFunResult \procMuProof{\varCoinShared}{\varFundValue}{\varBlindingFactorFor{sa}}{\varBlindingFactorFor{sb}} \< \\
-            \varSigAlice \opFunResult \procSignPtSingle{\varMsg}{\varBlindingFactorFor{a}} \< \< \\
+            \< \< \varBlindingFactorFor{2} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \< \< \varCoinShared \opFunResult \procCommit{\varFundValue}{\varBlindingFactorFor{2}} \opAddPoint \funGen{\varBlindingFactorFor{1}} \\
+            \< \< \varSigBob \opFunResult \procSignPtSingle{\varMsg}{\varBlindingFactorFor{r}} \\
+            \< \sendmessageleft*{ \scriptstyle \varTx \opAssign \varTx \opUnion (\varCoinShared \opSeperate \funGen{\varBlindingFactorFor{2}} \opSeperate \varSigBob)} \< \\
+            \< \scriptscriptstyle \varProof \opFunResult \procMuProof{\varCoinShared}{\varFundValue}{\varBlindingFactorFor{1}}{\varBlindingFactorFor{2}} \< \\
+            \varSigAlice \opFunResult \procSignPtSingle{\varMsg}{\varBlindingFactorFor{s}} \< \< \\
             \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \\
-            \varExcess \opAssign \funGen{\varBlindingFactorFor{a}} \opAddPoint \funGen{\varBlindingFactorFor{b}} \< \< \\
-            \scriptstyle \pcreturn \varTx \opAssign \varTx \opConc (\varExcess \opSeperate \varSigFin \opSeperate \varProof)
-            }
-            \procedure[linenumbering]{$\procSpendOutput{\varFundValue}{\varCoinOut}{\varBlindingFactorFor{o}}$}{
-            TODO
+            \varExcess \opAssign \funGen{\varBlindingFactorFor{s}} \opAddPoint \funGen{\varBlindingFactorFor{r}} \< \< \\
+            \scriptstyle \pcreturn \varTx \opAssign \varTx \opUnion (\varExcess \opSeperate \varSigFin \opSeperate \varProof)
             }
         \end{varwidth}
         }
     \end{center}
-    \caption{Instantiation of $\cnstPayToSharedCoin$ transaction protocol. \label{fig:payToSharedCoin}}
+    \caption{Instantiation of $\cnstSoToMuTx$ transaction protocol. \label{fig:So2MuTx}}
 \end{figure}
+
+\subsection{$\cnstMuToSoTx$}
+
+TODO
+
+\subsection{$\cnstMuToMuTx$}
+
+TODO
 
 \section{Atomic Swap protocol}\label{sec:atomic-swap}

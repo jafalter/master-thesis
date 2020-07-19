@@ -109,7 +109,7 @@ follows:
     }
 \end{center}
 The adapted signature scheme $\varSigSchemeApt$ is called $\cnstaEUFCMA$-secure if
-\[ \prob{\procExpForg{\varN} \opEq 1} \opSmEq \funNegl{\varN} \]
+\[ \prob{\procExpForg{\varN} \opEqNoQ 1} \opSmEq \funNegl{\varN} \]
 \end{definition}
 
 \begin{definition}[\cnstWitnessExtractability]
@@ -140,7 +140,7 @@ The adapted signature scheme $\varSigSchemeApt$ is called $\cnstaEUFCMA$-secure 
         }
     \end{center}
     In order to satisfy witness extractability the following must hold:
-    \[ \prob{\procExpExt{\varN} \opEq 1} \opSmEq \funNegl{\varN} \]
+    \[ \prob{\procExpExt{\varN} \opEqNoQ 1} \opSmEq \funNegl{\varN} \]
 \end{definition}
 
 \section{Schnorr-based instantiation}\label{sec:schnorrInst}
@@ -250,7 +250,7 @@ We further show in figure~\ref{fig:twoparty-schnorr-prot} how Alice and Bob can 
 The final signature is a valid signature to the message $\varMsg$ with the composite public key $\varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$.
 A verifier knowing the signed message $\varMsg$, the final signature $\varSigFin$ and the composite public key $\varPubKeyComp$ can now verify the signature using the regular $\procVerfId$ procedure.
 The challenge $\varSchnorrChallenge$ will be the same because
-\[ \funHash{\varMsg \opConc \varRand \opConc \varPubKeyComp} \opEq \funHash{\varMsg \opConc \varRandAlice \opAddPoint \varRandBob \opConc \varPubKeyAlice \opAddPoint \varPubKeyBob} \]
+\[ \funHash{\varMsg \opConc \varRand \opConc \varPubKeyComp} \opEqNoQ \funHash{\varMsg \opConc \varRandAlice \opAddPoint \varRandBob \opConc \varPubKeyAlice \opAddPoint \varPubKeyBob} \]
 
 In figure~\ref{fig:aptSchnorr} we further provide a schnorr-based instantiation for the fixed witness adapted signature scheme as defined in definition~\ref{def:twoPartyFixedWitAptSig}:
 
@@ -350,7 +350,7 @@ To prove that $\cnstAptSigCorrectness$ holds we have 3 statements to prove, firs
     \[
         ((\varStatement \opSeperate \funStar{\varWit}) \opIn \cnstRelation)
     \]
-    To prove correctness we show that $\varWit$ is calculated correctly in $\procExtWitId$:
+    We do this by showing that $\varWit$ is calculated correctly in $\procExtWitId$:
     \begin{align}
         \varWit \opAssign & \varSApt \opSub (\varS \opSub \varSAlice) \\
         & \varSApt \opSub ((\varSAlice \opAddScalar \varSBob ) \opSub \varSAlice ) \\
@@ -382,7 +382,7 @@ To perform the proof we must first recall the regular definition of $\cnstEUFCMA
     }
 \end{center}
 
-$\cnstEUFCMA$ holds if $\prob{\procExpForgeSimple{\varN} \opEq 1} \opSmEq \funNegl{\varN}$.
+$\cnstEUFCMA$ holds if $\prob{\procExpForgeSimple{\varN} \opEqNoQ 1} \opSmEq \funNegl{\varN}$.
 
 \begin{proof} We first proof $\cnstaEUFCMA$ by providing a black box reduction from $\cnstaEUFCMA$ to $\cnstEUFCMA$. Intuitively if we suppose there exists a $\cnstPolyTime$ adversary $\cnstAdversary$ that wins the $\procExpForgId$ game with probability $1$, then $\cnstAdversary$ will also be able to win the $\procExpForgeSimpleId$ game with the same probability, which leads us to a contradiction. This can be achieved by splitting up the secret key chosen in the $\procExpForgeSimpleId$ game into $\varSecKey_1$ and $\varSecKey_2$ and then running the $\procExpForgId$ game using the split keys. The output of the $\procExpForgId$ game will be a forged final signature valid under the combined public key of $\varSecKey_1$ and $\varSecKey_2$ which we can then use to win the $\procExpForgId$ game. See figure~\ref{prf:bbreuf} for the black-box reduction.
 

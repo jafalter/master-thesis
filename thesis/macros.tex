@@ -22,6 +22,13 @@
 \newcommand{\cnstAdversary}{\styleCal{A}}
 \newcommand{\cnstaEUFCMA}{\ensuremath{\styleFunction{aEUF-CMA\;}}}
 \newcommand{\cnstEUFCMA}{\ensuremath{\styleFunction{EUF-CMA\;}}}
+\newcommand{\cnstSoloCoin}{\ensuremath{SoloCoin}}
+\newcommand{\cnstMultiCoin}{\ensuremath{SharedCoin}}
+\newcommand{\cnstSoToSoTx}{\styleVariable{Solo2SoloTx}}
+\newcommand{\cnstSoToMuTx}{\styleVariable{Solo2SharedTx}}
+\newcommand{\cnstMuToSoTx}{\styleVariable{Shared2SoloTx}}
+\newcommand{\cnstMuToMuTx}{\styleVariable{Shared2SharedTx}}
+
 \newcommand{\cnstPayToCoin}{\styleVariable{PayToCoin}}
 \newcommand{\cnstPayToSharedCoin}{\styleVariable{PayToMuSigCoin}}
 \newcommand{\cnstPayToCoinHideSecret}{\styleVariable{PayToCoinHideSecret}}
@@ -38,7 +45,7 @@
 \newcommand{\funGen}[1]{\opPointScalar{\varG}{#1}}
 \newcommand{\funGenH}[1]{\opPointScalar{\varH}{#1}}
 \newcommand{\funList}[1]{\{#1\}}
-\newcommand{\funStar}[1]{#1*}
+\newcommand{\funStar}[1]{#1^*}
 \newcommand{\funHat}[1]{\hat{#1}}
 \newcommand{\funTilde}[1]{\tilde{#1}}
 \newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
@@ -100,6 +107,8 @@
 \newcommand{\varNonceAdv}{\varNonce_{\cnstAdversary}}
 \newcommand{\varBlindingFactor}{\styleVariable{r}}
 \newcommand{\varBlindingFactorFor}[1]{\varBlindingFactor_{#1}}
+\newcommand{\varBlindingFactorAlice}{\varBlindingFactorFor{\varBob}}
+\newcommand{\varBlindingFactorBob}{\varBlindingFactorFor{\varBob}}
 \newcommand{\varS}{\styleVariable{s}}
 \newcommand{\varSAptBob}{\funHat{\varS_\varBob}}
 \newcommand{\varSApt}{\funHat{\varS}}
@@ -222,14 +231,5 @@
 \newcommand{\procSignAptOracleId}{ \cnstOracle_{s} }
 \newcommand{\procSignAptOracle}[3]{ \procSignPtOracleId(#1,#2,#3) }
 
-\newcommand{\procCreateOutputId}{ \styleFunction{createOutput} }
-\newcommand{\procCreateOutput}[3]{\procCreateOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1)>}
 \newcommand{\procSpendOutputId}{ \styleFunction{spendOutput} }
-\newcommand{\procSpendOutput}[3]{\procSpendOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1)>}
-
-\newcommand{\procCreatePreTxId}{ \styleFunction{createPreTx} }
-\newcommand{\procCreatePreTx}[6]{ \procCreatePreTxId_{#2,#3,#4,#5,#6}(#1) }
-\newcommand{\procRecvTxId}{ \styleFunction{recvTx} }
-\newcommand{\procRecvTx}[4]{ \procRecvTxId_{#3,#4}(#1,#2) }
-\newcommand{\procFinalizeTxId}{ \styleFunction{finalizeTx} }
-\newcommand{\procFinalizeTx}[2]{ \procFinalizeTxId_{#1}(#2) }
+\newcommand{\procSpendOutput}[4]{\procSpendOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1, \opSeperate #4)>}
