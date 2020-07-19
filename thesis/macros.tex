@@ -21,12 +21,23 @@
 \newcommand{\varH}{\styleVariable{h}}
 \newcommand{\cnstAdversary}{\styleCal{A}}
 \newcommand{\cnstaEUFCMA}{\ensuremath{\styleFunction{aEUF-CMA\;}}}
+\newcommand{\cnstEUFCMA}{\ensuremath{\styleFunction{EUF-CMA\;}}}
+\newcommand{\cnstSoloCoin}{\ensuremath{SoloCoin}}
+\newcommand{\cnstMultiCoin}{\ensuremath{SharedCoin}}
+\newcommand{\cnstSoToSoTx}{\styleVariable{Solo2SoloTx}}
+\newcommand{\cnstSoToMuTx}{\styleVariable{Solo2SharedTx}}
+\newcommand{\cnstMuToSoTx}{\styleVariable{Shared2SoloTx}}
+\newcommand{\cnstMuToMuTx}{\styleVariable{Shared2SharedTx}}
+
 \newcommand{\cnstPayToCoin}{\styleVariable{PayToCoin}}
-\newcommand{\cnstPayToMuSigCoin}{\styleVariable{PayToMuSigCoin}}
+\newcommand{\cnstPayToSharedCoin}{\styleVariable{PayToMuSigCoin}}
 \newcommand{\cnstPayToCoinHideSecret}{\styleVariable{PayToCoinHideSecret}}
 \newcommand{\cnstAptSigCorrectness}{\ensuremath{\styleFunction{Adaptor\;Signature\;Correctness\;}}}
+\newcommand{\cnstSecureAptScheme}{\ensuremath{\styleFunction{Secure\;Adaptor\;Signature\;Scheme\;}}}
 \newcommand{\cnstWitnessExtractability}{\ensuremath{\styleFunction{Witness\;Extractability\;}}}
 \newcommand{\cnstCorrectness}{\ensuremath{\styleFunction{Correctness\;}}}
+\newcommand{\cnstTransaction}{\tau}
+\newcommand{\cnstTrueorFalse}{\{1,0\}}
 
 % functions
 \newcommand{\funHash}[1]{\cnstHash (#1)}
@@ -34,7 +45,7 @@
 \newcommand{\funGen}[1]{\opPointScalar{\varG}{#1}}
 \newcommand{\funGenH}[1]{\opPointScalar{\varH}{#1}}
 \newcommand{\funList}[1]{\{#1\}}
-\newcommand{\funStar}[1]{#1'}
+\newcommand{\funStar}[1]{#1^*}
 \newcommand{\funHat}[1]{\hat{#1}}
 \newcommand{\funTilde}[1]{\tilde{#1}}
 \newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
@@ -85,6 +96,7 @@
 \newcommand{\varCoinOut}{\varCoin_{\styleVariable{out}}}
 \newcommand{\varCoinOutAlice}{\varCoinOut^{\varAlice}}
 \newcommand{\varCoinOutBob}{\varCoinOut^{\varBob}}
+\newcommand{\varCoinShared}{\varCoinOut^{\styleVariable{sh}}}
 \newcommand{\varCoinSpecial}{\varCoinOut^{\styleVariable{sp}}}
 \newcommand{\varValue}{\styleVariable{v}}
 \newcommand{\varMsg}{\styleVariable{m}}
@@ -95,7 +107,11 @@
 \newcommand{\varNonceAdv}{\varNonce_{\cnstAdversary}}
 \newcommand{\varBlindingFactor}{\styleVariable{r}}
 \newcommand{\varBlindingFactorFor}[1]{\varBlindingFactor_{#1}}
+\newcommand{\varBlindingFactorAlice}{\varBlindingFactorFor{\varBob}}
+\newcommand{\varBlindingFactorBob}{\varBlindingFactorFor{\varBob}}
 \newcommand{\varS}{\styleVariable{s}}
+\newcommand{\varSAptBob}{\funHat{\varS_\varBob}}
+\newcommand{\varSApt}{\funHat{\varS}}
 \newcommand{\varSStar}{\funStar{\varS}}
 \newcommand{\varSAlice}{\styleVariable{s}_\varAlice}
 \newcommand{\varSBob}{\styleVariable{s}_\varBob}
@@ -149,7 +165,8 @@
 \newcommand{\opNegative}[1]{-#1}
 \newcommand{\opTimesScalar}{~\cdot~}
 \newcommand{\opAddPoint}{~\cdot~}
-\newcommand{\opEq}{~=~}
+\newcommand{\opEq}{~\stackrel{?}{=}~}
+\newcommand{\opEqNoQ}{~=~}
 \newcommand{\opNotEq}{~\neq~}
 \newcommand{\opSeperate}{,~}
 \newcommand{\opExcluding}{\ensuremath{\setminus}}
@@ -163,7 +180,7 @@
 \newcommand{\procGenRId}{\styleFunction{genRel}}
 \newcommand{\procGenR}[1]{\procGenRId(#1)}
 
-\newcommand{\procSetupId}{\styleFunction{setup}}
+\newcommand{\procSetupId}{\styleFunction{keyGen}}
 \newcommand{\procSetup}[1]{\procSetupId(#1)}
 
 \newcommand{\procCommitId}{\styleFunction{commit}}
@@ -176,18 +193,18 @@
 \newcommand{\procVerfId}{\styleFunction{verf}}
 \newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
 
-\newcommand{\procProofId}{\styleFunction{rproof}}
-\newcommand{\procProof}[5]{\procProofId_{#4,#5}(#1,#2,#3)}
+\newcommand{\procProofId}{\styleFunction{ranPrf}}
+\newcommand{\procProof}[3]{\procProofId(#1,#2,#3)}
+\newcommand{\procMuProofId}{\styleFunction{muRanPrf}}
+\newcommand{\procMuProof}[4]{\procMuProofId<(#1,#2,#3),(#1,#2,#4)>}
+\newcommand{\procVerfProofId}{\styleFunction{vrfRanPrf}}
+\newcommand{\procVerfProof}[1]{\procVerfProofId(#1)}
 
-\newcommand{\procGenPartSigId}{\styleFunction{signPt}}
-\newcommand{\procGenPartSig}[5]{ \procGenPartSigId_{#2 \opSeperate #3 \opSeperate #4 \opSeperate #5}(#1) }
 \newcommand{\procSignPtId}{\styleFunction{signPt}}
 \newcommand{\procSignPt}[3]{\procSignPtId<(#1 \opSeperate #2)(#1 \opSeperate #3)>}
 \newcommand{\procSignPtSingle}[2]{\procSignPtId(#1 \opSeperate #2)}
 \newcommand{\procVerfPtSigId}{\styleFunction{vrfPt}}
 \newcommand{\procVerfPtSig}[4]{\procVerfPtSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
-\newcommand{\procVerfPartSigId}{\styleFunction{vrfPt}}
-\newcommand{\procVerfPartSig}[6]{ \procVerfPartSigId_{#2 \opSeperate #3 \opSeperate #4 \opSeperate #5}(#1 \opSeperate #6) }
 \newcommand{\procFinSigId}{\styleFunction{finSig}}
 \newcommand{\procFinSig}[2]{ \procFinSigId(#1,#2) }
 
@@ -202,20 +219,17 @@
 
 \newcommand{\procExpForgId}{ \styleFunction{forgeAptSig_{\cnstAdversary}} }
 \newcommand{\procExpForg}[1]{ \procExpForgId(#1) }
-\newcommand{\procSignOracleId}{ \cnstOracle_{sa} }
-\newcommand{\procSignOracle}[1]{ \procSignOracleId(#1) }
+\newcommand{\procExpForgeSimpleId}{ \styleFunction{forgeSig_{\cnstAdversary}}}
+\newcommand{\procExpForgeSimple}[1]{ \procExpForgeSimpleId(#1) }
+\newcommand{\procSignOracleId}{ \cnstOracle_{s} }
+\newcommand{\procSignOracle}[2]{ \procSignOracleId(#1,#2) }
 \newcommand{\procFunctionId}{\styleFunction{f}}
 \newcommand{\procFunction}[1]{\procFunctionId(#1)}
 
 \newcommand{\procExpExtId}{ \styleFunction{aExtrWit_{\cnstAdversary}} }
 \newcommand{\procExpExt}[1]{ \procExpExtId(#1) }
-\newcommand{\procSignPtOracleId}{ \cnstOracle_{sp} }
-\newcommand{\procSignPtOracle}[1]{ \procSignPtOracleId(#1) }
+\newcommand{\procSignAptOracleId}{ \cnstOracle_{s} }
+\newcommand{\procSignAptOracle}[3]{ \procSignPtOracleId(#1,#2,#3) }
 
-\newcommand{\procCreatePreTxId}{ \styleFunction{createPreTx} }
-\newcommand{\procCreatePreTx}[6]{ \procCreatePreTxId_{#2,#3,#4,#5,#6}(#1) }
-\newcommand{\procRecvTxId}{ \styleFunction{recvTx} }
-\newcommand{\procRecvTx}[4]{ \procRecvTxId_{#3,#4}(#1,#2) }
-\newcommand{\procFinalizeTxId}{ \styleFunction{finalizeTx} }
-\newcommand{\procFinalizeTx}[2]{ \procFinalizeTxId_{#1}(#2) }
-\newcommand{\procSpendOutputId}{ \styleFunction{spendTxOutput} }
+\newcommand{\procSpendOutputId}{ \styleFunction{spendOutput} }
+\newcommand{\procSpendOutput}[4]{\procSpendOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1, \opSeperate #4)>}
