@@ -39,16 +39,15 @@ We assume to have access to a homomorphic commitment scheme such as Pedersen Com
             \varCoinOutAlice \opFunResult \procCommit{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactor}} \< \< \\
             \varProofAlice \opFunResult \procProof{\varCoinOutAlice}{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactor}} \< \< \\
             \varBlindingFactorFor{s} \opAssign \funStar{\varBlindingFactor} \opSub \varBlindingFactor \< \< \\
-            \< \sendmessageright*{\varTx \opAssign (\varMsg \opSeperate \varCoinInp \opSeperate \varCoinOutAlice \opSeperate \varProofAlice \opSeperate \funGen{\varBlindingFactorFor{s}})} \< \\
+            \< \scriptstyle \sendmessageright*{\varTx \opAssign (\varMsg \opSeperate \varCoinInp \opSeperate \varCoinOutAlice \opSeperate \varProofAlice \opSeperate \funGen{\varBlindingFactorFor{s}})} \< \\
             \< \< \procVerfProof{\varProofAlice} \opEq 1 \\
             \< \< \varBlindingFactorFor{r} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
             \< \< \varCoinOutBob \opFunResult \procCommit{\varFundValue}{\varBlindingFactorFor{r}} \\
-            \< \< \varSigBob \opFunResult \procSignPtSingle{\varMsg}{\varBlindingFactorFor{r}} \\
             \< \< \varProofBob \opFunResult \procProof{\varCoinOutBob}{\varFundValue}{\varBlindingFactorFor{r}} \\
-            \< \sendmessageleft*{\varTx \opAssign \varTx \opUnion (\varCoinOutBob \opSeperate \funGen{\varBlindingFactorFor{r}} \opSeperate \varSigBob \opSeperate \varProofBob)} \< \\
+            \< \scriptstyle \sendmessageleft*{\varTx \opAssign \varTx \opUnion (\varCoinOutBob \opSeperate \funGen{\varBlindingFactorFor{r}} \opSeperate \varSigBob \opSeperate \varProofBob)} \< \\
+            \< \scriptstyle (\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varBlindingFactorFor{s}}{\varBlindingFactorFor{r}} \< \\
             \procVerfPtSig{\varSigBob}{\varMsg}{\funGen{\varBlindingFactorFor{s}}}{\funGen{\varBlindingFactorFor{r}}} \opEq 1 \< \< \\
             \procVerfProof{\varProofBob} \opEq 1 \< \< \\
-            \varSigAlice \opFunResult \procSignPtSingle{\varMsg}{\varBlindingFactorFor{s}} \< \< \\
             \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \\
             \varExcess \opAssign \funGen{\varBlindingFactorFor{s}} \opAddPoint \funGen{\varBlindingFactorFor{r}} \< \< \\
             \pcreturn \varTx \opAssign \varTx \opUnion (\varExcess \opSeperate \varSigFin)
@@ -77,10 +76,10 @@ of multiparty rangeproofs for this protocol to be executeable. The concrete inst
             \< \< \procVerfProof{\varProofAlice} \opEq 1 \\
             \< \< \varBlindingFactorFor{2} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
             \< \< \varCoinShared \opFunResult \procCommit{\varFundValue}{\varBlindingFactorFor{2}} \opAddPoint \funGen{\varBlindingFactorFor{1}} \\
-            \< \< \varSigBob \opFunResult \procSignPtSingle{\varMsg}{\varBlindingFactorFor{r}} \\
             \< \sendmessageleft*{ \scriptstyle \varTx \opAssign \varTx \opUnion (\varCoinShared \opSeperate \funGen{\varBlindingFactorFor{2}} \opSeperate \varSigBob)} \< \\
-            \< \scriptscriptstyle \varProof \opFunResult \procMuProof{\varCoinShared}{\varFundValue}{\varBlindingFactorFor{1}}{\varBlindingFactorFor{2}} \< \\
-            \varSigAlice \opFunResult \procSignPtSingle{\varMsg}{\varBlindingFactorFor{s}} \< \< \\
+            \< \scriptstyle \varProof \opFunResult \procMuProof{\varCoinShared}{\varFundValue}{\varBlindingFactorFor{1}}{\varBlindingFactorFor{2}} \< \\
+            \< \scriptstyle (\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varBlindingFactorFor{s}}{\varBlindingFactorFor{r}} \< \\
+            \procVerfPtSig{\varSigBob}{\varMsg}{\funGen{\varBlindingFactorFor{s}}}{\funGen{\varBlindingFactorFor{r}}} \opEq 1 \< \< \\
             \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \\
             \varExcess \opAssign \funGen{\varBlindingFactorFor{s}} \opAddPoint \funGen{\varBlindingFactorFor{r}} \< \< \\
             \scriptstyle \pcreturn \varTx \opAssign \varTx \opUnion (\varExcess \opSeperate \varSigFin \opSeperate \varProof)
