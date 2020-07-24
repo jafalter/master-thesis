@@ -200,6 +200,9 @@
 \newcommand{\procVerfProofId}{\styleFunction{vrfRanPrf}}
 \newcommand{\procVerfProof}[1]{\procVerfProofId(#1)}
 
+
+\newcommand{\procKeyGenPtId}{\styleFunction{DKeyGen}}
+\newcommand{\procKeyGenPt}[2]{\procKeyGenPtId\langle #1 \opSeperate #2 \rangle}
 \newcommand{\procSignPtId}{\styleFunction{signPt}}
 \newcommand{\procSignPt}[3]{\procSignPtId<(#1 \opSeperate #2)(#1 \opSeperate #3)>}
 \newcommand{\procSignPtSingle}[2]{\procSignPtId(#1 \opSeperate #2)}
