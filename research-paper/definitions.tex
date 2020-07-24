@@ -1,0 +1,22 @@
+\section{Definitions}
+\label{sec:definitions}
+
+
+\begin{definition}[Flexible Adaptor Signatures]
+A \emph{flexible adaptor signature} scheme $\varSigSchemeApt$ wrt. a hard relation $R$ and digital signature scheme $\varSigScheme$	consists of three algorithms $(\procAptSigId, \procVerifyAptSigId, \procExtWitId)$ defined as follows:
+
+
+\begin{itemize}
+        \item $\varSigApt \opFunResult \procAptSig{\varSignature}{\varWit}$ takes as input a signature $\varSignature$ and a witness value $\varWit$ and it outputs an adapted signature $\varSigApt$. 
+        \item $\cnstTrueorFalse \opFunResult \procVerifyAptSig{\varSigApt}{\varMsg}{\varPubKey}{\varStatement}{}$ takes as input an adapted signature $\varSigApt$, a message $\varMsg$, a public key $\varPubKey$ and a statement $\varStatement$ it outputs if $1$ if $\varSigApt$ is a valid adaptation under statement $\varStatement$ of a signature on message $\varMsg$ verifiable with public key $\varPubKey$. 
+        \item $\varWit \opFunResult \procExtWit{\varSignature}{\varSigApt}{}$ takes as input a signature $\varSignature$ and the corresponding adapted signature $\varSigApt$ and returns the witness $\varWit$.
+    \end{itemize}
+
+\end{definition}
+
+
+
+\begin{definition}[Flexible Adaptor Signature Correctness]
+We say that a flexible adaptor signature scheme is \emph{correct} if for every message $\varMsg \in \cnstBinary{*}$, keypairs $\varKeyPair \opFunResult \procSetup{\varSecParam}$ and every statement/witness pair $(\varStatement \opSeperate \varWit)$ in a relation $\cnstRelation$ it must hold that:
+
+\end{definition}

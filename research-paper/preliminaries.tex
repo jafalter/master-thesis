@@ -1,0 +1,41 @@
+\section{Preliminaries}
+\label{sec:preliminaries}
+
+
+\begin{definition}[Digital Signature Scheme]\label{def:signatureScheme}
+    A  digital signature scheme $\varSigScheme$ is a tuple of algorithms $(\procSetupId \opSeperate \procSignId \opSeperate \procVerfId)$ defined as follows. 
+    \begin{itemize}
+    	\item $(\varSecKey, \varPubKey) \opFunResult \procSetup{\varSecParam}$ takes as input a security parameter $\varSecParam$ and outputs a keypair $\varKeyPair$, consisting of a secret key $\varSecKey$ and a public key $\varPubKey$.
+    	\item $\varSignature \gets \procSign{\varSecKey}{\varMsg}$ takes as input the secret key $\varSecKey$ and a message $\varMsg$ and creates a signature $\varSignature$ over the message $\varMsg$.
+    	\item $\{1,0\} \gets \procVerf{\varPubKey}{\varSignature}{\varMsg}$ outputs $1$ if $\varSignature$ is a valid signature over message $\varMsg$. 
+    \end{itemize}
+ \end{definition} 
+  
+ \begin{definition}[Digital Signature Correctness]
+ We say that a digital signature scheme is \emph{correct} if for all messages $\varMsg$ and valid keypairs $\varKeyPair \opFunResult \procSetup{\varSecParam}$ it holds that $\procVerf{\varPubKey}{\procSign{\varSecKey}{\varMsg}}{\varMsg} = 1$.
+ \end{definition}
+ 
+\begin{definition}[$\cnstEUFCMA$]\label{def:aeufcma}
+A digital signature scheme is \emph{existentially unforgeable under chosen-message attacks} if for every probabilistic polynomial-time adversary $\cnstAdversary$ there exists a negligible function $\funNegl{\varSecParam}$ such that 
+
+\[ \prob{\procExpForgeSimple{\varSecParam} \opEqNoQ 1} \opSmEq \funNegl{\varN} \]
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procExpForgeSimple{\varSecParam}$} {
+        \varKeyPair \opFunResult \procSetup{\varSecParam} \\
+        (\varMsg^* \opSeperate \varSignature^*) \opFunResult \cnstAdversary^{\procSignOracle{\cdot}{\cdot}}(\varPubKey) \\
+        \pcreturn ((\varMsg) \opNotIn \varSet \opAnd \funStar{\varSigAlice} \opNotEq \varSigAlice \opAnd \procVerf{\varMsg}{\varSigFin}{\varPubKeyAlice \opAddPoint \varPubKeyBob})
+        }\\[2\baselineskip]
+        \procedure[linenumbering]{$\procSignOracle{\varMsg}{\varPubKeyAlice}$} {
+        \varSet \opAssign \cnstEmptySet \\
+        \varSignature \opFunResult \procSign{\varSecKey}{\varMsg}\\
+        \varSet \opAssign \varSet \opUnion \{\varMsg\} \\
+        \pcreturn \varSignature
+        }
+    \end{varwidth}
+    }
+\end{center}
+\end{definition}
+
