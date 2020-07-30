@@ -1,0 +1,86 @@
+\section{Definitions}
+\label{sec:definitions}
+
+
+
+\renewcommand{\varSecKeyAlice}{\textit{sk}_0}
+\renewcommand{\varPubKeyAlice}{\textit{pk}_0}
+\renewcommand{\varSecKeyBob}{\textit{sk}_1}
+\renewcommand{\varPubKeyBob}{\textit{pk}_1}
+\renewcommand{\varSigAlice}{\ensuremath{\tilde{\sigma_0}}}
+\renewcommand{\varSigBob}{\ensuremath{\tilde{\sigma_1}}}
+\newcommand{\varSig}{\ensuremath{\tilde{\sigma_b}}}
+\newcommand{\procVerFinSig}{\ensuremath{\mathsf{vrfFinSig}}}
+
+\begin{definition}[Two Party Staggered Signature Scheme]
+	
+A \emph{two party staggered signature scheme $\varSigSchemeMP$} is a tuple of processes $(\procKeyGenPtId,$  $\procSignPtId, \procVerfPtSigId,$ $\procFinSigId)$ defined as follows: 
+    
+    \begin{itemize}
+    	\item $((\varSecKeyAlice, \varPubKeyAlice), (\varSecKeyBob, \varPubKeyBob)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam}$: The distributed key generation protocol takes as input the security parameter from both Alice and Bob and returns the tuple $(\varSecKeyAlice, \varPubKeyAlice)$ to Alice (similar to Bob) where $(\varSecKeyAlice, \varPubKeyAlice)$ is a pair of private and corresponding public keys whereas $\varPubKey$ is the composite of $\varPubKeyAlice$ and $\varPubKeyBob$. 
+    	
+    	\item $(\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varSecKeyAlice, \varPubKeyAlice, \varPubKeyBob}{\varSecKeyBob, \varPubKeyAlice, \varPubKeyBob}$: In the distributed first stage signing protocol, each participant takes as input the message $\varMsg$, its secret key ($\varSecKey$) and both public keys. This protocol outputs $(\varSigAlice, \varSigBob)$, that is, a half signature to each participant.  
+    	
+    	\item $\cnstTrueorFalse \opFunResult \procVerfPtSig{\varSig}{\varMsg}{\varPubKeyAlice}{\varPubKeyBob}$:  The verification algorithm for a half signature is a DPT function that takes as input the half signature $\varSig$, a message $m$, and the participants public keys $\varPubKeyAlice$ and $\varPubKeyBob$. The algorithm returns 1 if the verification was successful or 0 otherwise.
+        \item $\varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob}$: The finalize signature algorithm is a DPT function that takes as input two half  signatures and combines them into a final signature.
+        
+        \item $\cnstTrueorFalse \opFunResult \procVerFinSig(\varSigFin, \varMsg, \varPubKeyAlice, \varPubKeyBob) $: The verification algorithm for the complete signature is a DPT function that takes as input the signature $\varSigFin$, the message $\varMsg$ and public keys of both participants $\varPubKeyAlice$ and $\varPubKeyBob$ and returns $1$ if the verification is successful or $0$ otherwise.  
+    \end{itemize}
+\end{definition}
+
+
+\begin{definition}[Two Party Staggered Signature Correctness]
+	For all $((\varSecKeyAlice, \varPubKeyAlice),$ $(\varSecKeyBob, \varPubKeyBob)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam}$ and for all messages $\varMsg$, the following conditions should hold:
+	\begin{itemize}
+		\item Let $(\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varSecKeyAlice, \varPubKeyAlice, \varPubKeyBob}{\varSecKeyBob, \varPubKeyAlice, \varPubKeyBob}$. Then, $1 \opFunResult \procVerfPtSig{\varSig}{\varMsg}{\varPubKeyAlice}{\varPubKeyBob}$ for $b \in \set{0,1}$. 
+		\item  Let $\varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob}$. Then, $1 \opFunResult \procVerFinSig(\varSigFin, \varMsg, \varPubKeyAlice, \varPubKeyBob)$. 
+	\end{itemize}
+\end{definition}
+
+
+\begin{definition}[Two Party Staggered Signature Security]
+	A two party staggered signature scheme is \emph{existentially unforgeable under chosen-message attacks} if for every probabilistic polynomial-time adversary $\cnstAdversary$ there exists a negligible function $\funNegl{\varSecParam}$ such that 
+
+\[ \prob{\procExpForgeSimple{\varSecParam} \opEqNoQ 1} \opSmEq \funNegl{\varN} \]
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procExpForgeSimple{\varSecParam}$} {
+         \varSet \opAssign \cnstEmptySet \\
+        ((\varSecKeyAlice, \varPubKeyAlice), (\varSecKeyBob, \varPubKeyBob)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam}\\
+        (\varMsg^* \opSeperate \varSignature^*) \opFunResult \cnstAdversary^{\procSignOracle{\cdot}{\cdot}}(\varPubKeyAlice, \varPubKeyBob, \varSecKeyBob) \\
+        \pcreturn ((\varMsg) \opNotIn \varSet  \opAnd \procVerFinSig(\varSignature^*, \varMsg^*, \varPubKeyAlice, \varPubKeyBob))
+        }\\[2\baselineskip]
+        \procedure[linenumbering]{$\procSignOracle{\varMsg}{\varSecKeyBob}$} {
+        (\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varSecKeyAlice, \varPubKeyAlice, \varPubKeyBob}{\varSecKeyBob, \varPubKeyAlice, \varPubKeyBob}\\
+        \varSet \opAssign \varSet \opUnion \{\varMsg\} \\
+        \pcreturn (\varSigAlice \opSeperate \varSigBob)
+        }
+    \end{varwidth}
+    }
+\end{center}
+
+\end{definition}
+
+
+
+\begin{definition}[Flexible Adaptor Signatures]
+A \emph{flexible adaptor signature} scheme $\varSigSchemeApt$ wrt. a hard relation $R$ and two party staggered signature scheme $\varSigSchemeMP$ consists of three algorithms $(\procAptSigId, \procVerifyAptSigId, \procExtWitId)$ defined as follows:
+
+
+\begin{itemize}
+        \item $\varSigApt \opFunResult \procAptSig{\varSig}{\varWit}$ takes as input a half signature $\varSig$ and a witness value $\varWit$ and it outputs an adapted signature $\varSigApt$. 
+        \item $\cnstTrueorFalse \opFunResult \procVerifyAptSig{\varSigApt}{\varMsg}{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}$ takes as input an adapted signature $\varSigApt$, a message $\varMsg$, a couple of public keys $\varPubKeyAlice$, $\varPubKeyBob$ and a statement $\varStatement$ it outputs if $1$ if $\varSigApt$ is a valid adapted signature under statement $\varStatement$ and public keys $\varPubKeyAlice$, $\varPubKeyBob$. 
+        \item $\varWit \opFunResult \procExtWit{\varSignature}{\varSigApt}{\varSig}$ takes as input a full signature $\varSignature$, a half signature $\varSig$ and the other half signature in the adapted form $\varSigApt$ and returns the witness $\varWit$.
+    \end{itemize}
+
+\end{definition}
+
+
+
+
+\begin{definition}[Flexible Adaptor Signature Correctness]
+We say that a flexible adaptor signature scheme is \emph{correct} if for every message $\varMsg \in \cnstBinary{*}$, keypairs $\varKeyPair \opFunResult \procSetup{\varSecParam}$ and every statement/witness pair $(\varStatement \opSeperate \varWit)$ in a relation $\cnstRelation$ it must hold that:
+
+\end{definition}

@@ -8,20 +8,44 @@ We start by defining our extended signature scheme in section~\ref{sec:definitio
 
 \section{Definitions}\label{sec:definitions}
 
-A two-party signature scheme wrt. a hard relation $\cnstRelation$ is an extension of a signature scheme as defined in definition~\ref{def:signatureScheme}, which allows us to distribute signature generation for a composite public key shared between two parties Alice and Bob.
-    Alice and Bob want to collaborate to generate a signature valid under the composite public key $\varPubKeyComp \opAssign \varPubKeyAlice + \varPubKeyBob$ without having to reveal their secret keys to each other.\begin{definition}[Two Party Signature Scheme]
+A two-party signature scheme wrt. a hard relation $\cnstRelation$ \todo[inline]{why a two-party signature scheme is wrt. a hard relation $\cnstRelation$?} is an extension of a signature scheme as defined in definition~\ref{def:signatureScheme}, which allows us to distribute signature generation for a composite public key shared between two parties Alice and Bob.
+    Alice and Bob want to collaborate to generate a signature valid under the composite public key $\varPubKeyComp \opAssign \varPubKeyAlice + \varPubKeyBob$ \todo{this way of defining the public key as the composition of two public keys is not correct} without having to reveal their secret keys to each other.
+    
+    
+    \todo[inline]{Pedro: I changed the definition of two-party signature scheme. Your version is below commented out}
+    
+    \begin{definition}[Two Party Signature Scheme]
     \label{def:twoPartySig}
-     We extend the regular definition of a signature scheme~\ref{def:signatureScheme} with three functions:
-    \[
-        \varSigSchemeMP = (\varSigScheme \opConc \procSignPtId \opSeperate \procVerfPtSigId \opSeperate \procFinSigId)
-    \]
+    
+    A \emph{two party signature scheme $\varSigSchemeApt$} extends a signature scheme $\varSigScheme$ with a tuple of protocols and algorithms $(\procKeyGenPtId,  \procSignPtId, \procVerfPtSigId, \procFinSigId)$ defined as follows: 
     
     \begin{itemize}
-        \item $(\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varSecKeyAlice}{\varSecKeyBob}$ is defined as a two-party procedure which requires both Alice and Bob to provide their secret key and a message which should be signed. The parties collaborate to both calculate their own partial signatures. These partial signatures do not need to be valid signatures yet, but the other participating parties need to be able to verify them using the $\procVerfPtSigId$ procedure.
-        \item $\cnstTrueorFalse \opFunResult \procVerfPtSig{\varSigBob}{\varMsg}{\varPubKeyAlice}{\varPubKeyBob}$ Is a function which lets one party verify the partial signature of the other party. As input it requires the partial signature, signed message and the participants public keys. The output will be either 1 if the verification was successfull or 0 otherwise.
-        \item $\varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob})$ will take the two partial signatures and combine them into a final valid signature under the participants composite public key.
+    	\item $((\varSecKeyAlice, \varPubKeyAlice, \varPubKey), (\varSecKeyBob, \varPubKeyBob, \varPubKey)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam}$: The distributed key generation protocol takes as input the security parameter from both Alice and Bob and returns the tuple $(\varSecKeyAlice, \varPubKeyAlice, \varPubKey)$ to Alice (similar to Bob) where $(\varSecKeyAlice, \varPubKeyAlice)$ is a pair of private and corresponding public keys whereas $\varPubKey$ is the composite of $\varPubKeyAlice$ and $\varPubKeyBob$. 
+    	
+    	\item $(\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varSecKeyAlice}{\varSecKeyBob}$: The distributed signing protocol takes as input the message $\varMsg$ and the share of the secret key from each user $\varSecKeyAlice$, $\varSecKeyBob$. This protocol outputs $(\varSigAlice, \varSigBob)$, that is, a share of the signature to each participant.  
+    	
+    	\item $\cnstTrueorFalse \opFunResult \procVerfPtSig{\varSigBob}{\varMsg}{\varPubKeyAlice}{\varPubKeyBob}$:  The share verification algorithm is a DPT function that takes as input a signature share $\varSigBob$, a message $m$, and the participants public keys $\varPubKeyAlice$ and $\varPubKeyBob$. The algorithm returns 1 if the verification was successfull or 0 otherwise.
+        \item $\varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob})$: The finalize signature algorithm is a DPT function that takes as input two shares of the  signatures and combines them into a final signature.
+
     \end{itemize}
-\end{definition}
+    
+    \end{definition}
+    
+    \todo[inline]{You need to add here that we require a two-party signature scheme that is correct and unforgeable against chosen message attacks (EUF-CMA). You can then point to these paper \url{https://link.springer.com/content/pdf/10.1007/s00145-006-0347-3.pdf} The EUF-CMA game for 2-party signature scheme is defined in pages 14-15 of this paper \url{https://eprint.iacr.org/2017/552.pdf}}
+    
+%    \begin{definition}[Two Party Signature Scheme]
+%    \label{def:twoPartySig}
+%     We extend the regular definition of a signature scheme~\ref{def:signatureScheme} with three functions:
+%    \[
+%        \varSigSchemeMP = (\varSigScheme \opConc \procSignPtId \opSeperate \procVerfPtSigId \opSeperate \procFinSigId)
+%    \]
+%    
+%    \begin{itemize}
+%        \item $(\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varSecKeyAlice}{\varSecKeyBob}$ is defined as a two-party procedure which requires both Alice and Bob to provide their secret key and a message which should be signed. The parties collaborate to both calculate their own partial signatures. These partial signatures do not need to be valid signatures yet, but the other participating parties need to be able to verify them using the $\procVerfPtSigId$ procedure.
+%        \item $\cnstTrueorFalse \opFunResult \procVerfPtSig{\varSigBob}{\varMsg}{\varPubKeyAlice}{\varPubKeyBob}$ Is a function which lets one party verify the partial signature of the other party. As input it requires the partial signature, signed message and the participants public keys. The output will be either 1 if the verification was successfull or 0 otherwise.
+%        \item $\varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob})$ will take the two partial signatures and combine them into a final valid signature under the participants composite public key.
+%    \end{itemize}
+%\end{definition}
 
 \begin{definition}[Two Party Fixed Witness Adaptor Schnorr Signature Scheme]
     \label{def:twoPartyFixedWitAptSig}
@@ -53,15 +77,18 @@ be possible to extract the witness computing $\procExtWitId$ with the required p
 
 More formally \cnstAptSigCorrectness is given if for every security parameter $\varN \in \cnstNatural$, message $\varMsg \in \cnstBinary{*}$, keypairs $\varKeyPairAlice \opFunResult \procSetup{\varSecParam} \opSeperate
 \varKeyPairBob \opFunResult \procSetup{\varSecParam}$
-with their composite public key $\varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ and every statement/witness pair $(\varStatement \opSeperate \varWit)$ in a relation $\cnstRelation$ it must hold that:
+with their composite public key $\varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ \todo{you need to define keys in terms of DKeyGen}
+ and every statement/witness pair $(\varStatement \opSeperate \varWit)$ in a relation $\cnstRelation$ it must hold that:
+ \todo[inline]{Pedro: remove the question mark from equal in left part of Pr. They must hold} 
+ 
 \[
     \Pr\left[
     \begin{array}{c}
-        1.\:\procVerf{\varMsg}{\varSigFin}{\varPubKeyComp} \opEq 1 \\
+        \:\procVerf{\varMsg}{\varSigFin}{\varPubKeyComp} \opEq 1 \\
         \opAnd \\
-        2.\: \procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyAlice}{\varPubKeyBob}{\varStatement} \opEq 1 \\
+        \: \procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyAlice}{\varPubKeyBob}{\varStatement} \opEq 1 \\
         \opAnd \\
-        3.\:(\varStatement \opSeperate \funStar{\varWit} \opIn \cnstRelation)
+        \:(\varStatement \opSeperate \funStar{\varWit}) \opIn \cnstRelation
     \end{array}
     \middle\vert
     \begin{array}{l}
