@@ -46,6 +46,7 @@
 \newcommand{\funGenH}[1]{\opPointScalar{\varH}{#1}}
 \newcommand{\funList}[1]{\{#1\}}
 \newcommand{\funStar}[1]{#1^*}
+\newcommand{\funStarAlt}[1]{#1'}
 \newcommand{\funHat}[1]{\hat{#1}}
 \newcommand{\funTilde}[1]{\tilde{#1}}
 \newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
@@ -107,7 +108,7 @@
 \newcommand{\varNonceAdv}{\varNonce_{\cnstAdversary}}
 \newcommand{\varBlindingFactor}{\styleVariable{r}}
 \newcommand{\varBlindingFactorFor}[1]{\varBlindingFactor_{#1}}
-\newcommand{\varBlindingFactorAlice}{\varBlindingFactorFor{\varBob}}
+\newcommand{\varBlindingFactorAlice}{\varBlindingFactorFor{\varAlice}}
 \newcommand{\varBlindingFactorBob}{\varBlindingFactorFor{\varBob}}
 \newcommand{\varS}{\styleVariable{s}}
 \newcommand{\varSAptBob}{\funHat{\varS_\varBob}}
@@ -235,4 +236,4 @@
 \newcommand{\procSignAptOracle}[3]{ \procSignPtOracleId(#1,#2,#3) }
 
 \newcommand{\procSpendOutputId}{ \styleFunction{spendOutput} }
-\newcommand{\procSpendOutput}[4]{\procSpendOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1, \opSeperate #4)>}
+\newcommand{\procSpendOutput}[4]{\procSpendOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1 \opSeperate #4)>}
