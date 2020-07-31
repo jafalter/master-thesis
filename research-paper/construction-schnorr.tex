@@ -1,0 +1,157 @@
+\section{Construction from Schnorr}
+\label{sec:construction-schnorr}
+
+\newcommand{\cnstGroupScalar}{\ensuremath{\mathbb{Z}_p}}
+\newcommand{\zkpProve}[2]{\ensuremath{\mathsf{P}_{\textit{NIZK}}(#1; #2)}}
+\newcommand{\zkpProofAlice}{\ensuremath{\pi_0}}
+\newcommand{\zkpProofBob}{\ensuremath{\pi_1}}
+\newcommand{\opEquality}{\ensuremath{=}}
+\newcommand{\zkpStatementAlice}{\ensuremath{\textit{stmt}_0}}
+\newcommand{\zkpStatementBob}{\ensuremath{\textit{stmt}_1}}
+\newcommand{\zkpVerify}[1]{\ensuremath{\mathsf{V}_{\textit{NIZK}}(#1)}}
+
+\newcommand{\varSOneSide}{\ensuremath{\varS_b}}
+\newcommand{\varRandOneSide}{\ensuremath{\varRand_b}}
+\newcommand{\varSAptOneSide}{\ensuremath{\varS_b}}
+\renewcommand{\varNonceAlice}{\ensuremath{k_0}}
+\renewcommand{\varNonceBob}{\ensuremath{k_1}}
+\renewcommand{\varRandAlice}{\ensuremath{R_0}}
+\renewcommand{\varRandBob}{\ensuremath{R_1}}
+\renewcommand{\varSAlice}{\ensuremath{s_0}}
+\renewcommand{\varSBob}{\ensuremath{s_1}}
+
+
+\subsection{Two Party Staggered Signature Scheme from Schnorr}
+
+We first provide a two party staggered signature scheme from Schnorr in~\cref{fig:twoparty-schnorr}. 
+
+\begin{figure}[tb]
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+        	\procedure[linenumbering]{$ \procKeyGenPt{\varSecParam}{\varSecParam} $}{
+        	\textbf{Alice} \< \< \textbf{Bob} \\
+        	\varSecKeyAlice \sample \cnstGroupScalar \< \< \varSecKeyBob \sample \cnstGroupScalar \\
+        	\varPubKeyAlice \opAssign \funGen{\varSecKeyAlice} \< \< \varPubKeyBob \opAssign \funGen{\varSecKeyBob} \\
+        	\zkpStatementAlice \opAssign \exists \varSecKey \text{ s.t. } \varPubKeyAlice \opEquality \funGen{\varSecKeyAlice} \< \< \zkpStatementBob \opAssign \exists \varSecKey \text{ s.t. } \varPubKeyBob \opEquality \funGen{\varSecKeyBob} \\
+        	 \zkpProofAlice \opFunResult \zkpProve{\varSecKeyAlice}{\zkpStatementAlice} \< \< \zkpProofBob \opFunResult \zkpProve{\varSecKeyBob}{\zkpStatementBob}\\
+        	\< \sendmessageleft*{\varPubKeyBob, \zkpProofBob} \< \\
+        	\< \sendmessageright*{\varPubKeyAlice, \zkpProofAlice} \< \\
+        	\zkpVerify{\zkpProofBob} \opEq 1 \< \< \zkpVerify{\zkpProofAlice} \opEq 1\\
+        	\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob \< \< \varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob \\
+        	\pcreturn (\varSecKeyAlice, \varPubKeyAlice, \varPubKey) \< \< \pcreturn (\varSecKeyBob, \varPubKeyBob, \varPubKey)
+        	}\\
+            \procedure[linenumbering]{$\procSignPt{\varMsg}{\varSecKeyAlice, \varPubKey}{\varSecKeyBob, \varPubKey}$} {
+            \textbf{Alice} \< \< \textbf{Bob} \\
+            \varNonceAlice \sample \cnstGroupScalar \< \< \varNonceBob \sample \cnstGroupScalar \\
+            \varRandAlice \opAssign \funGen{\varNonceAlice} \< \< \varRandBob \opAssign \funGen{\varNonceBob} \\
+            \< \sendmessageright*{\varRandAlice} \< \\
+            \< \sendmessageleft*{\varRandBob} \< \\
+            \varRand \opAssign \varRandAlice \opAddPoint \varRandBob \< \< \varRand \opAssign \varRandAlice \opAddPoint \varRandBob \\
+            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKey} \< \< \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKey} \\
+            \varSAlice \opAssign \varNonceAlice \opAddScalar \varSecKeyAlice \opTimesScalar \varSchnorrChallenge \< \< \varSBob \opAssign \varNonceBob \opAddScalar \varSecKeyBob \opTimesScalar \varSchnorrChallenge \\
+            \varSigAlice \opAssign (\varSAlice \opSeperate \varSchnorrChallenge \opSeperate \varRandAlice ) \< \< \varSigBob \opAssign (\varSBob \opSeperate \varSchnorrChallenge \opSeperate \varRandBob) \\
+            \pcreturn \varSigAlice \< \< \pcreturn \varSigBob 
+            } \\
+            \procedure[linenumbering]{$\procVerfPtSig{\varSig}{\varMsg}{\varPubKeyOneSide}{}$} {
+            (\varSOneSide \opSeperate \varSchnorrChallenge \opSeperate \varRandOneSide) \opFunResult \varSig \\
+            \pcreturn \funGen{\varSOneSide} \opEq \varRandOneSide \opAddPoint \varPubKeyOneSide^{\varSchnorrChallenge}
+            }
+            \procedure[linenumbering]{$\procFinSig{\varSigAlice}{\varSigBob}$} {
+            (\varSAlice \opSeperate \varSchnorrChallenge \opSeperate \varRandAlice) \opFunResult \varSigAlice \\
+            (\varSBob \opSeperate \varSchnorrChallenge \opSeperate \varRandBob) \opFunResult \varSigBob \\
+            \varS \opAssign \varSAlice \opAddScalar \varSBob \\
+            \varSigFin \opAssign (\varS, \varSchnorrChallenge) \\
+            \pcreturn \varSigFin
+            }
+            \procedure[linenumbering]{$\procVerFinSig(\varSigFin, \varMsg, \varPubKey)$}{
+            (\varS, \varSchnorrChallenge) \opFunResult \varSigFin\\
+            \varSchnorrChallenge' \opFunResult \funHash{\varMsg \opConc \funGen{\varS} \opAddPoint \varPubKey^{-\varSchnorrChallenge} \opConc \varPubKey}\\
+            \pcreturn \varSchnorrChallenge \opEq \varSchnorrChallenge'
+            }
+        \end{varwidth}
+        }
+    \end{center}
+    \caption{Schnorr construction for the two party staggered signature scheme}
+    \label{fig:twoparty-schnorr}
+\end{figure}
+
+
+\begin{theorem}[Correctness of Two Party Staggered Signature Scheme from Schnorr] The two-party staggered signature scheme presented in~\cref{fig:twoparty-schnorr} is a \emph{correct}  two-party staggered signature scheme as defined in~\cref{def:two-party-sig-correctness}. 
+\end{theorem}
+
+\begin{proof}
+	Left as an exercise
+\end{proof}
+
+
+\begin{theorem}[Unforgeability of Two Party Staggered Signature Scheme from Schnorr] The two-party staggered signature scheme presented in~\cref{fig:twoparty-schnorr} is a \emph{correct}  two-party staggered signature scheme as defined in~\cref{def:two-party-sig-security}. 
+\end{theorem}
+
+\begin{proof}
+	To be done
+\end{proof}
+
+
+\subsection{Flexible Adaptor Signature from Schnorr}
+We give an instantiation of the the flexible adaptor signature scheme based on Schnorr signatures in~\cref{fig:aptSchnorr}.  
+
+
+
+
+\begin{figure}
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procAptSig{\varSig}{\varWit}$}{
+            (\varSOneSide \opSeperate \varSchnorrChallenge \opSeperate \varRandOneSide) \opFunResult \varSig \\
+            \varSStar \opAssign \varSOneSide \opAddScalar \varWit \\
+            \pcreturn \varSigApt \opAssign (\varSStar \opSeperate \varSchnorrChallenge \opSeperate \varRandOneSide)
+            } \\
+            \procedure[linenumbering]{$\procVerifyAptSig{\varSigApt}{\varMsg}{\varPubKey}{}{\varStatement}$} {
+            (\varSAptOneSide \opSeperate \varSchnorrChallenge \opSeperate \varRandOneSide) \opFunResult \varSigApt \\
+            \pcreturn \funGen{\varSOneSide} \opEq \varRandOneSide \opAddPoint \varPubKeyOneSide^{\varSchnorrChallenge} \opAddPoint \varStatement
+            }
+            \procedure[linenumbering]{$\procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob}$}{
+            (\varS \opSeperate \varSchnorrChallenge) \opFunResult \varSigFin \\
+            (\varSAlice \opSeperate \varSchnorrChallenge \opSeperate \varRandAlice) \opFunResult \varSigAlice \\
+            (\varSAptBob \opSeperate \varSchnorrChallenge \opSeperate \varRandBob) \opFunResult \varSigAptBob \\
+            \varSBob \opAssign \varS \opSub \varSAlice \\
+            \varWit \opAssign \varSAptBob \opSub \varSBob \\
+            \pcreturn \varWit
+            }
+        \end{varwidth}
+        }
+    \end{center}
+    \caption{Fixed Witness Adaptor Schnorr Signature Scheme}
+    \label{fig:aptSchnorr}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
