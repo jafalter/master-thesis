@@ -1,25 +1,41 @@
-In this section, we will formalize Mimblewimble transactions and define security properties, first found by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate} which have to hold for a valid transaction protocol.
-We then provide four different types of the transaction protocol, we separate between output coins which are controlled by a single party (denominated as $\cnstSoloCoin$) and a coin which is controlled by multiple parties owning a share of the blinding key, denominated as $\cnstMultiCoin$. These multiparty outputs can only spend by the two owners collaborating and are therefore semantically similiar to multisignature outputs in Bitcoin.~\cite{bistarelli2018analysis}
-From this we can then derive the different types of transactions $\cnstSoToMuTx$, $\cnstSoToMuTx$, $\cnstMuToSoTx$ and $\cnstMuToMuTx$. Note that in our case we restrict ourselfs to $\cnstMultiCoin$ outputs which are controlled by two parties, as those are the ones needed to construct the Atomic Swap protocol.
-Proving the security for coins controlled by n participants would be an interesting topic for future research.
-We then prove that all security definitions for Mimblewimble transactions, hold for all four types of transactions.
+In this section, we will formalize Mimblewimble transactions and define security properties, similiar to those found by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}. We will only focus on the creation of new transfer transactions
+(transfering value from one or many parties to one or many parties), the notions of transaction aggregation, coin minting and transaction publishing discussed in ~\cite{fuchsbauer2019aggregate} will not be topic of this formalization.
+We then provide four different types of the transaction protocol, we separate between output coins which are controlled by a single party (denominated as $\cnstSoloCoin$) and a coin which is controlled by multiple parties owning a share of the blinding key, denominated as $\cnstMultiCoin$.
+These multiparty outputs can only spend by the two owners collaborating and are therefore semantically similiar to multisignature outputs in Bitcoin.~\cite{bistarelli2018analysis}
+From this we can then derive the different types of transactions $\cnstSoToMuTx$, $\cnstSoToMuTx$, $\cnstMuToSoTx$ and $\cnstMuToMuTx$.
+Note that in our case we restrict ourselfs to $\cnstMultiCoin$ outputs which are controlled by two parties, as those are the ones needed to construct the Atomic Swap protocol.
+Proving the security for coins controlled by n participants would be a topic for future research.
+We conclude by providing proofs that all security definitions for Mimblewimble transactions hold for all four types of transactions.
 Finally, we define an Atomic Swap protocol from these building blocks, which allows us to securely swap funds from a Mimblewimble blockchain with those on another Blockchain, such as Bitcoin.
 
 \section{Definitions}\label{sec:atomic-def}
 
+As we have already discussed in section~\ref{sec:Mimblewimble} for the creation of a transaction, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
+To construct the transaction protocol we assume that we have access to a two-party signature scheme $\varSigSchemeMP$ as defined in definition~\ref{def:twoPartySig}, a zero-knowledge Rangeproofs system $\varProofSystem$ such as Bulletproofs, as
+described in section~\ref{sec:rangeProof} and a homomorphic commitment scheme $\varCommitScheme$ as defined in definition~\ref{def:homomorphicCom} such as Pedersen Commitments~\ref{def:pedersenCom}.
 \begin{definition}[Mimblewimble Transaction Scheme]
     \label{def:tx}
-    As we have already discussed in section~\ref{sec:Mimblewimble} for the creation of a transaction, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
-    To construct the transaction protocol we assume that we have access to a two-party signature scheme as defined in definition~\ref{def:twoPartySig}, a zero-knowledge Rangeproofs system such as Bulletproofs, as
-    described in section~\ref{sec:rangeProof} and a homomorphic commitment scheme as defined in definition~\ref{def:homomorphicCom} such as Pedersen Commitments~\ref{def:pedersenCom}.
-    A transaction scheme consist of the following procedure:
+    A Mimblewimble transaction scheme $\varMimblewimbleScheme$ consist of the following procedure:
     \[ \cnstTransaction \opAssign ( \procSpendOutputId ) \]
     \begin{itemize}
         \item $\procSpendOutput{\varFundValue}{\varCoinInp}{\varBlindingFactorAlice}{\varBlindingFactorBob}$ Takes a fund value $\varFundValue$ which should be transferred to a new output, an input coin $\varCoinInp$ and the coins blinding factor $\varBlindingFactor$. If the input coin is $\cnstMultiCoin$ we require the blinding factor of both owners. The protocol is constructed between a sender and a receiver. For simplicity we assume that if we spend a $\cnstMultiCoin$ that one of the owners will also be the transaction receiver, as this will be the case in the Atomic Swaps. However the procedure could easily be generalized to the case where a shared coin is sent to a third party.
     \end{itemize}
 \end{definition}
 
-TODO security definitons
+An essential security property for a Mimblewimble Transaction Scheme $\varMimblewimbleScheme$ is that a transaction can only transfer value from a sender to a receiver, but not create any new value, meaning the value
+of a transactions output coins must always be equal (or less accounting for transaction fees) then the sum of the value of its input coins.
+
+\begin{definition}[Inflation Resistence]
+
+\end{definition}
+
+\begin{definition}[Theft-resistance]
+
+\end{definition}
+
+\begin{definition}[Transaction indistinguishability]
+    
+\end{definition}
 
 \section{Grin instantiation}\label{sec:atomic-inst}
 

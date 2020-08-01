@@ -77,7 +77,7 @@ $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \o
 
 \todo[inline]{Pedro: I think here the Open operation of the commitment is missing, which you need later for the binding property}
 \begin{definition}[Commitment Scheme~\cite{bunz2018bulletproofs}]\label{def:commitment}
-    A cryptographic Commitment is defined by a pair of functions $(\procSetup{\varSecParam} \opSeperate \procCommitId(\varInput, \varNonce))$. $\procSetupId$ is the setup procedure, it takes as input a
+    A cryptographic Commitment Scheme $\varCommitScheme$ is defined by a pair of functions $(\procSetup{\varSecParam} \opSeperate \procCommitId(\varInput, \varNonce))$. $\procSetupId$ is the setup procedure, it takes as input a
     security parameter $\varSecParam$ and outputs public parameters $\varPublicParam$. Depending on $\varPublicParam$ we define a input space $\varInputSpace_{\varPublicParam}$,
     a randomness space $\varRandSpace_{\varPublicParam}$ and a commitment space $\varCommitSpace_{\varPublicParam}$.
 
