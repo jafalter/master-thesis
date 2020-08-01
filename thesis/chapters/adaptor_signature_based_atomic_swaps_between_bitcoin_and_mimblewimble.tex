@@ -11,18 +11,28 @@ Finally, we define an Atomic Swap protocol from these building blocks, which all
 \section{Definitions}\label{sec:atomic-def}
 
 As we have already discussed in section~\ref{sec:Mimblewimble} for the creation of a transaction, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
-To construct the transaction protocol we assume that we have access to a two-party signature scheme $\varSigSchemeMP$ as defined in definition~\ref{def:twoPartySig}, a zero-knowledge Rangeproofs system $\varProofSystem$ such as Bulletproofs, as
-described in section~\ref{sec:rangeProof} and a homomorphic commitment scheme $\varCommitScheme$ as defined in definition~\ref{def:homomorphicCom} such as Pedersen Commitments~\ref{def:pedersenCom}.
+To construct the transaction protocol we assume that we have access to a two-party signature scheme $\varSigSchemeMP$ as defined in definition~\ref{def:twoPartySig}, a zero-knowledge Rangeproofs system $\varProofSystem$
+such as Bulletproofs, as described in section~\ref{sec:rangeProof} and a homomorphic commitment scheme $\varCommitScheme$ as defined in definition~\ref{def:homomorphicCom} such as
+Pedersen Commitments~\ref{def:pedersenCom}.
+
+Fuchsbauer et al. have defined three procedures $\styleFunction{Send}$, $\styleFunction{Rcv}$ and $\styleFunction{Ldgr}$ with regards to the creation of a transaction. $\styleFunction{Send}$ called by the sender
+will create a pre-transaction, $\styleFunction{Rcv}$ take the pretransaction and add the receivers output and $\styleFunction{Ldgr}$. As we already pointed out in this thesis we won't discuss the transaction
+publishing phase therefore we will not cover the functionality of the $\styleFunction{Ldgr}$ procedure. Furthermore to better fit with out definitions of the multiparty signature scheme $\varSigSchemeMP$ instead
+of having two seperate functions $\styleFunction{Send}$, $\styleFunction{Rcv}$ we instead combine those two into a single distributed protocol $\procSpendOutputId$.  
+
 \begin{definition}[Mimblewimble Transaction Scheme]
     \label{def:tx}
-    A Mimblewimble transaction scheme $\varMimblewimbleScheme$ consist of the following procedure:
-    \[ \cnstTransaction \opAssign ( \procSpendOutputId ) \]
+    A Mimblewimble transaction scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ consist of the following procedure:
+    \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign ( \procSpendOutputId ) \]
     \begin{itemize}
-        \item $\procSpendOutput{\varFundValue}{\varCoinInp}{\varBlindingFactorAlice}{\varBlindingFactorBob}$ Takes a fund value $\varFundValue$ which should be transferred to a new output, an input coin $\varCoinInp$ and the coins blinding factor $\varBlindingFactor$. If the input coin is $\cnstMultiCoin$ we require the blinding factor of both owners. The protocol is constructed between a sender and a receiver. For simplicity we assume that if we spend a $\cnstMultiCoin$ that one of the owners will also be the transaction receiver, as this will be the case in the Atomic Swaps. However the procedure could easily be generalized to the case where a shared coin is sent to a third party.
+        \item $\varTx \opFunResult \procSpendOutput{\varFundValue}{\varCoinInp}{\varBlindingFactorAlice}{\varBlindingFactorBob}$ Takes a fund value $\varFundValue$ which should be transferred to a new output,
+        an input coin $\varCoinInp$ and the coins blinding factor $\varBlindingFactor$. If the input coin is $\cnstMultiCoin$ we require the blinding factor of both owners. The protocol is constructed between a sender and a receiver.
+        For simplicity we assume that if we spend a $\cnstMultiCoin$ that one of the owners will also be the transaction receiver, as this will be the case in the Atomic Swaps.
+        Generalizing to the case where a shared coin is sent to a third party of new owners will be left as a topic of further research.
     \end{itemize}
 \end{definition}
 
-An essential security property for a Mimblewimble Transaction Scheme $\varMimblewimbleScheme$ is that a transaction can only transfer value from a sender to a receiver, but not create any new value, meaning the value
+An essential security property for a Mimblewimble Transaction Scheme $\varMWScheme$ is that a transaction can only transfer value from a sender to a receiver, but not create any new value, meaning the value
 of a transactions output coins must always be equal (or less accounting for transaction fees) then the sum of the value of its input coins.
 
 \begin{definition}[Inflation Resistence]
@@ -34,7 +44,7 @@ of a transactions output coins must always be equal (or less accounting for tran
 \end{definition}
 
 \begin{definition}[Transaction indistinguishability]
-    
+
 \end{definition}
 
 \section{Grin instantiation}\label{sec:atomic-inst}
