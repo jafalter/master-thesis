@@ -80,7 +80,7 @@ A \emph{flexible adaptor signature} scheme $\varSigSchemeApt$ wrt. a hard relati
 
 \begin{itemize}
         \item $\varSigApt \opFunResult \procAptSig{\varSig}{\varWit}$ takes as input a half signature $\varSig$ and a witness value $\varWit$ and it outputs an adapted signature $\varSigApt$. 
-        \item $\cnstTrueorFalse \opFunResult \procVerifyAptSig{\varSigApt}{\varMsg}{\varPubKeyOneSide}{\varStatement}{}$ takes as input an adapted half signature $\varSigApt$, a message $\varMsg$, a couple of public keys $\varPubKeyAlice$, $\varPubKeyBob$ and a statement $\varStatement$ it outputs if $1$ if $\varSigApt$ is a valid adapted signature under statement $\varStatement$ and public keys $\varPubKeyAlice$, $\varPubKeyBob$. 
+        \item $\cnstTrueorFalse \opFunResult \procVerifyAptSig{\varSigApt}{\varMsg}{\varPubKeyOneSide}{\varStatement}{}$ takes as input an adapted half signature $\varSigApt$, a message $\varMsg$, a public key $\varPubKeyOneSide$ and a statement $\varStatement$.  It outputs $1$ if $\varSigApt$ is a valid adapted signature under statement $\varStatement$ and public key  $\varPubKeyOneSide$. 
         \item $\varWit \opFunResult \procExtWit{\varSignature}{\varSigApt}{\varSigOther}$ takes as input a full signature $\varSignature$, a half signature in the adapted form $\varSigApt$ and the other half signature $\varSigOther$ and returns the witness $\varWit$.
     \end{itemize}
 
