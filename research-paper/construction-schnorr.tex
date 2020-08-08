@@ -40,7 +40,7 @@ We first provide a two party staggered signature scheme from Schnorr in~\cref{fi
         	\zkpVerify{\zkpProofBob} \opEq 1 \< \< \zkpVerify{\zkpProofAlice} \opEq 1\\
         	\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob \< \< \varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob \\
         	\pcreturn (\varSecKeyAlice, \varPubKeyAlice, \varPubKey) \< \< \pcreturn (\varSecKeyBob, \varPubKeyBob, \varPubKey)
-        	}\\
+        	}
             \procedure[linenumbering]{$\procSignPt{\varMsg}{\varSecKeyAlice, \varPubKey}{\varSecKeyBob, \varPubKey}$} {
             \textbf{Alice} \< \< \textbf{Bob} \\
             \varNonceAlice \sample \cnstGroupScalar \< \< \varNonceBob \sample \cnstGroupScalar \\
@@ -52,7 +52,7 @@ We first provide a two party staggered signature scheme from Schnorr in~\cref{fi
             \varSAlice \opAssign \varNonceAlice \opAddScalar \varSecKeyAlice \opTimesScalar \varSchnorrChallenge \< \< \varSBob \opAssign \varNonceBob \opAddScalar \varSecKeyBob \opTimesScalar \varSchnorrChallenge \\
             \varSigAlice \opAssign (\varSAlice \opSeperate \varSchnorrChallenge \opSeperate \varRandAlice ) \< \< \varSigBob \opAssign (\varSBob \opSeperate \varSchnorrChallenge \opSeperate \varRandBob) \\
             \pcreturn \varSigAlice \< \< \pcreturn \varSigBob 
-            } \\
+            } 
             \procedure[linenumbering]{$\procVerfPtSig{\varSig}{\varMsg}{\varPubKeyOneSide}{}$} {
             (\varSOneSide \opSeperate \varSchnorrChallenge \opSeperate \varRandOneSide) \opFunResult \varSig \\
             \pcreturn \funGen{\varSOneSide} \opEq \varRandOneSide \opAddPoint \varPubKeyOneSide^{\varSchnorrChallenge}
@@ -81,7 +81,7 @@ We first provide a two party staggered signature scheme from Schnorr in~\cref{fi
 \end{theorem}
 
 \begin{proof}
-	Left as an exercise
+	To be done
 \end{proof}
 
 
@@ -123,7 +123,7 @@ We give an instantiation of the the flexible adaptor signature scheme based on S
         \end{varwidth}
         }
     \end{center}
-    \caption{Fixed Witness Adaptor Schnorr Signature Scheme}
+    \caption{Flexible Adaptor Schnorr Signature Scheme}
     \label{fig:aptSchnorr}
 \end{figure}
 
