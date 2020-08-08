@@ -14,6 +14,7 @@
 \newcommand{\cnstEmptySet}{\emptyset}
 \newcommand{\cnstHash}{\styleFunction{H}}
 \newcommand{\cnstGroup}{\styleSet{G}}
+\newcommand{\cnstIdentityElement}{1_{\varPrime}}
 \newcommand{\cnstOracle}{\styleCal{O}}
 \newcommand{\cnstRelation}{\styleVariable{R}}
 \newcommand{\cnstPolyTime}{\styleVariable{PPT}}
@@ -129,6 +130,7 @@
 \newcommand{\varRandBob}{\varRand_{\varBob}}
 \newcommand{\varRandAdv}{\varRand_{\cnstAdversary}}
 \newcommand{\varSigPt}{\funTilde{\varSignature}}
+\newcommand{\varSigContext}{\Lambda}
 \newcommand{\varSigPtAdv}{\funTilde{\varSignature_{\cnstAdversary}}}
 \newcommand{\varSigAlice}{\funTilde{\varSignature_{\varAlice}}}
 \newcommand{\varSigApt}{\funHat{\varSignature}}
@@ -136,14 +138,7 @@
 \newcommand{\varSigAptAlice}{\funHat{\varSignature_{\varAlice}}}
 \newcommand{\varSigAptBob}{\funHat{\varSignature_{\varBob}}}
 \newcommand{\varSigBob}{\funTilde{\varSignature_{\varBob}}}
-\newcommand{\varSigPart}{\varSignature_{\styleVariable{prt}}}
-\newcommand{\varSigPartAdv}{\varSignature_{\styleVariable{prt}}^{\cnstAdversary}}
-\newcommand{\varSigPartSt}{\funStar{\varSignature_{\styleVariable{prt}}}}
 \newcommand{\varSchnorrChallenge}{\styleVariable{e}}
-\newcommand{\varGSigPart}{\funGen{\varSigPart}}
-\newcommand{\varSigPartApt}{\varSignature_{\styleVariable{prt\_apt}}}
-\newcommand{\varSigPartAptSt}{\funStar{\varSigPartApt}}
-\newcommand{\varGSigPartAptSt}{\funGen{\varSigPartAptSt}}
 \newcommand{\varWit}{\styleVariable{x}}
 \newcommand{\varGWit}{\styleVariable{X}}
 \newcommand{\varStatement}{\styleVariable{X}}
@@ -157,6 +152,8 @@
 \newcommand{\varCommitSpace}{\styleSet{C}}
 \newcommand{\varCommitment}{\styleVariable{C}}
 \newcommand{\varSet}{\styleSet{S}}
+\newcommand{\varZkpStatementAlice}{\ensuremath{\textit{st}_\varAlice}}
+\newcommand{\varZkpStatementBob}{\ensuremath{\textit{st}_\varBob}}
 
 % operators
 \newcommand{\opAccess}[2]{#1.#2}
@@ -206,13 +203,17 @@
 \newcommand{\procVerfProof}[1]{\procVerfProofId(#1)}
 
 
-\newcommand{\procKeyGenPtId}{\styleFunction{DKeyGen}}
+\newcommand{\procKeyGenPtId}{\styleFunction{dKeyGen}}
 \newcommand{\procKeyGenPt}[2]{\procKeyGenPtId\langle #1 \opSeperate #2 \rangle}
+\newcommand{\procSetupCtxId}{\styleFunction{setupCtx}}
+\newcommand{\procSetupCtx}[3]{\procSetupCtxId\langle #1 \opSeperate #2 \opSeperate #3 \rangle}
 \newcommand{\procSignPtId}{\styleFunction{signPt}}
 \newcommand{\procSignPt}[3]{\procSignPtId<(#1 \opSeperate #2)(#1 \opSeperate #3)>}
 \newcommand{\procSignPtSingle}[2]{\procSignPtId(#1 \opSeperate #2)}
+\newcommand{\procSignPrtId}{\styleFunction{signPrt}}
+\newcommand{\procSignPrt}[4]{\procSignPrtId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
 \newcommand{\procVerfPtSigId}{\styleFunction{vrfPt}}
-\newcommand{\procVerfPtSig}[4]{\procVerfPtSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
+\newcommand{\procVerfPtSig}[3]{\procVerfPtSigId(#1 \opSeperate #2 \opSeperate #3)}
 \newcommand{\procFinSigId}{\styleFunction{finSig}}
 \newcommand{\procFinSig}[2]{ \procFinSigId(#1,#2) }
 
@@ -221,7 +222,7 @@
 \newcommand{\procExtWitId}{\styleFunction{extWit}}
 \newcommand{\procExtWit}[3]{ \procExtWitId(#1 \opSeperate #2 \opSeperate #3) }
 \newcommand{\procVerifyAptSigId}{\styleFunction{verifyAptSig}}
-\newcommand{\procVerifyAptSig}[5]{\procVerifyAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4 \opSeperate #5)}
+\newcommand{\procVerifyAptSig}[4]{\procVerifyAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
 \newcommand{\procFinAptSigId}{ \styleFunction{finAptPreSig} }
 \newcommand{\procFinAptSig}[5]{ \procFinAptSigId_{#3,#4,#5}(#1 \opSeperate #2) }
 
@@ -238,6 +239,9 @@
 \newcommand{\procExpExt}[1]{ \procExpExtId(#1) }
 \newcommand{\procSignAptOracleId}{ \cnstOracle_{s} }
 \newcommand{\procSignAptOracle}[3]{ \procSignPtOracleId(#1,#2,#3) }
+
+\newcommand{\procZkpProve}[2]{\ensuremath{\mathsf{P}_{\textit{NIZK}}(#1, #2)}}
+\newcommand{\procZkpVerify}[1]{\ensuremath{\mathsf{V}_{\textit{NIZK}}(#1)}}
 
 \newcommand{\procSpendOutputId}{ \styleFunction{spendOutput} }
 \newcommand{\procSpendOutput}[4]{\procSpendOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1 \opSeperate #4)>}
