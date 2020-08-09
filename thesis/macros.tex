@@ -51,6 +51,7 @@
 \newcommand{\funHat}[1]{\hat{#1}}
 \newcommand{\funTilde}[1]{\tilde{#1}}
 \newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
+\newcommand{\funArray}[1]{[#1]}
 
 % variables
 \newcommand{\varScA}{\styleVariable{a}}
@@ -63,6 +64,7 @@
 \newcommand{\varPrime}{\styleVariable{p}}
 \newcommand{\varN}{\styleVariable{n}}
 \newcommand{\varTx}{\styleVariable{tx}}
+\newcommand{\varPreTx}{\styleVariable{ptx}}
 \newcommand{\varTxAlice}{\varTx_{\varAlice}}
 \newcommand{\varTxBob}{\varTx_{\varBob}}
 \newcommand{\varExcess}{\styleCal{E}}
@@ -154,6 +156,10 @@
 \newcommand{\varSet}{\styleSet{S}}
 \newcommand{\varZkpStatementAlice}{\ensuremath{\textit{st}_\varAlice}}
 \newcommand{\varZkpStatementBob}{\ensuremath{\textit{st}_\varBob}}
+\newcommand{\varInputs}{\styleVariable{inp}}
+\newcommand{\varOutputs}{\styleVariable{out}}
+\newcommand{\varProofs}{\Pi}
+\newcommand{\varCommits}{\styleVariable{com}}
 
 % operators
 \newcommand{\opAccess}[2]{#1.#2}
@@ -245,3 +251,21 @@
 
 \newcommand{\procSpendOutputId}{ \styleFunction{spendOutput} }
 \newcommand{\procSpendOutput}[4]{\procSpendOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1 \opSeperate #4)>}
+
+\newcommand{\procSendCoinsId}{\styleFunction{spendCoins}}
+\newcommand{\procSendCoins}[4]{\procSendCoinsId(#1,#2,#3,#4)}
+
+\newcommand{\procRecvCoinsId}{\styleFunction{recvCoins}}
+\newcommand{\procRecvCoins}[2]{\procRecvCoinsId(#1,#2)}
+
+\newcommand{\procFinTxId}{\styleFunction{finTx}}
+\newcommand{\procFinTx}[2]{\procFinTxId(#1,#2)}
+
+\newcommand{\procVerfTxId}{\styleFunction{verfTx}}
+\newcommand{\procVerfTx}[1]{\procVerfTxId(#1)}
+
+\newcommand{\procCreateCoinId}{\styleFunction{createCoin}}
+\newcommand{\procCreateCoin}[2]{\procCreateCoinId(#1,#2)}
+
+\newcommand{\procCreatePreTxId}{\styleFunction{createTx}}
+\newcommand{\procCreatePreTx}[7]{\procCreatePreTxId(#1,#2,#3,#4,#5,#6,#7)}

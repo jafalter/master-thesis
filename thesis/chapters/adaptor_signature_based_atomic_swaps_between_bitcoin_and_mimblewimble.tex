@@ -8,6 +8,7 @@ Proving the security for coins controlled by n participants would be a topic for
 We conclude by providing proofs that all security definitions for Mimblewimble transactions hold for all four types of transactions.
 Finally, we define an Atomic Swap protocol from these building blocks, which allows us to securely swap funds from a Mimblewimble blockchain with those on another Blockchain, such as Bitcoin.
 
+
 \section{Definitions}\label{sec:atomic-def}
 
 As we have already discussed in section~\ref{sec:Mimblewimble} for the creation of a transaction, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
@@ -18,17 +19,21 @@ Pedersen Commitments~\ref{def:pedersenCom}.
 Fuchsbauer et al. have defined three procedures $\styleFunction{Send}$, $\styleFunction{Rcv}$ and $\styleFunction{Ldgr}$ with regards to the creation of a transaction. $\styleFunction{Send}$ called by the sender
 will create a pre-transaction, $\styleFunction{Rcv}$ take the pretransaction and add the receivers output and $\styleFunction{Ldgr}$. As we already pointed out in this thesis we won't discuss the transaction
 publishing phase therefore we will not cover the functionality of the $\styleFunction{Ldgr}$ procedure. Furthermore to better fit with out definitions of the multiparty signature scheme $\varSigSchemeMP$ instead
-of having two seperate functions $\styleFunction{Send}$, $\styleFunction{Rcv}$ we instead combine those two into a single distributed protocol $\procSpendOutputId$.  
+of having two seperate functions $\styleFunction{Send}$, $\styleFunction{Rcv}$ we instead combine those two into a single distributed protocol $\procSpendOutputId$.
 
 \begin{definition}[Mimblewimble Transaction Scheme]
     \label{def:tx}
-    A Mimblewimble transaction scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ consist of the following procedure:
-    \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign ( \procSpendOutputId ) \]
+    A Mimblewimble transaction scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ consist of the following procedures:
+    \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign ( \procSendCoinsId,\procRecvCoinsId,\procFinTxId,\procVerfTxId ) \]
     \begin{itemize}
-        \item $\varTx \opFunResult \procSpendOutput{\varFundValue}{\varCoinInp}{\varBlindingFactorAlice}{\varBlindingFactorBob}$ Takes a fund value $\varFundValue$ which should be transferred to a new output,
-        an input coin $\varCoinInp$ and the coins blinding factor $\varBlindingFactor$. If the input coin is $\cnstMultiCoin$ we require the blinding factor of both owners. The protocol is constructed between a sender and a receiver.
-        For simplicity we assume that if we spend a $\cnstMultiCoin$ that one of the owners will also be the transaction receiver, as this will be the case in the Atomic Swaps.
-        Generalizing to the case where a shared coin is sent to a third party of new owners will be left as a topic of further research.
+        \item $(\varPreTx, \varBlindingFactorAlice) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactor}}{\varFundValue}{\varValue}$ is a procedure called by the sending party to initiate a transaction
+        As input it takes a list of coins $\funArray{\varCoinInp}$ which should be spent, the respective keys $\funArray{\varKey}$ to the input coins and a value $\varFundValue$ which should be
+        transferred to the receiver as well as $\varValue$ which is the total value stored in the input coins. It outputs a pre-transaction $\varPreTx$ which can be sent to a receiver, as well as the senders signing key $\varBlindingFactorAlice$.
+        \item $\varPreTx \opFunResult \procRecvCoins{\varPreTx}{\varFundValue}$ is a procedure called by the receiver takes as input a pre-transaction $\varPreTx$ and a fund value
+        $\varFundValue$ and will output a modified pre-transaction $\varPreTx$.
+        \item $\varTx \opFunResult \procFinTx{\varPreTx}{\varBlindingFactorAlice}$ is a procedure that takes as input a pre-transaction $\varPreTx$ and a signing key
+        $\varBlindingFactorAlice$. The function will output a finalized transaction $\varTx$.
+        \item $\langle1,0\rangle \opFunResult \procVerfTx{\varTx}$ takes as input a transaction $\varTx$ and verifies it and outputs either 1 on verification success or 0 otherwise.
     \end{itemize}
 \end{definition}
 
@@ -46,6 +51,7 @@ of a transactions output coins must always be equal (or less accounting for tran
 \begin{definition}[Transaction indistinguishability]
 
 \end{definition}
+
 
 \section{Grin instantiation}\label{sec:atomic-inst}
 
@@ -68,29 +74,73 @@ to be included in the transaction. This optional message, the change coin togeth
 The receiver will create his output of value $\varFundValue$ together with a range proof and send back the coin, the proof and a commitment to his share of the excess secret.
 The participents then run in the $\procSignPtId$ protocol to calculate a signature whereas $\varExcess$ is the shared public key used in the signing process. After the signature is finalized
 the transaction can be published.
+
 \begin{figure}
     \begin{center}
         \fbox{
         \begin{varwidth}{\textwidth}
-            \procedure[linenumbering]{$\procSpendOutput{\varFundValue}{\varCoinInp}{\varBlindingFactorAlice}{\cdot}$} {
-            \varMsg \opAssign \cnstBinary{*} \< \< \\
-            \funStar{\varBlindingFactorAlice} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \\
-            \varCoinOutAlice \opFunResult \procCommit{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactorAlice}} \< \< \\
-            \varProofAlice \opFunResult \procProof{\varCoinOutAlice}{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactorAlice}} \< \< \\
-            \varBlindingFactorFor{s} \opAssign \funStar{\varBlindingFactorAlice} \opSub \varBlindingFactorAlice \< \< \\
-            \< \scriptstyle \sendmessageright*{\varTx \opAssign (\varMsg \opSeperate \varCoinInp \opSeperate \varCoinOutAlice \opSeperate \varProofAlice \opSeperate \funGen{\varBlindingFactorFor{s}})} \< \\
-            \< \< \procVerfProof{\varProofAlice} \opEq 1 \\
-            \< \< \funStar{\varBlindingFactorBob} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-            \< \< \varCoinOutBob \opFunResult \procCommit{\varFundValue}{\funStar{\varBlindingFactorBob}} \\
-            \< \< \varProofBob \opFunResult \procProof{\varCoinOutBob}{\varFundValue}{\funStar{\varBlindingFactorBob}} \\
-            \< \< \varBlindingFactorFor{r} \opAssign \funStar{\varBlindingFactorBob} \\
-            \< \scriptstyle \sendmessageleft*{\varTx \opAssign \varTx \opUnion (\varCoinOutBob \opSeperate \funGen{\varBlindingFactorFor{r}} \opSeperate \varProofBob)} \< \\
-            \< \scriptstyle (\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varBlindingFactorFor{s}}{\varBlindingFactorFor{r}} \< \\
-            \procVerfPtSig{\varSigBob}{\varMsg}{\funGen{\varBlindingFactorFor{s}}}{\funGen{\varBlindingFactorFor{r}}} \opEq 1 \< \< \\
-            \procVerfProof{\varProofBob} \opEq 1 \< \< \\
-            \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \\
-            \varExcess \opAssign \funGen{\varBlindingFactorFor{s}} \opAddPoint \funGen{\varBlindingFactorFor{r}} \< \< \\
-            \pcreturn \varTx \opAssign \varTx \opUnion (\varExcess \opSeperate \varSigFin)
+            \procedure[linenumbering]{$\procCreateCoin{\varValue}{\varBlindingFactor}$} {
+            \varCoin \opFunResult \procCommit{\varValue}{\varBlindingFactor} \\
+            \varProof \opFunResult \procProof{\varCoin}{\varValue}{\varBlindingFactor} \\
+            \pcreturn (\varCoin, \varProof)
+            }
+            \procedure[linenumbering]{$\procCreatePreTx{\varMsg}{\funArray{\varCoinInp}}{\funArray{\varCoinOut}}{\funArray{\varProof}}{\varSigContext}{\funArray{\varCommitment}}{\varSignature}$}{
+            \pcreturn ( \\
+            \varMsg \opAssign \varMsg, \\
+            \varInputs \opAssign \funArray{\varCoinInp}, \\
+            \varOutputs \opAssign \funArray{\varCoinOut}, \\
+            \varProofs \opAssign \funArray{\varProof}, \\
+            \varSigContext \opAssign \varSigContext, \\
+            \varCommits \opAssign \funArray{\varCommitment}, \\
+            \varSignature \opAssign \varSignature \\
+            )
+            }
+        \end{varwidth}
+        }
+    \end{center}
+\end{figure}
+
+\begin{figure}
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}$} {
+            \varMsg \opAssign \cnstBinary{*} \\
+            (\funStar{\varBlindingFactorAlice}, \varNonceAlice) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \\
+            (\varCoinOutAlice, \varProofAlice) \opFunResult \procCreateCoin{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactor}} \\
+            \varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \sum \funArray{\varBlindingFactorAlice} \\
+            \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \\
+            \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \\
+            \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\funArray{\varCoinInp}}{\funArray{\varCoinOutAlice}}{\funArray{\varProofAlice}}{\varSigContext}{\funArray{\funGen{\varSecKeyAlice}}}{\cnstEmptySet} \\
+            \pcreturn (\varPreTx, \varSecKeyAlice)
+            } \\
+            \procedure[linenumbering]{$\procRecvCoins{\varPreTx}{\varFundValue}$} {
+            (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\cnstEmptySet) \opFunResult \varPreTx \\
+            \procVerfProof{\varProofs[0]} \opEq 1 \\
+            (\funStar{\varBlindingFactorBob},\varNonceBob) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            (\varCoinOutBob,\varProofBob) \opFunResult \procCreateCoin{\varFundValue}{\funStar{\varBlindingFactorBob}} \\
+            \varSecKeyBob \opAssign \funStar{\varBlindingFactorBob} \\
+            \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\varSecKeyBob}{\varNonceBob} \\
+            \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varSigContext.\varPubKey}{\varSigContext.\varRand} \\
+            \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutBob}{\varProofs \opConc \varProofBob}{\varSigContext}{\varCommits \opConc \funGen{\varNonceBob}}{\varSigBob} \\
+            \pcreturn \varPreTx
+            }
+            \procedure[linenumbering]{$\procFinTx{\varPreTx}{\varSecKeyAlice}$} {
+            (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob) \opFunResult \varPreTx \\
+            \procVerfProof{\varProofs[1]} \opEq 1 \\
+            \procVerfPtSig{\varSigBob}{\varMsg}{\varCommits[1]} \opEq 1 \\
+            \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varSigContext.\varPubKey}{\varSigContext.\varRand} \\
+            \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
+            \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin} \\
+            \pcreturn \varTx
+            }
+            \procedure[linenumbering]{$\procVerfTx{\varTx}$} {
+            (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSignature) \opFunResult \varTx \\
+            \pcforeach \varProofs \textit{ as } \varProof \\
+            \t \procVerfProof{\varProof} \opEq 1 \\
+            \varPubKey \opFunResult \sum \varOutputs \opSub \sum \varInputs \\
+            \procVerf{\varSignature}{\varMsg}{\varPubKey} \opEq 1 \\
+            \pcreturn 1
             }
         \end{varwidth}
         }
@@ -208,5 +258,6 @@ input coin are the same as the ones who should control the output coin, however,
     \end{center}
     \caption{Instantiation of $\cnstMuToMuTx$ transaction protocol. \label{fig:Mu2MuTx}}
 \end{figure}
+
 
 \section{Atomic Swap protocol}\label{sec:atomic-swap}

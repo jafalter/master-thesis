@@ -19,8 +19,9 @@ Alice and Bob want to collaborate to generate a signature valid under the compos
     $(\procSetupCtxId, \procKeyGenPtId, \procSignPrtId , \procVerfPtSigId, \procFinSigId)$ defined as follows:
 
     \begin{itemize}
-        \item $\varSigContext \opFunResult \procSetupCtx{\varSigContext}{\varPubKeyAlice}{\varPubKeyBob}$ is an auxiliary function to populate a signature context. After one round of interaction the context
-        should contain the combined public key $\varPubKey$ and nonce commitment $\varRand$.
+        \item $\varSigContext \opFunResult \procSetupCtx{\varSigContext}{\varPubKeyAlice}{\varRandAlice}$ is an auxiliary function to populate a signature context. The signature context contains the shared
+        parameters between the participants. It takes as input the signature context which should be updated, the share of a public key and the share of the nonce commitment.
+        The procedure will output the updated context
 
         \item $((\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext), (\varSecKeyBob, \varPubKeyBob, \varNonceBob \varSigContext)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam}$: The distributed key generation protocol takes as input the security parameter from both Alice and Bob and returns
         the tuple $(\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice \varSigContext)$ to Alice (similar to Bob) where $(\varSecKeyAlice, \varPubKeyAlice)$ is a pair of private and corresponding public keys, $\varNonceAlice$ a secret nonce and $\varSigContext$ is the signature context containing shared parameters shared between Alice and Bob.
