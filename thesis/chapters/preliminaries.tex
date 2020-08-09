@@ -9,7 +9,7 @@ In this section, we first introduce the notation and definitions used hereby in 
 
 \paragraph{Notation}
 We first define the general notation used in the following chapters to formalize procedures and protocols. Let $\cnstGroup$ denote a cyclic group of prime order $\varPrime$ and $\cnstIntegersPrime{\varPrime}$
-the ring of integers modulo $\varPrime$. $\cnstIntegersPrimeWithoutZero{\varPrime}$ is $\cnstIntegersPrime{\varPrime} \opExcluding \funList{0}$. \todo{Pedro: I think macro $\opExcluding$ was broken here. I have updated to use $\setminus$ instead. Please check that this is what you expected} $\varG \opSeperate \varH$ are adjacent
+the ring of integers modulo $\varPrime$ with identity element $\cnstIdentityElement$. $\cnstIntegersPrimeWithoutZero{\varPrime}$ is $\cnstIntegersPrime{\varPrime} \opExcluding \funList{0}$. \todo{Pedro: I think macro $\opExcluding$ was broken here. I have updated to use $\setminus$ instead. Please check that this is what you expected} $\varG \opSeperate \varH$ are adjacent
 generators in $\cnstGroup$, where adjacent means the discrete logarithm of $\varH$ in regards to $\varG$ is not known. Exponentiation stands for repeated application of the group operation. We define the group operation between two curve points as
 $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \opAddScalar \varScB}$.
 
@@ -77,7 +77,7 @@ $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \o
 
 \todo[inline]{Pedro: I think here the Open operation of the commitment is missing, which you need later for the binding property}
 \begin{definition}[Commitment Scheme~\cite{bunz2018bulletproofs}]\label{def:commitment}
-    A cryptographic Commitment is defined by a pair of functions $(\procSetup{\varSecParam} \opSeperate \procCommitId(\varInput, \varNonce))$. $\procSetupId$ is the setup procedure, it takes as input a
+    A cryptographic Commitment Scheme $\varCommitScheme$ is defined by a pair of functions $(\procSetup{\varSecParam} \opSeperate \procCommitId(\varInput, \varNonce))$. $\procSetupId$ is the setup procedure, it takes as input a
     security parameter $\varSecParam$ and outputs public parameters $\varPublicParam$. Depending on $\varPublicParam$ we define a input space $\varInputSpace_{\varPublicParam}$,
     a randomness space $\varRandSpace_{\varPublicParam}$ and a commitment space $\varCommitSpace_{\varPublicParam}$.
 
