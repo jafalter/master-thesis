@@ -1,42 +1,49 @@
-In this chapter, we will define a variant of the adaptor signature scheme as explained in~\ref{sec:aptSignatures}. The main difference in the protocol outlined in this thesis is that one of the two parties does know the fixed secret witness before the start of the protocol. The aim of the protocol will then be that the other person is able to extract the witness from the final signature. This feature such that we can later build an atomic swap protocol on top of it.
+In this chapter, we will define a variant of the adaptor signature scheme as explained in section ~\ref{sec:aptSignatures}.
+The main difference in the protocol outlined in this thesis is that one of the two parties does know the fixed secret witness before the start of the protocol.
+The aim of the protocol will then be that the other person is able to extract the witness from the final signature. This feature can then be leveraged to build an Atomic Swap protocol as we
+will show in ~\ref{chp:atomicSwap}.
 
-First we will define the general two-party signature creation protocol as it is currently implemented for example in the Grin cryptocurrency.
-We reduce the generated signatures to the general case~\cite{schnorr1989efficient} and thereby prove its correctness.
-From this protocol, we then derive the adapted variant, which allows hiding a fixed witness
+
+First we will define the general two-party signature creation protocol as it is currently implemented in Mimblewimble-based Cryptocurrencies.
+We reduce the generated signatures to the general case~\cite{schnorr1989efficient} and prove its correctness.
+From this two-party protocol, we then derive the adapted variant, which allows hiding a fixed witness
 value in the signature, which can be revealed only by the other party after attaining the final signature.
-We start by defining our extended signature scheme in section~\ref{sec:definitions}, proceed by providing a schnorr-based instantiation of the protocol in section~\ref{sec:schnorrInst} and finally prove its security in section~\ref{sec:twopartyAptSecurity}.
+
+
+We start by defining our extended signature scheme in section~\ref{sec:definitions},
+proceed by providing a schnorr-based instantiation of the protocol in section~\ref{sec:schnorrInst} and finally prove its security in section~\ref{sec:twopartyAptSecurity}.
 
 
 \section{Definitions}\label{sec:definitions}
 
 A two-party signature scheme is an extension of a signature scheme as defined in definition~\ref{def:signatureScheme}, which allows us to distribute signature generation for a composite public key shared between two parties Alice and Bob.
-Alice and Bob want to collaborate to generate a signature valid under the composite public key $\varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ without having to reveal their secret keys to each other.
+Alice and Bob want to collaborate to generate a signature valid under the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ without having to reveal their secret keys to each other.
 
 \begin{definition}[Two Party Signature Scheme]
     \label{def:twoPartySig}
 
-    A \emph{two party signature scheme $\varSigSchemeMP$} extends a signature scheme $\varSigScheme$ with a tuple of protocols and algorithms
-    $(\procSetupCtxId, \procKeyGenPtId, \procSignPrtId , \procVerfPtSigId, \procFinSigId)$ defined as follows:
+    A \emph{two party signature scheme $\varSigSchemeMP$} extends a signature scheme $\varSigScheme$ with a tuple of protocols and algorithms\\
+    ($\procKeyGenPtId, \procSignPrtId , \procVerfPtSigId, \procFinSigId)$ defined as follows:
 
     \begin{itemize}
-        \item $\varSigContext \opFunResult \procSetupCtx{\varSigContext}{\varPubKeyAlice}{\varRandAlice}$ is an auxiliary function to populate a signature context. The signature context contains the shared
-        parameters between the participants. It takes as input the signature context which should be updated, the share of a public key and the share of the nonce commitment.
-        The procedure will output the updated context
+        \item $((\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext), (\varSecKeyBob, \varPubKeyBob, \varNonceBob, \varSigContext)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam}$: The distributed key generation protocol takes as input the security parameter from both Alice and Bob and returns
+        the tuple $(\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext)$ to Alice (similar to Bob) where $(\varSecKeyAlice, \varPubKeyAlice)$ is a pair of private and corresponding public keys, $\varNonceAlice$ a secret nonce and $\varSigContext$ is the signature context containing parameters shared between Alice and Bob.
+        We introduce $\varSigContext$ for the participants to share as well as update parameters with each other during the protocol execution.
 
-        \item $((\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext), (\varSecKeyBob, \varPubKeyBob, \varNonceBob \varSigContext)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam}$: The distributed key generation protocol takes as input the security parameter from both Alice and Bob and returns
-        the tuple $(\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice \varSigContext)$ to Alice (similar to Bob) where $(\varSecKeyAlice, \varPubKeyAlice)$ is a pair of private and corresponding public keys, $\varNonceAlice$ a secret nonce and $\varSigContext$ is the signature context containing shared parameters shared between Alice and Bob.
+        \item $(\varSigAlice) \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}$: The partial signing algorithm is a DPT function that takes as input the message $\varMsg$ and the share of the secret key $\varSecKeyAlice$ and nonce $\varNonceAlice$ (similiar for Bob) as well
+        as the shared signature context $\varSigContext$. The procedure outputs $(\varSigAlice)$, that is, a share of the signature to a participant.
 
-        \item $(\varSigAlice) \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}$: The partial signing procedure takes as input the message $\varMsg$ and the share of the secret key $\varSecKeyAlice$ and nonce $\varNonceAlice$ (similiar for Bob). This procedure outputs $(\varSigAlice)$, that is, a share of the signature to a participant.
+        \item $\cnstTrueorFalse \opFunResult \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice}$: The share verification algorithm is a DPT function that takes as input a signature share $\varSigAlice$, a message $m$, and the other participants public key $\varPubKeyAlice$ (similiar $\varPubKeyBob$ for Bobs partial signature). The algorithm returns 1 if the verification was successfull or 0 otherwise.
 
-        \item $\cnstTrueorFalse \opFunResult \procVerfPtSig{\varSigBob}{\varMsg}{\varPubKeyAlice}{\varPubKeyBob}$: The share verification algorithm is a DPT function that takes as input a signature share $\varSigAlice$, a message $m$, and the other participants public keys $\varPubKeyAlice$ or $\varPubKeyBob$. The algorithm returns 1 if the verification was successfull or 0 otherwise.
-
-        \item $\varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob})$: The finalize signature algorithm is a DPT function that takes as input two shares of the signatures and combines them into a final signature.
+        \item $\varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob}$: The finalize signature algorithm is a DPT function that takes as input two shares of the signatures and combines them into a final signature valid ander the shared public key $\varPubKey$.
 
     \end{itemize}
 
 \end{definition}
 
-\todo[inline]{You need to add here that we require a two-party signature scheme that is correct and unforgeable against chosen message attacks (EUF-CMA). You can then point to these paper \url{https://link.springer.com/content/pdf/10.1007/s00145-006-0347-3.pdf} The EUF-CMA game for 2-party signature scheme is defined in pages 14-15 of this paper \url{https://eprint.iacr.org/2017/552.pdf}}
+We require the Two Party Signature Scheme to be correct as well as unforgeable against chosen message attacks (EUF-CMA). EUF-CMA for a two-party signature scheme was defined for instance in~\cite{lindell2017fast}.
+For the correctness of the distributed key-generation protcol $\procKeyGenPtId$, special care needs to be taken to gurantee a uniformly random distribution of generated keys as
+pointed out by Lindell and Yehuda in~\cite{lindell2017fast}.
 
 \begin{definition}[Two Party Fixed Witness Adaptor Schnorr Signature Scheme]
     \label{def:twoPartyFixedWitAptSig}
