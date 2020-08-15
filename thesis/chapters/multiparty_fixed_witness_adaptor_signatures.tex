@@ -41,22 +41,30 @@ Alice and Bob want to collaborate to generate a signature valid under the compos
 
 \end{definition}
 
-We require the Two Party Signature Scheme to be correct as well as unforgeable against chosen message attacks (EUF-CMA). EUF-CMA for a two-party signature scheme was defined for instance in~\cite{lindell2017fast}.
+We require the two party signature scheme to be correct as well as unforgeable against chosen message attacks (EUF-CMA). EUF-CMA for a two-party signature scheme was defined for instance in~\cite{lindell2017fast}.
 For the correctness of the distributed key-generation protcol $\procKeyGenPtId$, special care needs to be taken to gurantee a uniformly random distribution of generated keys as
 pointed out by Lindell and Yehuda in~\cite{lindell2017fast}.
 
 \begin{definition}[Two Party Fixed Witness Adaptor Schnorr Signature Scheme]
     \label{def:twoPartyFixedWitAptSig}
-    From the definition~\ref{def:twoPartySig}, we now derive an adapted signature scheme $\varSigSchemeApt$, which allows one of the participants to hide the discrete logarithm $\varWit$ of a statement $\varStatement$ chosen
+    From the definition~\ref{def:twoPartySig}, we now derive an adapted signature scheme $\varSigSchemeApt$, which allows one of the participants to hide the discrete logarithm $\varWit$ of a statement $\varStatement \opAssign \funGen{\varWit}$ chosen
     at the beginning of the protocol. Again we extend our previously defined signature scheme with new functions:
     \[ \varSigSchemeApt \opAssign (\varSigSchemeMP \opConc \procAptSigId \opConc \procVerifyAptSigId \opConc \procExtWitId) \]
 
     \begin{itemize}
-        \item $\varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit}$ takes as input a partial signature $\varSigPt$ and a secret witness value $\varWit$. The procedure will output an adapted partial signature $\varSigApt$ which can be verified to contain $\varWit$ using the $\procVerifyAptSigId$ function, without immidiately revealing $\varWit$.
-        \item $\cnstTrueorFalse \opFunResult \procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}$ takes as input an adapted partial signature $\varSigApt$, the participants public keys and a statement $\varStatement$. The function will verify the partial signature's validity as well that it contains the secret witness $\varWit$.
-        \item $\varWit \opFunResult \procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob}$ lets Alice extract the secret witness $\varWit$ from the final composite signature. Note that to extract the witness $\varWit$ the partial signatures shared between the participants beforehand and the statement $\varStatement$ needs to be provided as inputs. This makes sure that only participants of the procotol will be able to perform the extraction.
+        \item $\varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit}$: The adapt signature algorithm is a DPT function that takes as input a partial signature $\varSigPt$ and a secret witness value $\varWit$.
+        The procedure will output a adapted partial signature $\varSigApt$ which can be verified to contain $\varWit$ using the $\procVerifyAptSigId$ function, without having to reveal $\varWit$.
+        \item $\cnstTrueorFalse \opFunResult \procVerifyAptSig{\varSigAptAlice}{\varMsg}{\varPubKeyAlice}{\varStatement}$: The verification algorithm is a DPT function that takes as input an adapted partial signature $\varSigApt$,
+        the other participants public keys and a statement $\varStatement$. The function will verify the partial signature's validity as well that it contains the secret witness $\varWit$.
+        \item $\varWit \opFunResult \procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob}$: The witness extraction algorithm is a DPT function that lets Alice extract the secret witness $\varWit$ from the final composite
+        signature. Note that to extract the witness $\varWit$ the partial signatures shared between the participants beforehand and the statement $\varStatement$ needs to be provided as inputs. This means that for
+        executing this function one needs to first learn the partial signatures exchanged between the parties.
     \end{itemize}
 \end{definition}
+
+Note that our definition of the adaptor signature scheme is different then the definition seen in~\ref{sec:aptSignatures}. This has the reason that we require our scheme to be able to hide a secret chosen before
+the signing protocol has been started. One of the participants will be able to hide this secret during the distributed signing protocol which the other party can extract after completion of the protocol. This feature
+is a requirement for our signature scheme such that we can build the atomic swap protocol which will be layed out in~\ref{sec:atomic-swap}.
 
 \begin{definition}[\cnstSecureAptScheme]
     \label{def:aptsigsecure}
@@ -69,31 +77,30 @@ pointed out by Lindell and Yehuda in~\cite{lindell2017fast}.
 
 We proceed by redefining these properties as well as adapted correctness for our adapted two-party fixed witness signature scheme defined in definition~\ref{def:twoPartyFixedWitAptSig}:
 
+Similar to how it is defined in~\cite{aumayr2020bitcoinchannels} additionally to \cnstCorrectness as defined in~\ref{def:signatureScheme} we require our signature scheme to satisfy \cnstAptSigCorrectness.
+This property is given when every adapted partial signature generated by $\procAptSigId$ can be completed into a final signature for all pairs $(\varWit \opSeperate \varStatement) \opIn \cnstRelation$, from which it will
+be possible to extract the witness computing $\procExtWitId$ with the required parameters.
+
 \begin{definition}[\cnstAptSigCorrectness]
     \label{def:aptSigCorrectness}
-    Similar to how it is defined in~\cite{aumayr2020bitcoinchannels} additionally to \cnstCorrectness as defined in~\ref{def:signatureScheme} we require our signature scheme to satisfy \cnstAptSigCorrectness.
-    This property is given when every adapted partial signature generated by $\procAptSigId$ can be completed into a final signature for all pairs $(\varWit \opSeperate \varStatement) \opIn \cnstRelation$, from which it will
-    be possible to extract the witness computing $\procExtWitId$ with the required parameters.
-
-    More formally \cnstAptSigCorrectness is given if for every security parameter $\varN \in \cnstNatural$, message $\varMsg \in \cnstBinary{*}$, keypairs $\varKeyPairAlice \opFunResult \procSetup{\varSecParam} \opSeperate
-    \varKeyPairBob \opFunResult \procSetup{\varSecParam}$
-    with their composite public key $\varPubKeyComp \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ \todo{you need to define keys in terms of DKeyGen}
-    and every statement/witness pair $(\varStatement \opSeperate \varWit)$ in a relation $\cnstRelation$ it must hold that:
-    \todo[inline]{Pedro: remove the question mark from equal in left part of Pr. They must hold}
+    More formally \cnstAptSigCorrectness is given if for every security parameter $\varN \in \cnstNatural$, message $\varMsg \in \cnstBinary{*}$, \\ keypairs
+    $((\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext), (\varSecKeyBob, \varPubKeyBob, \varNonceBob, \varSigContext)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam}$
+    with their composite public key $\varSigContext.\varPubKey$
+    and every statement/witness pair $(\varStatement \opSeperate \varWit) \procGenR{\varSecParam}$ in a relation $\cnstRelation$ it must hold that:
 
     \[
         \Pr\left[
         \begin{array}{c}
-            \:\procVerf{\varMsg}{\varSigFin}{\varPubKeyComp} \opEq 1                                            \\
+            \:\procVerf{\varMsg}{\varSigFin}{\varPubKeyComp} \opEqNoQ 1                                         \\
             \opAnd                                                                                              \\
-            \: \procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyAlice}{\varPubKeyBob}{\varStatement} \opEq 1 \\
+            \: \procVerifyAptSig{\varSigAptBob}{\varMsg}{}{\varPubKeyBob}{\varStatement} \opEqNoQ 1             \\
             \opAnd                                                                                              \\
             \:(\varStatement \opSeperate \funStar{\varWit}) \opIn \cnstRelation
         \end{array}
         \middle\vert
         \begin{array}{l}
-            (\varWit \opSeperate \varStatement) \opFunResult \procGenR{\varSecParam}                                \\
-            (\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varSecKeyAlice}{\varSecKeyBob} \\
+            \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}        \\
+            \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext}              \\
             \varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit}                                             \\
             \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob}                                           \\
             \funStar{\varWit} \opFunResult \procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob}
@@ -102,13 +109,12 @@ We proceed by redefining these properties as well as adapted correctness for our
     \]
 \end{definition}
 
-\begin{definition}[$\cnstaEUFCMA$]
-    \label{def:aeufcma}
-    Additionally to the regular definition of \textit{existential unforgeability under chosen message attacks} as defined for example in~\cite{vaudenay2006classical} we require that it is hard to produce a forged partial signature $\varSigPt$ if the
-    adversary $\cnstAdversary$ gets to know a valid adapted signature $\varSigApt$ w.r.t. some message $\varMsg$ and a statement $\varStatement$.
+Additionally to the regular definition of \emph{existential unforgeability under chosen message attacks} as defined for example in~\cite{lindell2017fast} or~\cite{vaudenay2006classical} we require that it is hard to produce a forged partial signature $\varSigPt$ if the
+adversary $\cnstAdversary$ gets to know a valid adapted signature $\varSigApt$ w.r.t. some message $\varMsg$ and a statement $\varStatement$.
+\begin{definition}[$\cnstaEUFCMA$] \label{def:aeufcma}
 
     For the definition of $\cnstaEUFCMA$-security we define the experiment $\procExpForgId$ for a $\cnstPolyTime$ adversary $\cnstAdversary$ with a keypair $(\varSecKeyAlice \opSeperate \varPubKeyAlice)$,
-    meaning the attacker plays the role of Alice in the protocol and an adapted signature scheme $\varSigSchemeApt$ as
+    meaning the attacker plays the role of Alice in the protocol as
     follows:
 
     \begin{center}
@@ -116,10 +122,10 @@ We proceed by redefining these properties as well as adapted correctness for our
         \begin{varwidth}{\textwidth}
             \procedure[linenumbering]{$\procExpForg{\varN}$} {
             \varSet \opAssign \cnstEmptySet \\
-            \varKeyPairBob \opFunResult \procSetup{\varSecParam} \\
-            (\varMsg \opSeperate \varSecKeyAlice) \opFunResult \cnstAdversary^{\procSignOracle{\cdot}{\cdot}}(\varPubKeyBob) \\
+            ((\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext), (\varSecKeyBob, \varPubKeyBob, \varNonceBob, \varSigContext)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam} \\
+            \varMsg \opFunResult \cnstAdversary^{\procSignOracle{\cdot}{\cdot}}(\varPubKeyBob) \\
             (\varWit \opSeperate \varStatement) \opFunResult \procGenR{\varSecParam} \\
-            (\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varSecKeyAlice}{\varSecKeyBob} \\
+            \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \\
             \varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit} \\
             \funStar{\varSigAlice} \opFunResult \cnstAdversary^{\procSignOracle{\cdot}{\cdot}}(\varSigBob) \\
             \varSigFin \opFunResult \procFinSig{\funStar{\varSigAlice}}{\varSigBob} \\
