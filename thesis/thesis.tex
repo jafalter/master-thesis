@@ -40,7 +40,10 @@
     asymptotics,
     keys
 ]{cryptocode}
+\usepackage[backend=biber]{biblatex}
 \usepackage{subfiles}
+
+\usepackage{csquotes}
 
 \usepackage{amsthm}
 
@@ -116,6 +119,8 @@
 % For dissertations at the PhD School:
 %\setfirstreviewerdata{Affiliation, Country}
 %\setsecondreviewerdata{Affiliation, Country}
+
+\addbibresource{thesis.bib}
 
 \begin{document}
 
@@ -200,9 +205,5 @@
 
 % Add a glossary.
 \printglossaries
-
-% Add a bibliography.
-\bibliographystyle{alpha}
-\bibliography{thesis}
 
 \end{document}

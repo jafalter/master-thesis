@@ -29,6 +29,7 @@
 \newcommand{\cnstSoToMuTx}{\styleVariable{Solo2SharedTx}}
 \newcommand{\cnstMuToSoTx}{\styleVariable{Shared2SoloTx}}
 \newcommand{\cnstMuToMuTx}{\styleVariable{Shared2SharedTx}}
+\newcommand{\cnstFalsum}{\bot}
 
 \newcommand{\cnstPayToCoin}{\styleVariable{PayToCoin}}
 \newcommand{\cnstPayToSharedCoin}{\styleVariable{PayToMuSigCoin}}
@@ -212,7 +213,7 @@
 \newcommand{\procKeyGenPtId}{\styleFunction{dKeyGen}}
 \newcommand{\procKeyGenPt}[2]{\procKeyGenPtId\langle #1 \opSeperate #2 \rangle}
 \newcommand{\procSetupCtxId}{\styleFunction{setupCtx}}
-\newcommand{\procSetupCtx}[3]{\procSetupCtxId\langle #1 \opSeperate #2 \opSeperate #3 \rangle}
+\newcommand{\procSetupCtx}[3]{\procSetupCtxId( #1 \opSeperate #2 \opSeperate #3 )}
 \newcommand{\procSignPtId}{\styleFunction{signPt}}
 \newcommand{\procSignPt}[3]{\procSignPtId<(#1 \opSeperate #2)(#1 \opSeperate #3)>}
 \newcommand{\procSignPtSingle}[2]{\procSignPtId(#1 \opSeperate #2)}
@@ -221,7 +222,7 @@
 \newcommand{\procVerfPtSigId}{\styleFunction{vrfPt}}
 \newcommand{\procVerfPtSig}[3]{\procVerfPtSigId(#1 \opSeperate #2 \opSeperate #3)}
 \newcommand{\procFinSigId}{\styleFunction{finSig}}
-\newcommand{\procFinSig}[2]{ \procFinSigId(#1,#2) }
+\newcommand{\procFinSig}[2]{ \procFinSigId(#1 \opSeperate #2) }
 
 \newcommand{\procAptSigId}{\styleFunction{adaptSig}}
 \newcommand{\procAptSig}[2]{\procAptSigId(#1 \opSeperate #2)}
@@ -238,6 +239,8 @@
 \newcommand{\procExpForgeSimple}[1]{ \procExpForgeSimpleId(#1) }
 \newcommand{\procSignOracleId}{ \cnstOracle_{s} }
 \newcommand{\procSignOracle}[2]{ \procSignOracleId(#1,#2) }
+\newcommand{\procSignOraclePtId}{ \cnstOracle_{ps} }
+\newcommand{\procSignOraclePt}[4]{ \procSignOraclePtId(#1,#2,#3,#4) }
 \newcommand{\procFunctionId}{\styleFunction{f}}
 \newcommand{\procFunction}[1]{\procFunctionId(#1)}
 
