@@ -272,11 +272,11 @@ to introduce the slightly adjusted $\procVerfPtSigId$ to be able to verify speci
             \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\varPubKeyAlice}{\varRandAlice} \< \< \\
             \< \sendmessageright*{\varSigContext, \varPubKeyAlice, \varProofAlice} \< \\
             \< \< \pcif \procZkpVerify{\varProofAlice} \opEqNoQ 0 \\
-            \< \< \t \pcreturn \bot \\
+            \< \< \t \pcreturn \cnstFalsum \\
             \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\varPubKeyBob}{\varRandBob} \\
             \< \sendmessageleft*{\varSigContext, \varPubKeyBob, \varProofBob} \< \\
             \pcif \procZkpVerify{\varProofBob} \opEqNoQ 0 \< \< \\
-            \t \pcreturn \bot \< \< \\
+            \t \pcreturn \cnstFalsum \< \< \\
             \pcreturn (\varSecKeyAlice,\varPubKeyAlice,\varNonceAlice,\varSigContext) \< \< \pcreturn (\varSecKeyBob,\varPubKeyBob,\varNonceBob,\varSigContext)
             } \\
             \procedure[linenumbering]{$\procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}$} {
