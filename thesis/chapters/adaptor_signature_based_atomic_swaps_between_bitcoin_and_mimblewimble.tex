@@ -44,12 +44,32 @@ connected to the Blockchain. The $\procVerfTxId$ function is called by nodes (ac
 
 \begin{definition}[Extended Mimblewimble Transaction Scheme]
     \label{def:ext-mw-tx-scheme}
-    TODO
+    An extended Mimblewimble transaction scheme $\varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ is an extension to $\varMWScheme$ with the following two procedures:
+    \[ \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc (\procDSendCoinsId, \procDRecvCoinsId) \]
+    \begin{itemize}
+        \item $((\varPreTx,\varSecKeyAlice), (\varPreTx,\varSecKeyBob)) \opFunResult \procDSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValue}{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorBob}}$:
+        The distributed coin spending algorithm takes as input a list of input coins, as well as a list of blinding factors from each Alice and Bob, and the to be transferred value $\varFundValue$ and
+        total value of input coins $\varValue$. Note that for each provided input coin $\varCoinInp$ the blinding factor is composed by combining the shares from Alice and Bob like
+        $\varBlindingFactor \opAssign \varBlindingFactorAlice \opAddScalar \varBlindingFactorBob$.
+        \item $(\varPreTx, \varPreTx) \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue}$: The distributed coin receive procedure takes as input a pre-transaction $\varPreTx$ and
+        a value $\varFundValue$ which should be transferred. The distributed algorithm will generate a output coin owned by both Alice and Bob. (each owning a share of the key). The output will be similiar
+        to the single party version a updated pre-transaction $\varPreTx$.
+    \end{itemize}
 \end{definition}
 
 \begin{definition}[Adapted Extended Mimblewimble Transaction Scheme]
     \label{def:apt-ext-mw-tx-scheme}
-    TODO
+    The adapted version of the extended Mimblewimble Transaction Scheme updates the Extended Mimblewimble Transaction Schme by providing a modified version of the single party receive function and the finalize
+    transaction function.
+    \[ \varaptMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc \procAptRecvCoinsId, \procDAptFinTxId \]
+    \begin{itemize}
+        \item $(\varPreTx, \varStatement) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$: The adapted variant of the receive function takes an additional input a secret witness value
+        $\varWit$ which will be hidden in the transactions signature and extractable by the other party after the protocols completion. Additionally to the updated pre-transaction $\varPreTx$ it returns
+        the statement $\varX$ which can be sent to the other party.
+        \item $((\varTx, \varWit), \varTx) \opFunResult \procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varStatement}{\varWit}$: The adapted variant of the finalize transaction algorithm is a distributed protocol between the sender
+        and receiver. Additionally to the pre-transaction $\varPreTx$ Alice (the sender) needs to input her signing key and the statement $\varStatement$ received from Bob. Bob (the receiver) additonally needs
+        to provide the secret witness $\varWit$ as input. The protocol will output the final transaction as well as $\varWit$ to Alice.
+    \end{itemize}
 \end{definition}
 
 An essential security property for a Mimblewimble Transaction Scheme $\varMWScheme$ is that a transaction can only transfer value from a sender to a receiver, but not create any new value, meaning the value
@@ -145,7 +165,7 @@ and use it as the public key for validating the transation signature. If the sig
             } \\
             \procedure[linenumbering]{$\procRecvCoins{\varPreTx}{\varFundValue}$} {
             (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\cnstEmptySet) \opFunResult \varPreTx \\
-            \pcif \procVerfProof{\varProofs[0]} \opEqNoQ 0 \\
+            \pcif \procVerfProof{\varProofs[0]}{\varOutputs[0]} \opEqNoQ 0 \\
             \t \pcreturn \cnstFalsum \\
             (\funStar{\varBlindingFactorBob},\varNonceBob) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
             (\varCoinOutBob,\varProofBob) \opFunResult \procCreateCoin{\varFundValue}{\funStar{\varBlindingFactorBob}} \\
@@ -157,7 +177,7 @@ and use it as the public key for validating the transation signature. If the sig
             }
             \procedure[linenumbering]{$\procFinTx{\varPreTx}{\varSecKeyAlice}$} {
             (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob) \opFunResult \varPreTx \\
-            \pcif \procVerfProof{\varProofs[1]} \opEqNoQ 0 \\
+            \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \\
             \t \pcreturn \cnstFalsum \\
             \pcif \procVerfPtSig{\varSigBob}{\varMsg}{\varCommits[1]} \opEqNoQ 0 \\
             \t \pcreturn \cnstFalsum \\
@@ -168,8 +188,8 @@ and use it as the public key for validating the transation signature. If the sig
             }
             \procedure[linenumbering]{$\procVerfTx{\varTx}$} {
             (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSignature) \opFunResult \varTx \\
-            \pcforeach \varProofs \textit{ as } \varProof \\
-            \t \pcif \procVerfProof{\varProof} \opEqNoQ 0 \\
+            \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \\
+            \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut} \opEqNoQ 0 \\
             \t \t \pcreturn 0 \\
             \varPubKey \opAssign \sum \varOutputs \opSub \sum \varInputs \\
             \pcreturn \procVerf{\varSignature}{\varMsg}{\varPubKey}\\
@@ -179,94 +199,5 @@ and use it as the public key for validating the transation signature. If the sig
     \end{center}
     \caption{Instantiation of Mimblewimble Transaction Scheme. \label{fig:inst-mw-tx}}
 \end{figure}
-
-\begin{figure}
-    \begin{center}
-        \fbox{
-        \begin{varwidth}{\textwidth}
-            \procedure[linenumbering]{$\procSpendOutput{\varFundValue}{\varCoinInp}{\varBlindingFactorAlice}{\cdot}$} {
-            \varMsg \opAssign \cnstBinary{*} \< \< \\
-            \funStar{\varBlindingFactorAlice} \opSeperate \varBlindingFactorFor{1} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \\
-            \varCoinOutAlice \opFunResult \procCommit{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactorAlice}} \< \< \\
-            \scriptstyle \varProofAlice \opFunResult \procProof{\varCoinOutAlice}{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactorAlice}} \< \< \\
-            \varBlindingFactorFor{s} \opAssign \funStar{\varBlindingFactorAlice} \opAddScalar \varBlindingFactorFor{1}  \opSub \varBlindingFactorAlice \< \< \\
-            \< \sendmessageright*{ \scriptstyle \varTx \opAssign (\varMsg \opSeperate \varCoinInp \opSeperate \varCoinOutAlice \opSeperate \varProofAlice \opSeperate \funGen{\varBlindingFactorFor{s}} \opSeperate \funGen{\varBlindingFactorFor{1}})} \< \\
-            \< \< \procVerfProof{\varProofAlice} \opEq 1 \\
-            \< \< \varBlindingFactorFor{2} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-            \< \< \varCoinShared \opFunResult \procCommit{\varFundValue}{\varBlindingFactorFor{2}} \opAddPoint \funGen{\varBlindingFactorFor{1}} \\
-            \< \< \varBlindingFactorFor{r} \opAssign \varBlindingFactorFor{2}
-            \< \sendmessageleft*{ \scriptstyle \varTx \opAssign \varTx \opUnion (\varCoinShared \opSeperate \funGen{\varBlindingFactorFor{r}})} \< \\
-            \< \scriptstyle \varProof \opFunResult \procMuProof{\varCoinShared}{\varFundValue}{\varBlindingFactorFor{1}}{\varBlindingFactorFor{2}} \< \\
-            \< \scriptstyle (\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varBlindingFactorFor{s}}{\varBlindingFactorFor{r}} \< \\
-            \procVerfPtSig{\varSigBob}{\varMsg}{\funGen{\varBlindingFactorFor{s}}}{\funGen{\varBlindingFactorFor{r}}} \opEq 1 \< \< \\
-            \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \\
-            \varExcess \opAssign \funGen{\varBlindingFactorFor{s}} \opAddPoint \funGen{\varBlindingFactorFor{r}} \< \< \\
-            \scriptstyle \pcreturn \varTx \opAssign \varTx \opUnion (\varExcess \opSeperate \varSigFin \opSeperate \varProof)
-            }
-        \end{varwidth}
-        }
-    \end{center}
-    \caption{Instantiation of $\cnstSoToMuTx$ transaction protocol. \label{fig:So2MuTx}}
-\end{figure}
-
-\begin{figure}
-    \begin{center}
-        \fbox{
-        \begin{varwidth}{\textwidth}
-            \procedure[linenumbering]{$\procSpendOutput{\varFundValue}{\varCoinInp}{\varBlindingFactorAlice}{\varBlindingFactorBob}$} {
-            \varMsg \opAssign \cnstBinary{*} \< \< \\
-            \funStar{\varBlindingFactorAlice} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \\
-            \varCoinOutAlice \opFunResult \procCommit{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactorAlice}} \< \< \\
-            \varProofAlice \opFunResult \procProof{\varCoinOutAlice}{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactorAlice}} \< \< \\
-            \varBlindingFactorFor{s} \opAssign \funStar{\varBlindingFactorAlice} \opSub \varBlindingFactorAlice \< \< \\
-            \< \scriptstyle \sendmessageright*{\varTx \opAssign (\varMsg \opSeperate \varCoinInp \opSeperate \varCoinOutAlice \opSeperate \varProofAlice \opSeperate \funGen{\varBlindingFactorFor{s}})} \< \\
-            \< \< \procVerfProof{\varProofAlice} \opEq 1 \\
-            \< \< \funStar{\varBlindingFactorBob} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-            \< \< \varCoinOutBob \opFunResult \procCommit{\varFundValue}{\funStar{\varBlindingFactorBob}} \\
-            \< \< \varProofBob \opFunResult \procProof{\varCoinOutBob}{\varFundValue}{\varBlindingFactorFor{r}} \\
-            \< \< \varBlindingFactorFor{r} \opAssign \funStar{\varBlindingFactorBob} \opSub \varBlindingFactorBob \\
-            \< \scriptstyle \sendmessageleft*{\varTx \opAssign \varTx \opUnion (\varCoinOutBob \opSeperate \funGen{\varBlindingFactorFor{r}} \opSeperate \varSigBob \opSeperate \varProofBob)} \< \\
-            \< \scriptstyle (\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varBlindingFactorFor{s}}{\varBlindingFactorFor{r}} \< \\
-            \procVerfPtSig{\varSigBob}{\varMsg}{\funGen{\varBlindingFactorFor{s}}}{\funGen{\varBlindingFactorFor{r}}} \opEq 1 \< \< \\
-            \procVerfProof{\varProofBob} \opEq 1 \< \< \\
-            \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \\
-            \varExcess \opAssign \funGen{\varBlindingFactorFor{s}} \opAddPoint \funGen{\varBlindingFactorFor{r}} \< \< \\
-            \pcreturn \varTx \opAssign \varTx \opUnion (\varExcess \opSeperate \varSigFin)
-            }
-        \end{varwidth}
-        }
-    \end{center}
-    \caption{Instantiation of $\cnstMuToSoTx$ transaction protocol. \label{fig:Mu2SoTx}}
-\end{figure}
-
-\begin{figure}
-    \begin{center}
-        \fbox{
-        \begin{varwidth}{\textwidth}
-            \procedure[linenumbering]{$\procSpendOutput{\varFundValue}{\varCoinInp}{\varBlindingFactorAlice}{\varBlindingFactorBob}$} {
-            \varMsg \opAssign \cnstBinary{*} \< \< \\
-            \funStar{\varBlindingFactorAlice} \opSeperate \varBlindingFactorFor{1} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \\
-            \varCoinOutAlice \opFunResult \procCommit{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactorAlice}} \< \< \\
-            \scriptstyle \varProofAlice \opFunResult \procProof{\varCoinOutAlice}{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactorAlice}} \< \< \\
-            \varBlindingFactorFor{s} \opAssign \funStar{\varBlindingFactorAlice} \opAddScalar \varBlindingFactorFor{1}  \opSub \varBlindingFactorAlice \< \< \\
-            \< \sendmessageright*{ \scriptstyle \varTx \opAssign (\varMsg \opSeperate \varCoinInp \opSeperate \varCoinOutAlice \opSeperate \varProofAlice \opSeperate \funGen{\varBlindingFactorFor{s}} \opSeperate \funGen{\varBlindingFactorFor{1}})} \< \\
-            \< \< \procVerfProof{\varProofAlice} \opEq 1 \\
-            \< \< \varBlindingFactorFor{2} \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-            \< \< \varCoinShared \opFunResult \procCommit{\varFundValue}{\varBlindingFactorFor{2}} \opAddPoint \funGen{\varBlindingFactorFor{1}} \\
-            \< \< \varBlindingFactorFor{r} \opAssign \varBlindingFactorFor{2} \opSub \varBlindingFactorBob \\
-            \< \sendmessageleft*{ \scriptstyle \varTx \opAssign \varTx \opUnion (\varCoinShared \opSeperate \funGen{\varBlindingFactorFor{r}})} \< \\
-            \< \scriptstyle \varProof \opFunResult \procMuProof{\varCoinShared}{\varFundValue}{\varBlindingFactorFor{1}}{\varBlindingFactorFor{2}} \< \\
-            \< \scriptstyle (\varSigAlice \opSeperate \varSigBob) \opFunResult \procSignPt{\varMsg}{\varBlindingFactorFor{s}}{\varBlindingFactorFor{r}} \< \\
-            \procVerfPtSig{\varSigBob}{\varMsg}{\funGen{\varBlindingFactorFor{s}}}{\funGen{\varBlindingFactorFor{r}}} \opEq 1 \< \< \\
-            \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \\
-            \varExcess \opAssign \funGen{\varBlindingFactorFor{s}} \opAddPoint \funGen{\varBlindingFactorFor{r}} \< \< \\
-            \scriptstyle \pcreturn \varTx \opAssign \varTx \opUnion (\varExcess \opSeperate \varSigFin \opSeperate \varProof)
-            }
-        \end{varwidth}
-        }
-    \end{center}
-    \caption{Instantiation of $\cnstMuToMuTx$ transaction protocol. \label{fig:Mu2MuTx}}
-\end{figure}
-
 
 \section{Atomic Swap protocol}\label{sec:atomic-swap}

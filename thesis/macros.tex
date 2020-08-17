@@ -91,10 +91,15 @@
 \newcommand{\varSigSchemeApt}{\varSigScheme_{\styleVariable{Apt}}}
 \newcommand{\varMWScheme}{\styleVariable{MW}}
 \newcommand{\varMWSchemeParams}[3]{\varMWScheme[#1,#2,#3]}
+\newcommand{\varextMWScheme}{\varMWScheme_{ext}}
+\newcommand{\varextMWSchemeParams}[3]{\varextMWScheme[#1,#2,#3]}
+\newcommand{\varaptMWScheme}{\varMWScheme_{apt}}
+\newcommand{\varaptMWSchemeParams}[3]{\varaptMWScheme[#1,#2,#3]}
 \newcommand{\varProof}{\pi}
 \newcommand{\varProofAlice}{\pi_\varAlice}
 \newcommand{\varProofBob}{\pi_\varBob}
 \newcommand{\varProofSystem}{\Pi}
+\newcommand{\varRProofSystemParam}[1]{\varProofSystem[#1]}
 \newcommand{\varSignature}{\sigma}
 \newcommand{\varInput}{\styleVariable{I}}
 \newcommand{\varFundValue}{\styleVariable{p}}
@@ -161,6 +166,11 @@
 \newcommand{\varOutputs}{\styleVariable{out}}
 \newcommand{\varProofs}{\Pi}
 \newcommand{\varCommits}{\styleVariable{com}}
+\newcommand{\varLowerBound}{\styleVariable{lb}}
+\newcommand{\varUpperBound}{\styleVariable{ub}}
+\newcommand{\varI}{\styleVariable{i}}
+\newcommand{\varJ}{\styleVariable{j}}
+\newcommand{\varIterator}{i}
 
 % operators
 \newcommand{\opAccess}[2]{#1.#2}
@@ -202,13 +212,14 @@
 \newcommand{\procVerfId}{\styleFunction{verf}}
 \newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
 
+\newcommand{\procRProofSetupId}{\styleFunction{ranPrfSetup}}
+\newcommand{\procRProofSetup}[3]{\procRProofSetupId(#1,#2,#3)}
 \newcommand{\procProofId}{\styleFunction{ranPrf}}
 \newcommand{\procProof}[3]{\procProofId(#1,#2,#3)}
 \newcommand{\procMuProofId}{\styleFunction{muRanPrf}}
 \newcommand{\procMuProof}[4]{\procMuProofId<(#1,#2,#3),(#1,#2,#4)>}
 \newcommand{\procVerfProofId}{\styleFunction{vrfRanPrf}}
-\newcommand{\procVerfProof}[1]{\procVerfProofId(#1)}
-
+\newcommand{\procVerfProof}[2]{\procVerfProofId(#1,#2)}
 
 \newcommand{\procKeyGenPtId}{\styleFunction{dKeyGen}}
 \newcommand{\procKeyGenPt}[2]{\procKeyGenPtId\langle #1 \opSeperate #2 \rangle}
@@ -252,8 +263,11 @@
 \newcommand{\procZkpProve}[2]{\ensuremath{\mathsf{P}_{\textit{NIZK}}(#1, #2)}}
 \newcommand{\procZkpVerify}[1]{\ensuremath{\mathsf{V}_{\textit{NIZK}}(#1)}}
 
-\newcommand{\procSpendOutputId}{ \styleFunction{spendOutput} }
-\newcommand{\procSpendOutput}[4]{\procSpendOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1 \opSeperate #4)>}
+\newcommand{\procCreateCoinId}{\styleFunction{createCoin}}
+\newcommand{\procCreateCoin}[2]{\procCreateCoinId(#1,#2)}
+
+\newcommand{\procCreatePreTxId}{\styleFunction{createTx}}
+\newcommand{\procCreatePreTx}[7]{\procCreatePreTxId(#1,#2,#3,#4,#5,#6,#7)}
 
 \newcommand{\procSendCoinsId}{\styleFunction{spendCoins}}
 \newcommand{\procSendCoins}[4]{\procSendCoinsId(#1,#2,#3,#4)}
@@ -267,8 +281,15 @@
 \newcommand{\procVerfTxId}{\styleFunction{verfTx}}
 \newcommand{\procVerfTx}[1]{\procVerfTxId(#1)}
 
-\newcommand{\procCreateCoinId}{\styleFunction{createCoin}}
-\newcommand{\procCreateCoin}[2]{\procCreateCoinId(#1,#2)}
+\newcommand{\procDSendCoinsId}{\styleFunction{dSpendCoinsId}}
+\newcommand{\procDSendCoins}[6]{\procSendCoinsId
+\langle (#1,#2,#3,#4) \opSeperate (#5,#6,#3,#4) \rangle}
 
-\newcommand{\procCreatePreTxId}{\styleFunction{createTx}}
-\newcommand{\procCreatePreTx}[7]{\procCreatePreTxId(#1,#2,#3,#4,#5,#6,#7)}
+\newcommand{\procDRecvCoinsId}{\styleFunction{dRecvCoins}}
+\newcommand{\procDRecvCoins}[2]{\procDRecvCoinsId \langle(#1,#2) \opSeperate (#1,#2) \rangle}
+
+\newcommand{\procAptRecvCoinsId}{\styleFunction{aptSpendCoins}}
+\newcommand{\procAptRecvCoins}[3]{\procAptRecvCoinsId(#1,#2,#3)}
+
+\newcommand{\procDAptFinTxId}{\styleFunction{dAptFinTx}}
+\newcommand{\procDAptFinTx}[4]{\procDAptFinTxId \langle (#1,#2,#3), (#1,#4) \rangle}
