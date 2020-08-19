@@ -58,6 +58,7 @@
 \newcommand{\varScA}{\styleVariable{a}}
 \newcommand{\varScB}{\styleVariable{b}}
 \newcommand{\varAlice}{\styleVariable{A}}
+\newcommand{\varCarol}{\styleVariable{C}}
 \newcommand{\varBob}{\styleVariable{B}}
 \newcommand{\varX}{\styleVariable{x}}
 \newcommand{\varProbability}{\styleVariable{P}}
@@ -75,6 +76,7 @@
 \newcommand{\varSecKey}{\styleVariable{sk}}
 \newcommand{\varSecKeyAlice}{\varSecKey_{\varAlice}}
 \newcommand{\varSecKeyBob}{\varSecKey_{\varBob}}
+\newcommand{\varSecKeyCarol}{\varSecKey_{\varCarol}}
 \newcommand{\varSecKeyAdv}{\varSecKey_{\cnstAdversary}}
 \newcommand{\varPubKey}{\styleVariable{pk}}
 \newcommand{\varPubKeyAlice}{\varPubKey_{\varAlice}}
@@ -118,11 +120,13 @@
 \newcommand{\varNonce}{\styleVariable{k}}
 \newcommand{\varNonceAlice}{\styleVariable{\varNonce_{\varAlice}}}
 \newcommand{\varNonceBob}{\styleVariable{\varNonce_{\varBob}}}
+\newcommand{\varNonceCarol}{\styleVariable{\varNonce_{\varCarol}}}
 \newcommand{\varNonceAdv}{\varNonce_{\cnstAdversary}}
 \newcommand{\varBlindingFactor}{\styleVariable{r}}
 \newcommand{\varBlindingFactorFor}[1]{\varBlindingFactor_{#1}}
 \newcommand{\varBlindingFactorAlice}{\varBlindingFactorFor{\varAlice}}
 \newcommand{\varBlindingFactorBob}{\varBlindingFactorFor{\varBob}}
+\newcommand{\varBlindingFactorCarol}{\varBlindingFactorFor{\varCarol}}
 \newcommand{\varS}{\styleVariable{s}}
 \newcommand{\varSAptBob}{\funHat{\varS_\varBob}}
 \newcommand{\varSApt}{\funHat{\varS}}
@@ -282,8 +286,8 @@
 \newcommand{\procVerfTx}[1]{\procVerfTxId(#1)}
 
 \newcommand{\procDSendCoinsId}{\styleFunction{dSpendCoinsId}}
-\newcommand{\procDSendCoins}[6]{\procSendCoinsId
-\langle (#1,#2,#3,#4) \opSeperate (#5,#6,#3,#4) \rangle}
+\newcommand{\procDSendCoins}[5]{\procDSendCoinsId
+\langle (#1,#2,#3,#4) \opSeperate (#1,#5,#3,#4) \rangle}
 
 \newcommand{\procDRecvCoinsId}{\styleFunction{dRecvCoins}}
 \newcommand{\procDRecvCoins}[2]{\procDRecvCoinsId \langle(#1,#2) \opSeperate (#1,#2) \rangle}

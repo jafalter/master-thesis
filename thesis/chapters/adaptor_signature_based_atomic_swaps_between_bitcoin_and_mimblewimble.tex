@@ -93,7 +93,7 @@ of a transactions output coins must always be equal (or less accounting for tran
 In this section we will provide an instantiation of the transaction scheme definitions found in~\ref{def:mw-tx-scheme},~\ref{def:ext-mw-tx-scheme} and~\ref{def:apt-ext-mw-tx-scheme}. The instantiations can be
 implemented in a Cryptocurrency based on the Mimblewimble protocol such as Beam and Grin.
 
-\subsection{$Miblewimble Transation Scheme$}
+\subsection{Mimblewimble Transation Scheme}
 
 First we provide an instantiation of the simplest form of a transaction in which a sender wants to transfer some value $\varFundValue$ to a receiver. For the execution of the protocol we assume to have access to a homomorphic
 commitment scheme such as Pedersen Commitment $\varCommitScheme$ as defined in definition~\ref{def:pedersenCom}. Furthermore we require a Rangeproof system $\varProofSystem$ as defined in
@@ -153,7 +153,7 @@ and use it as the public key for validating the transation signature. If the sig
     \begin{center}
         \fbox{
         \begin{varwidth}{\textwidth}
-            \procedure[linenumbering]{$\procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}$} {
+            \procedure[linenumbering]{$\procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValue}$} {
             \varMsg \opAssign \cnstBinary{*} \\
             (\funStar{\varBlindingFactorAlice}, \varNonceAlice) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \\
             (\varCoinOutAlice, \varProofAlice) \opFunResult \procCreateCoin{\varValue \opSub \varFundValue}{\funStar{\varBlindingFactorAlice}} \\
@@ -198,6 +198,38 @@ and use it as the public key for validating the transation signature. If the sig
         }
     \end{center}
     \caption{Instantiation of Mimblewimble Transaction Scheme. \label{fig:inst-mw-tx}}
+\end{figure}
+
+\subsection{Extended Mimblewimble Transation Scheme}
+
+\begin{figure}
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procDSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValue}{\funArray{\varBlindingFactorBob}}$}{
+                \pcreturn 1
+            } \\
+            \procedure[linenumbering]{$\procDRecvCoins{\varPreTx}{\varFundValue}$} {
+                Alice \< \< Bob \\
+                (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob) \opFunResult \varPreTx \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob) \opFunResult \varPreTx \\
+                \pcif \procVerfProof{\varProofs[0]}{\varOutputs[0]} \opEqNoQ 0 \< \< \pcif \procVerfProof{\varProofs[0]}{\varOutputs[0]} \opEqNoQ 0 \\
+                \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
+                (\funStar{\varBlindingFactorBob}, \varNonceBob) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \\
+                (\varCoinShared,\cdot) \opFunResult \procCreateCoin{\varFundValue}{\funStar{\varBlindingFactorBob}} \< \< \\
+                \varSecKeyBob \opAssign \funStar{\varBlindingFactorBob} \< \< \\
+                \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyBob}}{\funGen{\varNonceBob}} \< \< \\
+                \< \sendmessageright*{\varCoinShared, \varSigContext} \< \\
+                \< \< (\funStar{\varBlindingFactorCarol}, \varNonceCarol) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+                \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \\
+                \< \< \varCoinShared \opAssign \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \\
+                \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyCarol}}{\funGen{\varNonceCarol}} \\
+                \< \sendmessageleft*{\varCoinShared, \varSigContext} \\
+                \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinShared}{\varProofs}{\varSigContext}{\varCommits}{} \\
+                \pcreturn \varPreTx
+            }
+        \end{varwidth}
+        }
+    \end{center}
 \end{figure}
 
 \section{Atomic Swap protocol}\label{sec:atomic-swap}
