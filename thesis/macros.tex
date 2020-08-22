@@ -48,7 +48,7 @@
 \newcommand{\funGenH}[1]{\opPointScalar{\varH}{#1}}
 \newcommand{\funList}[1]{\{#1\}}
 \newcommand{\funStar}[1]{#1^*}
-\newcommand{\funStarAlt}[1]{#1'}
+\newcommand{\funStarAlt}[1]{{#1}'}
 \newcommand{\funHat}[1]{\hat{#1}}
 \newcommand{\funTilde}[1]{\tilde{#1}}
 \newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
@@ -58,6 +58,7 @@
 \newcommand{\varScA}{\styleVariable{a}}
 \newcommand{\varScB}{\styleVariable{b}}
 \newcommand{\varAlice}{\styleVariable{A}}
+\newcommand{\varCarol}{\styleVariable{C}}
 \newcommand{\varBob}{\styleVariable{B}}
 \newcommand{\varX}{\styleVariable{x}}
 \newcommand{\varProbability}{\styleVariable{P}}
@@ -75,10 +76,12 @@
 \newcommand{\varSecKey}{\styleVariable{sk}}
 \newcommand{\varSecKeyAlice}{\varSecKey_{\varAlice}}
 \newcommand{\varSecKeyBob}{\varSecKey_{\varBob}}
+\newcommand{\varSecKeyCarol}{\varSecKey_{\varCarol}}
 \newcommand{\varSecKeyAdv}{\varSecKey_{\cnstAdversary}}
 \newcommand{\varPubKey}{\styleVariable{pk}}
 \newcommand{\varPubKeyAlice}{\varPubKey_{\varAlice}}
 \newcommand{\varPubKeyBob}{\varPubKey_{\varBob}}
+\newcommand{\varPubKeyBobCarol}{\varPubKey_{\varBob\varCarol}}
 \newcommand{\varPubKeyComp}{\varPubKey_{\styleVariable{C}}}
 \newcommand{\varPubKeyCompApt}{\varPubKey_{\styleVariable{comp\_apt}}}
 \newcommand{\varPubKeyAdv}{\varPubKey_{\cnstAdversary}}
@@ -91,10 +94,18 @@
 \newcommand{\varSigSchemeApt}{\varSigScheme_{\styleVariable{Apt}}}
 \newcommand{\varMWScheme}{\styleVariable{MW}}
 \newcommand{\varMWSchemeParams}[3]{\varMWScheme[#1,#2,#3]}
+\newcommand{\varextMWScheme}{\varMWScheme_{ext}}
+\newcommand{\varextMWSchemeParams}[3]{\varextMWScheme[#1,#2,#3]}
+\newcommand{\varaptMWScheme}{\varMWScheme_{apt}}
+\newcommand{\varaptMWSchemeParams}[3]{\varaptMWScheme[#1,#2,#3]}
 \newcommand{\varProof}{\pi}
 \newcommand{\varProofAlice}{\pi_\varAlice}
 \newcommand{\varProofBob}{\pi_\varBob}
+\newcommand{\varProofCarol}{\pi_\varCarol}
+\newcommand{\varProofBobCarol}{\varProof_{\varBob\varCarol}}
 \newcommand{\varProofSystem}{\Pi}
+\newcommand{\varRProofSystemParam}[1]{\varProofSystem[#1]}
+\newcommand{\varMPRProofSystemParam}[1]{\varProofSystem_{mp}[#1]}
 \newcommand{\varSignature}{\sigma}
 \newcommand{\varInput}{\styleVariable{I}}
 \newcommand{\varFundValue}{\styleVariable{p}}
@@ -105,19 +116,24 @@
 \newcommand{\varCoinOut}{\varCoin_{\styleVariable{out}}}
 \newcommand{\varCoinOutAlice}{\varCoinOut^{\varAlice}}
 \newcommand{\varCoinOutBob}{\varCoinOut^{\varBob}}
+\newcommand{\varCoinOutCarol}{\varCoinOut^{\varCarol}}
 \newcommand{\varCoinShared}{\varCoinOut^{\styleVariable{sh}}}
 \newcommand{\varCoinSpecial}{\varCoinOut^{\styleVariable{sp}}}
 \newcommand{\varValue}{\styleVariable{v}}
+\newcommand{\varValueAlice}{\varValue_{\varAlice}}
+\newcommand{\varValueCarol}{\varValue_{\varCarol}}
 \newcommand{\varMsg}{\styleVariable{m}}
 \newcommand{\varLockHeight}{\styleVariable{h}}
 \newcommand{\varNonce}{\styleVariable{k}}
 \newcommand{\varNonceAlice}{\styleVariable{\varNonce_{\varAlice}}}
 \newcommand{\varNonceBob}{\styleVariable{\varNonce_{\varBob}}}
+\newcommand{\varNonceCarol}{\styleVariable{\varNonce_{\varCarol}}}
 \newcommand{\varNonceAdv}{\varNonce_{\cnstAdversary}}
 \newcommand{\varBlindingFactor}{\styleVariable{r}}
 \newcommand{\varBlindingFactorFor}[1]{\varBlindingFactor_{#1}}
 \newcommand{\varBlindingFactorAlice}{\varBlindingFactorFor{\varAlice}}
 \newcommand{\varBlindingFactorBob}{\varBlindingFactorFor{\varBob}}
+\newcommand{\varBlindingFactorCarol}{\varBlindingFactorFor{\varCarol}}
 \newcommand{\varS}{\styleVariable{s}}
 \newcommand{\varSAptBob}{\funHat{\varS_\varBob}}
 \newcommand{\varSApt}{\funHat{\varS}}
@@ -136,11 +152,13 @@
 \newcommand{\varSigContext}{\Lambda}
 \newcommand{\varSigPtAdv}{\funTilde{\varSignature_{\cnstAdversary}}}
 \newcommand{\varSigAlice}{\funTilde{\varSignature_{\varAlice}}}
+\newcommand{\varSigBobCarol}{\funTilde{\varSignature_{\varBob\varCarol}}}
 \newcommand{\varSigApt}{\funHat{\varSignature}}
 \newcommand{\varSigAptAdv}{\funHat{\varSignature_{\cnstAdversary}}}
 \newcommand{\varSigAptAlice}{\funHat{\varSignature_{\varAlice}}}
 \newcommand{\varSigAptBob}{\funHat{\varSignature_{\varBob}}}
 \newcommand{\varSigBob}{\funTilde{\varSignature_{\varBob}}}
+\newcommand{\varSigCarol}{\funTilde{\varSignature_{\varCarol}}}
 \newcommand{\varSchnorrChallenge}{\styleVariable{e}}
 \newcommand{\varWit}{\styleVariable{x}}
 \newcommand{\varGWit}{\styleVariable{X}}
@@ -161,6 +179,11 @@
 \newcommand{\varOutputs}{\styleVariable{out}}
 \newcommand{\varProofs}{\Pi}
 \newcommand{\varCommits}{\styleVariable{com}}
+\newcommand{\varLowerBound}{\styleVariable{lb}}
+\newcommand{\varUpperBound}{\styleVariable{ub}}
+\newcommand{\varI}{\styleVariable{i}}
+\newcommand{\varJ}{\styleVariable{j}}
+\newcommand{\varIterator}{i}
 
 % operators
 \newcommand{\opAccess}[2]{#1.#2}
@@ -182,6 +205,7 @@
 \newcommand{\opIff}{~\textit{iff}~}
 \newcommand{\opFunResult}{~\leftarrow~}
 \newcommand{\opAnd}{~\land~}
+\newcommand{\opOr}{~\lor~}
 \newcommand{\opUnion}{~\cup~}
 \newcommand{\opSmEq}{~\leq~}
 
@@ -202,13 +226,14 @@
 \newcommand{\procVerfId}{\styleFunction{verf}}
 \newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
 
+\newcommand{\procRProofSetupId}{\styleFunction{ranPrfSetup}}
+\newcommand{\procRProofSetup}[3]{\procRProofSetupId(#1,#2,#3)}
 \newcommand{\procProofId}{\styleFunction{ranPrf}}
 \newcommand{\procProof}[3]{\procProofId(#1,#2,#3)}
 \newcommand{\procMuProofId}{\styleFunction{muRanPrf}}
 \newcommand{\procMuProof}[4]{\procMuProofId<(#1,#2,#3),(#1,#2,#4)>}
 \newcommand{\procVerfProofId}{\styleFunction{vrfRanPrf}}
-\newcommand{\procVerfProof}[1]{\procVerfProofId(#1)}
-
+\newcommand{\procVerfProof}[2]{\procVerfProofId(#1,#2)}
 
 \newcommand{\procKeyGenPtId}{\styleFunction{dKeyGen}}
 \newcommand{\procKeyGenPt}[2]{\procKeyGenPtId\langle #1 \opSeperate #2 \rangle}
@@ -252,8 +277,11 @@
 \newcommand{\procZkpProve}[2]{\ensuremath{\mathsf{P}_{\textit{NIZK}}(#1, #2)}}
 \newcommand{\procZkpVerify}[1]{\ensuremath{\mathsf{V}_{\textit{NIZK}}(#1)}}
 
-\newcommand{\procSpendOutputId}{ \styleFunction{spendOutput} }
-\newcommand{\procSpendOutput}[4]{\procSpendOutputId<(#1 \opSeperate #2 \opSeperate #3), (#1 \opSeperate #4)>}
+\newcommand{\procCreateCoinId}{\styleFunction{createCoin}}
+\newcommand{\procCreateCoin}[2]{\procCreateCoinId(#1,#2)}
+
+\newcommand{\procCreatePreTxId}{\styleFunction{createTx}}
+\newcommand{\procCreatePreTx}[7]{\procCreatePreTxId(#1,#2,#3,#4,#5,#6,#7)}
 
 \newcommand{\procSendCoinsId}{\styleFunction{spendCoins}}
 \newcommand{\procSendCoins}[4]{\procSendCoinsId(#1,#2,#3,#4)}
@@ -262,13 +290,25 @@
 \newcommand{\procRecvCoins}[2]{\procRecvCoinsId(#1,#2)}
 
 \newcommand{\procFinTxId}{\styleFunction{finTx}}
-\newcommand{\procFinTx}[2]{\procFinTxId(#1,#2)}
+\newcommand{\procFinTx}[3]{\procFinTxId(#1,#2,#3)}
 
 \newcommand{\procVerfTxId}{\styleFunction{verfTx}}
 \newcommand{\procVerfTx}[1]{\procVerfTxId(#1)}
 
-\newcommand{\procCreateCoinId}{\styleFunction{createCoin}}
-\newcommand{\procCreateCoin}[2]{\procCreateCoinId(#1,#2)}
+\newcommand{\procDSignId}{\styleFunction{dSign}}
+\newcommand{\procDSign}[5]{\procDSignId \langle(#1,#2,#4),(#1,#3,#5)\rangle}
+\newcommand{\procDRProofId}{\styleFunction{dRanPrf}}
+\newcommand{\procDRProof}[4]{\procDRProofId \langle(#1,#2,#3),(#1,#2,#4)}
 
-\newcommand{\procCreatePreTxId}{\styleFunction{createTx}}
-\newcommand{\procCreatePreTx}[7]{\procCreatePreTxId(#1,#2,#3,#4,#5,#6,#7)}
+\newcommand{\procDSendCoinsId}{\styleFunction{dSpendCoinsId}}
+\newcommand{\procDSendCoins}[6]{\procDSendCoinsId
+\langle (#1,#2,#3,#4) \opSeperate (#1,#5,#3,#6) \rangle}
+
+\newcommand{\procDRecvCoinsId}{\styleFunction{dRecvCoins}}
+\newcommand{\procDRecvCoins}[2]{\procDRecvCoinsId \langle(#1,#2) \opSeperate (#1,#2) \rangle}
+
+\newcommand{\procAptRecvCoinsId}{\styleFunction{aptSpendCoins}}
+\newcommand{\procAptRecvCoins}[3]{\procAptRecvCoinsId(#1,#2,#3)}
+
+\newcommand{\procDAptFinTxId}{\styleFunction{dAptFinTx}}
+\newcommand{\procDAptFinTx}[5]{\procDAptFinTxId \langle (#1,#2,#3,#4), (#1,#5) \rangle}

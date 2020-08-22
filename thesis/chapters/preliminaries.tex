@@ -125,6 +125,30 @@ $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \o
 
 \subsection{Range Proofs}\label{sec:rangeProof}
 
+\begin{definition}[Rangeproof System]
+    A Rangeproofs system $\varRProofSystemParam{\varCommitScheme}$ with regards to a homomorphic commitment scheme $\varCommitScheme$ consists of a tupel of functions $(\procRProofSetupId, \procProofId, \procVerfProofId)$.
+    \begin{itemize}
+        \item $(\varLowerBound,\varUpperBound) \opFunResult \procRProofSetup{\varSecParam}{\varI}{\varJ}$: The rangeproof setup algorithm takes as input a security paramter $\varSecParam$ as well as two numbers
+        $\varI$ and $\varJ$ which are treated as exponents of 2 to define the lower and upper bound of the rangeproof protocol.
+        \item $\varProof \opFunResult \procProof{\varCommitment}{\varValue}{\varBlindingFactor}$: The proof algorithm is a DPT function which takes as input a commitment $\varCommitment$ a value $\varValue$ and
+        a blinding factor $\varBlindingFactor$. It will output a proof $\varProof$ attesting to the statement that the value $\varValue$ of commitment $\varCommitment$ is in between the range $\langle \varLowerBound, \varUpperBound \rangle$ as
+        defined during the $\procRProofSetupId$ function.
+        \item $\{1,0\} \opFunResult \procVerfProof{\varProof}{\varCommitment}$: The proof verification algorithm is a DPT function which verifies the validity of the proof $\varProof$ with regards to the commitment
+        $\varCommitment$. It will output 1 upon a successfull verification or 0 otherwise.
+    \end{itemize}
+\end{definition}
+
+\begin{definition}[Multiparty Rangeproof System]
+    A Multiparty Rangeproof Sytem $\varMPRProofSystemParam{\varCommitScheme}$ with regards to a homomorphic commitment scheme $\varCommitScheme$ is an extension of the regular Rangeproof Sytem with the following
+    distributed protocol $\procDRProofId$.
+    \begin{itemize}
+        \item $\varProof \opFunResult \procDRProof{\varCommitment}{\varValue}{\varBlindingFactorAlice}{\varBlindingFactorBob}$: The distributed proof protocol allows two parties Alice and Bob, each owning a share of the
+        commitment $\varCommitment$ to cooperate in order to produce a valid range proof $\varProof$ without a party learning the blinding factor share from the other party.
+    \end{itemize}
+\end{definition}
+
+For MP proofs \cite{klinec2020privacy}
+
 \subsection{Mimblewimble}\label{sec:Mimblewimble}
 In this section we will outline the fundamental properties of the protocols employed in Mimblewimble which are relevant for the thesis and particularily the construction of the Atomic Swap protocol defined in
 \ref{chp:atomicSwap}.
@@ -133,7 +157,7 @@ In this section we will outline the fundamental properties of the protocols empl
 
 \begin{itemize}
     \item For two adjacent elliptic curve generators $\varG$ and $\varH$ a coin in Mimblewimble is a tuple of the form ($\varCoin$, $\varProof$), where $\varCoin \opAssign \funGen{\varValue} \opAddPoint \funGenH{\varNonce}$  a Pedersen Commitment~\cite{pedersen1991non}
-    to the value $\varValue$ with blinding factor $\varNonce$. $\varProof$ is a range proof attesting to the fact that $\varValue$ is in a valid range \todo{Pedro: you might want to specify what range is used here. Also I rewrote some part, so please check.} in zero-knowledge.
+    to the value $\varValue$ with blinding factor $\varNonce$. $\varProof$ is a range proof attesting to the statement that $\varValue$ is in a valid range \todo{Pedro: you might want to specify what range is used here. Also I rewrote some part, so please check.} in zero-knowledge.
     
     \todo[inline]{Pedro: not sure whether the point below is required}
     \item As already pointed out, there are now addresses in Mimblewimble. Ownership of a coin is equivalent to the knowledge of its opening, so the blinding factor takes the role of the secret key.
