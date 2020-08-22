@@ -138,6 +138,17 @@ $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \o
     \end{itemize}
 \end{definition}
 
+\begin{definition}[Multiparty Rangeproof System]
+    A Multiparty Rangeproof Sytem $\varMPRProofSystemParam{\varCommitScheme}$ with regards to a homomorphic commitment scheme $\varCommitScheme$ is an extension of the regular Rangeproof Sytem with the following
+    distributed protocol $\procDRProofId$.
+    \begin{itemize}
+        \item $\varProof \opFunResult \procDRProof{\varCommitment}{\varValue}{\varBlindingFactorAlice}{\varBlindingFactorBob}$: The distributed proof protocol allows two parties Alice and Bob, each owning a share of the
+        commitment $\varCommitment$ to cooperate in order to produce a valid range proof $\varProof$ without a party learning the blinding factor share from the other party.
+    \end{itemize}
+\end{definition}
+
+For MP proofs \cite{klinec2020privacy}
+
 \subsection{Mimblewimble}\label{sec:Mimblewimble}
 In this section we will outline the fundamental properties of the protocols employed in Mimblewimble which are relevant for the thesis and particularily the construction of the Atomic Swap protocol defined in
 \ref{chp:atomicSwap}.

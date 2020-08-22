@@ -66,7 +66,7 @@ connected to the Blockchain. The $\procVerfTxId$ function is called by nodes (ac
         \item $(\varPreTx, \varStatement) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$: The adapted variant of the receive function takes an additional input a secret witness value
         $\varWit$ which will be hidden in the transactions signature and extractable by the other party after the protocols completion. Additionally to the updated pre-transaction $\varPreTx$ it returns
         the statement $\varX$ which can be sent to the other party.
-        \item $((\varTx, \varWit), \varTx) \opFunResult \procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varStatement}{\varWit}$: The adapted variant of the finalize transaction algorithm is a distributed protocol between the sender
+        \item $((\varTx, \varWit), \varTx) \opFunResult \procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSigBob}$: The adapted variant of the finalize transaction algorithm is a distributed protocol between the sender
         and receiver. Additionally to the pre-transaction $\varPreTx$ Alice (the sender) needs to input her signing key and the statement $\varStatement$ received from Bob. Bob (the receiver) needs
         to provide the secret witness $\varWit$ as input. The protocol will output the final transaction as well as $\varWit$ to Alice.
     \end{itemize}
@@ -202,17 +202,28 @@ and use it as the public key for validating the transation signature. If the sig
 
 \subsection{Extended Mimblewimble Transaction Scheme}
 
-First of all we define two protocols $\procDSignId$ and $\procDRProofId$, whereas $\procDSignId$ is a protocol between two-parties running the partial signature creation outlined in section \ref{sec:schnorrInst} and
-$\procDRProofId$ is a two-party protocol to create a single proof $\varProof$ for a commitment $\varCommitment$ for which the blinding factor consists of two shares $(\varBlindingFactorAlice, \varBlindingFactorBob)$.
+First of all we define a protocol $\procDSignId$ which is a protocol between two-parties running the partial signature creation outlined in section~\ref{sec:schnorrInst}, which will be used to simplify the pseudocodes of the
+following protocols. Note that we assume that the secret keys as well as nonces are already given as a paramter (which is the case during the transaction protocol) therefore we don't need an additional call to $\procKeyGenPtId$.
 
 \begin{center}
     \fbox{
     \begin{varwidth}{\textwidth}
-        \procedure[linenumbering]{$\procDSign{\varMsg}{\varSecKeyAlice}{\varSecKeyBob}$} {
-        \pcreturn 1
-        }
-        \procedure[linenumbering]{$\procDRProof{\varCommitment}{\varValue}{\varBlindingFactorAlice}{\varBlindingFactorBob}$}{
-        \pcreturn 1
+        \procedure[linenumbering]{$\procDSign{\varMsg}{\varSecKeyAlice}{\varSecKeyBob}{\varNonceAlice}{\varNonceBob}$} {
+        Alice \< \< Bob \\
+        \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
+        \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
+        \< \sendmessageright*{\varSigContext, \varPubKeyAlice \opAssign \funGen{\varSecKeyAlice}} \< \\
+        \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyBob}}{\funGen{\varNonceBob}} \< \< \\
+        \< \< \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
+        \< \sendmessageleft*{\varSigBob, \varSigContext, \varPubKeyBob \opAssign \funGen{\varSecKeyBob}} \< \\
+        \pcif \procVerfPtSig{\varSigBob}{\varMsg}{\varPubKeyBob} \opEqNoQ 0 \< \< \\
+        \t \pcreturn \cnstFalsum \< \< \\
+        \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \< \< \\
+        \< \sendmessageright*{\varSigAlice} \< \\
+        \< \< \pcif \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice} \opEqNoQ 0 \\
+        \< \< \t \pcreturn \cnstFalsum \\
+        \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
+        \pcreturn \varSigFin \< \< \pcreturn \varSigFin
         }
     \end{varwidth}
     }
@@ -279,7 +290,7 @@ pre-transaction $\varPreTx$ which can be sent back to the sender.
         \< \sendmessageleft*{\funStarAlt{\varCoinShared}, \funGen{\varSecKeyCarol}} \< \\
         \< \< \pcif \funStarAlt{\varCoinShared} \opNotEq \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \\
         \< \< \t \pcreturn \cnstFalsum \\
-        \< (\varSigBobCarol, \varPubKeyBobCarol, \funStar{\varSigContext}) \opFunResult \procDSign{\varMsg}{\varSecKeyBob}{\varSecKeyBob} \< \\
+        \< (\varSigBobCarol, \varPubKeyBobCarol, \funStar{\varSigContext}) \opFunResult \procDSign{\varMsg}{\varSecKeyBob}{\varSecKeyBob}{\varNonceAlice}{\varNonceBob} \< \\
         \< \funStarAlt{\varSigContext} \opFunResult \procSetupCtx{\varSigContext}{\funStar{\varSigContext}.\varPubKey}{\funStar{\varSigContext}.\varNonce} \< \\
         \< \varProofBobCarol \opFunResult \procDRProof{\funStarAlt{\varCoinShared}}{\varFundValue}{\varSecKeyAlice}{\varSecKeyBob} \< \\
         \< \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \funStarAlt{\varCoinShared}}{\varProofs \opConc \varProofBobCarol}{\funStarAlt{\varSigContext}}{\varCommits \opConc \varPubKeyBobCarol}{\varSigBobCarol} \< \\
@@ -288,6 +299,63 @@ pre-transaction $\varPreTx$ which can be sent back to the sender.
         }
     \end{sideways}
     \caption{Extended Mimblewimble Transaction Scheme - $\procDRecvCoinsId$ \label{fig:ext-mim-tx-recv}}
+\end{figure}
+
+\subsection{Adapted Extended Mimblewimble Transaction Scheme}
+
+Figure~\ref{fig:inst-apt-mw-tx-recv} shows an instantiation of the $\procAptRecvCoinsId$ algorithm. Before updating the pre-transaction $\varPreTx$ Bob adapts his partial signature with the witness value $\varWit$. The procedure
+then returns the pre-transaction $\varPreTx$ containing Bobs adapted partial signature, and the statement $\varStatement$ which is a commitment to the witness value $\varWit$.
+
+\begin{figure}
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$} {
+            (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\cnstEmptySet) \opFunResult \varPreTx \\
+            \pcif \procVerfProof{\varProofs[0]}{\varOutputs[0]} \opEqNoQ 0 \\
+            \t \pcreturn \cnstFalsum \\
+            (\funStar{\varBlindingFactorBob},\varNonceBob) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            (\varCoinOutBob,\varProofBob) \opFunResult \procCreateCoin{\varFundValue}{\funStar{\varBlindingFactorBob}} \\
+            \varSecKeyBob \opAssign \funStar{\varBlindingFactorBob} \\
+            \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyBob}}{\funGen{\varNonceBob}} \\
+            \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varSigContext.\varPubKey}{\varSigContext.\varRand} \\
+            \varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit} \\
+            \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutBob}{\varProofs \opConc \varProofBob}{\varSigContext}{\varCommits \opConc \funGen{\varNonceBob}}{\varSigAptBob} \\
+            \pcreturn (\varPreTx, \varStatement)
+            }
+        \end{varwidth}
+        }
+    \end{center}
+    \caption{Adapted Extended Mimblewimble Transaction Scheme - $\procAptRecvCoinsId$. \label{fig:inst-apt-mw-tx-recv}}
+\end{figure}
+
+In figure~\ref{fig:inst-apt-mw-tx-fin} we show the updated distributed version of the transaction finalization protocol. Again Alice verifies the pre-transaction $\varPreTx$ received by Bob and then proceeds by building
+her own partial signature. Note that at this point Alice is not able to finalize the signature (and consequently the transaction) as she only knows Bobs adapted partial signature, but not the original one, which is needed
+for the $\procFinSigId$ function. Therefore in another round of interaction Alice sends her partial signature to Bob, who will verify Alice partial signature and finally calculate the final signature, needed for the transaction.
+He will send over $\varSigFin$ which lets both parties construct the valid transaction as well as Alice call $\procExtWitId$ to extract the secret witness $\varWit$.
+
+\begin{figure}
+    \begin{sideways}
+        \fbox{
+        \procedure[linenumbering]{$\procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varWit}$} {
+        Alice \< \< Bob \\
+        (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob) \opFunResult \varPreTx \< \< \\
+        \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \< \< \\
+        \t \pcreturn \cnstFalsum \< \< \\
+        \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varCommits[1]}{\varStatement} \opEqNoQ 0 \< \< \\
+        \t \pcreturn \cnstFalsum \< \< \\
+        \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \< \< \\
+        \< \sendmessageright*{\varSigAlice} \< \\
+        \< \< \procVerfPtSig{\varSigAlice}{\varMsg}{\varCommits[0]} \\
+        \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
+        \< \sendmessageleft*{\varSigFin} \< \\
+        \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin} \< \< \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin} \\
+        \varWit \opFunResult \procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob} \\
+        \pcreturn (\varTx, \varWit) \< \< \pcreturn \varTx
+        }
+        }
+    \end{sideways}
+    \caption{Adapted Extended Mimblewimble Transaction Scheme - $\procDAptFinTxId$. \label{fig:inst-apt-mw-tx-fin}}
 \end{figure}
 
 \section{Atomic Swap protocol}\label{sec:atomic-swap}
