@@ -60,6 +60,7 @@
 \newcommand{\varAlice}{\styleVariable{A}}
 \newcommand{\varCarol}{\styleVariable{C}}
 \newcommand{\varBob}{\styleVariable{B}}
+\newcommand{\varB}{\styleVariable{b}}
 \newcommand{\varX}{\styleVariable{x}}
 \newcommand{\varProbability}{\styleVariable{P}}
 \newcommand{\varLanguage}{\styleVariable{L}_\cnstRelation}
@@ -122,6 +123,7 @@
 \newcommand{\varValue}{\styleVariable{v}}
 \newcommand{\varValueAlice}{\varValue_{\varAlice}}
 \newcommand{\varValueCarol}{\varValue_{\varCarol}}
+\newcommand{\varValueMax}{\varValue_{max}}
 \newcommand{\varMsg}{\styleVariable{m}}
 \newcommand{\varLockHeight}{\styleVariable{h}}
 \newcommand{\varNonce}{\styleVariable{k}}
@@ -319,3 +321,9 @@
 
 \newcommand{\procStealCoinId}{\styleFunction{stealCoin}}
 \newcommand{\procStealCoin}[2]{\procStealCoinId (#1,#2)}
+
+\newcommand{\procTxIndId}{\styleFunction{TX-IND}}
+\newcommand{\procTxInd}[2]{\procTxIndId (#1,#2)}
+
+\newcommand{\procOracleTxId}{\cnstOracle_{tx}}
+\newcommand{\procOracleTx}[4]{\procOracleTxId ((#1,#2),(#3,#4))}

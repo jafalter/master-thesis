@@ -98,7 +98,7 @@ creating new value $\funStar{\varValue} \opSub \varValue$.
 
 \begin{definition}[Inflation Resistence]
     A Mimblewimbe Transaction Scheme is called inflation resistent if for any value $\varValue$ in a valid range (as defined by the public parameters of the ledger), security
-    paramter $\varSecParam$ and a polytime adversary $\cnstAdversary$ the following holds:
+    paramter $\varSecParam$ and a PPT adversary $\cnstAdversary$ the following holds:
     \[ \prob{\procInflate{\varSecParam}{\varValue} \opEqNoQ 1} \opSmEq \funNegl{\varN} \]
 \end{definition}
 
@@ -106,8 +106,8 @@ creating new value $\funStar{\varValue} \opSub \varValue$.
 to the blinding factor, however as the possible values for $\varValue$ in practice is restriced by the systems parameters, it is trivial to guess.
 Therefore we assume that knowledge of the blinding factor $\varBlindingFactor$ alone implies ownership of the coin.
 
-We define a game $\procStealCoinId$ which takes as input a security paramter $\varSecParam$ and a coin $\varCoinInp$. The adversary is given the task to spend the input coin not belonging to him.
-He adversary wins if he can construct a valid transaction $\varTx$ together with the help of a challenger which spends the input coin $\varCoinInp$ and transfers its value.
+We define a game $\procStealCoinId$ which takes as input a security paramter $\varSecParam$ and a coin $\varCoinInp$. A PPT adversary $\cnstAdversary$ is given the challenge to spend the input coin given in the parameter.
+He wins if he can construct a valid transaction $\varTx$ together with the help of a challenger spending the input coin $\varCoinInp$ and thereby transferring its value.
 
 \begin{center}
     \fbox{
@@ -123,11 +123,45 @@ He adversary wins if he can construct a valid transaction $\varTx$ together with
 \end{center}
 
 \begin{definition}[Theft-resistance]
-
+    A Mimblewimble Transaction Scheme is called theft-resistent if for any input coin $\varCoinInp$, security parameter $\varSecParam$ and PPT adversary $\cnstAdversary$ the following holds:
+    \[ \prob{\procStealCoin{\varSecParam}{\varCoinInp} \opEqNoQ 1 } \opSmEq \funNegl{\varN} \]
 \end{definition}
 
+\emph{Transaction indistinguishability}: The third security property for a Mimblewimble Transaction System is related to transaction amounts. Due to the use of homomorphic commitments instead of plaintext values,
+an adversary should be unable to extract plaintext amounts from the final transaction. To formalize the property we define the game $\procTxIndId$:
+A PPT adversary $\cnstAdversary$ gets access to a transaction oracle $\procOracleTxId$ to which he can send two sets of values, one being the input value, the other the output value. We require all values to be in
+a valid range as defined by the game parameter $\varValueMax$, furthermore we require the transaction to be balanced, so the output values can not be higher then input values. The oracle will select one of the two
+sets depending on the bit $\varB$ chosen by the challenger and construct a transaction spending a coin with value $\varValue_b$ to and outputcoin $\varFundValue_b$ (as well as a change coin with the remainder).
+From the returned transaction the adversary has to guess the value of $\varB$.
+If the adversary manages to chose the correct value of $\varB$ he or she has won the game.
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procTxInd{\varN}{\varValueMax}$} {
+            \varB \sample \{0,1\} \\
+            \funStar{\varB} \opFunResult \cnstAdversary^{\procOracleTx{\cdot}{\cdot}{\cdot}{\cdot}} \\
+            \pcreturn \varB \opEq \funStar{\varB}
+        }
+        \procedure[linenumbering]{$\procOracleTx{\varValue_1}{\varFundValue_1}{\varValue_2}{\varFundValue_2}$} {
+            \pcif (\varValue_1, \varFundValue_1, \varValue_2, \varFundValue_2) \opNotIn [0, \varValueMax]*) \\
+            \t \pcreturn \cnstFalsum \\
+            \pcif \varFundValue_1 \opGreaterThen \varValue_1 \opOr \varFundValue_2 \opGreaterThen \varValue_2 \\
+            \t \pcreturn \cnstFalsum \\
+            \varBlindingFactor \sample \cnstIntegersPrimeWithoutZero{\varSecParam} \\
+            \varCoinInp \opFunResult \procCreateCoin{\varValue_b}{\varBlindingFactor} \\
+            (\varPreTx, \varSecKey, \varNonce) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactor}}{\varFundValue_b}{\varValue_b} \\
+            \funStar{\varPreTx} \opFunResult \procRecvCoins{\varPreTx}{\varFundValue_b} \\
+            \pcreturn \procFinTx{\funStar{\varPreTx}}{\varSecKey}{\varNonce}
+        }
+    \end{varwidth}
+    }
+\end{center}
+
 \begin{definition}[Transaction indistinguishability]
-    TODO
+    We say Transaction Indistinguishability holds for a Mimblewimble Transaction System $\varMWScheme$ if for a PPT adversary $\cnstAdversary$ with access to the transaction oracle $\procOracleTxId$ a 
+    security parameter $\varN$ and any max value $\varValueMax$ the following must hold:
+    \[ \prob{\procTxInd{\varSecParam}{\varValueMax} \opEq 1} \opSmEq 0.5 \opAddScalar \funNegl{\varN} \]
 \end{definition}
 
 
