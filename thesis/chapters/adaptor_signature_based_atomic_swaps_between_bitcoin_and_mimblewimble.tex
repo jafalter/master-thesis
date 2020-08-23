@@ -72,15 +72,58 @@ connected to the Blockchain. The $\procVerfTxId$ function is called by nodes (ac
     \end{itemize}
 \end{definition}
 
-An essential security property for a Mimblewimble Transaction Scheme $\varMWScheme$ is that a transaction can only transfer value from a sender to a receiver, but not create any new value, meaning the value
-of a transactions output coins must always be equal (or less accounting for transaction fees) then the sum of the value of its input coins.
+\emph{Resistance against inflation}: We first define a security property which informally states that a transactions output value can only be less or equal to  the value of its input coins (if less then the miner of the transaction can extract fees).
+In other words a transaction in our definition shall only transfer existing but never generate any new value. We call this security property \emph{Inflation Resistance}.
+In order to define this property we first have to define a cryptographic game $\procInflateId$ which takes as input a security parameter $\varSecParam$ and a value $\varValue$ which the Adversary
+$\cnstAdversary$ tries to inflate.
+
+We define the game $\procInflateId$ as follows, whereas a challenger creates a input coin with value $\varValue$ given as a parameter to the game. The adversary then chooses a value $\funStar{\varValue}$ with
+$\funStar{\varValue} \opGreaterThen \varValue$ and creates a new output coin. The adversary wins if he can construct a valid transaction spending the challengers input coin $\varCoinInp$ to $\varCoinOut$ and thereby
+creating new value $\funStar{\varValue} \opSub \varValue$.
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procInflate{\varSecParam}{\varValue}$} {
+        \varBlindingFactor \sample \cnstIntegersPrimeWithoutZero{*} \\
+        (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactor}
+        (\funStar{\varBlindingFactor}, \funStar{\varValue}) \opFunResult \cnstAdversary (\varCoinInp, \varValue) \\
+        (\varCoinOut, \varProof) \opFunResult \procCreateCoin{\funStar{\varValue}}{\varBlindingFactor} \\
+        \varTx \cnstAdversary (\varCoinInp, \varValue, \varCoinOut) \\
+        \pcreturn \funStar{\varValue} \opGreaterThen \varValue \opAnd \procVerfTx{\varTx} \opEqNoQ 1 \opAnd \varTx.out \opEq \funArray{\varCoinOut} \opAnd \varTx.inp \opEq \funArray{\varCoinInp}
+        }
+    \end{varwidth}
+    }
+\end{center}
 
 \begin{definition}[Inflation Resistence]
-    TODO
+    A Mimblewimbe Transaction Scheme is called inflation resistent if for any value $\varValue$ in a valid range (as defined by the public parameters of the ledger), security
+    paramter $\varSecParam$ and a polytime adversary $\cnstAdversary$ the following holds:
+    \[ \prob{\procInflate{\varSecParam}{\varValue} \opEqNoQ 1} \opSmEq \funNegl{\varN} \]
 \end{definition}
 
+\emph{Resistance against Coin theft}: In a Mimblewimble transaction scheme a coins ownership is given by the knowledge of its blinding factor $\varBlindingFactor$. To spend the coin the sender would also have to know the coins value $\varValue$ in addition
+to the blinding factor, however as the possible values for $\varValue$ in practice is restriced by the systems parameters, it is trivial to guess.
+Therefore we assume that knowledge of the blinding factor $\varBlindingFactor$ alone implies ownership of the coin.
+
+We define a game $\procStealCoinId$ which takes as input a security paramter $\varSecParam$ and a coin $\varCoinInp$. The adversary is given the task to spend the input coin not belonging to him.
+He adversary wins if he can construct a valid transaction $\varTx$ together with the help of a challenger which spends the input coin $\varCoinInp$ and transfers its value.
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procStealCoin{\varSecParam}{\varCoinInp}$} {
+        (\varPreTx, \varSecKey, \varFundValue) \opFunResult \cnstAdversary (\varCoinInp) \\
+        \funStar{\varPreTx} \opFunResult \procRecvCoins{\varPreTx}{\varFundValue} \\
+        \varTx \opFunResult \cnstAdversary (\funStar{\varPreTx}) \\
+        \pcreturn \procVerfTx{\varTx} \opEqNoQ 1 \opAnd \varCoinInp \opIn \varTx.inp
+        }
+    \end{varwidth}
+    }
+\end{center}
+
 \begin{definition}[Theft-resistance]
-    TODO
+
 \end{definition}
 
 \begin{definition}[Transaction indistinguishability]

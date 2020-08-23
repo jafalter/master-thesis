@@ -208,6 +208,7 @@
 \newcommand{\opOr}{~\lor~}
 \newcommand{\opUnion}{~\cup~}
 \newcommand{\opSmEq}{~\leq~}
+\newcommand{\opGreaterThen}{~>~}
 
 % procedures
 \newcommand{\procGenRId}{\styleFunction{genRel}}
@@ -312,3 +313,9 @@
 
 \newcommand{\procDAptFinTxId}{\styleFunction{dAptFinTx}}
 \newcommand{\procDAptFinTx}[5]{\procDAptFinTxId \langle (#1,#2,#3,#4), (#1,#5) \rangle}
+
+\newcommand{\procInflateId}{\styleFunction{inflate}}
+\newcommand{\procInflate}[2]{\procInflateId (#1,#2)}
+
+\newcommand{\procStealCoinId}{\styleFunction{stealCoin}}
+\newcommand{\procStealCoin}[2]{\procStealCoinId (#1,#2)}
