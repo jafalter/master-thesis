@@ -303,14 +303,14 @@
 \newcommand{\procDRProofId}{\styleFunction{dRanPrf}}
 \newcommand{\procDRProof}[4]{\procDRProofId \langle(#1,#2,#3),(#1,#2,#4)}
 
-\newcommand{\procDSendCoinsId}{\styleFunction{dSpendCoinsId}}
-\newcommand{\procDSendCoins}[6]{\procDSendCoinsId
-\langle (#1,#2,#3,#4) \opSeperate (#1,#5,#3,#6) \rangle}
+\newcommand{\procDSendCoinsId}{\styleFunction{dSpendCoins}}
+\newcommand{\procDSendCoins}[5]{\procDSendCoinsId
+\langle (#1,#2,#3,#4) \opSeperate (#1,#5,#3,#4) \rangle}
 
 \newcommand{\procDRecvCoinsId}{\styleFunction{dRecvCoins}}
 \newcommand{\procDRecvCoins}[2]{\procDRecvCoinsId \langle(#1,#2) \opSeperate (#1,#2) \rangle}
 
-\newcommand{\procAptRecvCoinsId}{\styleFunction{aptSpendCoins}}
+\newcommand{\procAptRecvCoinsId}{\styleFunction{aptRecvCoins}}
 \newcommand{\procAptRecvCoins}[3]{\procAptRecvCoinsId(#1,#2,#3)}
 
 \newcommand{\procDAptFinTxId}{\styleFunction{dAptFinTx}}
