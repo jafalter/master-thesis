@@ -1,42 +1,42 @@
-In this section, we will define Mimblewimble transactions and required security properties, similiar to those found by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}. We will only focus on the creation of new transfer transactions
-(transferring value from one or many parties to one or many parties), the notions of transaction aggregation, coin minting and transaction publishing discussed in ~\cite{fuchsbauer2019aggregate} will not be topic of this formalization, as
+In this section, we will define Mimblewimble transactions and security properties which must hold for such a transaction system. The formalizations will be similar to those found by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}. However, we will only focus on the transaction protocol
+(transferring value from one or many parties to one or many parties), the notions of transaction aggregation, coin minting and adding transaction to the main ledger also discussed in~\cite{fuchsbauer2019aggregate} will not be topic of this formalization, as
 they are not relevant building blocks for the proposed Atomic Swap protocol.
 
-However, as an extension to the regular transaction protocol transferring value from one sender to a receiver we will define two further protocols. The first of them titled Extended Mimblewimble Transaction Scheme
-will provide additional functions to create and spend coins owned by two parties instead of just one. The second extended definition is called Adapted Extended Mimblewimble Transaction Scheme and will allow the receiver
+However, as an extension to the regular transaction protocol transferring value from one sender to a receiver we will define two further protocols. The first of them titled \emph{Extended Mimblewimble Transaction Scheme}
+will provide additional functions to create and spend coins owned by two parties instead of just one. The second extended definition is called \emph{Adapted Extended Mimblewimble Transaction Scheme} and will allow the receiver
 of a coin to hide a secret witness value $\varWit$ in his signature, in a way that the sender (or the senders) can redeem this secret after the protocol has completed.
 
 We will proceed by providing an instantiation of the three transactions schemes which can be implemented and deployed on a Mimblewimble based Cryptocurrency such as Beam or Grin. Furthermore we provide proofs
 that the schemes are correct and secure with regards to the defined security properties.
 
-Finally, we define a Atomic Swap protocol from these building blocks, allowing two parties to securely and trustlessly swap funds from a Mimblewimble blockchain with those on another Blockchain, such as Bitcoin.
+Finally, we define a Atomic Swap protocol from these building blocks, allowing two parties to securely and trustlessly swap funds from a Mimblewimble blockchain with those on another blockchain, such as Bitcoin.
 
 
 \section{Definitions}\label{sec:atomic-def}
 
-As we have already discussed in section~\ref{sec:Mimblewimble} for the creation of a transaction, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
+As we have already discussed in section~\ref{sec:Mimblewimble} for the creation of a transaction in Mimblewimble, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
 To construct the transaction protocol we assume that we have access to a two-party signature scheme $\varSigSchemeMP$ as defined in definition~\ref{def:twoPartySig}, a zero-knowledge Rangeproofs system $\varProofSystem$
 such as Bulletproofs, as described in section~\ref{sec:rangeProof} and a homomorphic commitment scheme $\varCommitScheme$ as defined in definition~\ref{def:homomorphicCom} such as
 Pedersen Commitments~\ref{def:pedersenCom}.
 
 Fuchsbauer et al. have defined three procedures $\styleFunction{Send}$, $\styleFunction{Rcv}$ and $\styleFunction{Ldgr}$ with regards to the creation of a transaction. $\styleFunction{Send}$ called by the sender
-will create a pre-transaction, $\styleFunction{Rcv}$ takes the pre-transaction and adds the receivers output and $\styleFunction{Ldgr}$ (again called by the sender) publishes the final transaction to the Blockchain ledger.
-As we already pointed out in this thesis we won't discuss the transaction publishing phase therefore we will not cover the functionality of the $\styleFunction{Ldgr}$ procedure, instead we indroduce two
-functions $\procFinSigId$ and $\procVerfTxId$. $\procFinSigId$ can be called by the transaction sender to finalize a pre-transaction into final valid transaction, which then could be broadcast with a node
-connected to the Blockchain. The $\procVerfTxId$ function is called by nodes (acting as public verifiers) on the blockchain verifying the validity of the transaction, before including them to a block.
+will create a pre-transaction, $\styleFunction{Rcv}$ takes the pre-transaction and adds the receivers output and $\styleFunction{Ldgr}$ (again called by the sender) publishes the final transaction to the blockchain ledger.
+As we have already pointed out in this thesis we won't discuss the transaction publishing phase therefore we will not cover the functionality of the $\styleFunction{Ldgr}$ procedure, instead we introduce two
+functions $\procFinTxId$ and $\procVerfTxId$. $\procFinTxId$ can be called by the transaction sender to finalize a pre-transaction into final valid transaction, which then could be broadcast with a node
+connected to the blockchain. The $\procVerfTxId$ function is called by nodes (acting as public verifiers) on the blockchain verifying the validity of the transaction, before including them in a block.
 
 \begin{definition}[Mimblewimble Transaction Scheme]
     \label{def:mw-tx-scheme}
-    A Mimblewimble transaction scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ consist of the following procedures:
+    A Mimblewimble Transaction Scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ with commitment scheme $\varCommitScheme$, two-party signature scheme $\varSigSchemeMP$, and rangeproof system $\varProofSystem$ consist of the following tupel of procedures:
     \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign ( \procSendCoinsId,\procRecvCoinsId,\procFinTxId,\procVerfTxId ) \]
     \begin{itemize}
         \item $(\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactor}}{\varFundValue}{\varValue}$: The spendCoins algorithm is a DPT function called by the sending party to
         initiate the spending of some input coins. As input it takes a list of coins $\funArray{\varCoinInp}$ which should be spent, the respective keys $\funArray{\varBlindingFactor}$ to the input coins and a value $\varFundValue$ which should be
-        transferred to the receiver as well as $\varValue$ which is the total value stored in the input coins. It outputs a pre-transaction $\varPreTx$ which can be sent to a receiver, as well as the senders signing key and nonce $(\varSecKeyAlice, \varNonceAlice)$.
-        \item $\varPreTx \opFunResult \procRecvCoins{\varPreTx}{\varFundValue}$: The receiveCoins algorithm is a DPT function called by the receiver and takes as input a pre-transaction $\varPreTx$ and a fund value
-        $\varFundValue$ and will output a modified pre-transaction $\varPreTx$.
+        transferred to the receiver as well as $\varValue$ which is the total value stored in the input coins. It outputs a pre-transaction $\varPreTx$ which can be sent to a receiver, as well as the senders signing key and secret nonce $(\varSecKeyAlice, \varNonceAlice)$.
+        \item $(\varPreTx, \varBlindingFactorBob) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue}$: The receiveCoins algorithm is a DPT function called by the receiver and takes as input a pre-transaction $\varPreTx$ and a fund value
+        $\varFundValue$. It will construct the receivers output coin and output a modified pre-transaction $\varPreTx$ together a blinding factor $\varBlindingFactorBob$, which the receiver might use at a later point to again spend this output.
         \item $\varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}$: The finalize algorithm is a DPT function again called by the transaction sender that takes as input a pre-transaction $\varPreTx$ and the senders
-        signing key $\varSecKeyAlice$. The function will output a finalized transaction $\varTx$, which can be published to the blockchain.
+        signing key $\varSecKeyAlice$ and nonce $\varNonceAlice$. The function will output a finalized transaction $\varTx$, which can be published to the blockchain.
         \item $\{1,0\} \opFunResult \procVerfTx{\varTx}$: The transaction verification algorithm is a DPT function which can be called by a public verifier and takes as input a transaction $\varTx$. It
         outputs either 1 on verification success or 0 otherwise.
     \end{itemize}
@@ -47,13 +47,14 @@ connected to the Blockchain. The $\procVerfTxId$ function is called by nodes (ac
     An extended Mimblewimble transaction scheme $\varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ is an extension to $\varMWScheme$ with the following two procedures:
     \[ \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc (\procDSendCoinsId, \procDRecvCoinsId) \]
     \begin{itemize}
-        \item $((\varPreTx,\varSecKey), (\varPreTx,\varSecKey)) \opFunResult \procDSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValue}{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorBob}}$:
-        The distributed coin spending algorithm takes as input a list of input coins, as well as a list of blinding factors from each Alice and Bob, and the to be transferred value $\varFundValue$ and
-        total value of input coins $\varValue$. Note that for each provided input coin $\varCoinInp$ the blinding factor is composed by combining the shares from Alice and Bob like
-        $\varBlindingFactor \opAssign \varBlindingFactorAlice \opAddScalar \varBlindingFactorBob$.
-        \item $(\varPreTx, \varPreTx) \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue}$: The distributed coin receive procedure takes as input a pre-transaction $\varPreTx$ and
-        a value $\varFundValue$ which should be transferred. The distributed algorithm will generate a output coin owned by both Alice and Bob. (each owning a share of the key). The output will be similiar
-        to the single party version a updated pre-transaction $\varPreTx$.
+        \item $((\varPreTx,(\varSecKeyAlice,\varNonceAlice)), (\varPreTx,(\varSecKeyCarol,\varNonceCarol))) \\
+        \opFunResult \procDSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValue}{\funArray{\varBlindingFactorCarol}}$:
+        The distributed coin spending algorithm takes as input a list of input coins, as well as a list of blinding factors from each Alice and Carol, and the to be transferred value $\varFundValue$ and
+        total value of input coins $\varValue$. Note that for each provided input coin $\varCoinInp$ the blinding factor is composed by combining the shares from Alice and Carol like
+        $\varBlindingFactor \opAssign \varBlindingFactorAlice \opAddScalar \varBlindingFactorCarol$.
+        \item $((\varPreTx, \funStar{\varBlindingFactorBob}), (\varPreTx, \varBlindingFactorCarol)) \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue}$: The distributed coin receive procedure takes as input a pre-transaction $\varPreTx$ and
+        a value $\varFundValue$ which should be transferred during the course of the transaction. The distributed algorithm will generate a output coin owned by both Alice and Carol. (each owning a share of the key). The output will be similiar
+        to the single party version a updated pre-transaction $\varPreTx$ and the respective shares of the blinding factor.
     \end{itemize}
 \end{definition}
 
@@ -63,28 +64,105 @@ connected to the Blockchain. The $\procVerfTxId$ function is called by nodes (ac
     transaction function.
     \[ \varaptMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc \procAptRecvCoinsId, \procDAptFinTxId \]
     \begin{itemize}
-        \item $(\varPreTx, \varStatement) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$: The adapted variant of the receive function takes an additional input a secret witness value
-        $\varWit$ which will be hidden in the transactions signature and extractable by the other party after the protocols completion. Additionally to the updated pre-transaction $\varPreTx$ it returns
-        the statement $\varX$ which can be sent to the other party.
+        \item $(\varPreTx, \varBlindingFactorBob, \varStatement) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$: The adapted variant of the receive function takes an additional input a secret witness value
+        $\varWit$ which will be hidden in the transactions signature and extractable by the other party after the protocols completion. Additionally to the updated pre-transaction $\varPreTx$ and output coin blinding factor $\varBlindingFactorBob$ it returns
+        the statement $\varX$ which can be sent to the other party, for verification.
         \item $((\varTx, \varWit), \varTx) \opFunResult \procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSigBob}$: The adapted variant of the finalize transaction algorithm is a distributed protocol between the sender
-        and receiver. Additionally to the pre-transaction $\varPreTx$ Alice (the sender) needs to input her signing key and the statement $\varStatement$ received from Bob. Bob (the receiver) needs
-        to provide the secret witness $\varWit$ as input. The protocol will output the final transaction as well as $\varWit$ to Alice.
+        and receiver. Additionally to the pre-transaction $\varPreTx$ Alice (the sender) needs to input her signing key, nonce and the statement $\varStatement$ received from Bob. Bob (the receiver) needs
+        to provide the original (unadapted) partial signature $\varSigBob$ as input. The protocol will output the final transaction as well as $\varWit$ to Alice.
     \end{itemize}
 \end{definition}
 
-An essential security property for a Mimblewimble Transaction Scheme $\varMWScheme$ is that a transaction can only transfer value from a sender to a receiver, but not create any new value, meaning the value
-of a transactions output coins must always be equal (or less accounting for transaction fees) then the sum of the value of its input coins.
+\emph{Resistance against inflation}: We first define a security property which informally states that a transactions output value can only be less or equal to  the value of its input coins (if less then the miner of the transaction can extract fees).
+In other words a transaction in our definition shall only transfer existing but never generate any new value. We call this security property \emph{Inflation Resistance}.
+In order to define this property we first have to define a cryptographic game $\procInflateId$ which takes as input a security parameter $\varN$ and a value $\varValue$ which the Adversary
+$\cnstAdversary$ tries to inflate.
+
+We define the game $\procInflateId$ as follows, whereas a challenger creates a input coin with value $\varValue$ given as a parameter to the game. The adversary then chooses a value $\funStar{\varValue}$ with
+$\funStar{\varValue} \opGreaterThen \varValue$ and creates a new output coin $\varCoinOut$. The adversary wins if he can construct a valid transaction spending the challengers input coin $\varCoinInp$ to $\varCoinOut$ and thereby
+creating new value in the total of $\funStar{\varValue} \opSub \varValue$.
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procInflate{\varN}{\varValue}$} {
+        \varBlindingFactor \sample \cnstIntegersPrimeWithoutZero{\varN} \\
+        (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactor} \\
+        (\funStar{\varBlindingFactor}, \funStar{\varValue}) \opFunResult \cnstAdversary (\varCoinInp, \varValue) \\
+        (\varCoinOut, \varProof) \opFunResult \procCreateCoin{\funStar{\varValue}}{\funStar{\varBlindingFactor}} \\
+        \varTx \opFunResult\cnstAdversary (\varCoinInp, \varValue, \varCoinOut) \\
+        \pcreturn \funStar{\varValue} \opGreaterThen \varValue \opAnd \procVerfTx{\varTx} \opEqNoQ 1 \opAnd \varTx.out \opEqNoQ \funArray{\varCoinOut} \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
+        }
+    \end{varwidth}
+    }
+\end{center}
 
 \begin{definition}[Inflation Resistence]
-    TODO
+    A Mimblewimbe Transaction Scheme is called inflation resistent if for any value $\varValue$ in a valid range (as defined by the public parameters of the ledger), security
+    paramter $\varN$ and a PPT adversary $\cnstAdversary$ the following holds:
+    \[ \prob{\procInflate{\varN}{\varValue} \opEqNoQ 1} \opSmEq \funNegl{\varN} \]
 \end{definition}
+
+\emph{Resistance against Coin theft}: In a Mimblewimble transaction scheme a coins ownership is given by the knowledge of its blinding factor $\varBlindingFactor$. To spend the coin the sender would also have to know the coins value $\varValue$ in addition
+to the blinding factor, however as the possible values for $\varValue$ in practice is restriced by the blockchains public parameters, it is trivial to guess.
+Therefore we assume that knowledge of the blinding factor $\varBlindingFactor$ alone implies ownership of the coin.
+
+We define a game $\procStealCoinId$ which takes as input a security parameter $\varN$ and a coin $\varCoinInp$. A PPT adversary $\cnstAdversary$ is given the challenge to spend the input coin given in the parameter.
+He wins if he can construct a valid transaction $\varTx$ together with the help of a challenger spending the input coin $\varCoinInp$ and thereby transferring its value.
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procStealCoin{\varN}{\varCoinInp}$} {
+        (\varPreTx, \varSecKey, \varFundValue) \opFunResult \cnstAdversary (\varCoinInp) \\
+        \funStar{\varPreTx} \opFunResult \procRecvCoins{\varPreTx}{\varFundValue} \\
+        \varTx \opFunResult \cnstAdversary (\funStar{\varPreTx}) \\
+        \pcreturn \procVerfTx{\varTx} \opEqNoQ 1 \opAnd \varCoinInp \opIn \varTx.inp
+        }
+    \end{varwidth}
+    }
+\end{center}
 
 \begin{definition}[Theft-resistance]
-    TODO
+    A Mimblewimble Transaction Scheme is called theft-resistent if for any input coin $\varCoinInp$, security parameter $\varN$ and PPT adversary $\cnstAdversary$ the following holds:
+    \[ \prob{\procStealCoin{\varN}{\varCoinInp} \opEqNoQ 1 } \opSmEq \funNegl{\varN} \]
 \end{definition}
 
+\emph{Transaction indistinguishability}: The third security property for a Mimblewimble Transaction System is related to transaction amounts. Due to the use of homomorphic commitments instead of plaintext values,
+an adversary should be unable to extract plaintext amounts from the final transaction. To formalize the property we define the game $\procTxIndId$:
+A PPT adversary $\cnstAdversary$ gets access to a transaction oracle $\procOracleTxId$ to which he can send two sets of values, one being the input value, the other the output value. We require all values to be in
+a valid range as defined by the game parameter $\varValueMax$, furthermore we require the transaction to be balanced, so the output values can not be higher then input values. The oracle will select one of the two
+sets depending on the bit $\varB$ chosen by the challenger and construct a transaction spending a coin with value $\varValue_b$ to a outputcoin of value $\varFundValue_b$ (as well as a change coin with the remainder).
+From the returned transaction the adversary has to guess the value of $\varB$.
+If the adversary manages to chose the correct value of $\varB$ he or she has won the game.
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procTxInd{\varN}{\varValueMax}$} {
+            \varB \sample \{0,1\} \\
+            \funStar{\varB} \opFunResult \cnstAdversary^{\procOracleTx{\cdot}{\cdot}{\cdot}{\cdot}} \\
+            \pcreturn \varB \opEq \funStar{\varB}
+        }
+        \procedure[linenumbering]{$\procOracleTx{\varValue_1}{\varFundValue_1}{\varValue_2}{\varFundValue_2}$} {
+            \pcif (\varValue_1, \varFundValue_1, \varValue_2, \varFundValue_2) \opNotIn [0, \varValueMax]*) \\
+            \t \pcreturn \cnstFalsum \\
+            \pcif \varFundValue_1 \opGreaterThen \varValue_1 \opOr \varFundValue_2 \opGreaterThen \varValue_2 \\
+            \t \pcreturn \cnstFalsum \\
+            \varBlindingFactor \sample \cnstIntegersPrimeWithoutZero{\varSecParam} \\
+            \varCoinInp \opFunResult \procCreateCoin{\varValue_b}{\varBlindingFactor} \\
+            (\varPreTx, \varSecKey, \varNonce) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactor}}{\varFundValue_b}{\varValue_b} \\
+            \funStar{\varPreTx} \opFunResult \procRecvCoins{\varPreTx}{\varFundValue_b} \\
+            \pcreturn \procFinTx{\funStar{\varPreTx}}{\varSecKey}{\varNonce}
+        }
+    \end{varwidth}
+    }
+\end{center}
+
 \begin{definition}[Transaction indistinguishability]
-    TODO
+    We say Transaction Indistinguishability holds for a Mimblewimble Transaction System $\varMWScheme$ if for a PPT adversary $\cnstAdversary$ with access to the transaction oracle $\procOracleTxId$ a 
+    security parameter $\varN$ and any max value $\varValueMax$ the following must hold:
+    \[ \prob{\procTxInd{\varN}{\varValueMax} \opEq 1} \opSmEq 0.5 \opAddScalar \funNegl{\varN} \]
 \end{definition}
 
 
@@ -93,7 +171,7 @@ of a transactions output coins must always be equal (or less accounting for tran
 In this section we will provide an instantiation of the transaction scheme definitions found in~\ref{def:mw-tx-scheme},~\ref{def:ext-mw-tx-scheme} and~\ref{def:apt-ext-mw-tx-scheme}. The instantiations can be
 implemented in a Cryptocurrency based on the Mimblewimble protocol such as Beam and Grin.
 
-\subsection{Mimblewimble Transation Scheme}
+\subsection{Mimblewimble Transaction Scheme}
 
 First we provide an instantiation of the simplest form of a transaction in which a sender wants to transfer some value $\varFundValue$ to a receiver. For the execution of the protocol we assume to have access to a homomorphic
 commitment scheme such as Pedersen Commitment $\varCommitScheme$ as defined in definition~\ref{def:pedersenCom}. Furthermore we require a Rangeproof system $\varProofSystem$ as defined in
@@ -103,7 +181,7 @@ The make the pseudocode for the transaction protocol easier we first introduce t
 and $\procCreatePreTxId$. The coin creation function will take as input a value $\varValue$ and a blinding factor $\varBlindingFactor$, it will create and output a new coin $\varCoin$ together with a range proof
 $\varProof$ attesting to the statement that the coins value $\varValue$ is within the valid range as defined for the blockchain.
 The transaction creation algorithm $\procCreatePreTxId$ takes as input a message $\varMsg$, a list of input coins $\funArray{\varCoinInp}$, a list of output coins $\funArray{\varCoinOut}$, a list of rangeproofs
-$\funArray{\varProof}$, a signature context $\varSigContext$, a list of nonce commitments $\varCommitment$ and a signature $\varSignature$ and will collect the input data into a transaction object.
+$\funArray{\varProof}$, a signature context $\varSigContext$, a list of commitments $\varCommitment$ and a signature $\varSignature$ and will collect the input data into a transaction object.
 
 \begin{center}
     \fbox{
@@ -131,13 +209,13 @@ $\funArray{\varProof}$, a signature context $\varSigContext$, a list of nonce co
 In figure~\ref{fig:inst-mw-tx} we provide an instantiation of the Mimblewimble Transction Scheme using the auxiliary functions provided before.
 
 In the $\procSendCoinsId$ function the sender creates his change output coin, which is the difference between the value stored in his input coins and the value which should be transferred to a receiver.
-He sets up the signature context with his parameters and gets a pretransaction $\varPreTx$, as well as a signing key $\varSecKeyAlice$ as output. The pretransaction can then be sent to a receiver.
+He sets up the signature context with his parameters and gets a pre-transaction $\varPreTx$, as well as a signing key $\varSecKeyAlice$ and secret nonce $\varNonceAlice$ as output. The pre-transaction can then be sent to a receiver.
 Note that this instantiation differs from the one described by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} in that the sender does not yet sign the transaction during $\procSendCoinsId$. This has
-the reason that in our definition of the Two-Party Signature Scheme~\ref{def:twoPartySig} the signature context $\varSigContext$ requires to be fully setup before a partial signature can be created, therfore
-signing can only start at the recievers turn, after the signature context has been completed. In the paper by Fuchsbauer et al. signing already at the senders turn works, because instead of using the notion
-of a two party signing protocol, they instead rely on a aggregateable signature scheme. The sender and receiver both will create their signatures which will then be aggregated into the final one. However,
+the reason that in our definition of the Two-Party Signature Scheme~\ref{def:twoPartySig} the signature context $\varSigContext$ requires to be fully setup before a partial signature can be created, therefore
+signing can only start at the recievers turn, after the signature context has been completed. In Fuchsbauer et al. paper it is possible to start the signing earlier, because instead of using the notion
+of a two-party signing protocol, they instead rely on a aggregateable signature scheme. The sender and receiver both will create their signatures which will then be aggregated into the final one. However,
 we find that by relying upon a two-party signature scheme instead we are closer to what is implemented in practice~\footcite{https://medium.com/@brandonarvanaghi/grin-transactions-explained-step-by-step-fdceb905a853} .
-Furthermore by starting the signing process at the receivers turn we avoid a potential problem: If an adversary learns the already signed pre-transaction $\varPreTx$ and the value $\varFundValue$ before the
+Furthermore by starting the signing process at the receivers turn we avoid a potential problem: If an adversary learns the already signed pre-transaction, before the
 intended receiver, the adversary would be able to steal the coins by creating his malicious output coin together with his signature, which he could then aggregate to the senders pre-transaction.
 
 In $\procRecvCoinsId$ the receiver of a pre-transaction will verify the senders proof $\varProofBob$, create his outputcoin $\varCoinOutBob$, add his parameters to the signature context and then create his partial signature $\varSigBob$.
@@ -146,8 +224,8 @@ The function returns an updated version of the pre-transaction $\varPreTx$ which
 Now in $\procFinTxId$ the original sender will validate the updated pre-transcation $\varPreTx$ sent to him by the receiver. If he finds it as valid, he will only now create his partial signature and finally
 finalize the two partial signatures in the final composite one, with which he can then build the final transaction.
 
-In $\procVerfTxId$ a public verifier will verify the rangeproofs for the transactions output coins. Then he will compute the so-called Excess value $\varExcess$ from the difference between output and input coins
-and use it as the public key for validating the transation signature. If the signature is now also found to be correct the verfiier can deduce that the transaction is well-formed and valid.
+In $\procVerfTxId$ a public verifier will verify the rangeproofs for the transactions output coins. If they are found valid she will compute the so-called Excess value $\varExcess$ from the difference between output and input coins
+and use it as the public key for validating the transaction signature. If the signature is now also found to be correct the verfiier can deduce that the transaction is well-formed and valid.
 
 \begin{figure}
     \begin{center}
@@ -172,8 +250,8 @@ and use it as the public key for validating the transation signature. If the sig
             \varSecKeyBob \opAssign \funStar{\varBlindingFactorBob} \\
             \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyBob}}{\funGen{\varNonceBob}} \\
             \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varSigContext.\varPubKey}{\varSigContext.\varRand} \\
-            \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutBob}{\varProofs \opConc \varProofBob}{\varSigContext}{\varCommits \opConc \funGen{\varNonceBob}}{\varSigBob} \\
-            \pcreturn \varPreTx
+            \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutBob}{\varProofs \opConc \varProofBob}{\varSigContext}{\varCommits \opConc \funGen{\varSecKeyBob}}{\varSigBob} \\
+            \pcreturn (\varPreTx, \funStar{\varBlindingFactorBob})
             }
             \procedure[linenumbering]{$\procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}$} {
             (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob) \opFunResult \varPreTx \\
@@ -230,10 +308,10 @@ following protocols. Note that we assume that the secret keys as well as nonces 
 \end{center}
 
 Figure~\ref{fig:ext-mim-tx-spend} shows an instantiation of the $\procDSendCoinsId$ function of the Extended Mimblewimble Transaction Scheme. We have one array of input coins which keys are shared between two parties
-$\varAlice$ and $\varCarol$, which should be spent. We use $\varCarol$ here to not confuse this party with the receiver, which we previously called $\varBob$. Although $\varCarol$ and $\varBob$ could be the same person, they not necessarily have
-to be.\\
+Alice and Carol, which should be spent. We use Carol here to not confuse this party with the receiver, which we previously called Bob. Although Carol and $\varBob$ could be the same person, they not necessarily have to be.
+
 The protocol starts with both Alice and Carol creating her spend outputs with values $\varValueAlice$ and $\varValueCarol$. Alice then creates the initial pre-transaction $\varPreTx$ and sends it to Carol who verifies
-Alice's output, adds her outputs and paramters and sends back $\varPreTx$, which Alice verifies. The protocol returns $\varPreTx$ to both parties, which can then be transmitted to the receiver by any of the two parties, as 
+Alice's output, adds her outputs and parameters and sends back $\varPreTx$, which Alice verifies. The protocol returns $\varPreTx$ to both parties, which can then be transmitted to the receiver by any of the two parties, as
 well as the secret signing information $(\varSecKeyAlice, \varNonceAlice)$, $(\varSecKeyCarol, \varNonceCarol)$. Note that when using this protocol to spend coins that $\procFinTxId$ also turns into a protocol, using
 $\procDSignId$ instead of $\procSignPrtId$ for signature generation. (Apart from that $\procFinTxId$ remains unchanged)
 
@@ -265,10 +343,10 @@ $\procDSignId$ instead of $\procSignPrtId$ for signature generation. (Apart from
     \caption{Extended Mimblewimble Transaction Scheme - $\procDSendCoinsId$ \label{fig:ext-mim-tx-spend}}
 \end{figure}
 
-Figure~\ref{fig:ext-mim-tx-recv} shows an instantiation of the $\procRecvCoinsId$ function of the Extended Mimblewimble Transaction Scheme. Calling this protocol two receivers $\varBob$ and $\varCarol$ want to create a
-receiving shared coin $\varCoinShared$ with value $\varFundValue$ and key shares $(\varSecKeyAlice, \varSecKeyBob)$. The protocol starts by both receivers verifing the senders output(s). Bob starts by creating a coin with
+Figure~\ref{fig:ext-mim-tx-recv} shows an instantiation of the $\procRecvCoinsId$ function of the Extended Mimblewimble Transaction Scheme. Calling this protocol two receivers Bob and Carol want to create a
+receiving shared coin $\varCoinShared$ with value $\varFundValue$ and key shares $(\varBlindingFactorAlice, \varBlindingFactorCarol)$. The protocol starts by both receivers verifing the senders output(s). Bob starts by creating a coin with
 fund value $\varFundValue$ and his share of the newly create blinding factor and sends it over to Carol. Carol finalizes the shared coin by adding a commitment to her blinding factor to the coin and sends it back, together
-with the commitment. Bob verifies validity of the updated shared coin after which the two parties engange in two-party protocols to create their partial signature and coin rangeproof. Finally they create the updated
+with the commitment. Bob verifies validity of the updated shared coin after which the two parties engange in two two-party protocols to create their partial signature and coin rangeproof. Finally they create the updated
 pre-transaction $\varPreTx$ which can be sent back to the sender.
 
 \begin{figure}
@@ -288,8 +366,8 @@ pre-transaction $\varPreTx$ which can be sent back to the sender.
         \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \\
         \< \< \funStarAlt{\varCoinShared} \opAssign \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \\
         \< \sendmessageleft*{\funStarAlt{\varCoinShared}, \funGen{\varSecKeyCarol}} \< \\
-        \< \< \pcif \funStarAlt{\varCoinShared} \opNotEq \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \\
-        \< \< \t \pcreturn \cnstFalsum \\
+        \pcif \funStarAlt{\varCoinShared} \opNotEq \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \< \< \\
+        \t \pcreturn \cnstFalsum \< \< \\
         \< (\varSigBobCarol, \varPubKeyBobCarol, \funStar{\varSigContext}) \opFunResult \procDSign{\varMsg}{\varSecKeyBob}{\varSecKeyBob}{\varNonceAlice}{\varNonceBob} \< \\
         \< \funStarAlt{\varSigContext} \opFunResult \procSetupCtx{\varSigContext}{\funStar{\varSigContext}.\varPubKey}{\funStar{\varSigContext}.\varNonce} \< \\
         \< \varProofBobCarol \opFunResult \procDRProof{\funStarAlt{\varCoinShared}}{\varFundValue}{\varSecKeyAlice}{\varSecKeyBob} \< \\
@@ -321,7 +399,7 @@ then returns the pre-transaction $\varPreTx$ containing Bobs adapted partial sig
             \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varSigContext.\varPubKey}{\varSigContext.\varRand} \\
             \varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit} \\
             \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutBob}{\varProofs \opConc \varProofBob}{\varSigContext}{\varCommits \opConc \funGen{\varNonceBob}}{\varSigAptBob} \\
-            \pcreturn (\varPreTx, \varStatement)
+            \pcreturn (\varPreTx, \funStar{\varBlindingFactorBob}, \varStatement)
             }
         \end{varwidth}
         }
