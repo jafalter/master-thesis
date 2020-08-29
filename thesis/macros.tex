@@ -155,6 +155,7 @@
 \newcommand{\varSigPtAdv}{\funTilde{\varSignature_{\cnstAdversary}}}
 \newcommand{\varSigAlice}{\funTilde{\varSignature_{\varAlice}}}
 \newcommand{\varSigBobCarol}{\funTilde{\varSignature_{\varBob\varCarol}}}
+\newcommand{\varSigAliceCarol}{\funTilde{\varSignature_{\varAlice\varCarol}}}
 \newcommand{\varSigApt}{\funHat{\varSignature}}
 \newcommand{\varSigAptAdv}{\funHat{\varSignature_{\cnstAdversary}}}
 \newcommand{\varSigAptAlice}{\funHat{\varSignature_{\varAlice}}}
@@ -282,19 +283,15 @@
 
 \newcommand{\procCreateCoinId}{\styleFunction{createCoin}}
 \newcommand{\procCreateCoin}[2]{\procCreateCoinId(#1,#2)}
-
 \newcommand{\procCreatePreTxId}{\styleFunction{createTx}}
 \newcommand{\procCreatePreTx}[7]{\procCreatePreTxId(#1,#2,#3,#4,#5,#6,#7)}
 
 \newcommand{\procSendCoinsId}{\styleFunction{spendCoins}}
 \newcommand{\procSendCoins}[4]{\procSendCoinsId(#1,#2,#3,#4)}
-
 \newcommand{\procRecvCoinsId}{\styleFunction{recvCoins}}
 \newcommand{\procRecvCoins}[2]{\procRecvCoinsId(#1,#2)}
-
 \newcommand{\procFinTxId}{\styleFunction{finTx}}
 \newcommand{\procFinTx}[3]{\procFinTxId(#1,#2,#3)}
-
 \newcommand{\procVerfTxId}{\styleFunction{verfTx}}
 \newcommand{\procVerfTx}[1]{\procVerfTxId(#1)}
 
@@ -306,9 +303,10 @@
 \newcommand{\procDSendCoinsId}{\styleFunction{dSpendCoins}}
 \newcommand{\procDSendCoins}[5]{\procDSendCoinsId
 \langle (#1,#2,#3,#4) \opSeperate (#1,#5,#3,#4) \rangle}
-
 \newcommand{\procDRecvCoinsId}{\styleFunction{dRecvCoins}}
 \newcommand{\procDRecvCoins}[2]{\procDRecvCoinsId \langle(#1,#2) \opSeperate (#1,#2) \rangle}
+\newcommand{\procDFinTxId}{\styleFunction{dFinTx}}
+\newcommand{\procDFinTx}[5]{\procDFinTxId \langle(#1,#2,#3),(#1,#4,#5)\rangle}
 
 \newcommand{\procAptRecvCoinsId}{\styleFunction{aptRecvCoins}}
 \newcommand{\procAptRecvCoins}[3]{\procAptRecvCoinsId(#1,#2,#3)}
