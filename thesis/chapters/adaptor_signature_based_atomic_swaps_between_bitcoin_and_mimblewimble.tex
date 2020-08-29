@@ -528,5 +528,24 @@ He will send over $\varSigFin$ which lets both parties construct the valid trans
     \caption{Adapted Extended Mimblewimble Transaction Scheme - $\procDAptFinTxId$. \label{fig:inst-apt-mw-tx-fin}}
 \end{figure}
 
-
 \section{Atomic Swap protocol}\label{sec:atomic-swap}
+
+With the outlined Adapted Mimblewimble Transaction Scheme from definition~\ref{def:apt-ext-mw-tx-scheme} we can now construct a Atomic Swap protocol with another Cryptocurrency.
+In this thesis we will explain a swap with Bitcoin, as at present Bitcoin is the most widely adopted cryptocurrency. On the Bitcoin side we construct two
+DPT functions ($\procLockAddrId, \procVerifyLockId$).
+\begin{itemize}
+    \item $\varAddress \opFunResult \procLockAddr{\varPubKeyAlice}{\varStatement}{\varPubKeyBob}{\varTime}$: The locking address function lets Bob construct
+    a Bitcoin address only spendable by Alice if she receives the discrete logrithm $\varWit$ of $\varStatement \opEqNoQ \funGen{\varWit}$.
+    Additionally the function requires Bobs' public key
+    $\varPubKeyBob$ and a timelock $\varTime$ (given as a block number) as input which allows Bob to reclaim his funds after some time if the atomic swap was not
+    completed successfully. The function will create a lock output under the public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varStatement$ and return
+    a Bitcoin address $\varAddress$. If Alice
+    (knowing her secret key $\varSecKeyAlice$) acquires $\varWit$ with $\varStatement \opEqNoQ \funGen{\varWit}$ she can construct the complete secret key simply
+    by calculating $\varSecKey \opAssign \varSecKeyAlice \opAddScalar \varWit$. This construction is similiar although much simpler to the locks described
+    by Malavolta et al. in~\cite{malavolta2019anonymous}. For a in-depth security analysis of this concept we refer the interested reader to their paper. For
+    a concrete Bitcoin Script realizing this functionality please see section~\ref{sec:ImplementationBtc}.
+    \item $\{ 1,0 \} \opFunResult \procVerifyLock{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varFundValue}$: The lock verification algorithm takes as input Alices',
+    Bobs' public keys and the statement $\varStatement$. The function will recompute the address the lock address $\varAddress$ as created by
+    $\procLockAddrId$ and then check the Bitcoin blockchain if the value locked under this address is indeed $\varFundValue$. Upon successfull verification
+    the function returns 1, otherwise 0.
+\end{itemize}

@@ -187,6 +187,8 @@
 \newcommand{\varI}{\styleVariable{i}}
 \newcommand{\varJ}{\styleVariable{j}}
 \newcommand{\varIterator}{i}
+\newcommand{\varTime}{t}
+\newcommand{\varAddress}{a}
 
 % operators
 \newcommand{\opAccess}[2]{#1.#2}
@@ -325,3 +327,8 @@
 
 \newcommand{\procOracleTxId}{\cnstOracle_{tx}}
 \newcommand{\procOracleTx}[4]{\procOracleTxId ((#1,#2),(#3,#4))}
+
+\newcommand{\procLockAddrId}{\styleFunction{lockBtcAddress}}
+\newcommand{\procLockAddr}[4]{\procLockAddrId (#1,#2,#3,#4)}
+\newcommand{\procVerifyLockId}{\styleFunction{verifyLock}}
+\newcommand{\procVerifyLock}[4]{\procVerifyLockId (#1,2,#3,#4)}
