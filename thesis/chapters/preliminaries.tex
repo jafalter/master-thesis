@@ -114,22 +114,23 @@ $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \o
 
 \section{Bitcoin}\label{sec:bitcoin}
 
-In this section we will discuss the basics of the Bitcoin transaction protocol. We will find definitions which we will use in section~\ref{sec:atomic-swap} to construct an
-atomic swap protocol.
+In this section we will discuss the basics of the Bitcoin transaction protocol.
+We will find definitions which we will use later in section~\ref{sec:atomic-swap} to construct an atomic swap protocol.
 The main reference of this section is the book Mastering Bitcoin by Andreas Antonopoulos~\cite{antonopoulos2014mastering}.
 
-\subsection{Bitcoin Transaction Protocol}\label{sec:bitcoinTx}
+\subsection{Bitcoin Transaction Protocol}\label{subsec:bitcointx}
 
-A \emph{Bitcoin Transaction} is a data structure which transfering value between participants. In Bitcoin there are no user balances or user accounts,
-instead the UTXO model (unspent transaction outputs) is empoloyed. A UTXO is a output constructed in a previous transaction which holds value in
-the form of an amount expressed in Bitcoin (more precisely in Satoshis, which is the smallest unit of Bitcoin) and an locking condition (refered to as scriptPubKey).
-Unspend means that this output has not been spent yet in a transaction and its funds are therefore available to be redeemed by a participant capable of unlocking the output.
-To unlock this value one has to provide a script fulfilling the locking condition, referred to as scriptSig. In the most common case the lock condition
-will be to provide a valid signature under a public key.
-This is referred to as a P2PK or P2PKH output which we will see in more detail in section \ref{sec:p2pk}.
+A \emph{Bitcoin Transaction} is a data structure which allows transferring value between participants of the network.
+In Bitcoin there are no user balances or user accounts, instead the UTXO model (unspent transaction outputs) is empoloyed.
+A UTXO is a output constructed in a previous transaction which holds value in the form of an amount expressed in Bitcoin (more precisely in Satoshis, which is the smallest unit of Bitcoin) and a locking condition (referred to as scriptPubKey).
+Unspent means that this output has not been spent yet in a transaction and its funds are therefore available to be redeemed by a participant capable of unlocking the output.
+To unlock this value one has to provide a script fulfilling the locking condition, referred to as scriptSig.
+In the most common case the lock condition will be to provide a valid signature under a public key.
+This is referred to as a P2PK or P2PKH output which we will see in more detail in section~\ref{subsubsec:p2pk}.
+However, more complex conditions, such we shall see in section~\ref{subsubsec:p2sh} are possible.
 
-\begin{definition}[$\varUTXO$] A unspent transaction output ($\varUTXO$) is a data structure consisting of a a locking condition $\varScriptPubKey$, a value expressed
-    in Bitcoin satoshis $\varValue$ and a unlocking script $\varScriptSig$ which is initially empty and has to be provided by the owner when spending
+\begin{definition}[$\varUTXO$] A unspent transaction output ($\varUTXO$) is a data structure consisting of a locking condition $\varScriptPubKey$, a value expressed
+    in Bitcoin satoshis $\varValue$ and an unlocking script $\varScriptSig$ which is initially empty and has to be provided by the owner when spending
     the UTXO in a transaction.
     \[ \varUTXO \opAssign \{ \varValue \opSeperate \varScriptPubKey \opSeperate \varScriptSig \} \]
 \end{definition}
@@ -150,14 +151,27 @@ We define two auxiliary functions for the creation and spending of an $\varUTXO$
     }
 \end{center}
 
-Now a full transaction consists of one or many UTXOs as inputs and one or many UTXOs as output. For the transaction to be considered valid the
-$\varScriptSig$ fields in the inputs need the be correctly filled, and the value in the newly created output UTXOs most not exceed the value stored in
-the spending UTXOs. A value lower then what is provided in the inputs is allowed, this means the miner of the transaction gets to collect the difference as
-a fee. The higher this fee, the more incentive the miners will have to include your transaction.
+Now a full transaction consists of one, or many UTXOs as inputs and one or many UTXOs as output.
+For the transaction to be considered valid the $\varScriptSig$ fields in the inputs need the be correctly filled, and the value in the newly created output UTXOs must not exceed the value stored in the spending UTXOs.
+A value lower than what is provided in the inputs is allowed, this means the miner of the transaction gets to collect the difference as a fee.
+The higher this fee, the more incentive the miners will have to include your transaction in the blockchain.
+Additionally a transaction consists of a version number, and a locktime field which can be used, to only allow the transaction to become valid after a certain block has been mined. Figure \ref{fig:btc-tx} shows a decoded Bitcoin transaction
 
-\subsubsection{P2PK, P2PKH - Transaction \label{sec:p2pk}}
+\begin{definition}[Bitcoin Transaction]
+    A Bitcoin transaction consists of a series of input UTXOs $\varInputs$, a series of output UTXOs $\varOutputs$, a transaction version $\varVersion$ and a locktime $\varTime$:
+    \[ \varBtxtx \opAssign \{ \varVersion, \varTime, \varInputs, \varOutputs \} \]
+\end{definition}
 
-\subsubsection{P2SH - Transaction}
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=\textwidth]{btc-tx.png}
+    \end{center}
+    \caption{A decoded Bitcoin transaction~\footcite{https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch06.asciidoc} \label{fig:btc-tx}}
+\end{figure}
+
+\subsubsection{P2PK, P2PKH - Transaction \label{subsubsec:p2pk}}
+
+\subsubsection{P2SH - Transaction \label{subsubsec:p2sh}}
 
 \begin{definition}[Bitcion - Transaction Scheme]
     $\varTx \opFunResult \procBuildTransaction{\varInputs}{\varOutputs}{\varVersion}{\varTime}$
