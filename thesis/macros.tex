@@ -186,9 +186,14 @@
 \newcommand{\varUpperBound}{\styleVariable{ub}}
 \newcommand{\varI}{\styleVariable{i}}
 \newcommand{\varJ}{\styleVariable{j}}
-\newcommand{\varIterator}{i}
-\newcommand{\varTime}{t}
-\newcommand{\varAddress}{a}
+\newcommand{\varIterator}{\styleVariable{i}}
+\newcommand{\varTime}{\styleVariable{t}}
+\newcommand{\varAddress}{\styleVariable{a}}
+\newcommand{\varScript}{\styleVariable{s}}
+\newcommand{\varVersion}{\styleVariable{v}}
+\newcommand{\varScriptPubKey}{\styleVariable{scriptPubKey}}
+\newcommand{\varScriptSig}{\styleVariable{scriptSig}}
+\newcommand{\varUTXO}{\styleVariable{UTXO}}
 
 % operators
 \newcommand{\opAccess}[2]{#1.#2}
@@ -231,6 +236,11 @@
 \newcommand{\procSign}[2]{ \procSignId(#1 \opSeperate #2) }
 \newcommand{\procVerfId}{\styleFunction{verf}}
 \newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
+
+\newcommand{\procCreateUTXOId}{\styleFunction{createUTXO}}
+\newcommand{\procCreateUTXO}[2]{\procCreateUTXOId (#1,2)}
+\newcommand{\procSpendUTXOId}{\styleFunction{spendUTXO}}
+\newcommand{\procSpendUTXO}[2]{\procSpendUTXOId (#1,#2)}
 
 \newcommand{\procRProofSetupId}{\styleFunction{ranPrfSetup}}
 \newcommand{\procRProofSetup}[3]{\procRProofSetupId(#1,#2,#3)}
@@ -297,6 +307,9 @@
 \newcommand{\procVerfTxId}{\styleFunction{verfTx}}
 \newcommand{\procVerfTx}[1]{\procVerfTxId(#1)}
 
+\newcommand{\procBuildTransactionId}{\styleFunction{buildTransaction}}
+\newcommand{\procBuildTransaction}[4]{\procBuildTransactionId(#1,#2,#3,#4)}
+
 \newcommand{\procDSignId}{\styleFunction{dSign}}
 \newcommand{\procDSign}[5]{\procDSignId \langle(#1,#2,#4),(#1,#3,#5)\rangle}
 \newcommand{\procDRProofId}{\styleFunction{dRanPrf}}
@@ -328,7 +341,7 @@
 \newcommand{\procOracleTxId}{\cnstOracle_{tx}}
 \newcommand{\procOracleTx}[4]{\procOracleTxId ((#1,#2),(#3,#4))}
 
-\newcommand{\procLockAddrId}{\styleFunction{lockBtcAddress}}
+\newcommand{\procLockAddrId}{\styleFunction{lockBtcScript}}
 \newcommand{\procLockAddr}[4]{\procLockAddrId (#1,#2,#3,#4)}
 \newcommand{\procVerifyLockId}{\styleFunction{verifyLock}}
-\newcommand{\procVerifyLock}[4]{\procVerifyLockId (#1,2,#3,#4)}
+\newcommand{\procVerifyLock}[5]{\procVerifyLockId (#1,2,#3,#4,#5)}

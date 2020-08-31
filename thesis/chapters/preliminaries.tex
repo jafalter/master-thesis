@@ -114,12 +114,56 @@ $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \o
 
 \section{Bitcoin}\label{sec:bitcoin}
 
+In this section we will discuss the basics of the Bitcoin transaction protocol. We will find definitions which we will use in section~\ref{sec:atomic-swap} to construct an
+atomic swap protocol.
+The main reference of this section is the book Mastering Bitcoin by Andreas Antonopoulos~\cite{antonopoulos2014mastering}.
+
 \subsection{Bitcoin Transaction Protocol}\label{sec:bitcoinTx}
 
+A \emph{Bitcoin Transaction} is a data structure which transfering value between participants. In Bitcoin there are no user balances or user accounts,
+instead the UTXO model (unspent transaction outputs) is empoloyed. A UTXO is a output constructed in a previous transaction which holds value in
+the form of an amount expressed in Bitcoin (more precisely in Satoshis, which is the smallest unit of Bitcoin) and an locking condition (refered to as scriptPubKey).
+Unspend means that this output has not been spent yet in a transaction and its funds are therefore available to be redeemed by a participant capable of unlocking the output.
+To unlock this value one has to provide a script fulfilling the locking condition, referred to as scriptSig. In the most common case the lock condition
+will be to provide a valid signature under a public key.
+This is referred to as a P2PK or P2PKH output which we will see in more detail in section \ref{sec:p2pk}.
 
+\begin{definition}[$\varUTXO$] A unspent transaction output ($\varUTXO$) is a data structure consisting of a a locking condition $\varScriptPubKey$, a value expressed
+    in Bitcoin satoshis $\varValue$ and a unlocking script $\varScriptSig$ which is initially empty and has to be provided by the owner when spending
+    the UTXO in a transaction.
+    \[ \varUTXO \opAssign \{ \varValue \opSeperate \varScriptPubKey \opSeperate \varScriptSig \} \]
+\end{definition}
+
+We define two auxiliary functions for the creation and spending of an $\varUTXO$.
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procCreateUTXO{\varValue}{\varScriptPubKey}$} {
+        \pcreturn \{ \varValue \opAssign \varValue, \varScriptPubKey \opAssign \varScriptPubKey, \varScriptSig \opAssign \cnstEmptySet \}
+        }
+        \procedure[linenumbering]{$\procSpendUTXO{\varUTXO}{\varScriptSig}$} {
+        \{ \varValue, \varScriptPubKey \} \opFunResult \varUTXO \\
+        \pcreturn \{ \varValue \opAssign \varValue, \varScriptPubKey \opAssign \varScriptPubKey, \varScriptSig \opAssign \varScriptSig \}
+        }
+    \end{varwidth}
+    }
+\end{center}
+
+Now a full transaction consists of one or many UTXOs as inputs and one or many UTXOs as output. For the transaction to be considered valid the
+$\varScriptSig$ fields in the inputs need the be correctly filled, and the value in the newly created output UTXOs most not exceed the value stored in
+the spending UTXOs. A value lower then what is provided in the inputs is allowed, this means the miner of the transaction gets to collect the difference as
+a fee. The higher this fee, the more incentive the miners will have to include your transaction.
+
+\subsubsection{P2PK, P2PKH - Transaction \label{sec:p2pk}}
+
+\subsubsection{P2SH - Transaction}
+
+\begin{definition}[Bitcion - Transaction Scheme]
+    $\varTx \opFunResult \procBuildTransaction{\varInputs}{\varOutputs}{\varVersion}{\varTime}$
+\end{definition}
 
 \subsection{Bitcoin Scaling and Layer Two Solutions}\label{sec:bitcoinScaling}
-
 
 \section{Privacy-enhancing Cryptocurrencies}\label{sec:privacyCryptos}
 
