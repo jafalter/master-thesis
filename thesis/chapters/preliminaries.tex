@@ -155,10 +155,11 @@ Now a full transaction consists of one, or many UTXOs as inputs and one or many 
 For the transaction to be considered valid the $\varScriptSig$ fields in the inputs need the be correctly filled, and the value in the newly created output UTXOs must not exceed the value stored in the spending UTXOs.
 A value lower than what is provided in the inputs is allowed, this means the miner of the transaction gets to collect the difference as a fee.
 The higher this fee, the more incentive the miners will have to include your transaction in the blockchain.
-Additionally a transaction consists of a version number, and a locktime field which can be used, to only allow the transaction to become valid after a certain block has been mined. Figure \ref{fig:btc-tx} shows a decoded Bitcoin transaction
+Additionally a transaction consists of a version number, and a locktime field which can be used, to only allow the transaction to become valid after a certain block has been mined.
+Figure~\ref{fig:btc-tx} shows a decoded Bitcoin transaction
 
 \begin{definition}[Bitcoin Transaction]
-    A Bitcoin transaction consists of a series of input UTXOs $\varInputs$, a series of output UTXOs $\varOutputs$, a transaction version $\varVersion$ and a locktime $\varTime$:
+    A Bitcoin transaction consists of a series of input UTXOs $\varInputs$, a series of output UTXOs $\varOutputs$, a transaction version $\varVersion$, and a optional locktime $\varTime$:
     \[ \varBtxtx \opAssign \{ \varVersion, \varTime, \varInputs, \varOutputs \} \]
 \end{definition}
 
@@ -169,9 +170,35 @@ Additionally a transaction consists of a version number, and a locktime field wh
     \caption{A decoded Bitcoin transaction~\footcite{https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch06.asciidoc} \label{fig:btc-tx}}
 \end{figure}
 
+A transaction is valid if the follwing conditions are fullfilled:
+
+\begin{itemize}
+    \item The total value of inputs is greater or equal the total value of outputs.
+    \item Every spend input contains a $\varScriptSig$ which unlocks the respective $\varScriptPubKey$.
+    \item If a locktime $\varTime$ is given, the current block on the Bitcoin blockchain needs to be higher or equal $\varTime$.
+\end{itemize}
+
+Following we will outline two common structures of Bitcoin outputs the P2PK/P2PKH and the P2SH outputs.
+
 \subsubsection{P2PK, P2PKH - Transaction \label{subsubsec:p2pk}}
 
+P2PK stands for Pay-to-Public-Key and P2PKH for Pay-to-Public-Key-Hash.
+In this type of output the $\varScriptPubKey$ will be constructed such that its value unlocks if a correct signature is provided in the $\varScriptSig$ for a corresponding public key $\varScriptPubKey$.
+P2PKH is an update to this script in which the $\varScriptPubKey$ contains a hased version of the public key, not the public key itself.
+To spend a P2PKH output one has to additionally provide the unhashed public key in addition to a valid signature.
+This type of output, is the most commonly used output in the Bitcoin blockchain to transfer value from one participant to another.
+Delgado et at. found in their paper Analysis of the Bitcoin UTXO set from 2017 that more then 80\% of the UTXO set at that time consisted of P2PHK transactions, whereas about 17\% were P2SH and 0.12\% P2PK outputs. ~\cite{delgado2018analysis}
+P2PKH outputs can be encoded into a Bitcoin address using base58 encoding.
+This addresses can be handed out to request a payment from somebody.
+
 \subsubsection{P2SH - Transaction \label{subsubsec:p2sh}}
+
+If more advanced spending conditions, such as multi signature are required, P2SH, introduced in 2012, is a way to implement those in a space efficient and simple matter.
+Here the locking condition $\varScriptPubKey$ does not contain a script, but instead the hash of a script.
+Upon spending the spender has to provide the original script which when hashed will equal the hash given in the locking condition.
+If the hashes matches the script itself will be executed, requiring the spender to additionally provide the unlocking requirements for the script itself.
+The advantages of using this approach over just handcrafting custom locking script is that the locking scripts are rather short making the transactions smaller and therefore reducing fees, or rather shifting the fees from the party sending funds to the output, to owner of the output who has to provide the full script when spending it again.
+Additionally this type of output can be encoded again into a Bitcoin address similiar to a P2PKH output, making it easy to request a payment.
 
 \begin{definition}[Bitcion - Transaction Scheme]
     $\varTx \opFunResult \procBuildTransaction{\varInputs}{\varOutputs}{\varVersion}{\varTime}$
