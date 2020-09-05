@@ -531,13 +531,17 @@ He will send over $\varSigFin$ which lets both parties construct the valid trans
 \section{Atomic Swap protocol}\label{sec:atomic-swap}
 
 With the outlined Adapted Mimblewimble Transaction Scheme from definition~\ref{def:apt-ext-mw-tx-scheme} we can now construct a Atomic Swap protocol with another Cryptocurrency.
-In this thesis we will explain a swap with Bitcoin, as at present Bitcoin is the most widely adopted cryptocurrency. On the Bitcoin side we construct two
-DPT functions ($\procLockAddrId, \procVerifyLockId$).
+In this thesis we will explain a swap with Bitcoin, as at present Bitcoin and Bitcoin-like cryptocurrencies are the
+most widely adopted. We will generally refer to the Bitcoin side and the Mimblewimble side of the swap to be most generic.
+Upon implementation one has to decide for a specific implementation, for example BTC on the Bitcoin side and Grin on
+the Mimblewimble side.
+On the Bitcoin side we construct two DPT functions ($\procLockAddrId, \procVerifyLockId$).
 \begin{itemize}
-    \item $(\varAddress, \varScript) \opFunResult \procLockAddr{\varPubKeyAlice}{\varStatement}{\varPubKeyBob}{\varTime}$: The locking script function lets Bob construct
-    a Bitcoin script + address only spendable by Alice if she receives the discrete logrithm $\varWit$ of $\varStatement \opEqNoQ \funGen{\varWit}$.
-    Additionally the function requires Bobs' public key
-    $\varPubKeyBob$ and a timelock $\varTime$ (given as a block number) as input which allows Bob to reclaim his funds after some time if the atomic swap was not
+    \item $(\varAddress, \varUTXO) \opFunResult \procLockAddr{\varPubKeyAlice}{\varStatement}{\varPubKeyBob}{\varTime}$:
+    The locking script function lets Bob construct a Bitcoin script + address only spendable by Alice if she receives the discrete logrithm
+    $\varWit$ of $\varStatement \opEqNoQ \funGen{\varWit}$.
+    Additionally the function requires Bobs' public key $\varPubKeyBob$ and a timelock $\varTime$ (given as a block
+    number) as input which allows Bob to reclaim his funds after some time if the atomic swap was not
     completed successfully. The function will create and return a Bitcon script $\varScript$ and address $\varAddress$ to which Bob can send funds using a P2SH transaction.
     If Alice (knowing her secret key $\varSecKeyAlice$) acquires $\varWit$ with $\varStatement \opEqNoQ \funGen{\varWit}$ she can construct the complete secret key simply
     by calculating $\varSecKey \opAssign \varSecKeyAlice \opAddScalar \varWit$. This construction is similiar although simpler to the locks described
@@ -547,4 +551,19 @@ DPT functions ($\procLockAddrId, \procVerifyLockId$).
     Bobs' public keys and the statement $\varStatement$. The function will compute the Bitcoin lock address $\varAddress$ as created by
     $\procLockAddrId$ and then check the Bitcoin blockchain if the value locked under this address equals $\varFundValue$. Upon successfull verification
     the function returns 1, otherwise 0.
+\end{itemize}
+
+\subsection{Setup phase}
+
+We assume Alice owns Mimblewimble coins $\varCoinOutAlice$ and Bob Bitcoin locked in some UTXO
+$\varUTXO$ belonging to him.
+Before the protocol can start the two parties must agree on an the value they want to swap, the exchange rate of the
+currencies and a time after which the swap should be canceled. (if not completed) \todo[inline]{Explaining difficulty
+finding this timelock cross chains}.
+Afer coming to an aggrement the following variables are defined and known by both Alice and Bob:
+\begin{itemize}
+    \item $\varAmountBtc$ The amount of Bitcoin Bob will swap to Alice
+    \item $\varAmountMW$ The amount of the Mimblewimble coin Alice will swap to Bob
+    \item $\varTimeBTC$ The locktime as a blockheight for the Bitcoin side.
+    \item $\varTimeMW$ The locktime as a blockheight for the Mimblewimble side.
 \end{itemize}
