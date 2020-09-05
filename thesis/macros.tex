@@ -67,7 +67,6 @@
 \newcommand{\varPrime}{\styleVariable{p}}
 \newcommand{\varN}{\styleVariable{n}}
 \newcommand{\varTx}{\styleVariable{tx}}
-\newcommand{\varBtxtx}{\styleVariable{tx}}
 \newcommand{\varPreTx}{\styleVariable{ptx}}
 \newcommand{\varTxAlice}{\varTx_{\varAlice}}
 \newcommand{\varTxBob}{\varTx_{\varBob}}
@@ -179,8 +178,8 @@
 \newcommand{\varSet}{\styleSet{S}}
 \newcommand{\varZkpStatementAlice}{\ensuremath{\textit{st}_\varAlice}}
 \newcommand{\varZkpStatementBob}{\ensuremath{\textit{st}_\varBob}}
-\newcommand{\varInputs}{\styleVariable{inp}}
-\newcommand{\varOutputs}{\styleVariable{out}}
+\newcommand{\varInputs}{inp}
+\newcommand{\varOutputs}{out}
 \newcommand{\varProofs}{\Pi}
 \newcommand{\varCommits}{\styleVariable{com}}
 \newcommand{\varLowerBound}{\styleVariable{lb}}
@@ -191,10 +190,15 @@
 \newcommand{\varTime}{\styleVariable{t}}
 \newcommand{\varAddress}{\styleVariable{a}}
 \newcommand{\varScript}{\styleVariable{s}}
-\newcommand{\varVersion}{\styleVariable{v}}
-\newcommand{\varScriptPubKey}{\styleVariable{scriptPubKey}}
-\newcommand{\varScriptSig}{\styleVariable{scriptSig}}
-\newcommand{\varUTXO}{\styleVariable{UTXO}}
+\newcommand{\varVersion}{\styleVariable{vs}}
+\newcommand{\varScriptPubKey}{\styleVariable{spk}}
+\newcommand{\varScriptSig}{\styleVariable{\varSignature}}
+\newcommand{\varUTXO}{\psi}
+\newcommand{\varUTXOSet}{\Psi}
+\newcommand{\varBtcInputs}{\varUTXOSet_{inp}}
+\newcommand{\varBtcOutpus}{\varUTXOSet_{out}}
+\newcommand{\varBtxTx}{\styleVariable{tx_{btc}}}
+\newcommand{\varBtcTx}{\styleVariable{tx_{btc}}}
 
 % operators
 \newcommand{\opAccess}[2]{#1.#2}
@@ -239,9 +243,11 @@
 \newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
 
 \newcommand{\procCreateUTXOId}{\styleFunction{createUTXO}}
-\newcommand{\procCreateUTXO}[2]{\procCreateUTXOId (#1,2)}
+\newcommand{\procCreateUTXO}[2]{\procCreateUTXOId (#1,#2)}
 \newcommand{\procSpendUTXOId}{\styleFunction{spendUTXO}}
 \newcommand{\procSpendUTXO}[2]{\procSpendUTXOId (#1,#2)}
+\newcommand{\procVerfUTXOId}{\styleFunction{verfUTXO}}
+\newcommand{\procVerfUTXO}[1]{\procVerfUTXOId(#1)}
 
 \newcommand{\procRProofSetupId}{\styleFunction{ranPrfSetup}}
 \newcommand{\procRProofSetup}[3]{\procRProofSetupId(#1,#2,#3)}
@@ -310,6 +316,10 @@
 
 \newcommand{\procBuildTransactionId}{\styleFunction{buildTransaction}}
 \newcommand{\procBuildTransaction}[4]{\procBuildTransactionId(#1,#2,#3,#4)}
+\newcommand{\procSignTransactionId}{\styleFunction{signTransaction}}
+\newcommand{\procSignTransaction}[2]{\procSignTransactionId (#1,#2)}
+\newcommand{\procVerfTransactionId}{\styleFunction{verfTransaction}}
+\newcommand{\procVerfTransaction}[1]{\procVerfTransactionId(#1)}
 
 \newcommand{\procDSignId}{\styleFunction{dSign}}
 \newcommand{\procDSign}[5]{\procDSignId \langle(#1,#2,#4),(#1,#3,#5)\rangle}

@@ -504,8 +504,8 @@ her own partial signature. Note that at this point Alice is not able to finalize
 for the $\procFinSigId$ function. Therefore in another round of interaction Alice sends her partial signature to Bob, who will verify Alice partial signature and finally calculate the final signature, needed for the transaction.
 He will send over $\varSigFin$ which lets both parties construct the valid transaction as well as Alice call $\procExtWitId$ to extract the secret witness $\varWit$.
 
+\begin{landscape}
 \begin{figure}
-    \begin{sideways}
         \fbox{
         \procedure[linenumbering]{$\procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varWit}$} {
         Alice \< \< Bob \\
@@ -524,9 +524,9 @@ He will send over $\varSigFin$ which lets both parties construct the valid trans
         \pcreturn (\varTx, \varWit) \< \< \pcreturn \varTx
         }
         }
-    \end{sideways}
     \caption{Adapted Extended Mimblewimble Transaction Scheme - $\procDAptFinTxId$. \label{fig:inst-apt-mw-tx-fin}}
 \end{figure}
+\end{landscape}
 
 \section{Atomic Swap protocol}\label{sec:atomic-swap}
 
