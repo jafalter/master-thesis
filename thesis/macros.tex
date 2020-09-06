@@ -110,6 +110,7 @@
 \newcommand{\varSignature}{\sigma}
 \newcommand{\varInput}{\styleVariable{I}}
 \newcommand{\varFundValue}{\styleVariable{p}}
+\newcommand{\varAmount}{a}
 \newcommand{\varOffset}{\styleVariable{o}}
 \newcommand{\varSupply}{\styleVariable{s}}
 \newcommand{\varCoin}{\styleCal{C}}
@@ -342,7 +343,7 @@
 \newcommand{\procAptRecvCoins}[3]{\procAptRecvCoinsId(#1,#2,#3)}
 
 \newcommand{\procDAptFinTxId}{\styleFunction{dAptFinTx}}
-\newcommand{\procDAptFinTx}[5]{\procDAptFinTxId \langle (#1,#2,#3,#4), (#1,#5) \rangle}
+\newcommand{\procDAptFinTx}[6]{\procDAptFinTxId \langle (#1,#2,#3), (#1,#4,#5,#6) \rangle}
 
 \newcommand{\procInflateId}{\styleFunction{inflate}}
 \newcommand{\procInflate}[2]{\procInflateId (#1,#2)}
@@ -359,4 +360,16 @@
 \newcommand{\procLockAddrId}{\styleFunction{lockBtcScript}}
 \newcommand{\procLockAddr}[4]{\procLockAddrId (#1,#2,#3,#4)}
 \newcommand{\procVerifyLockId}{\styleFunction{verifyLock}}
-\newcommand{\procVerifyLock}[5]{\procVerifyLockId (#1,2,#3,#4,#5)}
+\newcommand{\procVerifyLock}[5]{\procVerifyLockId (#1,#2,#3,#4,#5)}
+
+\newcommand{\procPublishBtcId}{\styleFunction{publish_{BTC}}}
+\newcommand{\procPublishBtc}[1]{\procPublishBtcId(#1)}
+
+\newcommand{\procPublishMWId}{\styleFunction{publish_{MW}}}
+\newcommand{\procPublishMW}[1]{\procPublishMWId(#1)}
+
+\newcommand{\procSetupSwapId}{\styleFunction{setupSwp}}
+\newcommand{\procSetupSwap}[7]{\procSetupSwapId \langle(#1,#2,#3,#4)(#1,#5,#6,#7)\rangle}
+
+\newcommand{\procExcSwapId}{\styleFunction{execSwap}}
+\newcommand{\procExcSwap}{\procExcSwapId()}
