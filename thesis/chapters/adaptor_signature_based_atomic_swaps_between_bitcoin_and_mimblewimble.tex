@@ -60,7 +60,7 @@ balanced and its signature is valid. More formally:
         \begin{array}{l}
             (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactor}}{\varFundValue}{\varValue} \\
             (\funStar{\varPreTx}, \varBlindingFactorBob) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue}                                                          \\
-            \varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\cnstFalsum}
+            \varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\cdot}
         \end{array}
         \right]=1.
     \]
@@ -71,17 +71,19 @@ balanced and its signature is valid. More formally:
     An extended Mimblewimble transaction scheme $\varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ is an extension to $\varMWScheme$ with the following two procedures:
     \[ \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc (\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId) \]
     \begin{itemize}
-        \item $((\varPreTx,(\varSecKeyAlice,\varNonceAlice)), (\varPreTx,(\varSecKeyCarol,\varNonceCarol))) \\
+        \item $\langle (\varPreTx,(\varSecKeyAlice,\varNonceAlice)), (\varPreTx,(\varSecKeyCarol,\varNonceCarol)) \rangle \\
         \opFunResult \procDSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValue}{\funArray{\varBlindingFactorCarol}}$:
         The distributed coin spending algorithm takes as input a list of input coins, as well as a list of blinding factors from each Alice and Carol, and the to be transferred value $\varFundValue$ and
         total value of input coins $\varValue$. Note that for each provided input coin $\varCoinInp$ the blinding factor is composed by combining the shares from Alice and Carol like
         $\varBlindingFactor \opAssign \varBlindingFactorAlice \opAddScalar \varBlindingFactorCarol$.
-        \item $((\varPreTx, \funStar{\varBlindingFactorBob}), (\varPreTx, \varBlindingFactorCarol)) \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue}$: The distributed coin receive procedure takes as input a pre-transaction $\varPreTx$ and
-        a value $\varFundValue$ which should be transferred during the course of the transaction. The distributed algorithm will generate a output coin owned by both Alice and Carol. (each owning a share of the key). The output will be similiar
-        to the single party version a updated pre-transaction $\varPreTx$ and the respective shares of the blinding factor.
-        \item $\varTx \opFunResult \procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}$: The distributed finalized transaction
-        protocol has to be used if we are creating a transaction spending a shared coin (i.e. the transaction was created with the $\procDSendCoinsId$ algorithm). In this
-        case we require signing information from both Alice and Carol.
+        \item $\langle (\funStar{\varPreTx}, (\varCoinShared, \funStar{\varBlindingFactorBob})), (\funStar{\varPreTx}, (\varCoinShared, \funStar{\varBlindingFactorCarol})) \rangle \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue}$: The distributed coin receive procedure takes as input a pre-transaction $\varPreTx$ and
+        a value $\varFundValue$ which should be transferred during the course of the transaction.
+        The distributed algorithm will generate a output coin owned by both Alice and Carol. (each owning a share of the key).
+        The output will be an updated pre-transaction $\funStar{\varPreTx}$, the shared output coin $\varCoinShared$ and the respective shares of the blinding factor.
+        Note that $\varCoinShared$ will only be spendable if both owners cooperate running the $\procDSendCoinsId$ protocol.
+        \item $\varTx \opFunResult \procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}{\varTime}$: The distributed finalized transaction protocol has to be used if we are creating a transaction spending a shared coin (i.e. the transaction was created with the $\procDSendCoinsId$ algorithm).
+        In this case we require signing information from both Alice and Carol.
+        Again an optional locktime $\varTime$ can be provided.
     \end{itemize}
 \end{definition}
 
@@ -98,10 +100,10 @@ Correctness is given very similar to the standard scheme:
         \end{array}
         \middle\vert
         \begin{array}{l}
-            (\varPreTx, (\varSecKeyAlice, \varNonceAlice), (\varSecKeyCarol, \varNonceCarol)) \opFunResult \\
-            \procDSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValue}{\funArray{\varBlindingFactorCarol}}{\varValue} \\
-            (\funStar{\varPreTx}, \varBlindingFactorBob) \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue} \\
-            \varTx \opFunResult \procDFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}
+            \langle (\varPreTx, (\varSecKeyAlice, \varNonceAlice)), (\varPreTx, (\varSecKeyCarol, \varNonceCarol)) \rangle \opFunResult \\
+            \procDSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValue}{\funArray{\varBlindingFactorCarol}} \\
+            \langle (\funStar{\varPreTx}, \cdot)(\funStar{\varPreTx}, \cdot) \rangle \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue} \\
+            \varTx \opFunResult \procDFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}{\varTime}
         \end{array}
         \right]=1.
     \]
@@ -109,16 +111,19 @@ Correctness is given very similar to the standard scheme:
 
 \begin{definition}[Adapted Extended Mimblewimble Transaction Scheme]
     \label{def:apt-ext-mw-tx-scheme}
-    The adapted version of the extended Mimblewimble Transaction Scheme updates the Extended Mimblewimble Transaction Schme by providing a modified version of the single party receive function and the finalize
-    transaction function.
+    The adapted version of the extended Mimblewimble Transaction Scheme updates the Extended Mimblewimble Transaction Schme by providing a modified version of the single party receive routine and the distributed finalize transaction protocol.
     \[ \varaptMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc \procAptRecvCoinsId, \procDAptFinTxId \]
     \begin{itemize}
-        \item $(\varPreTx, \varBlindingFactorBob, \varStatement) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$: The adapted variant of the receive function takes an additional input a secret witness value
-        $\varWit$ which will be hidden in the transactions signature and extractable by the other party after the protocols completion. Additionally to the updated pre-transaction $\varPreTx$ and output coin blinding factor $\varBlindingFactorBob$ it returns
-        the statement $\varX$ which can be sent to the other party, for verification.
-        \item $((\varTx, \varWit), \varTx) \opFunResult \procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}{\varSigBob}$: The adapted variant of the finalize transaction algorithm is a distributed protocol between the sender
-        and receiver. Additionally to the pre-transaction $\varPreTx$ Alice (the sender) needs to input her signing key, nonce and the statement $\varStatement$ received from Bob. Bob (the receiver) needs
-        to provide the original (unadapted) partial signature $\varSigBob$ as input. The protocol will output the final transaction as well as $\varWit$ to Alice.
+        \item $(\funStar{\varPreTx}, (\varCoinOutBob,\varBlindingFactorBob), \varSigBob) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$: The adapted variant of the receive function takes an additional input a secret witness value
+        $\varWit$ which will be hidden in the transactions signature and extractable by the other party after the protocols' completion.
+        Note that the routine also returns Bob's unadapted partial signature.
+        The reason for this is that we later still need the unadapted version to complete the signature und thereby finalize the transaction.
+        By not sharing this unadapted signature with Alice, Bob is the one who gets to finalize the transaction which is different from the simpler protocol and is an important feature for our atomic swap protocol.
+        \item $\langle \cdot, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$: The adapted variant of the finalize transaction algorithm is a distributed protocol between the sender(s) and receiver.
+        Additionally to the pre-transaction $\funStar{\varPreTx}$ the senders need to input their signing information, Bob needs to input the unadapted version of his partial signature as it is needed for transaction completion.
+        In theory this protocol can be seen as a three party protocol.
+        Two senders controlling a shared coin and a third receiver.
+        However, as in the case we will describe later in \ref{sec:atomic-swap} one of the two senders is also the receiver, we allowed ourselfs to model this protocol as being between only two parties.
     \end{itemize}
 \end{definition}
 
@@ -458,7 +463,7 @@ pre-transaction $\varPreTx$ which can be sent back to the sender.
 \begin{landscape}
     \begin{figure}
         \fbox{
-        \procedure[linenumbering]{$\procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}$} {
+        \procedure[linenumbering]{$\procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}{\varTime}$} {
         Alice \< \< Carol \\
         (\varMsg, \varInputs, \varOutputs, \varProofs, \varSigContext, \varCommits, \varSigBob) \opFunResult \varPreTx \< \< (\varMsg, \varInputs, \varOutputs, \varProofs, \varSigContext, \varCommits, \varSigBob) \opFunResult \varPreTx \\
         \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \< \< \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \\
@@ -467,7 +472,7 @@ pre-transaction $\varPreTx$ which can be sent back to the sender.
         \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
         \< \varSigAliceCarol \opFunResult \procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol} \\
         \varSigFin \opFunResult \procFinSig{\varSigBob}{\varSigAliceCarol} \< \< \varSigFin \opFunResult \procFinSig{\varSigBob}{\varSigAliceCarol} \\
-        \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\cnstFalsum} \< \< \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\cnstFalsum} \\
+        \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\cnstFalsum} \< \< \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \\
         \pcreturn \varTx \< \< \pcreturn \varTx
         }
         }
@@ -597,7 +602,7 @@ Afer coming to an aggrement the following variables are defined and known by bot
         \varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\cnstFalsum} \\
         \< \varPreTx_2 \\ \< \opFunResult \procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}} \\
         \funStar{\varPreTx_2} \opFunResult \procRecvCoins{\varPreTx_2}{\varAmountMW} \\
-        \varTx_2 \opFunResult \procDFinTx{\funStar{\varPreTx_2}}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob} \\
+        \varTx_2 \opFunResult \procDFinTx{\funStar{\varPreTx_2}}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}{\varTimeMW} \\
         \procPublishMW{\funArray{\varTx, \varTx_2}}
         }
         }
