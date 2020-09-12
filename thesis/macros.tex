@@ -110,6 +110,7 @@
 \newcommand{\varSignature}{\sigma}
 \newcommand{\varInput}{\styleVariable{I}}
 \newcommand{\varFundValue}{\styleVariable{p}}
+\newcommand{\varAmount}{a}
 \newcommand{\varOffset}{\styleVariable{o}}
 \newcommand{\varSupply}{\styleVariable{s}}
 \newcommand{\varCoin}{\styleCal{C}}
@@ -124,6 +125,8 @@
 \newcommand{\varValueAlice}{\varValue_{\varAlice}}
 \newcommand{\varValueCarol}{\varValue_{\varCarol}}
 \newcommand{\varValueMax}{\varValue_{max}}
+\newcommand{\varAmountBtc}{\styleVariable{a}_{btc}}
+\newcommand{\varAmountMW}{\styleVariable{a}_{mw}}
 \newcommand{\varMsg}{\styleVariable{m}}
 \newcommand{\varLockHeight}{\styleVariable{h}}
 \newcommand{\varNonce}{\styleVariable{k}}
@@ -155,6 +158,7 @@
 \newcommand{\varSigPtAdv}{\funTilde{\varSignature_{\cnstAdversary}}}
 \newcommand{\varSigAlice}{\funTilde{\varSignature_{\varAlice}}}
 \newcommand{\varSigBobCarol}{\funTilde{\varSignature_{\varBob\varCarol}}}
+\newcommand{\varSigAliceCarol}{\funTilde{\varSignature_{\varAlice\varCarol}}}
 \newcommand{\varSigApt}{\funHat{\varSignature}}
 \newcommand{\varSigAptAdv}{\funHat{\varSignature_{\cnstAdversary}}}
 \newcommand{\varSigAptAlice}{\funHat{\varSignature_{\varAlice}}}
@@ -177,15 +181,29 @@
 \newcommand{\varSet}{\styleSet{S}}
 \newcommand{\varZkpStatementAlice}{\ensuremath{\textit{st}_\varAlice}}
 \newcommand{\varZkpStatementBob}{\ensuremath{\textit{st}_\varBob}}
-\newcommand{\varInputs}{\styleVariable{inp}}
-\newcommand{\varOutputs}{\styleVariable{out}}
+\newcommand{\varInputs}{inp}
+\newcommand{\varOutputs}{out}
 \newcommand{\varProofs}{\Pi}
 \newcommand{\varCommits}{\styleVariable{com}}
 \newcommand{\varLowerBound}{\styleVariable{lb}}
 \newcommand{\varUpperBound}{\styleVariable{ub}}
 \newcommand{\varI}{\styleVariable{i}}
 \newcommand{\varJ}{\styleVariable{j}}
-\newcommand{\varIterator}{i}
+\newcommand{\varIterator}{\styleVariable{i}}
+\newcommand{\varTime}{\styleVariable{t}}
+\newcommand{\varTimeBTC}{\varTime_{btc}}
+\newcommand{\varTimeMW}{\varTime_{mw}}
+\newcommand{\varAddress}{\styleVariable{a}}
+\newcommand{\varScript}{\styleVariable{s}}
+\newcommand{\varVersion}{\styleVariable{vs}}
+\newcommand{\varScriptPubKey}{\styleVariable{spk}}
+\newcommand{\varScriptSig}{\styleVariable{\varSignature}}
+\newcommand{\varUTXO}{\psi}
+\newcommand{\varUTXOSet}{\Psi}
+\newcommand{\varBtcInputs}{\varUTXOSet_{inp}}
+\newcommand{\varBtcOutpus}{\varUTXOSet_{out}}
+\newcommand{\varBtxTx}{\styleVariable{tx_{btc}}}
+\newcommand{\varBtcTx}{\styleVariable{tx_{btc}}}
 
 % operators
 \newcommand{\opAccess}[2]{#1.#2}
@@ -228,6 +246,13 @@
 \newcommand{\procSign}[2]{ \procSignId(#1 \opSeperate #2) }
 \newcommand{\procVerfId}{\styleFunction{verf}}
 \newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
+
+\newcommand{\procCreateUTXOId}{\styleFunction{createUTXO}}
+\newcommand{\procCreateUTXO}[2]{\procCreateUTXOId (#1,#2)}
+\newcommand{\procSpendUTXOId}{\styleFunction{spendUTXO}}
+\newcommand{\procSpendUTXO}[2]{\procSpendUTXOId (#1,#2)}
+\newcommand{\procVerfUTXOId}{\styleFunction{verfUTXO}}
+\newcommand{\procVerfUTXO}[1]{\procVerfUTXOId(#1)}
 
 \newcommand{\procRProofSetupId}{\styleFunction{ranPrfSetup}}
 \newcommand{\procRProofSetup}[3]{\procRProofSetupId(#1,#2,#3)}
@@ -282,39 +307,43 @@
 
 \newcommand{\procCreateCoinId}{\styleFunction{createCoin}}
 \newcommand{\procCreateCoin}[2]{\procCreateCoinId(#1,#2)}
-
 \newcommand{\procCreatePreTxId}{\styleFunction{createTx}}
-\newcommand{\procCreatePreTx}[7]{\procCreatePreTxId(#1,#2,#3,#4,#5,#6,#7)}
+\newcommand{\procCreatePreTx}[8]{\procCreatePreTxId(#1,#2,#3,#4,#5,#6,#7,#8)}
 
 \newcommand{\procSendCoinsId}{\styleFunction{spendCoins}}
-\newcommand{\procSendCoins}[4]{\procSendCoinsId(#1,#2,#3,#4)}
-
+\newcommand{\procSendCoins}[5]{\procSendCoinsId(#1,#2,#3,#4,#5)}
 \newcommand{\procRecvCoinsId}{\styleFunction{recvCoins}}
 \newcommand{\procRecvCoins}[2]{\procRecvCoinsId(#1,#2)}
-
 \newcommand{\procFinTxId}{\styleFunction{finTx}}
 \newcommand{\procFinTx}[3]{\procFinTxId(#1,#2,#3)}
-
 \newcommand{\procVerfTxId}{\styleFunction{verfTx}}
 \newcommand{\procVerfTx}[1]{\procVerfTxId(#1)}
 
+\newcommand{\procBuildTransactionId}{\styleFunction{buildTransaction}}
+\newcommand{\procBuildTransaction}[4]{\procBuildTransactionId(#1,#2,#3,#4)}
+\newcommand{\procSignTransactionId}{\styleFunction{signTransaction}}
+\newcommand{\procSignTransaction}[2]{\procSignTransactionId (#1,#2)}
+\newcommand{\procVerfTransactionId}{\styleFunction{verfTransaction}}
+\newcommand{\procVerfTransaction}[1]{\procVerfTransactionId(#1)}
+
 \newcommand{\procDSignId}{\styleFunction{dSign}}
-\newcommand{\procDSign}[5]{\procDSignId \langle(#1,#2,#4),(#1,#3,#5)\rangle}
+\newcommand{\procDSign}[5]{\procDSignId \langle(#1,#2,#3),(#1,#4,#5)\rangle}
 \newcommand{\procDRProofId}{\styleFunction{dRanPrf}}
 \newcommand{\procDRProof}[4]{\procDRProofId \langle(#1,#2,#3),(#1,#2,#4)}
 
 \newcommand{\procDSendCoinsId}{\styleFunction{dSpendCoins}}
-\newcommand{\procDSendCoins}[5]{\procDSendCoinsId
-\langle (#1,#2,#3,#4) \opSeperate (#1,#5,#3,#4) \rangle}
-
+\newcommand{\procDSendCoins}[6]{\procDSendCoinsId
+\langle (#1,#2,#3,#4,#6) \opSeperate (#1,#5,#3,#4,#6) \rangle}
 \newcommand{\procDRecvCoinsId}{\styleFunction{dRecvCoins}}
 \newcommand{\procDRecvCoins}[2]{\procDRecvCoinsId \langle(#1,#2) \opSeperate (#1,#2) \rangle}
+\newcommand{\procDFinTxId}{\styleFunction{dFinTx}}
+\newcommand{\procDFinTx}[5]{\procDFinTxId \langle(#1,#2,#3),(#1,#4,#5)\rangle}
 
 \newcommand{\procAptRecvCoinsId}{\styleFunction{aptRecvCoins}}
 \newcommand{\procAptRecvCoins}[3]{\procAptRecvCoinsId(#1,#2,#3)}
 
 \newcommand{\procDAptFinTxId}{\styleFunction{dAptFinTx}}
-\newcommand{\procDAptFinTx}[5]{\procDAptFinTxId \langle (#1,#2,#3,#4), (#1,#5) \rangle}
+\newcommand{\procDAptFinTx}[7]{\procDAptFinTxId \langle (#1,#2,#3,#4), (#1,#5,#6,#7) \rangle}
 
 \newcommand{\procInflateId}{\styleFunction{inflate}}
 \newcommand{\procInflate}[2]{\procInflateId (#1,#2)}
@@ -327,3 +356,20 @@
 
 \newcommand{\procOracleTxId}{\cnstOracle_{tx}}
 \newcommand{\procOracleTx}[4]{\procOracleTxId ((#1,#2),(#3,#4))}
+
+\newcommand{\procLockAddrId}{\styleFunction{lockBtcScript}}
+\newcommand{\procLockAddr}[4]{\procLockAddrId (#1,#2,#3,#4)}
+\newcommand{\procVerifyLockId}{\styleFunction{verifyLock}}
+\newcommand{\procVerifyLock}[5]{\procVerifyLockId (#1,#2,#3,#4,#5)}
+
+\newcommand{\procPublishBtcId}{\styleFunction{publish_{BTC}}}
+\newcommand{\procPublishBtc}[1]{\procPublishBtcId(#1)}
+
+\newcommand{\procPublishMWId}{\styleFunction{publish_{MW}}}
+\newcommand{\procPublishMW}[1]{\procPublishMWId(#1)}
+
+\newcommand{\procSetupSwapId}{\styleFunction{setupSwp}}
+\newcommand{\procSetupSwap}[7]{\procSetupSwapId \langle(#1,#2,#3,#4)(#1,#5,#6,#7)\rangle}
+
+\newcommand{\procExcSwapId}{\styleFunction{execSwap}}
+\newcommand{\procExcSwap}{\procExcSwapId()}

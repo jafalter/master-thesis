@@ -87,7 +87,6 @@ be possible to extract the witness computing $\procExtWitId$ with the required p
     $((\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext), (\varSecKeyBob, \varPubKeyBob, \varNonceBob, \varSigContext)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam}$
     with their composite public key $\varSigContext.\varPubKey$
     and every statement/witness pair $(\varStatement \opSeperate \varWit) \procGenR{\varSecParam}$ in a relation $\cnstRelation$ it must hold that:
-
     \[
         \Pr\left[
         \begin{array}{c}
@@ -523,6 +522,6 @@ $\cnstEUFCMA$ holds if $\prob{\procExpForgeSimple{\varN} \opEqNoQ 1} \opSmEq \fu
     then $\cnstAdversary$ will always be able to win the $\procExpForgeSimpleId$, leading to a contradiction. Similiar to the previous proof the adversary $\cnstAdversary$
     splits up the secret key $\varPubKey$ computed during the $\procExpForgeSimpleId$ game into $\varPubKey_1$ and $\varPubKey_2$ to use them in the $\procExpExtId$.
     The forged final signature $\varSigFin$ can then be used to win the $\procExpForgeSimpleId$ game. As the black-box reduction is the same as before we again refer
-    to figure \ref{prf:bbreuf} to see the details.
+    to figure~\ref{prf:bbreuf} to see the details.
 
 \end{proof}
