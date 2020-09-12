@@ -551,11 +551,11 @@ the Mimblewimble side.
 On the Bitcoin side we construct two DPT functions ($\procLockAddrId, \procVerifyLockId$).
 \begin{itemize}
     \item $(\varScriptPubKey) \opFunResult \procLockAddr{\varPubKeyAlice}{\varStatement}{\varPubKeyBob}{\varTime}$:
-    The locking script function lets Bob construct a Bitcoin script + address only spendable by Alice if she receives the discrete logrithm
+    The locking script function lets Bob construct a Bitcoin script only spendable by Alice if she receives the discrete logrithm
     $\varWit$ of $\varStatement \opEqNoQ \funGen{\varWit}$.
     Additionally the function requires Bobs' public key $\varPubKeyBob$ and a timelock $\varTime$ (given as a block
     number) as input which allows Bob to reclaim his funds after some time if the atomic swap was not
-    completed successfully. The function will create and return a Bitcon script $\varScript$ and address $\varAddress$ to which Bob can send funds using a P2SH transaction.
+    completed successfully. The function will create and return a Bitcon script $\varScriptPubKey$ to which Bob can send funds using a P2SH transaction.
     If Alice (knowing her secret key $\varSecKeyAlice$) acquires $\varWit$ with $\varStatement \opEqNoQ \funGen{\varWit}$ she can construct the complete secret key simply
     by calculating $\varSecKey \opAssign \varSecKeyAlice \opAddScalar \varWit$. This construction is similiar although simpler to the locks described
     by Malavolta et al. in~\cite{malavolta2019anonymous}. For a in-depth security analysis of this concept we refer the interested reader to their paper. For
@@ -575,7 +575,7 @@ Bitcoin locked in some UTXO $\varUTXO$ with a value of $\varAmount$ belonging to
 Before the protocol can start the two parties must agree on an the value they want to swap, the exchange rate of the
 currencies and a time after which the swap should be canceled. (if not completed) \todo[inline]{Explaining difficulty
 finding this timelock cross chains}.
-Afer coming to an aggrement the following variables are defined and known by both Alice and Bob:
+After coming to an agreement the following variables are defined and known by both Alice and Bob:
 \begin{itemize}
     \item $\varSecParam$ A security parameter.
     \item $\varAmountBtc$ The amount of Bitcoin Bob will swap to Alice.
@@ -583,30 +583,32 @@ Afer coming to an aggrement the following variables are defined and known by bot
     \item $\varTimeBTC$ The locktime as a blockheight for the Bitcoin side.
     \item $\varTimeMW$ The locktime as a blockheight for the Mimblewimble side.
 \end{itemize}
+We collect this shared variables in an initial swap state $\varSwpState$:
+\[ \varSwpState \opAssign \{ \varSecParam, \varAmountBtc, \varAmountMW, \varTimeBTC, \varTimeMW \} \]
 
 \newgeometry{margin=2cm}
 \begin{landscape}
     \begin{figure}
         \fbox{
-        \procedure[linenumbering]{$\procSetupSwap{\varSecParam}{\varCoinInp}{\varAmountMW}{\varTimeMW}{\varUTXO}{\varAmountBtc
-        }{\varTimeBTC}$} {
+        \procedure[linenumbering]{$\procSetupSwap{\varSwpState}{\varCoinInp}{\varBlindingFactorAlice}{\varValueMw}{\varUTXO}{\varScriptSig}{\varValueBtc}$} {
         Alice \< \< Bob \\
         \varKeyPairAlice \opFunResult \procSetup{\varSecParam} \< \< \varKeyPairBob \opFunResult \procSetup{\varSecParam} \\
         \< \< (\varWit, \varStatement) \opFunResult \procSetup{\varSecParam} \\
         \< \sendmessageright*{\varPubKeyAlice} \\
-        \< \< \procLockAddr{\varPubKeyAlice}{\varStatement}{\varPubKeyBob}{\varTimeBTC} \\
+        \< \< \varScriptPubKey \opFunResult \procLockAddr{\varPubKeyAlice}{\varStatement}{\varPubKeyBob}{\varTimeBTC} \\
         \< \< \varUTXO_{lock} \opFunResult \procCreateUTXO{\varAmountBtc}{\varScriptPubKey} \\
-        \< \< \varUTXO_{B} \opFunResult \procCreateUTXO{\varAmount - \varAmountBtc}{\varPubKeyBob} \\
-        \< \< \varBtcTx \opFunResult \procBuildTransaction{\funArray{\varUTXO}}{\funArray{\varUTXO_{lock}}}{1}{\cnstEmptySet} \\
-        \< \< \procPublishBtc{\funArray{\varBtcTx}} \\
+        \< \< \varUTXO_{B} \opFunResult \procCreateUTXO{\varValueBtc - \varAmountBtc}{\varPubKeyBob} \\
+        \< \< \varBtcTx \opFunResult \procBuildTransaction{\funArray{\varUTXO_{inp}}}{\funArray{\varUTXO_{lock}, \varUTXO_{B}}}{1}{\cnstEmptySet} \\
+        \< \< \funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\funArray{\varScriptSig}} \\
+        \< \< \procPublishBtc{\funArray{\funStar{\varBtcTx}}} \\
         \< \sendmessageleft*{\varStatement, \varPubKeyBob} \\
         \pcif \procVerifyLock{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varAmountBtc}{\cnstEmptySet} \opEqNoQ 0 \\
         \t \pcreturn 0 \\
-        (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \\ \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varAmountMW}{\varValue}{\cnstFalsum} \\
+        (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \\ \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varAmountMW}{\varValueMw}{\cnstFalsum} \\
         \< \sendmessageright*{\varPreTx} \\
         \< \langle (\funStar{\varPreTx}, \funStar{\varBlindingFactorAlice}), (\funStar{\varPreTx}, \funStar{\varBlindingFactorBob}) \rangle \\ \<  \opFunResult \procDRecvCoins{\varPreTx}{\varPreTx}  \\
         \varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
-        \< \varPreTx_2 \\ \< \opFunResult \procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\varTime} \\
+        \< \varPreTx_2 \\ \< \opFunResult \procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\varTimeMW} \\
         \funStar{\varPreTx_2} \opFunResult \procRecvCoins{\varPreTx_2}{\varAmountMW} \\
         \varTx_2 \opFunResult \procDFinTx{\funStar{\varPreTx_2}}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob} \\
         \procPublishMW{\funArray{\varTx, \varTx_2}}
@@ -623,20 +625,20 @@ Afer coming to an aggrement the following variables are defined and known by bot
         \fbox{
         \procedure[linenumbering]{$\procExcSwap$} {
         Alice \< \< Bob \\
-        \< \langle (\varPreTx, (\varSecKeyAlice, \varNonceAlice), (\varPreTx, (\varSecKeyBob, \varNonceBob))) \rangle \\ \< \opFunResult \procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\varTime} \\
+        \< \langle (\varPreTx, (\varSecKeyAlice, \varNonceAlice), (\varPreTx, (\varSecKeyBob, \varNonceBob))) \rangle \\ \< \opFunResult \procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\cnstFalsum} \\
         \< \< (\funStar{\varPreTx}, \funStarAlt{\varBlindingFactorBob}) \opFunResult \procAptRecvCoins{\varPreTx}{\varAmountMW}{\varWit} \\
         \< \sendmessageleft*{\funStar{\varPreTx}} \\
         \< \langle \cnstEmptySet, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob} \\
         \< \< \procPublishMW{\varTx} \\
         \< \sendmessageleft*{\varTx} \\
-        (\cdot,\cdot,\cdot,\cdot,\cdot,\cdot,\varSigFin) \opFunResult \varPreTx \< \< \\
+        (...,\varSigFin) \opFunResult \varTx \< \< \\
         \varWit \opFunResult \procExtWit{\varSigFin}{\varSigAliceCarol}{\varSigAptBob} \\
         \varSecKey_{BTC} \opFunResult \varSecKeyAlice \opAddScalar \varWit \\
         (\funStarAlt{\varSecKeyAlice}, \funStarAlt{\varPubKeyAlice}) \opFunResult \procSetup{\varSecParam} \\
         \varUTXO_{A} \opFunResult \procCreateUTXO{\varAmountBtc}{\funStarAlt{\varPubKeyAlice}} \\
-        \funStar{\varUTXO} \opFunResult \procSpendUTXO{\varUTXO}{\varSecKey_{BTC}} \\
-        \varBtcTx \opFunResult \procBuildTransaction{\funArray{\funStar{\varUTXO}}}{\funArray{\varUTXO_{A}}}{1}{\cnstEmptySet} \\
-        \procPublishBtc{\varBtcTx}
+        \varBtcTx \opFunResult \procBuildTransaction{\funArray{\funStar{\varUTXO_{lock}}}}{\funArray{\varUTXO_{A}}}{1}{\cnstEmptySet} \\
+        \funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\varSecKey_{BTC}} \\
+        \procPublishBtc{\funStar{\varBtcTx}}
         }
         }
         \caption{Atomic Swap - $\procSetupSwapId$. \label{fig:exec-swap}}

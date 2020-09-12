@@ -201,7 +201,7 @@ A transaction is valid if the follwing conditions are fullfilled:
         transaction building algorithm is a DPT function which takes as input a set of unspent transaction outputs
         $\varBtcInputs$, a set of newly created transaction outputs $\varBtcOutpus$ a version number $\varVersion$
         and a optional locking time $\varTime$. The algoritm will output an unsigned transaction $\varBtcTx$.
-        \item $\funStar{\varBtcTx} \opFunResult \procSign{\varBtcTx}{\funArray{\varScriptSig}}$: The transaction
+        \item $\funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\funArray{\varScriptSig}}$: The transaction
         signing algoritm is DPT function which takes as input a unsigned Bitcoin transaction $\varBtcTx$ and an array
         of unlocking scripts $\funArray{\varScriptSig}$ for all inputs of the transaction. The algoritm outputs a
         signed Bitcoin transaction which can now be broadcast to the network.
