@@ -311,11 +311,11 @@
 \newcommand{\procCreatePreTx}[8]{\procCreatePreTxId(#1,#2,#3,#4,#5,#6,#7,#8)}
 
 \newcommand{\procSendCoinsId}{\styleFunction{spendCoins}}
-\newcommand{\procSendCoins}[4]{\procSendCoinsId(#1,#2,#3,#4)}
+\newcommand{\procSendCoins}[5]{\procSendCoinsId(#1,#2,#3,#4,#5)}
 \newcommand{\procRecvCoinsId}{\styleFunction{recvCoins}}
 \newcommand{\procRecvCoins}[2]{\procRecvCoinsId(#1,#2)}
 \newcommand{\procFinTxId}{\styleFunction{finTx}}
-\newcommand{\procFinTx}[4]{\procFinTxId(#1,#2,#3,#4)}
+\newcommand{\procFinTx}[3]{\procFinTxId(#1,#2,#3)}
 \newcommand{\procVerfTxId}{\styleFunction{verfTx}}
 \newcommand{\procVerfTx}[1]{\procVerfTxId(#1)}
 
@@ -327,23 +327,23 @@
 \newcommand{\procVerfTransaction}[1]{\procVerfTransactionId(#1)}
 
 \newcommand{\procDSignId}{\styleFunction{dSign}}
-\newcommand{\procDSign}[5]{\procDSignId \langle(#1,#2,#4),(#1,#3,#5)\rangle}
+\newcommand{\procDSign}[5]{\procDSignId \langle(#1,#2,#3),(#1,#4,#5)\rangle}
 \newcommand{\procDRProofId}{\styleFunction{dRanPrf}}
 \newcommand{\procDRProof}[4]{\procDRProofId \langle(#1,#2,#3),(#1,#2,#4)}
 
 \newcommand{\procDSendCoinsId}{\styleFunction{dSpendCoins}}
-\newcommand{\procDSendCoins}[5]{\procDSendCoinsId
-\langle (#1,#2,#3,#4) \opSeperate (#1,#5,#3,#4) \rangle}
+\newcommand{\procDSendCoins}[6]{\procDSendCoinsId
+\langle (#1,#2,#3,#4,#6) \opSeperate (#1,#5,#3,#4,#6) \rangle}
 \newcommand{\procDRecvCoinsId}{\styleFunction{dRecvCoins}}
 \newcommand{\procDRecvCoins}[2]{\procDRecvCoinsId \langle(#1,#2) \opSeperate (#1,#2) \rangle}
 \newcommand{\procDFinTxId}{\styleFunction{dFinTx}}
-\newcommand{\procDFinTx}[6]{\procDFinTxId \langle(#1,#2,#3,#6),(#1,#4,#5,#6)\rangle}
+\newcommand{\procDFinTx}[5]{\procDFinTxId \langle(#1,#2,#3),(#1,#4,#5)\rangle}
 
 \newcommand{\procAptRecvCoinsId}{\styleFunction{aptRecvCoins}}
 \newcommand{\procAptRecvCoins}[3]{\procAptRecvCoinsId(#1,#2,#3)}
 
 \newcommand{\procDAptFinTxId}{\styleFunction{dAptFinTx}}
-\newcommand{\procDAptFinTx}[6]{\procDAptFinTxId \langle (#1,#2,#3), (#1,#4,#5,#6) \rangle}
+\newcommand{\procDAptFinTx}[7]{\procDAptFinTxId \langle (#1,#2,#3,#4), (#1,#5,#6,#7) \rangle}
 
 \newcommand{\procInflateId}{\styleFunction{inflate}}
 \newcommand{\procInflate}[2]{\procInflateId (#1,#2)}
