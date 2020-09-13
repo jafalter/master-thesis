@@ -79,7 +79,7 @@ balanced and its signature is valid. More formally:
         The distributed algorithm will generate a output coin owned by both Alice and Carol. (each owning a share of the key).
         The output will be an updated pre-transaction $\funStar{\varPreTx}$, the shared output coin $\varCoinShared$ and the respective shares of the blinding factor.
         Note that $\varCoinShared$ will only be spendable if both owners cooperate running the $\procDSendCoinsId$ protocol.
-        \item $\varTx \opFunResult \procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}$: The distributed finalized transaction protocol has to be used if we are creating a transaction spending a shared coin (i.e. the transaction was created with the $\procDSendCoinsId$ algorithm).
+        \item $\langle \varTx, \varTx \rangle \opFunResult \procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}$: The distributed finalized transaction protocol has to be used if we are creating a transaction spending a shared coin (i.e. the transaction was created with the $\procDSendCoinsId$ algorithm).
         In this case we require signing information from both Alice and Carol.
         Again an optional locktime $\varTime$ can be provided.
     \end{itemize}
@@ -437,22 +437,23 @@ pre-transaction $\varPreTx$ which can be sent back to the sender.
     \begin{figure}
             \fbox{
             \procedure[linenumbering]{$\procDRecvCoins{\varPreTx}{\varFundValue}$} {
-            Bob \< \< Carol \\
-            (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \\
-            \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \< \< \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \\
-            \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut[\varIterator]} \opEqNoQ 0 \< \< \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut[\varIterator]} \opEqNoQ 0 \\
-            \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
-            (\funStar{\varBlindingFactorBob}, \varNonceBob) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \\
-            (\varCoinShared,\cdot) \opFunResult \procCreateCoin{\varFundValue}{\funStar{\varBlindingFactorBob}} \< \< \\
-            \varSecKeyBob \opAssign \funStar{\varBlindingFactorBob} \< \< \\
-            \< \sendmessageright*{\varCoinShared} \< \\
-            \< \< (\funStar{\varBlindingFactorCarol}, \varNonceCarol) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-            \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \\
-            \< \< \funStarAlt{\varCoinShared} \opAssign \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \\
-            \< \sendmessageleft*{\funStarAlt{\varCoinShared}, \funGen{\varSecKeyCarol}} \< \\
-            \pcif \funStarAlt{\varCoinShared} \opNotEq \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \< \< \\
-            \t \pcreturn \cnstFalsum \< \< \\
-            \< (\varSigBobCarol, \varPubKeyBobCarol, \funStar{\varSigContext}) \opFunResult \procDSign{\varMsg}{\varSecKeyBob}{\varSecKeyBob}{\varNonceAlice}{\varNonceBob} \< \\
+            Bob \< \< \< \< Carol \\
+            (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \< \< \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \\
+            \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \< \< \< \< \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \\
+            \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut[\varIterator]} \opEqNoQ 0 \< \< \< \< \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut[\varIterator]} \opEqNoQ 0 \\
+            \t \pcreturn \cnstFalsum \< \< \< \< \t \pcreturn \cnstFalsum \\
+            (\funStar{\varBlindingFactorBob}, \varNonceBob) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \< \< \\
+            (\varCoinShared,\cdot) \opFunResult \procCreateCoin{\varFundValue}{\funStar{\varBlindingFactorBob}} \< \< \< \< \\
+            \varSecKeyBob \opAssign \funStar{\varBlindingFactorBob} \< \< \< \< \\
+            \< \sendmessagerightx{4}{\varCoinShared} \< \\
+            \< \< \< \< (\funStar{\varBlindingFactorCarol}, \varNonceCarol) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \< \< \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \\
+            \< \< \< \< \funStarAlt{\varCoinShared} \opAssign \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \\
+            \< \sendmessageleftx{4}{\funStarAlt{\varCoinShared}, \funGen{\varSecKeyCarol}} \< \\
+            \pcif \funStarAlt{\varCoinShared} \opNotEq \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \< \< \< \< \\
+            \t \pcreturn \cnstFalsum \< \< \< \< \\
+            \< (\varSigBobCarol, \varPubKeyBobCarol, \funStar{\varSigContext}) \opFunResult \procDSign{\varMsg}{\varSecKeyBob}{\varSecKeyBob}{\varNonceAlice}{\varNonceBob}
+            \< \\
             \< \funStarAlt{\varSigContext} \opFunResult \procSetupCtx{\varSigContext}{\funStar{\varSigContext}.\varPubKey}{\funStar{\varSigContext}.\varNonce} \< \\
             \< \varProofBobCarol \opFunResult \procDRProof{\funStarAlt{\varCoinShared}}{\varFundValue}{\varSecKeyAlice}{\varSecKeyBob} \< \\
             \< \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \funStarAlt{\varCoinShared}}{\varProofs \opConc \varProofBobCarol}{\funStarAlt{\varSigContext}}{\varCommits \opConc \varPubKeyBobCarol}{\varSigBobCarol}{\varTime} \< \\
@@ -586,32 +587,56 @@ After coming to an agreement the following variables are defined and known by bo
 We collect this shared variables in an initial swap state $\varSwpState$:
 \[ \varSwpState \opAssign \{ \varSecParam, \varAmountBtc, \varAmountMW, \varTimeBTC, \varTimeMW \} \]
 
+We formalize the protocol $\procSetupSwapId$ in figure~\ref{fig:setup-swap}.
+The protocol takes as input the share swap state $\varSwpState$ from both parties.
+From Alice her Mimblewimble input coin $\varCoinInp$ together with the required spending information $\varBlindingFactorAlice$ and the coins value $\varValueMw$.
+From Bob we require the UTXO $\varUTXO$ he wants to spend, similiar to Alice he needs to provide spending secret $\varScriptSig$ and total value stored in the UTXO $\varValueBtc$.
+
+The protocol starts by both parties creating and exchanging keys.
+Bob now creates two new Bitcoin outputs $\varUTXO_{lock}$ and $\varUTXO_{B}$, of which one is the locked Bitcoins which Alice might retrieve later (or Bob after time $\varTimeBTC has passed$), and the other Bobs change output. (Difference between what is stored in the input UTXO and what should be sent to Alice).
+After Bob has published the transaction sending value to the new outputs he will provide Alice with the statement $\varStatement$ und which the Bitcoins' are locked together with Alice's public key.
+Alice can now verify that the funds on Bitcoin side are indeed correctly locked.
+After that she will collaborate with Bob to spend her Mimblewimble coins into an output shared by both parties.
+Immediately after both parties collaborate again to spend this shared coin back to Alice with a timelock of $\varTimeMW$.
+It is immanent that Alice does not publish the first transaction (A -> AB) before the timelocked refund transaction (AB -> A) was signed, otherwise her funds are locked in the shared output without the possibility of refund.
+The setup protocol concludes with the funds locked up in both chains and ready to be swapped.
+
+\footnotetext[1]{$\procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varAmountMW}{\varValueMw}{\cnstFalsum}$}
+\footnotetext[2]{$\procDRecvCoins{\varPreTx}{\varPreTx}$}
+\footnotetext[3]{$\procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\varTimeMW}$}
+\footnotetext[4]{$\procDFinTx{\funStar{\varPreTx_2}}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}$}
+
 \newgeometry{margin=2cm}
 \begin{landscape}
+    \thispagestyle{plain}
     \begin{figure}
         \fbox{
         \procedure[linenumbering]{$\procSetupSwap{\varSwpState}{\varCoinInp}{\varBlindingFactorAlice}{\varValueMw}{\varUTXO}{\varScriptSig}{\varValueBtc}$} {
-        Alice \< \< Bob \\
-        \varKeyPairAlice \opFunResult \procSetup{\varSecParam} \< \< \varKeyPairBob \opFunResult \procSetup{\varSecParam} \\
-        \< \< (\varWit, \varStatement) \opFunResult \procSetup{\varSecParam} \\
-        \< \sendmessageright*{\varPubKeyAlice} \\
-        \< \< \varScriptPubKey \opFunResult \procLockAddr{\varPubKeyAlice}{\varStatement}{\varPubKeyBob}{\varTimeBTC} \\
-        \< \< \varUTXO_{lock} \opFunResult \procCreateUTXO{\varAmountBtc}{\varScriptPubKey} \\
-        \< \< \varUTXO_{B} \opFunResult \procCreateUTXO{\varValueBtc - \varAmountBtc}{\varPubKeyBob} \\
-        \< \< \varBtcTx \opFunResult \procBuildTransaction{\funArray{\varUTXO_{inp}}}{\funArray{\varUTXO_{lock}, \varUTXO_{B}}}{1}{\cnstEmptySet} \\
-        \< \< \funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\funArray{\varScriptSig}} \\
-        \< \< \procPublishBtc{\funArray{\funStar{\varBtcTx}}} \\
-        \< \sendmessageleft*{\varStatement, \varPubKeyBob} \\
+        Alice \< \< \< \< Bob \\
+        \varKeyPairAlice \opFunResult \procSetup{\varSecParam} \< \< \< \< \varKeyPairBob \opFunResult \procSetup{\varSecParam} \\
+        \< \< \< \< (\varWit, \varStatement) \opFunResult \procSetup{\varSecParam} \\
+        \< \sendmessagerightx{4}{\varPubKeyAlice} \< \\
+        \< \sendmessageleftx{4}{\varPubKeyBob} \< \\
+        \< \< \< \< \pccomment{Preparing locked Bitcoin output} \\
+        \< \< \< \< \varScriptPubKey \opFunResult \procLockAddr{\varPubKeyAlice}{\varStatement}{\varPubKeyBob}{\varTimeBTC} \\
+        \< \< \< \< \varUTXO_{lock} \opFunResult \procCreateUTXO{\varAmountBtc}{\varScriptPubKey} \\
+        \< \< \< \< \varUTXO_{B} \opFunResult \procCreateUTXO{\varValueBtc - \varAmountBtc}{\varPubKeyBob} \\
+        \< \< \< \< \varBtcTx \opFunResult \procBuildTransaction{\funArray{\varUTXO_{inp}}}{\funArray{\varUTXO_{lock}, \varUTXO_{B}}}{1}{\cnstEmptySet} \\
+        \< \< \< \< \funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\funArray{\varScriptSig}} \\
+        \< \< \< \< \procPublishBtc{\funArray{\funStar{\varBtcTx}}} \\
+        \< \sendmessageleftx{4}{\varStatement, \varPubKeyBob} \< \\
         \pcif \procVerifyLock{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varAmountBtc}{\cnstEmptySet} \opEqNoQ 0 \\
-        \t \pcreturn 0 \\
-        (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \\ \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varAmountMW}{\varValueMw}{\cnstFalsum} \\
-        \< \sendmessageright*{\varPreTx} \\
-        \< \langle (\funStar{\varPreTx}, \funStar{\varBlindingFactorAlice}), (\funStar{\varPreTx}, \funStar{\varBlindingFactorBob}) \rangle \\ \<  \opFunResult \procDRecvCoins{\varPreTx}{\varPreTx}  \\
-        \varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
-        \< \varPreTx_2 \\ \< \opFunResult \procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\varTimeMW} \\
-        \funStar{\varPreTx_2} \opFunResult \procRecvCoins{\varPreTx_2}{\varAmountMW} \\
-        \varTx_2 \opFunResult \procDFinTx{\funStar{\varPreTx_2}}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob} \\
-        \procPublishMW{\funArray{\varTx, \varTx_2}}
+        \t \pcreturn 0 \< \< \< \< \\
+        \pccomment{Preparing locked Mimblewimble output} \< \< \< \< \\
+        (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoinsId^1 \< \< \< \< \\
+        \< \sendmessagerightx{4}{\varPreTx} \< \\
+        \< \langle (\funStar{\varPreTx}, \funStar{\varBlindingFactorAlice}), (\funStar{\varPreTx}, \funStar{\varBlindingFactorBob}) \rangle \opFunResult \procDRecvCoinsId^2 \< \\
+        \varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \< \< \< \< \\
+        \< \langle (\varPreTx_2, (\varSecKeyAlice, \varNonceAlice)), (\varPreTx_2, (\varSecKeyBob, \varNonceBob))  \rangle \opFunResult \procDSendCoinsId^3 \< \\
+        \funStar{\varPreTx_2} \opFunResult \procRecvCoins{\varPreTx_2}{\varAmountMW} \< \< \< \< \\
+        \< \langle \varTx_2, \varTx_2 \rangle \opFunResult \procDFinTxId^4 \< \\
+        \procPublishMW{\funArray{\varTx, \varTx_2}} \< \< \< \< \\
+        \pcreturn \varSwpState \< \< \< \< \pcreturn \varSwpState \\
         }
         }
         \caption{Atomic Swap - $\procSetupSwapId$. \label{fig:setup-swap}}
