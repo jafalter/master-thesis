@@ -606,6 +606,11 @@ The setup protocol concludes with the funds locked up in both chains and ready t
 \footnotetext[3]{$\procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\varTimeMW}$}
 \footnotetext[4]{$\procDFinTx{\funStar{\varPreTx_2}}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}$}
 
+\subsection{Execution Phase}
+
+\footnotetext[5]{$\procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\cnstFalsum}$}
+\footnotetext[6]{$\procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$}
+
 \newgeometry{margin=2cm}
 \begin{landscape}
     \thispagestyle{plain}
@@ -646,24 +651,25 @@ The setup protocol concludes with the funds locked up in both chains and ready t
 
 \newgeometry{margin=2cm}
 \begin{landscape}
+    \thispagestyle{plain}
     \begin{figure}
         \fbox{
         \procedure[linenumbering]{$\procExcSwap$} {
-        Alice \< \< Bob \\
-        \< \langle (\varPreTx, (\varSecKeyAlice, \varNonceAlice), (\varPreTx, (\varSecKeyBob, \varNonceBob))) \rangle \\ \< \opFunResult \procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\cnstFalsum} \\
-        \< \< (\funStar{\varPreTx}, \funStarAlt{\varBlindingFactorBob}) \opFunResult \procAptRecvCoins{\varPreTx}{\varAmountMW}{\varWit} \\
-        \< \sendmessageleft*{\funStar{\varPreTx}} \\
-        \< \langle \cnstEmptySet, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob} \\
-        \< \< \procPublishMW{\varTx} \\
-        \< \sendmessageleft*{\varTx} \\
-        (...,\varSigFin) \opFunResult \varTx \< \< \\
-        \varWit \opFunResult \procExtWit{\varSigFin}{\varSigAliceCarol}{\varSigAptBob} \\
-        \varSecKey_{BTC} \opFunResult \varSecKeyAlice \opAddScalar \varWit \\
-        (\funStarAlt{\varSecKeyAlice}, \funStarAlt{\varPubKeyAlice}) \opFunResult \procSetup{\varSecParam} \\
-        \varUTXO_{A} \opFunResult \procCreateUTXO{\varAmountBtc}{\funStarAlt{\varPubKeyAlice}} \\
-        \varBtcTx \opFunResult \procBuildTransaction{\funArray{\funStar{\varUTXO_{lock}}}}{\funArray{\varUTXO_{A}}}{1}{\cnstEmptySet} \\
-        \funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\varSecKey_{BTC}} \\
-        \procPublishBtc{\funStar{\varBtcTx}}
+        Alice \< \< \< \< Bob \\
+        \< \langle (\varPreTx, (\varSecKeyAlice, \varNonceAlice), (\varPreTx, (\varSecKeyBob, \varNonceBob))) \rangle \opFunResult \procDSendCoinsId^5 \< \\
+        \< \< \< \<  (\funStar{\varPreTx}, \funStarAlt{\varBlindingFactorBob}) \opFunResult \procAptRecvCoins{\varPreTx}{\varAmountMW}{\varWit} \\
+        \<  \sendmessageleftx{4}{\funStar{\varPreTx}} \<  \\
+        \< \langle \cnstEmptySet, \varTx \rangle \opFunResult \procDAptFinTxId^6 \\
+        \< \< \< \< \procPublishMW{\varTx} \\
+        \< \sendmessageleftx{4}{\varTx} \< \\
+        (...,\varSigFin) \opFunResult \varTx \< \< \< \< \\
+        \varWit \opFunResult \procExtWit{\varSigFin}{\varSigAliceCarol}{\varSigAptBob} \< \< \< \< \\
+        \varSecKey_{BTC} \opFunResult \varSecKeyAlice \opAddScalar \varWit \< \< \< \< \\
+        (\funStarAlt{\varSecKeyAlice}, \funStarAlt{\varPubKeyAlice}) \opFunResult \procSetup{\varSecParam} \< \< \< \< \\
+        \varUTXO_{A} \opFunResult \procCreateUTXO{\varAmountBtc}{\funStarAlt{\varPubKeyAlice}} \< \< \< \< \\
+        \varBtcTx \opFunResult \procBuildTransaction{\funArray{\funStar{\varUTXO_{lock}}}}{\funArray{\varUTXO_{A}}}{1}{\cnstEmptySet} \< \< \< \< \\
+        \funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\varSecKey_{BTC}} \< \< \< \< \\
+        \procPublishBtc{\funStar{\varBtcTx}} \< \< \< \<
         }
         }
         \caption{Atomic Swap - $\procSetupSwapId$. \label{fig:exec-swap}}
