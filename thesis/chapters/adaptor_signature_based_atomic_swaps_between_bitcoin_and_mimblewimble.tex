@@ -117,14 +117,14 @@ Correctness is given very similar to the standard scheme:
         Note that the routine also returns Bob's unadapted partial signature.
         The reason for this is that we later still need the unadapted version to complete the signature und thereby finalize the transaction.
         By not sharing this unadapted signature with Alice, Bob is the one who gets to finalize the transaction which is different from the simpler protocol and is an important feature for our atomic swap protocol.
-        \item $\langle \cdot, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$: The adapted variant of the finalize transaction algorithm is a distributed protocol between the sender(s) and receiver.
+        \item $\langle \varSigAliceBob, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$: The adapted variant of the finalize transaction algorithm is a distributed protocol between the sender(s) and receiver.
         Additionally to the pre-transaction $\funStar{\varPreTx}$ the senders need to input their signing information, Bob needs to input the unadapted version of his partial signature as it is needed for transaction completion.
-        In theory this protocol can be seen as a three party protocol.
-        Two senders controlling a shared coin and a third receiver.
+        This protocol could also be implemented as a three party protocol, two senders controlling a shared coin and a third receiver.
         However, as in the case we will describe later in~\ref{sec:atomic-swap} one of the two senders is also the receiver, we allowed ourselves to model this protocol as being between only two parties to simplify the formalization.
         In this version of the protocol only Bob will be able to finalize the transaction, which is different to $\procFinTxId$ and $\procDFinTxId$.
         This has the practical reason that for the atomic swap execution Bob needs to be the one in control of the final transaction.
         If Alice were to build the final transaction before Bob, she might be able to extract the Witness value before the transaction has been published, which in the atomic swap scenario would mean she could steal the funds stored on the other chain.
+        This is why the protocol does not return the final transaction $\varTx$ to Alice, instead the protocol will output the senders partial signature, which Alice can later use to extract a witness value.
     \end{itemize}
 \end{definition}
 
@@ -143,7 +143,7 @@ Similar as before we define correctness for the adapted scheme:
         \begin{array}{l}
             (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactor}}{\varFundValue}{\varValue}{\cnstFalsum} \\
             (\funStar{\varPreTx}, (\varCoinOutBob,\varBlindingFactorBob), \varSigBob) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit} \\
-            \langle \cdot, \varTx \rangle \opFunResult \procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyCarol}{\varNonceCarol}{\varSigBob}
+            \langle \varSigAliceCarol, \varTx \rangle \opFunResult \procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyCarol}{\varNonceCarol}{\varSigBob}
         \end{array}
         \right]=1.
     \]
@@ -507,7 +507,7 @@ then returns the pre-transaction $\varPreTx$ containing Bobs adapted partial sig
             \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varSigContext.\varPubKey}{\varSigContext.\varRand} \\
             \varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit} \\
             \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutBob}{\varProofs \opConc \varProofBob}{\varSigContext}{\varCommits \opConc \funGen{\varNonceBob}}{\varSigAptBob}{\varTime} \\
-            \pcreturn (\varPreTx, \funStar{\varBlindingFactorBob}, \varStatement)
+            \pcreturn (\varPreTx, (\varCoinOutBob, \funStar{\varBlindingFactorBob}),\varSigBob)
             }
         \end{varwidth}
         }
@@ -606,11 +606,6 @@ The setup protocol concludes with the funds locked up in both chains and ready t
 \footnotetext[3]{$\procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\varTimeMW}$}
 \footnotetext[4]{$\procDFinTx{\funStar{\varPreTx_2}}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}$}
 
-\subsection{Execution Phase}
-
-\footnotetext[5]{$\procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\cnstFalsum}$}
-\footnotetext[6]{$\procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$}
-
 \newgeometry{margin=2cm}
 \begin{landscape}
     \thispagestyle{plain}
@@ -622,9 +617,9 @@ The setup protocol concludes with the funds locked up in both chains and ready t
         \< \< \< \< (\varWit, \varStatement) \opFunResult \procSetup{\varSecParam} \\
         \< \sendmessagerightx{4}{\varPubKeyAlice} \< \\
         \< \sendmessageleftx{4}{\varPubKeyBob} \< \\
-        \< \< \< \< \pccomment{Preparing locked Bitcoin output} \\
         \< \< \< \< \varScriptPubKey \opFunResult \procLockAddr{\varPubKeyAlice}{\varStatement}{\varPubKeyBob}{\varTimeBTC} \\
         \< \< \< \< \varUTXO_{lock} \opFunResult \procCreateUTXO{\varAmountBtc}{\varScriptPubKey} \\
+        \< \< \< \< \varSwpState \opAssign \varSwpState \opUnion \varUTXO_{lock} \opUnion \varStatement \\
         \< \< \< \< \varUTXO_{B} \opFunResult \procCreateUTXO{\varValueBtc - \varAmountBtc}{\varPubKeyBob} \\
         \< \< \< \< \varBtcTx \opFunResult \procBuildTransaction{\funArray{\varUTXO_{inp}}}{\funArray{\varUTXO_{lock}, \varUTXO_{B}}}{1}{\cnstEmptySet} \\
         \< \< \< \< \funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\funArray{\varScriptSig}} \\
@@ -632,10 +627,10 @@ The setup protocol concludes with the funds locked up in both chains and ready t
         \< \sendmessageleftx{4}{\varStatement, \varPubKeyBob} \< \\
         \pcif \procVerifyLock{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varAmountBtc}{\cnstEmptySet} \opEqNoQ 0 \\
         \t \pcreturn 0 \< \< \< \< \\
-        \pccomment{Preparing locked Mimblewimble output} \< \< \< \< \\
         (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoinsId^1 \< \< \< \< \\
         \< \sendmessagerightx{4}{\varPreTx} \< \\
-        \< \langle (\funStar{\varPreTx}, \funStar{\varBlindingFactorAlice}), (\funStar{\varPreTx}, \funStar{\varBlindingFactorBob}) \rangle \opFunResult \procDRecvCoinsId^2 \< \\
+        \< \langle (\funStar{\varPreTx}, (\varCoinShared,\funStar{\varBlindingFactorAlice})), (\funStar{\varPreTx}, (\varCoinShared,\funStar{\varBlindingFactorBob})) \rangle \opFunResult \procDRecvCoinsId^2 \< \\
+        \< \varSwpState \opAssign \varSwpState \opUnion \varCoinShared \< \\
         \varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \< \< \< \< \\
         \< \langle (\varPreTx_2, (\varSecKeyAlice, \varNonceAlice)), (\varPreTx_2, (\varSecKeyBob, \varNonceBob))  \rangle \opFunResult \procDSendCoinsId^3 \< \\
         \funStar{\varPreTx_2} \opFunResult \procRecvCoins{\varPreTx_2}{\varAmountMW} \< \< \< \< \\
@@ -649,27 +644,64 @@ The setup protocol concludes with the funds locked up in both chains and ready t
 \end{landscape}
 \restoregeometry
 
+\subsection{Execution Phase}
+
+First we need to define an additional auxiliary function $\procVerifyTimeId$ with the following signature:
+\[ \{0,1\} \opFunResult \procVerifyTime{\varChain}{\varTime} \]
+This function will verify that there is sufficient time to execute the atomic swap protcol.
+As input it takes a chain paramter $\varChain$ (in our case this could be either BTC or MW) and a block height $\varTime$.
+The routine will verify that the current height of the blockchain is marginally below $\varTime$.
+If this is the case it will return 1, or 0 otherwise.
+How much time exactly should be left for the function to return 1 is implementation specific, fur further discussion we again like to refer to \todo[inline]{timeout paper}
+We now define a protocol $\procExcSwapId$ to execute the Atomic Swap between some amount $\varAmountBtc$ on the Bitcoin side and some amount on the Mimblewimble side $\varAmountMW$.
+We assume the participants have successfully run the $\procSetupSwapId$ protocl and both know the updated swap state $\varSwpState$ as returned by the setup protocol.
+Alice (Mimblewimble side) needs to provide the part of the blinding factor $\funStar{\varBlindingFactorAlice}$ of the shared Mimblewimble coin $\varCoinShared$ as well as the swap state $\varSwpState$ as protocol inputs.
+Bob (Bitcoin side) needs to provide his part of the blinding factor $\funStar{\varBlindingFactorBob}$ of the shared Mimblewimble coin $\varCoinShared$, the secret witness value $\varWit$ and the swap state $\varSwpState$ as protocol inputs.
+The protocol starts with the two parties creating a Mimblewimble transaction with the goal of spending the shared input coin to Bob.
+Bob will call the $\procAptRecvCoinsId$ routine to hide the secret $\varWit$ in his adapted signature $\varSigAptBob$, which Alice can retrieve from the pre-transaction.
+Note that at this point only Bobs know his original partial signature $\varSigBob$.
+Therefore they cooperate again in the $\procDAptFinTxId$ to compute the final Mimblewimble transaction transferring value from the shared coin $\varCoinShared$ to Bob.
+After Bob has published the transaction and is now in possession of the swapped funds on the Mimblewimble side, he will send the transaction to Alice (or Alice could retrieve it directly from the blockchain, if Bob would refuse to cooperate).
+Now Alice know all pieces needed to extract the secret witness $\varWit$:
+\begin{itemize}
+    \item The final signature $\varSigFin$.
+    \item Bobs adapted signature containing x $\varSigAptBob$.
+    \item Her and Bobs partial signature spending the shared coin $\varSigAliceBob$.
+\end{itemize}
+She can now call $\procExtWitId$ to retrieve $\varWit$ and compute the secret key $\varSecKey_{BTC}$ needed to unlock the Bitcoin funds.
+She will now create her own output $\varUTXO_{\varAlice}$, and will transfer the funds from the lock.
+After publishing this transaction to the Bitcoin network, Alice is in full possession of the swapped funds on the Bitcoin side.
+The procedure returns 1 if the swap was successfully executed or 0 otherwise (when not enough time was left to safely execute the swap).
+
+\footnotetext[5]{$\procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\cnstFalsum}$}
+\footnotetext[6]{$\procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$}
+
 \newgeometry{margin=2cm}
 \begin{landscape}
     \thispagestyle{plain}
     \begin{figure}
         \fbox{
-        \procedure[linenumbering]{$\procExcSwap$} {
+        \procedure[linenumbering]{$\procExcSwap{\varSwpState}{\varWit}{\funStar{\varBlindingFactorAlice}}{\funStar{\varBlindingFactorBob}}$} {
         Alice \< \< \< \< Bob \\
+        (\varAmountMW, \varAmountBtc, \varTimeMW, \varTimeBTC, \varCoinShared, \varUTXO_{lock}, \varStatement) \opFunResult \varSwpState \< \< \< \< (\varAmountMW, \varTimeMW, \varTimeBTC, \varCoinShared) \opFunResult \varSwpState \\
         \< \langle (\varPreTx, (\varSecKeyAlice, \varNonceAlice), (\varPreTx, (\varSecKeyBob, \varNonceBob))) \rangle \opFunResult \procDSendCoinsId^5 \< \\
-        \< \< \< \<  (\funStar{\varPreTx}, \funStarAlt{\varBlindingFactorBob}) \opFunResult \procAptRecvCoins{\varPreTx}{\varAmountMW}{\varWit} \\
+        \< \< \< \<  (\funStar{\varPreTx}, (\varCoinOutBob, \funStarAlt{\varBlindingFactorBob}), \varSigBob) \opFunResult \procAptRecvCoins{\varPreTx}{\varAmountMW}{\varWit} \\
         \<  \sendmessageleftx{4}{\funStar{\varPreTx}} \<  \\
-        \< \langle \cnstEmptySet, \varTx \rangle \opFunResult \procDAptFinTxId^6 \\
-        \< \< \< \< \procPublishMW{\varTx} \\
-        \< \sendmessageleftx{4}{\varTx} \< \\
-        (...,\varSigFin) \opFunResult \varTx \< \< \< \< \\
-        \varWit \opFunResult \procExtWit{\varSigFin}{\varSigAliceCarol}{\varSigAptBob} \< \< \< \< \\
+        (...,\varSigAptBob) \opFunResult \funStar{\varPreTx} \< \< \< \< \\
+        \< \pcif \procVerifyTime{BTC}{\varTimeBTC} \opEqNoQ 0 \opOr \procVerifyTime{MW}{\varTimeMW} \opEqNoQ 0 \< \\
+        \< \t \pcreturn 0 \< \\
+        \< \langle \varSigAliceBob, \varMwTx \rangle \opFunResult \procDAptFinTxId^6 \\
+        \< \< \< \< \procPublishMW{\varMwTx} \\
+        \< \sendmessageleftx{4}{\varMwTx} \< \\
+        (...,\varSigFin) \opFunResult \varMwTx \< \< \< \< \\
+        \varWit \opFunResult \procExtWit{\varSigFin}{\varSigAliceBob}{\varSigAptBob} \< \< \< \< \\
         \varSecKey_{BTC} \opFunResult \varSecKeyAlice \opAddScalar \varWit \< \< \< \< \\
         (\funStarAlt{\varSecKeyAlice}, \funStarAlt{\varPubKeyAlice}) \opFunResult \procSetup{\varSecParam} \< \< \< \< \\
         \varUTXO_{A} \opFunResult \procCreateUTXO{\varAmountBtc}{\funStarAlt{\varPubKeyAlice}} \< \< \< \< \\
         \varBtcTx \opFunResult \procBuildTransaction{\funArray{\funStar{\varUTXO_{lock}}}}{\funArray{\varUTXO_{A}}}{1}{\cnstEmptySet} \< \< \< \< \\
         \funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\varSecKey_{BTC}} \< \< \< \< \\
-        \procPublishBtc{\funStar{\varBtcTx}} \< \< \< \<
+        \procPublishBtc{\funStar{\varBtcTx}} \< \< \< \< \\
+        \pcreturn 1 \< \< \< \< \pcreturn 1
         }
         }
         \caption{Atomic Swap - $\procSetupSwapId$. \label{fig:exec-swap}}
