@@ -11,7 +11,6 @@ that the schemes are correct and secure with regards to the defined security pro
 
 Finally, we define a Atomic Swap protocol from these building blocks, allowing two parties to securely and trustlessly swap funds from a Mimblewimble blockchain with those on another blockchain, such as Bitcoin.
 
-
 \section{Definitions}\label{sec:atomic-def}
 
 As we have already discussed in section~\ref{sec:Mimblewimble} for the creation of a transaction in Mimblewimble, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
@@ -714,6 +713,7 @@ The procedure returns 1 if the swap was successfully executed or 0 otherwise (wh
         \caption{Atomic Swap - $\procSetupSwapId$. \label{fig:exec-swap}}
     \end{figure}
 \end{landscape}
+\restoregeometry
 
 \subsection{Refunding}
 
@@ -727,7 +727,4 @@ On the Mimblewimble side the second transaction spending the shared output back 
 Because of this line number 24 in the setup phase is very important.
 Alice here published both the locking of the funds and the refund at the same time.
 If she would publish the locking transaction first, Bob could refuse to cooperate, in which case the funds would stay in the locking output only retrievable if both parties cooperate.
-If the swap executes successfull the refund transaction would get discarded by miners, as it then is no longer valid even after the timeout $\varTimeMW$.
-
-\restoregeometry
-
+If the swap executes successful the refund transaction would get discarded by miners, as it then is no longer valid even after the timeout $\varTimeMW$.
