@@ -11,7 +11,6 @@ that the schemes are correct and secure with regards to the defined security pro
 
 Finally, we define a Atomic Swap protocol from these building blocks, allowing two parties to securely and trustlessly swap funds from a Mimblewimble blockchain with those on another blockchain, such as Bitcoin.
 
-
 \section{Definitions}\label{sec:atomic-def}
 
 As we have already discussed in section~\ref{sec:Mimblewimble} for the creation of a transaction in Mimblewimble, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
@@ -395,6 +394,7 @@ $\procDSignId$ instead of $\procSignPrtId$ for signature generation. (Apart from
 
 \newgeometry{margin=2cm}
 \begin{landscape}
+    \thispagestyle{plain}
     \begin{figure}
         \fbox{
         \procedure[linenumbering]{$\procDSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValueAlice}{\funArray{\varBlindingFactorCarol}}{\varTime}$}{
@@ -434,6 +434,7 @@ pre-transaction $\varPreTx$ which can be sent back to the sender.
 
 \newgeometry{margin=2cm}
 \begin{landscape}
+    \thispagestyle{plain}
     \begin{figure}
             \fbox{
             \procedure[linenumbering]{$\procDRecvCoins{\varPreTx}{\varFundValue}$} {
@@ -467,6 +468,7 @@ pre-transaction $\varPreTx$ which can be sent back to the sender.
 
 \newgeometry{margin=2cm}
 \begin{landscape}
+    \thispagestyle{plain}
     \begin{figure}
         \fbox{
         \procedure[linenumbering]{$\procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}$} {
@@ -521,49 +523,50 @@ for the $\procFinSigId$ function. Therefore in another round of interaction Alic
 He will send over $\varSigFin$ which lets both parties construct the valid transaction as well as Alice call $\procExtWitId$ to extract the secret witness $\varWit$.
 
 \begin{landscape}
-\begin{figure}
-        \fbox{
-        \procedure[linenumbering]{$\procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyCarol}{\varNonceCarol}{\varSigBob}$} {
-        Alice \< \< Bob \\
-        (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \\
-        \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \< \< \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \\
-        \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
-        \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varCommits[1]}{\varStatement} \opEqNoQ 0 \< \< \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varCommits[1]}{\varStatement} \opEqNoQ 0 \\
-        \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
-        \varSigAliceCarol \opFunResult \procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol} \< \< \\
-        \< \sendmessageright*{\varSigAliceCarol} \< \\
-        \< \< \procVerfPtSig{\varSigAliceCarol}{\varMsg}{\varCommits[0]} \\
-        \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
-        \< \< \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \\
-        \< \< \pcreturn \varTx
-        }
-        }
-    \caption{Adapted Extended Mimblewimble Transaction Scheme - $\procDAptFinTxId$. \label{fig:inst-apt-mw-tx-fin}}
-\end{figure}
+    \thispagestyle{plain}
+    \begin{figure}
+            \fbox{
+            \procedure[linenumbering]{$\procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyCarol}{\varNonceCarol}{\varSigBob}$} {
+            Alice \< \< Bob \\
+            (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \\
+            \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \< \< \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \\
+            \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
+            \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varCommits[1]}{\varStatement} \opEqNoQ 0 \< \< \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varCommits[1]}{\varStatement} \opEqNoQ 0 \\
+            \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
+            \varSigAliceCarol \opFunResult \procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol} \< \< \\
+            \< \sendmessageright*{\varSigAliceCarol} \< \\
+            \< \< \procVerfPtSig{\varSigAliceCarol}{\varMsg}{\varCommits[0]} \\
+            \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
+            \< \< \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \\
+            \< \< \pcreturn \varTx
+            }
+            }
+        \caption{Adapted Extended Mimblewimble Transaction Scheme - $\procDAptFinTxId$. \label{fig:inst-apt-mw-tx-fin}}
+    \end{figure}
 \end{landscape}
 
 \section{Atomic Swap protocol}\label{sec:atomic-swap}
 
 With the outlined Adapted Mimblewimble Transaction Scheme from definition~\ref{def:apt-ext-mw-tx-scheme} we can now construct an Atomic Swap protocol with another Cryptocurrency.
 In this thesis we will explain a swap with Bitcoin, as at present Bitcoin and Bitcoin-like cryptocurrencies are the most widely adopted.
-We will generally refer to the \"Bitcoin side\" and the \"Mimblewimble side\" of the swap to be most generic.
+We will generally refer to the ``Bitcoin side`` and the ``Mimblewimble side`` of the swap to be most generic.
 Upon implementation one has to decide for a specific implementation, for example BTC on the Bitcoin side and Grin on
 the Mimblewimble side.
 On the Bitcoin side we construct two DPT functions ($\procLockAddrId, \procVerifyLockId$).
 \begin{itemize}
-    \item $(\varScriptPubKey) \opFunResult \procLockAddr{\varPubKeyAlice}{\varStatement}{\varPubKeyBob}{\varTime}$:
-    The locking script function lets Bob construct a Bitcoin script only spendable by Alice if she receives the discrete logrithm
-    $\varWit$ of $\varStatement \opEqNoQ \funGen{\varWit}$.
-    Additionally the function requires Bobs' public key $\varPubKeyBob$ and a timelock $\varTime$ (given as a block
+    \item $(\varScriptPubKey) \opFunResult \procLockAddr{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varTime}$:
+    The locking script function lets Bob construct a Bitcoin script only spendable by Alice if she receives the discrete logarithm
+    $\varWit$ of $\varStatement$ with $\varStatement \opEqNoQ \funGen{\varWit}$.
+    Additionally the function requires Bobs public key $\varPubKeyBob$ and a timelock $\varTime$ (given as a block
     number) as input which allows Bob to reclaim his funds after some time if the atomic swap was not
     completed successfully. The function will create and return a Bitcon script $\varScriptPubKey$ to which Bob can send funds using a P2SH transaction.
-    If Alice (knowing her secret key $\varSecKeyAlice$) acquires $\varWit$ with $\varStatement \opEqNoQ \funGen{\varWit}$ she can construct the complete secret key simply
-    by calculating $\varSecKey \opAssign \varSecKeyAlice \opAddScalar \varWit$. This construction is similiar although simpler to the lock described
-    by Malavolta et al. For a in-depth security analysis of this concept we refer the interested reader to their paper ~\cite{malavolta2019anonymous}. For
-    a concrete Bitcoin Script realizing this functionality see section~\ref{chp:implementation}.
+    If Alice (knowing her secret key $\varSecKeyAlice$) acquires $\varWit$, she can construct the complete secret key simply
+    by calculating $\varSecKey \opAssign \varSecKeyAlice \opAddScalar \varWit$.
+    This construction is similiar although simpler to the locking mechanism described by Malavolta et al. For a in-depth security analysis of this concept we refer the interested reader to their paper ~\cite{malavolta2019anonymous}.
+    For a concrete Bitcoin Script realizing this functionality see section~\ref{chp:implementation}.
     \item $\{ 1,0 \} \opFunResult \procVerifyLock{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varValue}{\varTime}$:
-    The lock verification algorithm takes as input Alices',
-    Bobs' public keys and the statement $\varStatement$. The function will compute the Bitcoin lock script 
+    The lock verification algorithm takes as input Alices,
+    Bobs public keys and the statement $\varStatement$. The function will compute the Bitcoin lock script
     $\varScriptPubKey$ as created by $\procLockAddrId$ and then check the Bitcoin blockchain if the value locked
     under the script equals $\varValue$.
     Upon successful verification the function returns 1, otherwise 0.
@@ -571,7 +574,7 @@ On the Bitcoin side we construct two DPT functions ($\procLockAddrId, \procVerif
 
 \subsection{Setup phase}
 
-We assume Alice owns Mimblewimble coins $\varCoinInp$ with a value of $\varValueMW$ and blinding factor $\varBlindingFactorAlice$ and Bob
+We assume Alice owns Mimblewimble coins $\varCoinInp$ with a value of $\varValueMw$ and blinding factor $\varBlindingFactorAlice$ and Bob
 Bitcoin locked in some UTXO $\varUTXO$ with a value of $\varValueBtc$ belonging to him.
 Before the protocol can start the two parties must agree on the value they want to swap, the exchange rate of the currencies and a time after which the swap should be canceled.
 After coming to an agreement the following variables are defined and known by both Alice and Bob:
@@ -588,19 +591,19 @@ We collect this shared variables in an initial swap state $\varSwpState$:
 In practice, we need to consider that exchange rates might fluctuate, furthermore timeouts have to be calculated separately for each chain.
 The problems with cross chain payments are discussed by Tairi et al. in~\cite{tairi2019a2l}, they propose to use a fixed exchange rate for each day and to use a real world timeout like one day and then calculate the specific block numbers by taking the average block time of the blockchain into account.
 In our setup we can also fix the exchange rate at the beginning of the protocol, which stays unchanged during protocol execution.
-If the exchange rate fluctuates and one party is negatively impacted he could still decide to stop being cooperative which means the coins would be returned to the original owners after the timeout.
+If the exchange rate fluctuates and one party is negatively impacted he or she could still decide to stop being cooperative which means the coins would be returned to the original owners after the timeout.
 
 We formalize the protocol $\procSetupSwapId$ in figure~\ref{fig:setup-swap}.
 The protocol takes as input the shared swap state $\varSwpState$ from both parties.
 From Alice her Mimblewimble input coin $\varCoinInp$ together with the required spending information $\varBlindingFactorAlice$ and the coins value $\varValueMw$.
-From Bob we require the UTXO $\varUTXO$ he wants to spend, similar to Alice he needs to provide spending secret $\varScriptSig$ and total value stored in the UTXO $\varValueBtc$.
+From Bob we require the UTXO $\varUTXO$ he wants to spend, similar to Alice he needs to provide spending secret $\varScriptSig$ and total value stored in the UTXO $\varValueBtc$, although this could also be read from the blockchain.
 
 The protocol starts by both parties creating and exchanging keys.
-Bob now creates two new Bitcoin outputs $\varUTXO_{lock}$ and $\varUTXO_{B}$, of which one is the locked Bitcoins which Alice might retrieve later (or Bob after time $\varTimeBTC has passed$), and the other Bobs change output. (Difference between what is stored in the input UTXO and what should be sent to Alice).
-After Bob has published the transaction sending value to the new outputs he will provide Alice with the statement $\varStatement$ und which the Bitcoins' are locked together with Alice's public key.
+Bob now creates two new Bitcoin outputs $\varUTXO_{lock}$ and $\varUTXO_{B}$, of which one is the locked Bitcoins which Alice might retrieve later (or Bob after time $\varTimeBTC$ has passed), and the other Bobs change output. (Difference between what is stored in the input UTXO and what should be sent to Alice).
+After Bob has published the transaction sending value to the new outputs he will provide Alice with the statement $\varStatement$ under which the Bitcoins' are locked together with Alice's public key.
 Alice can now verify that the funds on Bitcoin side are indeed correctly locked.
 After that she will collaborate with Bob to spend her Mimblewimble coins into an output shared by both parties.
-Immediately after both parties collaborate again to spend this shared coin back to Alice with a timelock of $\varTimeMW$.
+Immediately after, both parties collaborate again to spend this shared coin back to Alice with a timelock of $\varTimeMW$.
 It is immanent that Alice does not publish the first transaction (A -> AB) before the timelocked refund transaction (AB -> A) was signed, otherwise her funds are locked in the shared output without the possibility of refund.
 The setup protocol concludes with the funds locked up in both chains and ready to be swapped.
 
@@ -627,7 +630,7 @@ The setup protocol concludes with the funds locked up in both chains and ready t
         \< \< \< \< \varBtcTx \opFunResult \procBuildTransaction{\funArray{\varUTXO_{inp}}}{\funArray{\varUTXO_{lock}, \varUTXO_{B}}}{1}{\cnstEmptySet} \\
         \< \< \< \< \funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\funArray{\varScriptSig}} \\
         \< \< \< \< \procPublishBtc{\funArray{\funStar{\varBtcTx}}} \\
-        \< \sendmessageleftx{4}{\varStatement, \varPubKeyBob} \< \\
+        \< \sendmessageleftx{4}{\varStatement} \< \\
         \pcif \procVerifyLock{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varAmountBtc}{\cnstEmptySet} \opEqNoQ 0 \\
         \t \pcreturn 0 \< \< \< \< \\
         (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoinsId^1 \< \< \< \< \\
@@ -655,20 +658,20 @@ This function will verify that there is sufficient time to execute the atomic sw
 As input it takes a chain paramter $\varChain$ (in our case this could be either BTC or MW) and a block height $\varTime$.
 The routine will verify that the current height of the blockchain is marginally below $\varTime$.
 If this is the case it will return 1, or 0 otherwise.
-How much time exactly should be left for the function to return 1 is implementation specific.
+How much time exactly should be left for the function to return 1 is implementation specific, and could be set to for instance one day.
 We now define a protocol $\procExcSwapId$ to execute the Atomic Swap between some amount $\varAmountBtc$ on the Bitcoin side and some amount on the Mimblewimble side $\varAmountMW$.
-We assume the participants have successfully run the $\procSetupSwapId$ protocl and both know the updated swap state $\varSwpState$ as returned by the setup protocol.
-Alice (Mimblewimble side) needs to provide the part of the blinding factor $\funStar{\varBlindingFactorAlice}$ of the shared Mimblewimble coin $\varCoinShared$ as well as the swap state $\varSwpState$ as protocol inputs.
+We assume the participants have successfully run the $\procSetupSwapId$ protocol and both know the updated swap state $\varSwpState$ as returned by the setup protocol.
+Alice (Mimblewimble side) needs to provide her part of the blinding factor $\funStar{\varBlindingFactorAlice}$ of the shared Mimblewimble coin $\varCoinShared$ as well as the swap state $\varSwpState$ as protocol inputs.
 Bob (Bitcoin side) needs to provide his part of the blinding factor $\funStar{\varBlindingFactorBob}$ of the shared Mimblewimble coin $\varCoinShared$, the secret witness value $\varWit$ and the swap state $\varSwpState$ as protocol inputs.
 The protocol starts with the two parties creating a Mimblewimble transaction with the goal of spending the shared input coin to Bob.
-Bob will call the $\procAptRecvCoinsId$ routine to hide the secret $\varWit$ in his adapted signature $\varSigAptBob$, which Alice can retrieve from the pre-transaction.
-Note that at this point only Bobs know his original partial signature $\varSigBob$.
-Therefore they cooperate again in the $\procDAptFinTxId$ to compute the final Mimblewimble transaction transferring value from the shared coin $\varCoinShared$ to Bob.
+Bob will call the $\procAptRecvCoinsId$ routine to hide the secret $\varWit$ in his adapted signature $\varSigAptBob$, which Alice can retrieve from the final transaction.
+Note that at this point only Bob knows his original partial signature $\varSigBob$.
+Therefore they have to cooperate again in the $\procDAptFinTxId$ to compute the final Mimblewimble transaction transferring value from the shared coin $\varCoinShared$ to Bob.
 After Bob has published the transaction and is now in possession of the swapped funds on the Mimblewimble side, he will send the transaction to Alice (or Alice could retrieve it directly from the blockchain, if Bob would refuse to cooperate).
-Now Alice know all pieces needed to extract the secret witness $\varWit$:
+Now Alice knows all the pieces needed to extract the secret witness $\varWit$:
 \begin{itemize}
     \item The final signature $\varSigFin$.
-    \item Bobs adapted signature containing x $\varSigAptBob$.
+    \item Bobs adapted signature $\varSigAptBob$ previously verified to contain $\varWit$.
     \item Her and Bobs partial signature spending the shared coin $\varSigAliceBob$.
 \end{itemize}
 She can now call $\procExtWitId$ to retrieve $\varWit$ and compute the secret key $\varSecKey_{BTC}$ needed to unlock the Bitcoin funds.
@@ -712,3 +715,16 @@ The procedure returns 1 if the swap was successfully executed or 0 otherwise (wh
 \end{landscape}
 \restoregeometry
 
+\subsection{Refunding}
+
+If one party refused to cooperate or goes offline the coins will be returned to the original owner.
+On the Bitcoin side this is the case as Bob can simply spend the locked output with his private key $\varSecKeyBob$ after the timeout $\varTimeBTC$ has passed.
+He then can simply construct and sign a transaction spending the output to a new UTXO which is in his possession.
+He even could prepare this transaction upfront and broadcast it, once the the blocknumber hits $\varTimeBTC$ the transaction will become valid and get mined.
+Again we stress the importance of using appropriate timeouts, if a timeout is too short the swap might get cancelled if there are some delays, if the timeout is too long the funds might be locked for an unnessary amount of time.
+
+On the Mimblewimble side the second transaction spending the shared output back to Alice guarantees that her funds are returned to her after the timeout $\varTimeMW$ hits.
+Because of this line number 24 in the setup phase is very important.
+Alice here published both the locking of the funds and the refund at the same time.
+If she would publish the locking transaction first, Bob could refuse to cooperate, in which case the funds would stay in the locking output only retrievable if both parties cooperate.
+If the swap executes successful the refund transaction would get discarded by miners, as it then is no longer valid even after the timeout $\varTimeMW$.
