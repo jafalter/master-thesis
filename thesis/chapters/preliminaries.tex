@@ -1,68 +1,58 @@
+In this chapter we will lay down the general notations and definitions required for the later parts of the thesis.
+In section~\ref{sec:pre:general} we will define several cryptographic primitives which are required for our constructions.
+Section~\ref{sec:pre:bitcoin} will describe several definitions around Bitcoin, particularly its transaction structure.
+After that in secion~\ref{sec:pre:privacy} we will discuss the notion of privacy enhancing cryptocurrencies, and then range proofs in section~\ref{sec:pre:rproof} of which both are needed to understand the Mimblewimble protocol discussed in section~\ref{sec:pre:mimblewimble}.
+Finally we explain the concept of scriptless scripts in section~\ref{sec:pre:scriptlessscripts} and adaptor signatures~\ref{sec:pre:aptsignatures} which are both relevant building blocks for the constructions found in this thesis.
 
-\todo[inline]{Pedro: Although not strictly required, IMO it is nice to have some text here introducing what the reader should expect in the rest of the section. For instance: \\
-In this section, we first introduce the notation and definitions used hereby in this thesis. Then, we ...... Finally, we introduce.....}
-
-\section{General Notation and Definitions}\label{sec:generalNotationDefinitions}
-
-
-
+\section{General Notation and Definitions\label{sec:pre:general}}
 
 \paragraph{Notation}
-We first define the general notation used in the following chapters to formalize procedures and protocols. Let $\cnstGroup$ denote a cyclic group of prime order $\varPrime$ and $\cnstIntegersPrime{\varPrime}$
-the ring of integers modulo $\varPrime$ with identity element $\cnstIdentityElement$. $\cnstIntegersPrimeWithoutZero{\varPrime}$ is $\cnstIntegersPrime{\varPrime} \opExcluding \funList{0}$. \todo{Pedro: I think macro $\opExcluding$ was broken here. I have updated to use $\setminus$ instead. Please check that this is what you expected} $\varG \opSeperate \varH$ are adjacent
-generators in $\cnstGroup$, where adjacent means the discrete logarithm of $\varH$ in regards to $\varG$ is not known. Exponentiation stands for repeated application of the group operation. We define the group operation between two curve points as
-$\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \opAddScalar \varScB}$.
+We first define the general notation used in the following chapters to formalize procedures and protocols.
+Let $\cnstGroup$ denote a cyclic group of prime order $\varPrime$ and $\cnstIntegersPrime{\varPrime}$ the ring of integers modulo $\varPrime$ with identity element $\cnstIdentityElement$.
+$\cnstIntegersPrimeWithoutZero{\varPrime}$ is $\cnstIntegersPrime{\varPrime} \opExcluding \funList{0}$.
+$\varG \opSeperate \varH$ are adjacent generators in $\cnstGroup$, where adjacent means the discrete logarithm of $\varH$ in regards to $\varG$ is not known.
+Exponentiation stands for repeated application of the group operation.
+We define the group operation between two curve points as $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \opAddScalar \varScB}$.
 
-\todo{Pedro: We normally do not use the tilde to add spaces in math mode}
-
-\begin{definition}[Hard Relation\cite{aumayr2020bitcoinchannels}]\label{def:hardRelation}
+\begin{definition}[Hard Relation]\label{def:hardRelation}
     Given a language $\varLanguage \opAssign \funList{\varBigA \opForWhich \exists\varSmallA \text{ s.t. } (\varBigA, \varSmallA) \opIn \cnstRelation}$ then the relation $\cnstRelation$ is
-    considered hard if the following three properties hold:
+    considered hard if the following three properties hold: \cite{aumayr2020bitcoinchannels}
     \begin{enumerate}
         \item $\procGenR{(\varSecParam)}$ is a $\cnstPolyTime$ sampling algorithm which outputs a statement/witness of the form $(\varBigA, \varSmallA) \opIn \cnstRelation$.
         \item Relation $\cnstRelation$ is poly-time decidable.
         \item For all $\cnstPolyTime$ adversaries $\cnstAdversary$ the probability of finding $\varSmallA$ given $\varBigA$ is negligible.
     \end{enumerate}
-    
-    
-    \todo[inline]{Pedro: I would include these two relations below as your own definitions because I imagine that you would like to refer to them afterwards in the thesis} 
-    In this thesis we find two types of hard relations:
-    \begin{enumerate}
-        \item The output of a secure hash function (as defined in~\ref{def:hashFunction}) and it's input $(\varInput, \funHash{\varInput})$.
-        \item The discrete logarithm $\varX$ of $\funGen{\varX}$ in the group $\cnstGroup$.
-    \end{enumerate}
 \end{definition}
 
+\begin{definition}[Discrete Logarithm]\label{def:discretelog}
+    We define the discirte logarithm in a group $\cnstGroup$ of a number $\varN$ as the number $\varM$ such that for the groups generator $\varG$ the following holds:
+    \[ \funGen{\varM} \opEqNoQ \varN \]
+    The discrete logarithm is a hard relation as defined in~\ref{def:hardRelation}.
+\end{definition}
 
-\todo[inline]{Pedro: Link to paper/book where you got this definition from is missing}
 \begin{definition}[Signature Scheme]\label{def:signatureScheme}
-    A valid \todo{Pedro: What is valid here? You have not defined it before} Signature Scheme must provide three procedures: \todo[inline]{Pedro: I would write this sentence as: A signature scheme $\varSigScheme$ is a tuple of algorithms $(\procSetupId \opSeperate \procSignId \opSeperate \procVerfId)$ defined as follows: }
+    A signature scheme $\varSigScheme$ is a tuple of algorithms $(\procSetupId \opSeperate \procSignId \opSeperate \procVerfId)$ defined as follows: \cite{goldwasser1988digital}
     \[ \varSigScheme = (\procSetupId \opSeperate \procSignId \opSeperate \procVerfId) \]
-    
-    \todo[inline]{Pedro: write the API of the algorithms in bullet points} 
-    $(\varSecKey, \varPubKey) \gets \procSetup{\varSecParam}$ takes as input a security parameter $\varSecParam$ and outputs a keypair $\varKeyPair$, consisting of a secret key $\varSecKey$ and a public key $\varPubKey$, whereas
-    the secret key has to be kept private and the public key is shared with other parties.
-    $\varSecKey$ can be used together with a message $\varMsg$ to call the $\procSign{\varSecKey}{\varMsg}$ procedure to create a signature $\varSignature$ over the message $\varMsg$.
-    Parties knowing $\varPubKey$ can then test the validity of the signature by calling $\procVerf{\varPubKey}{\varSignature}{\varMsg}$ with the same message $\varMsg$. The procedure will only output $1$ if the message was
-    indeed signed with the correct secret key $\varSecKey$ of $\varPubKey$ and therefore proves the possesion of $\varSecKey$ by the signer \todo{Pedro: ``proving that the sender had the $\varSecKey$'' is a property that no all signature schemes may have}.
-    A valid signature scheme have to fulfill two security properties
-    \todo[inline]{Pedro:  Choose one unforgeability form, the one that you require later in the thesis}
+
     \begin{itemize}
-        \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold $\procVerf{\varPubKey}{\procSign{\varSecKey}{\varMsg}}{\varMsg} \opEq 1$ \todo{Pedro: Except with negligible probability}
-        \item Unforgeability: Note that there are different levels of Unforgability:~\cite{goldwasser1988digital}
-        \begin{itemize}
-            \item Universal Forgery: The ability to forge signatures for any message.
-            \item Selective Forgery: The ability to fogre signatures for messages of the adversary's choice.
-            \item Existential Forgery: The ability to forge a valid signature / message pair not previously known to the adversary.
-        \end{itemize}
+        \item $\varKeyPair \opFunResult \procSetup{\varSecParam}$: The keygen function creates a keypair $\varKeyPair$, the public key can be distributed to the verifier(s) and the secret key has to be kept private. \\
+        \item $\varSignature \opFunResult \procSign{\varMsg}{\varSecKey}$: The signing function creates a signature consisting of a variable $\varS$ and $\varRand$ which is a commitment to the secret nonce $\varNonce$ used during the signing process.
+        As an input it takes a message $\varMsg$ and the secret key $\varSecKey$ of the signer.
+        \item $\cnstTrueorFalse \opFunResult \procVerf{\varMsg}{\varSignature}{\varPubKey}$: The verification function allows a verifier knowing the signature $\varSignature$, message $\varMsg$ and the provers public key $\varPubKey$ to verify the signatures
+        validity. \\
+    \end{itemize}
+
+    A valid signature scheme has to fulfill two security properties:
+    \begin{itemize}
+        \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold with overwhealming probabillity: $\procVerf{\varPubKey}{\procSign{\varSecKey}{\varMsg}}{\varMsg} \opEq 1$
+        \item Unforgeability (\cnstEUFCMA): Informally the existential unforgeability under chosen message attacks holds if an attacker $\cnstAdversary$ is unable to forge a valid signature for a chosen message.
+        A formalization of the property can be found in section~\ref{subsec:cnstsecureaptscheme}
     \end{itemize}
 \end{definition}
 
-\todo[inline]{Pedro: nice that you have defined the three properties. I would keep the one that you need later}
-
 \begin{definition}[Cryptographic Hash Function]\label{def:hashFunction}
-    A cryptographic hash function $\cnstHash$\todo{Pedro: minor thing: we normally use capital H} is defined as $\funHash{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$. A secure hashing function
-    has to fullfill the following security properties:~\cite{al2011cryptographic}
+    A cryptographic hash function $\cnstHash$ is defined as $\funHash{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$ ~\cite{al2011cryptographic}.
+    A secure hashing function has to fulfill the following security properties:
     \begin{itemize}
         \item Collision-Resistence (CR): Collision-Resistance means that it is computationally infeasible to find two inputs $\varInput_1$ and $\varInput_2$ such that
         $\funHash{\varInput_1} \opAssign \funHash{\varInput_2}$ with $\varInput_1 \opNotEq \varInput_2$.
@@ -72,39 +62,39 @@ $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \o
         Given such a hash function $\cnstHash$ and an input $\varInput$, it should be infeasible to find a different input $\funStar{\varInput}$ such that $\varInput \opNotEq \funStar{\varInput}$
         and $\funHash{\varInput} \opEq \funHash{\funStar{\varInput}}$.
     \end{itemize}
+    The relation between the input $\varInput$ and the output $\funHash{\varInput}$ is a hard relation as defined in~\ref{def:hardRelation}.
 \end{definition}
 
+\begin{definition}[Commitment Scheme]\label{def:commitment}
+    A cryptographic Commitment Scheme $\varCommitScheme$ is defined by a pair of functions $(\procSetupId, \procCommitId)$~\cite{bunz2018bulletproofs}.
+    \begin{itemize}
+        \item $\varPublicParam \opFunResult \procSetupCom{\varSecParam}$: The setup procedure is a DPT function, it takes as input a security parameter $\varSecParam$ and outputs public parameters $\varPublicParam$.
+        Depending on $\varPublicParam$ we define a input space $\varInputSpace_{\varPublicParam}$, a randomness space $\varRandSpace_{\varPublicParam}$ and a commitment space $\varCommitSpace_{\varPublicParam}$.
+        \item $\varCommitment \opFunResult \procCommit{\varInput}{\varNonce}$ The commit routine is DPT function that takes an arbitrary input $\varInput \opIn \varInputSpace_{\varPublicParam}$, a random value $\varNonce \opIn \varRandSpace_{\varPublicParam}$ and
+        generates an output $\varCommitment \opIn \varCommitSpace_{\varPublicParam}$.
+    \end{itemize}
 
-\todo[inline]{Pedro: I think here the Open operation of the commitment is missing, which you need later for the binding property}
-\begin{definition}[Commitment Scheme~\cite{bunz2018bulletproofs}]\label{def:commitment}
-    A cryptographic Commitment Scheme $\varCommitScheme$ is defined by a pair of functions $(\procSetup{\varSecParam} \opSeperate \procCommitId(\varInput, \varNonce))$. $\procSetupId$ is the setup procedure, it takes as input a
-    security parameter $\varSecParam$ and outputs public parameters $\varPublicParam$. Depending on $\varPublicParam$ we define a input space $\varInputSpace_{\varPublicParam}$,
-    a randomness space $\varRandSpace_{\varPublicParam}$ and a commitment space $\varCommitSpace_{\varPublicParam}$.
-
-    The function $\procCommitId$ takes an arbitrary input $\varInput \opIn \varInputSpace_{\varPublicParam}$, and a random value $\varNonce \opIn \varRandSpace_{\varPublicParam}$ and
-    generates an output$\varCommitment \opIn \varCommitSpace_{\varPublicParam}$.
-
-    Secure commitments must fullfill the \textit{Binding} and \textit{Hiding} security properties:
+    Secure commitments must fullfill the \emph{Binding} and \emph{Hiding} security properties:
     \begin{itemize}
         \item \textit{Binding:} If a Commitment Scheme is binding it must hold that for all $\cnstPolyTime$ adversaries $\cnstAdversary$ given a valid input $\varInput \opIn \varInputSpace_{\varPublicParam}$
         and randomness $\varNonce \opIn \varRandSpace_{\varPublicParam}$ the probabilty of finding a $\funStar{\varInput} \opNotEq \varInput$ and a $\funStar{\varNonce}$ with
-        $\procCommit{\varInput}{\varNonce} \opEq \procCommit{\funStar{\varInput}}{\funStar{\varNonce}}$ is negligible.
-        \item \textit{Hiding:} For a $\cnstPolyTime$ adversary $\cnstAdversary$, commitment inputs $\varInput \opIn \varInputSpace_{\varPublicParam} \opSeperate \varNonce \opIn
-       \varRandSpace_{\varPublicParam}$ and a commitment output $\varCommitment \opAssign \procCommit{\varInput, \varNonce}$ the probabilty of the adversary choosing the correct input
-        $\funList{\varInput, \funStar{\varInput}}$ must not be higher then $\frac{1}{2} + \funNegl{\varProbability}$. \todo{Pedro: this definition  seems wrong to me? Where does $\funStar{\varInput}$ come from?}
+        $\procCommit{\varInput}{\varNonce} \opEqNoQ \procCommit{\funStar{\varInput}}{\funStar{\varNonce}}$ is negligible.
+        \item \textit{Hiding:} For a $\cnstPolyTime$ adversary $\cnstAdversary$, commitment inputs $\varInput_0, \varInput_1 \opIn \varInputSpace_{\varPublicParam}$ randomness $\varNonce \opIn
+       \varRandSpace_{\varPublicParam}$ and a commitment output $\varCommitment \opAssign \procCommit{\varInput_{\varB}, \varNonce}$ the probabilty of the adversary choosing the correct $\varB$ out of $\{0,1\}$
+        must not be higher then $\frac{1}{2} + \funNegl{\varProbability}$.
     \end{itemize}
 \end{definition}
 
-\todo[inline]{Pedro: Add reference from where you took this definition. You may want to add that it is an ``Additive'' Homomorphic Commitment}
-\begin{definition}[Homomorphic Commitment]\label{def:homomorphicCom}
-    If a Commitment Scheme as defined in~\ref{def:commitment} is homomorphic then the following must hold
-    \[ \procCommit{\varInput_1}{\varNonce_1} \opAddPoint \procCommit{\varInput_2}{\varNonce_2} \opEq \procCommit{\varInput_1 \opAddScalar \varInput_2}{\varNonce_1 \opAddScalar \varNonce_2} \]
+\begin{definition}[Additive Homomorphic Commitment]\label{def:homomorphicCom}
+    A Commitment Scheme as defined in~\ref{def:commitment} is said to be addtive homomorphic if the following holds \cite{bunz2018bulletproofs}
+    \[ \procCommit{\varInput_1}{\varNonce_1} \opAddPoint \procCommit{\varInput_2}{\varNonce_2} \opEqNoQ \procCommit{\varInput_1 \opAddScalar \varInput_2}{\varNonce_1 \opAddScalar \varNonce_2} \]
 \end{definition}
 
-\todo[inline]{First, a Pedersen Commitment is an instance of Commitment Scheme as in Def 3.4; Second it has the homomorphic property as in 3.5. Clarify that, for instance, by explaining exactly how the algorithms are implemented, as you did below.}
-\begin{definition}[Pedersen Commitment]\label{def:pedersenCom}
-    A Pedersen Commitment is an instantiation of a Homomoprhic Commitment Scheme as defined in~\ref{def:homomorphicCom}:
-    \[ \varCommitSpace_{\varPublicParam} \opAssign \cnstGroup\] of order $\varPrime \opSeperate \varInputSpace_{\varPublicParam} \opSeperate \varRandSpace_{\varPublicParam} \opAssign \cnstIntegersPrime{\varPrime}$.
+\begin{definition}[Pedersen Commitment Scheme]\label{def:pedersenCom}
+    A \emph{Pedersen Commitment Scheme} is an instance of a Commitment Scheme as defined in definition~\ref{def:commitment} that has the additive homomorphic property as defined in \ref{def:homomorphicCom}.
+
+This can be achieved as follows:
+    $\varCommitSpace_{\varPublicParam} \opAssign \cnstGroup$ of order $\varPrime \opSeperate \varInputSpace_{\varPublicParam} \opSeperate \varRandSpace_{\varPublicParam} \opAssign \cnstIntegersPrime{\varPrime}$.
     the procedures $(\procSetupId, \procCommitId)$ are then instantiated as:
     \[ \procSetup{\varSecParam} \opAssign \varG, \varH \sample \cnstGroup\]
     \[ \procCommit{\varInput}{\varNonce} \opAssign \funGen{\varNonce} \funGenH{\varInput} \]
@@ -112,7 +102,7 @@ $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \o
 \end{definition}
 
 
-\section{Bitcoin}\label{sec:bitcoin}
+\section{Bitcoin\label{sec:pre:bitcoin}}
 
 In this section we will discuss the basics of the Bitcoin transaction protocol.
 We will find definitions which we will use later in section~\ref{sec:atomic-swap} to construct an atomic swap protocol.
@@ -128,8 +118,8 @@ scriptPubKey).
 Unspent means that this output has not been spent yet in a transaction and its funds are therefore available to be redeemed by a participant capable of unlocking the output.
 To unlock this value one has to provide a script fulfilling the locking condition, referred to as scriptSig.
 In the most common case the lock condition will be to provide a valid signature under a public key.
-This is referred to as a P2PK or P2PKH output which we will see in more detail in section~\ref{subsubsec:p2pk}.
-However, more complex conditions, such we shall see in section~\ref{subsubsec:p2sh} are possible.
+This is referred to as a P2PK or P2PKH output which we will see in more detail in section~\ref{sec:pre:bitcoin:p2pk}.
+However, more complex conditions, such we shall see in section~\ref{sec:pre:bitcoin:p2sh} are possible.
 
 \begin{definition}[Unspent Transaction Output - UTXO] An unspent transaction output is a data structure
 consisting of a locking condition $\varScriptPubKey$, a value expressed in Bitcoin $\varValue$ and an unlocking script $\varScriptSig$ which is
@@ -141,7 +131,7 @@ generally use $\varUTXO$ to refer to a singular UTXO and $\varUTXOSet$ to refer 
 We define three auxiliary functions for the creation, spending and verification of an UTXO.
 Note that we use $\procVerfId$ as a generalization of a verification function.
 In practice verifcation of a UTXO will most of the time correspond to the verification of a digital signature.
-However, as we shall see in~\ref{subsubsec:p2sh} this is not necessarily always the case.
+However, as we shall see in~\ref{sec:pre:bitcoin:p2sh} this is not necessarily always the case.
 
 \begin{center}
     \fbox{
@@ -215,7 +205,7 @@ A transaction is valid if the follwing conditions are fullfilled:
 
 Following we will outline two common structures of Bitcoin outputs the P2PK/P2PKH and the P2SH outputs.
 
-\subsubsection{P2PK, P2PKH\label{subsubsec:p2pk}}
+\subsubsection{P2PK, P2PKH\label{sec:pre:bitcoin:p2pk}}
 
 P2PK stands for Pay-to-Public-Key and P2PKH for Pay-to-Public-Key-Hash.
 In this type of output $\varScriptPubKey$ will be constructed such that its value unlocks if a correct signature is
@@ -230,7 +220,7 @@ that time consisted of P2PKH transactions, whereas about 17\% were P2SH and 0.12
 P2PKH outputs can be encoded into a Bitcoin address using base58 encoding.
 This addresses can be handed out to request a payment from somebody.
 
-\subsubsection{P2SH\label{subsubsec:p2sh}}
+\subsubsection{P2SH\label{sec:pre:bitcoin:p2sh}}
 
 If more advanced spending conditions, such as multi signature are required, P2SH (Pay-to-script-hash), introduced in
 2012, is a way to implement those in a space efficient and simple matter.
@@ -245,13 +235,11 @@ to the owner of the output.
 Additionally this type of output can be encoded again into a Bitcoin address similar to a P2PKH output, making it
 easy to request a payment.
 
-\subsection{Bitcoin Scaling and Layer Two Solutions}\label{sec:bitcoinScaling}
+\section{Privacy-enhancing Cryptocurrencies \label{sec:pre:privacy}}
 
-\section{Privacy-enhancing Cryptocurrencies}\label{sec:privacyCryptos}
+\subsection{Zero Knowledge Proofs} \label{sec:pre:privacy:zeroknowlegde}
 
-\subsection{Zero Knowledge Proofs}\label{sec:zeroKnowlegde}
-
-\subsection{Range Proofs}\label{sec:rangeProof}
+\subsection{Range Proofs \label{sec:rangeProof}}
 
 \begin{definition}[Rangeproof System]
     A Rangeproofs system $\varRProofSystemParam{\varCommitScheme}$ with regards to a homomorphic commitment scheme $\varCommitScheme$ consists of a tupel of functions $(\procRProofSetupId, \procProofId, \procVerfProofId)$.
@@ -277,10 +265,10 @@ easy to request a payment.
 
 For MP proofs \cite{klinec2020privacy}
 
-\subsection{Mimblewimble}\label{sec:Mimblewimble}
+\subsection{Mimblewimble} \label{sec:pre:mimblewimble}
 In this section we will outline the fundamental properties of the protocols employed in Mimblewimble which are relevant for the thesis and particularily the construction of the Atomic Swap protocol defined in
 \ref{chp:atomicSwap}.
-\subsubsection{Transaction Structure}
+\subsubsection{Transaction Structure \label{sec:pre:mimblwimble:tx}}
 \todo[inline]{Pedro: I think that throughout this section, you have nice explanations of the different parts of the transaction. It would be also possible to add definitions for the different things that you use}
 
 \begin{itemize}
@@ -307,7 +295,7 @@ Finally a Mimblewimble transaction is of form:
 where $\varSupply$ is the transaction supply amount, $\varCoinInp$ is the list of input coins, $\varCoinOut$ is the list of output coins and $\varKernel$ is the transaction Kernel. The Kernel consists of $\funList{\varProof}$
 which is a list of all output coin range proofs, $\funList{\varExcess}$ a list of excess values and finally $\funList{\varSignature}$ a list of signatures ~\cite{fuchsbauer2019aggregate}. \todo{Pedro: the $\varExcess$ is a single value? or a set?}
 
-\subsubsection{Transaction Merging}
+\subsubsection{Transaction Merging \label{sec:pre:mimblewimble:merge}}
 An essential property of the Mimblewimble protocol is that two transactions can easily be merged into one, which is essentially a non-interactive version of the CoinJoin protocol on Bitcoin~\cite{maxwell2013coinjoin}
 Assume we have the following two transactions:
 \[ \varTx_0 \opAssign (\varSupply_0 \opSeperate \varCoinInp^0 \opSeperate \varCoinOut^0 \opSeperate (\funList{\varProof_0} \opSeperate \funList{\varExcess_0} \opSeperate \funList{\varSignature_0}) ) \]
@@ -323,7 +311,7 @@ By the rules of arithmetic it then must also hold that
 \[ \varCoinInp^0 \opConc \varCoinInp^1 \opSub \varCoinOut^0 \opConc \varCoinOut^1 \opSub \funGenH{\varSupply_0 \opAddScalar \varSupply_1} \opAssign \varExcess_0 \opAddPoint \varExcess_1 \opSeperate \funList{\varProof_0} \opConc \funList{\varProof_1} \]
 must contain valid range proofs for the output coins and $\funList{\varSignature_0} \opConc \funList{\varSignature_1}$ must contain valid signatures to the respective Excess points, which makes $\varTx_m$ a valid transaction.
 
-\subsubsection{Subset Problem}
+\subsubsection{Subset Problem \label{sec:pre:mimblewimble:subset}}
 \todo[inline]{Pedro: I think the content below is not fully clear yet. If needed for the rest, we need to clarify (e.g., add an example?)}
 A subtle problem arises with the way transactions are merged in Mimblewimble. From the shown construction, it is possible to reconstruct the original separate transactions from the merged one,
 which can be a privacy issue. Given a set of inputs, outputs, and kernels, a subset of these will recombine to reconstruct one of the valid transaction which were aggregated since Kernel Excess values are not combined.
@@ -335,13 +323,13 @@ uncombined offsets from a merged one becomes negligible, making it infeasable to
 
 
 
-\subsubsection{Cut Through}
+\subsubsection{Cut Through \label{sec:pre:mimblewimble:cut}}
 \todo{Pedro: This requires further explanation and maybe an example?}
 From the way transactions are merged together, we can now learn how to purge spent outputs securely. Let's assume $\varCoin_i$ appears as an output in $\varTx_0$ and as an input in $\varTx_1$,
 which are being merged. Remembering the equation for transaction balancedness, $\varCoinInp \opSub \varCoinOut \opAssign \varExcess$ if $\varCoin_i$ appears both in the inputs and outputs, and we erase it on both sides, the equation will still hold.
 Therefore every time a transaction spends an output, it can be virtually forgotten to improve transaction unlinkability as well as yielding saving space.
 
-\subsubsection{The Ledger}
+\subsubsection{The Ledger \label{sec:pre:mimblewimble:ledger}}
 \todo[inline]{Pedro: Do we need this subsection?}
 The ledger of the Mimblewimble protocol itself is a transaction of the already discussed form. Initially, the ledger starts empty, and transactions are added and aggregated recursively.
 \begin{itemize}
@@ -350,7 +338,7 @@ The ledger of the Mimblewimble protocol itself is a transaction of the already d
     \item Due to cut through, the input coin list of the ledger is always empty, and the output list is the set of UTXOs.
 \end{itemize}
 
-\subsubsection{Transaction Building}
+\subsubsection{Transaction Building \label{sec:pre:mimblewimble:txbuild}}
 As already pointed out, building transactions in Mimblewimble is an interactive process between the sender and receiver of funds. Jedusor, Tom Elvis originally envisioned the following two-step process
 to build a transaction:~\cite{jedusor2016mimblewimble}
 
@@ -433,10 +421,7 @@ A figure showing the protocol flow is depicted in Figure~\ref{fig:txSalvaged}.
     \todo[inline]{Pedro: put labels inside captions} 
 \end{figure}
 
-\section{Scriptless Scripts}\label{sec:scriptlessScripts}
+\section{Scriptless Scripts}\label{sec:pre:scriptlessscripts}
 
-\section{Adaptor Signatures}\label{sec:aptSignatures}
+\section{Adaptor Signatures}\label{sec:pre:aptsignatures}
 
-\subsection{Schnorr Signature Construction}\label{sec:schnorrAptSignatures}
-
-\subsection{ECDSA Signature Construction}\label{sec:ecdsaAptSignatures}

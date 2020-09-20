@@ -66,6 +66,7 @@
 \newcommand{\varLanguage}{\styleVariable{L}_\cnstRelation}
 \newcommand{\varPrime}{\styleVariable{p}}
 \newcommand{\varN}{\styleVariable{n}}
+\newcommand{\varM}{\styleVariable{m}}
 \newcommand{\varTx}{\styleVariable{tx}}
 \newcommand{\varPreTx}{\styleVariable{ptx}}
 \newcommand{\varTxAlice}{\varTx_{\varAlice}}
@@ -241,6 +242,9 @@
 
 \newcommand{\procSetupId}{\styleFunction{keyGen}}
 \newcommand{\procSetup}[1]{\procSetupId(#1)}
+
+\newcommand{\procSetupComId}{\styleFunction{setup}}
+\newcommand{\procSetupCom}[1]{\procSetupComId (#1)}
 
 \newcommand{\procCommitId}{\styleFunction{commit}}
 \newcommand{\procCommit}[2]{\procCommitId(#1, #2)}

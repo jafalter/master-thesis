@@ -187,13 +187,7 @@ adversary $\cnstAdversary$ gets to know a valid adapted signature $\varSigApt$ w
 We start by providing a general instantiation of a signature scheme (see definition~\ref{def:signatureScheme}):
 We assume we have a group $\cnstGroup$ with prime $\varPrime$, $\cnstHash$ is a secure hash function as defined in definition~\ref{def:hashFunction} and $\varMsg \opIn \cnstBinary{*}$ is a message.
 
-\begin{itemize}
-    \item $\varKeyPair \opFunResult \procSetup{\varSecParam}$: The keygen function creates a keypair $\varKeyPair$, the public key can be distributed to the verifier(s) and the secret key has to be kept private. \\
-    \item $\varSignature \opFunResult \procSign{\varMsg}{\varSecKey}$: The signing function creates a signature consisting of a variable $\varS$ and $\varRand$ which is a commitment to the secret nonce $\varNonce$ used during the signing process.
-    As an input it takes a message $\varMsg$ and the secret key $\varSecKey$ of the signer.
-    \item $\cnstTrueorFalse \opFunResult \procVerf{\varMsg}{\varSignature}{\varPubKey}$: The verification function allows a verifier knowing the signature $\varSignature$, message $\varMsg$ and the provers public key $\varPubKey$ to verify the signatures
-    validity. \\
-\end{itemize}
+
 A concrete implementation can be seen in figure~\ref{fig:schnorr}. The signature scheme is called schnorr signature scheme, first defined in~\cite{schnorr1989efficient} and is widely employed in many cryptography systems.
 \begin{figure}
     \begin{center}
