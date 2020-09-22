@@ -1,5 +1,5 @@
-In this section, we will define Mimblewimble transactions and security properties which must hold for such a transaction system. The formalizations will be similar to those found by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}. However, we will only focus on the transaction protocol
-(transferring value from one or many parties to one or many parties), the notions of transaction aggregation, coin minting and adding transaction to the main ledger also discussed in~\cite{fuchsbauer2019aggregate} will not be topic of this formalization, as
+In this section, we will define Mimblewimble transactions and security properties which must hold for such a transaction system. The formalizations will be similar to those found by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}.
+However, we will only focus on the transaction protocol (transferring value from one or many parties to one or many parties), the notions of transaction aggregation, coin minting and adding transaction to the main ledger also discussed in~\cite{fuchsbauer2019aggregate} will not be topic of this formalization, as
 they are not relevant building blocks for the proposed Atomic Swap protocol.
 
 However, as an extension to the regular transaction protocol transferring value from one sender to a receiver we will define two further protocols. The first of them titled \emph{Extended Mimblewimble Transaction Scheme}
@@ -11,12 +11,12 @@ that the schemes are correct and secure with regards to the defined security pro
 
 Finally, we define a Atomic Swap protocol from these building blocks, allowing two parties to securely and trustlessly swap funds from a Mimblewimble blockchain with those on another blockchain, such as Bitcoin.
 
-\section{Definitions}\label{sec:atomic-def}
+\section{Definitions}\label{sec:atom:definitions}
 
-As we have already discussed in section~\ref{sec:Mimblewimble} for the creation of a transaction in Mimblewimble, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
-To construct the transaction protocol we assume that we have access to a two-party signature scheme $\varSigSchemeMP$ as defined in definition~\ref{def:twoPartySig}, a zero-knowledge Rangeproofs system $\varProofSystem$
-such as Bulletproofs, as described in section~\ref{sec:rangeProof} and a homomorphic commitment scheme $\varCommitScheme$ as defined in definition~\ref{def:homomorphicCom} such as
-Pedersen Commitments~\ref{def:pedersenCom}.
+As we have already discussed in section~\ref{sec:pre:mimblewimble} for the creation of a transaction in Mimblewimble, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
+To construct the transaction protocol we assume that we have access to a two-party signature scheme $\varSigSchemeMP$ as defined in definition~\ref{def:sig:two-party-sig}, a zero-knowledge Rangeproofs system $\varProofSystem$
+such as Bulletproofs, as described in section~\ref{sec:pre:rangeproof} and a homomorphic commitment scheme $\varCommitScheme$ as defined in definition~\ref{def:pre:homo-com} such as
+Pedersen Commitments~\ref{def:pre:pedersen}.
 
 Fuchsbauer et al. have defined three procedures $\styleFunction{Send}$, $\styleFunction{Rcv}$ and $\styleFunction{Ldgr}$ with regards to the creation of a transaction. $\styleFunction{Send}$ called by the sender
 will create a pre-transaction, $\styleFunction{Rcv}$ takes the pre-transaction and adds the receivers output and $\styleFunction{Ldgr}$ (again called by the sender) publishes the final transaction to the blockchain ledger.
@@ -25,7 +25,7 @@ functions $\procFinTxId$ and $\procVerfTxId$. $\procFinTxId$ can be called by th
 connected to the blockchain. The $\procVerfTxId$ function is called by nodes (acting as public verifiers) on the blockchain verifying the validity of the transaction, before including them in a block.
 
 \begin{definition}[Mimblewimble Transaction Scheme]
-    \label{def:mw-tx-scheme}
+    \label{def:atom:mw-tx-scheme}
     A Mimblewimble Transaction Scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ with commitment scheme $\varCommitScheme$, two-party signature scheme $\varSigSchemeMP$, and rangeproof system $\varProofSystem$ consists of the following tupel of procedures:
     \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign ( \procSendCoinsId,\procRecvCoinsId,\procFinTxId,\procVerfTxId ) \]
     \begin{itemize}
@@ -45,7 +45,7 @@ connected to the blockchain. The $\procVerfTxId$ function is called by nodes (ac
 We say a Mimblewimble Transaction Scheme is correct if the verification algorithm $\procVerfTxId$ returns 1 if and only if the the transaction is well
 balanced and its signature is valid. More formally:
 \begin{definition}[Transaction Scheme Correctness]
-    \label{def:tx-scheme-correctness}
+    \label{def:atom:tx-scheme-correctness}
     For any list of input coins $\funArray{\varCoinInp}$ with total value $\varValue$ and blinding factors
     $\funArray{\varBlindingFactor}$ and a transaction fund value $\varFundValue$ with $\varFundValue \opSmEq \varValue$ the following must hold:
     \[
@@ -64,7 +64,7 @@ balanced and its signature is valid. More formally:
 \end{definition}
 
 \begin{definition}[Extended Mimblewimble Transaction Scheme]
-    \label{def:ext-mw-tx-scheme}
+    \label{def:atom:ext-mw-tx-scheme}
     An extended Mimblewimble transaction scheme $\varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ is an extension to $\varMWScheme$ with the following two procedures:
     \[ \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc (\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId) \]
     \begin{itemize}
@@ -87,7 +87,7 @@ balanced and its signature is valid. More formally:
 Correctness is given very similar to the standard scheme:
 
 \begin{definition}[Extended Transaction Scheme Correctness]
-    \label{def:ext-tx-scheme-correctness}
+    \label{def:atom:ext-tx-scheme-correctness}
     For any list of input coins $\funArray{\varCoinInp}$ with total value $\varValue$ and split blinding factors
     $(\funArray{\varBlindingFactorAlice}, \funArray{\varBlindingFactorCarol})$ and a transaction fund value $\varFundValue$ with $\varFundValue \opSmEq \varValue$ the following must hold:
     \[
@@ -107,7 +107,7 @@ Correctness is given very similar to the standard scheme:
 \end{definition}
 
 \begin{definition}[Adapted Extended Mimblewimble Transaction Scheme]
-    \label{def:apt-ext-mw-tx-scheme}
+    \label{def:atom:apt-ext-mw-tx-scheme}
     The adapted version of the extended Mimblewimble Transaction Scheme updates the Extended Mimblewimble Transaction Schme by providing a modified version of the single party receive routine and the distributed finalize transaction protocol.
     \[ \varaptMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc \procAptRecvCoinsId, \procDAptFinTxId \]
     \begin{itemize}
@@ -119,7 +119,7 @@ Correctness is given very similar to the standard scheme:
         \item $\langle \varSigAliceBob, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$: The adapted variant of the finalize transaction algorithm is a distributed protocol between the sender(s) and receiver.
         Additionally to the pre-transaction $\funStar{\varPreTx}$ the senders need to input their signing information, Bob needs to input the unadapted version of his partial signature as it is needed for transaction completion.
         This protocol could also be implemented as a three party protocol, two senders controlling a shared coin and a third receiver.
-        However, as in the case we will describe later in~\ref{sec:atomic-swap} one of the two senders is also the receiver, we allowed ourselves to model this protocol as being between only two parties to simplify the formalization.
+        However, as in the case we will describe later in~\ref{sec:atom:atomic-swap} one of the two senders is also the receiver, we allowed ourselves to model this protocol as being between only two parties to simplify the formalization.
         In this version of the protocol only Bob will be able to finalize the transaction, which is different to $\procFinTxId$ and $\procDFinTxId$.
         This has the practical reason that for the atomic swap execution Bob needs to be the one in control of the final transaction.
         If Alice were to build the final transaction before Bob, she might be able to extract the Witness value before the transaction has been published, which in the atomic swap scenario would mean she could steal the funds stored on the other chain.
@@ -130,7 +130,7 @@ Correctness is given very similar to the standard scheme:
 Similar as before we define correctness for the adapted scheme:
 
 \begin{definition}[Adapted Transaction Scheme Correctness]
-    \label{def:apt-tx-scheme-correctness}
+    \label{def:atom:apt-tx-scheme-correctness}
     For any list of input coins $\funArray{\varCoinInp}$ with total value $\varValue$ and blinding factors
     $\funArray{\varBlindingFactor}$ and a transaction fund value $\varFundValue$ with $\varFundValue \opSmEq \varValue$ and any witness value $\varX$ the following must hold:
     \[
@@ -241,15 +241,15 @@ If the adversary manages to choose the correct value of $\varB$ he or she has wo
 \end{definition}
 
 
-\section{Mimblewimble instantiation}\label{sec:atomic-inst}
+\section{Mimblewimble instantiation}\label{sec:atom:atomic-inst}
 
-In this section we will provide an instantiation of the transaction scheme definitions found in~\ref{def:mw-tx-scheme},~\ref{def:ext-mw-tx-scheme} and~\ref{def:apt-ext-mw-tx-scheme}. The instantiations can be implemented in a Cryptocurrency based on the Mimblewimble protocol such as Beam and Grin.
+In this section we will provide an instantiation of the transaction scheme definitions found in~\ref{def:atom:mw-tx-scheme},~\ref{def:atom:ext-mw-tx-scheme} and~\ref{def:atom:apt-ext-mw-tx-scheme}. The instantiations can be implemented in a Cryptocurrency based on the Mimblewimble protocol such as Beam and Grin.
 
 \subsection{Mimblewimble Transaction Scheme}
 
 First we provide an instantiation of the simplest form of a transaction in which a sender wants to transfer some value $\varFundValue$ to a receiver.
-For the execution of the protocol we assume to have access to a homomorphic commitment scheme such as Pedersen Commitment $\varCommitScheme$ as defined in definition~\ref{def:pedersenCom}.
-Furthermore we require a Rangeproof system $\varProofSystem$ as defined in~\ref{sec:rangeProof} and a two-party signature scheme $\varSigSchemeMP$ as defined in~\ref{def:twoPartySig}.
+For the execution of the protocol we assume to have access to a homomorphic commitment scheme such as Pedersen Commitment $\varCommitScheme$ as defined in definition~\ref{def:pre:pedersen}.
+Furthermore we require a Rangeproof system $\varProofSystem$ as defined in~\ref{sec:pre:rangeproof} and a two-party signature scheme $\varSigSchemeMP$ as defined in~\ref{def:sig:two-party-sig}.
 
 The make the pseudocode for the transaction protocol easier we first introduce two auxiliary functions $\procCreateCoinId$
 and $\procCreatePreTxId$. The coin creation function will take as input a value $\varValue$ and a blinding factor $\varBlindingFactor$, it will create and output a new coin $\varCoin$ together with a range proof
@@ -286,7 +286,7 @@ In figure~\ref{fig:inst-mw-tx} we provide an instantiation of the Mimblewimble T
 In the $\procSendCoinsId$ function the sender creates his change output coin, which is the difference between the value stored in his input coins and the value which should be transferred to a receiver.
 He sets up the signature context with his parameters and gets a pre-transaction $\varPreTx$, as well as a signing key $\varSecKeyAlice$ and secret nonce $\varNonceAlice$ as output. The pre-transaction can then be sent to a receiver.
 Note that this instantiation differs from the one described by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} in that the sender does not yet sign the transaction during $\procSendCoinsId$. This has
-the reason that in our definition of the Two-Party Signature Scheme~\ref{def:twoPartySig} the signature context $\varSigContext$ requires to be fully setup before a partial signature can be created, therefore
+the reason that in our definition of the Two-Party Signature Scheme~\ref{def:sig:two-party-sig} the signature context $\varSigContext$ requires to be fully setup before a partial signature can be created, therefore
 signing can only start at the recievers turn, after the signature context has been completed. In Fuchsbauer et al. paper it is possible to start the signing earlier, because instead of using the notion
 of a two-party signing protocol, they instead rely on a aggregateable signature scheme. The sender and receiver both will create their signatures which will then be aggregated into the final one. However,
 we find that by relying upon a two-party signature scheme instead we are closer to what is implemented in practice~\footcite{https://medium.com/@brandonarvanaghi/grin-transactions-explained-step-by-step-fdceb905a853} .
@@ -357,7 +357,7 @@ and use it as the public key for validating the transaction signature. If the si
 
 \subsection{Extended Mimblewimble Transaction Scheme}
 
-So make the formalization of algorithms easier we define a protocol $\procDSignId$ which is a protocol between two-parties running the partial signature creation outlined in section~\ref{sec:schnorrInst}.
+So make the formalization of algorithms easier we define a protocol $\procDSignId$ which is a protocol between two-parties running the partial signature creation outlined in section~\ref{sec:sig:schnorr-inst}.
 Note that we assume that the secret keys as well as nonces are already given as a paramter (which is the case during the transaction protocol) therefore we don't need an additional call to $\procKeyGenPtId$.
 
 \begin{center}
@@ -545,9 +545,9 @@ He will send over $\varSigFin$ which lets both parties construct the valid trans
     \end{figure}
 \end{landscape}
 
-\section{Atomic Swap protocol}\label{sec:atomic-swap}
+\section{Atomic Swap protocol}\label{sec:atom:atomic-swap}
 
-With the outlined Adapted Mimblewimble Transaction Scheme from definition~\ref{def:apt-ext-mw-tx-scheme} we can now construct an Atomic Swap protocol with another Cryptocurrency.
+With the outlined Adapted Mimblewimble Transaction Scheme from definition~\ref{def:atom:apt-ext-mw-tx-scheme} we can now construct an Atomic Swap protocol with another Cryptocurrency.
 In this thesis we will explain a swap with Bitcoin, as at present Bitcoin and Bitcoin-like cryptocurrencies are the most widely adopted.
 We will generally refer to the ``Bitcoin side`` and the ``Mimblewimble side`` of the swap to be most generic.
 Upon implementation one has to decide for a specific implementation, for example BTC on the Bitcoin side and Grin on

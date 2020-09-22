@@ -1,10 +1,10 @@
 In this chapter we will lay down the general notations and definitions required for the later parts of the thesis.
 In section~\ref{sec:pre:general} we will define several cryptographic primitives which are required for our constructions.
 Section~\ref{sec:pre:bitcoin} will describe several definitions around Bitcoin, particularly its transaction structure.
-After that in secion~\ref{sec:pre:privacy} we will discuss the notion of privacy enhancing cryptocurrencies, and then range proofs in section~\ref{sec:pre:rproof} of which both are needed to understand the Mimblewimble protocol discussed in section~\ref{sec:pre:mimblewimble}.
-Finally we explain the concept of scriptless scripts in section~\ref{sec:pre:scriptlessscripts} and adaptor signatures~\ref{sec:pre:aptsignatures} which are both relevant building blocks for the constructions found in this thesis.
+After that in secion~\ref{sec:pre:privacy} we will discuss the notion of privacy enhancing cryptocurrencies, and then range proofs in section~\ref{sec:pre:rangeproof} of which both are needed to understand the Mimblewimble protocol discussed in section~\ref{sec:pre:mimblewimble}.
+Finally we explain the concept of scriptless scripts in section~\ref{sec:pre:scriptless-scripts} and adaptor signatures~\ref{sec:pre:aptsignatures} which are both relevant building blocks for the constructions found in this thesis.
 
-\section{General Notation and Definitions\label{sec:pre:general}}
+\section{General Notation and Definitions}\label{sec:pre:general}
 
 \paragraph{Notation}
 We first define the general notation used in the following chapters to formalize procedures and protocols.
@@ -14,9 +14,9 @@ $\varG \opSeperate \varH$ are adjacent generators in $\cnstGroup$, where adjacen
 Exponentiation stands for repeated application of the group operation.
 We define the group operation between two curve points as $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \opAddScalar \varScB}$.
 
-\begin{definition}[Hard Relation]\label{def:hardRelation}
+\begin{definition}[Hard Relation]\label{def:pre:hard-relation}
     Given a language $\varLanguage \opAssign \funList{\varBigA \opForWhich \exists\varSmallA \text{ s.t. } (\varBigA, \varSmallA) \opIn \cnstRelation}$ then the relation $\cnstRelation$ is
-    considered hard if the following three properties hold: \cite{aumayr2020bitcoinchannels}
+    considered hard if the following three properties hold:~\cite{aumayr2020bitcoinchannels}
     \begin{enumerate}
         \item $\procGenR{(\varSecParam)}$ is a $\cnstPolyTime$ sampling algorithm which outputs a statement/witness of the form $(\varBigA, \varSmallA) \opIn \cnstRelation$.
         \item Relation $\cnstRelation$ is poly-time decidable.
@@ -24,13 +24,13 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
     \end{enumerate}
 \end{definition}
 
-\begin{definition}[Discrete Logarithm]\label{def:discretelog}
+\begin{definition}[Discrete Logarithm]\label{def:pre:discretelog}
     We define the discirte logarithm in a group $\cnstGroup$ of a number $\varN$ as the number $\varM$ such that for the groups generator $\varG$ the following holds:
     \[ \funGen{\varM} \opEqNoQ \varN \]
-    The discrete logarithm is a hard relation as defined in~\ref{def:hardRelation}.
+    The discrete logarithm is a hard relation as defined in~\ref{def:pre:hard-relation}.
 \end{definition}
 
-\begin{definition}[Signature Scheme]\label{def:signatureScheme}
+\begin{definition}[Signature Scheme]\label{def:pre:signature-scheme}
     A signature scheme $\varSigScheme$ is a tuple of algorithms $(\procSetupId \opSeperate \procSignId \opSeperate \procVerfId)$ defined as follows: \cite{goldwasser1988digital}
     \[ \varSigScheme = (\procSetupId \opSeperate \procSignId \opSeperate \procVerfId) \]
 
@@ -46,11 +46,11 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
     \begin{itemize}
         \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold with overwhealming probabillity: $\procVerf{\varPubKey}{\procSign{\varSecKey}{\varMsg}}{\varMsg} \opEq 1$
         \item Unforgeability (\cnstEUFCMA): Informally the existential unforgeability under chosen message attacks holds if an attacker $\cnstAdversary$ is unable to forge a valid signature for a chosen message.
-        A formalization of the property can be found in section~\ref{subsec:cnstsecureaptscheme}
+        A formalization of the property can be found in section~\ref{subsec:sig:secureaptscheme}
     \end{itemize}
 \end{definition}
 
-\begin{definition}[Cryptographic Hash Function]\label{def:hashFunction}
+\begin{definition}[Cryptographic Hash Function]\label{def:pre:hash-function}
     A cryptographic hash function $\cnstHash$ is defined as $\funHash{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$ ~\cite{al2011cryptographic}.
     A secure hashing function has to fulfill the following security properties:
     \begin{itemize}
@@ -62,10 +62,10 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
         Given such a hash function $\cnstHash$ and an input $\varInput$, it should be infeasible to find a different input $\funStar{\varInput}$ such that $\varInput \opNotEq \funStar{\varInput}$
         and $\funHash{\varInput} \opEq \funHash{\funStar{\varInput}}$.
     \end{itemize}
-    The relation between the input $\varInput$ and the output $\funHash{\varInput}$ is a hard relation as defined in~\ref{def:hardRelation}.
+    The relation between the input $\varInput$ and the output $\funHash{\varInput}$ is a hard relation as defined in~\ref{def:pre:hard-relation}.
 \end{definition}
 
-\begin{definition}[Commitment Scheme]\label{def:commitment}
+\begin{definition}[Commitment Scheme]\label{def:pre:commitment}
     A cryptographic Commitment Scheme $\varCommitScheme$ is defined by a pair of functions $(\procSetupId, \procCommitId)$~\cite{bunz2018bulletproofs}.
     \begin{itemize}
         \item $\varPublicParam \opFunResult \procSetupCom{\varSecParam}$: The setup procedure is a DPT function, it takes as input a security parameter $\varSecParam$ and outputs public parameters $\varPublicParam$.
@@ -85,13 +85,13 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
     \end{itemize}
 \end{definition}
 
-\begin{definition}[Additive Homomorphic Commitment]\label{def:homomorphicCom}
-    A Commitment Scheme as defined in~\ref{def:commitment} is said to be addtive homomorphic if the following holds \cite{bunz2018bulletproofs}
+\begin{definition}[Additive Homomorphic Commitment]\label{def:pre:homo-com}
+    A Commitment Scheme as defined in~\ref{def:pre:commitment} is said to be addtive homomorphic if the following holds~\cite{bunz2018bulletproofs}
     \[ \procCommit{\varInput_1}{\varNonce_1} \opAddPoint \procCommit{\varInput_2}{\varNonce_2} \opEqNoQ \procCommit{\varInput_1 \opAddScalar \varInput_2}{\varNonce_1 \opAddScalar \varNonce_2} \]
 \end{definition}
 
-\begin{definition}[Pedersen Commitment Scheme]\label{def:pedersenCom}
-    A \emph{Pedersen Commitment Scheme} is an instance of a Commitment Scheme as defined in definition~\ref{def:commitment} that has the additive homomorphic property as defined in \ref{def:homomorphicCom}.
+\begin{definition}[Pedersen Commitment Scheme]\label{def:pre:pedersen}
+    A \emph{Pedersen Commitment Scheme} is an instance of a Commitment Scheme as defined in definition~\ref{def:pre:commitment} that has the additive homomorphic property as defined in~\ref{def:pre:homo-com}.
 
 This can be achieved as follows:
     $\varCommitSpace_{\varPublicParam} \opAssign \cnstGroup$ of order $\varPrime \opSeperate \varInputSpace_{\varPublicParam} \opSeperate \varRandSpace_{\varPublicParam} \opAssign \cnstIntegersPrime{\varPrime}$.
@@ -102,13 +102,13 @@ This can be achieved as follows:
 \end{definition}
 
 
-\section{Bitcoin\label{sec:pre:bitcoin}}
+\section{Bitcoin} \label{sec:pre:bitcoin}
 
 In this section we will discuss the basics of the Bitcoin transaction protocol.
-We will find definitions which we will use later in section~\ref{sec:atomic-swap} to construct an atomic swap protocol.
+We will find definitions which we will use later in section~\ref{sec:atom:atomic-swap} to construct an atomic swap protocol.
 The main reference of this section is the book Mastering Bitcoin by Andreas Antonopoulos~\cite{antonopoulos2014mastering}.
 
-\subsection{Bitcoin Transaction Protocol}\label{subsec:bitcointx}
+\subsection{Bitcoin Transaction Protocol}\label{subsec:pre:bitcointx}
 
 A \emph{Bitcoin Transaction} is a data structure which allows transferring value between participants of the network.
 In Bitcoin there are no user balances or user accounts, instead the UTXO model (unspent transaction outputs) is empoloyed.
@@ -220,7 +220,7 @@ that time consisted of P2PKH transactions, whereas about 17\% were P2SH and 0.12
 P2PKH outputs can be encoded into a Bitcoin address using base58 encoding.
 This addresses can be handed out to request a payment from somebody.
 
-\subsubsection{P2SH\label{sec:pre:bitcoin:p2sh}}
+\subsubsection{P2SH} \label{sec:pre:bitcoin:p2sh}
 
 If more advanced spending conditions, such as multi signature are required, P2SH (Pay-to-script-hash), introduced in
 2012, is a way to implement those in a space efficient and simple matter.
@@ -235,11 +235,11 @@ to the owner of the output.
 Additionally this type of output can be encoded again into a Bitcoin address similar to a P2PKH output, making it
 easy to request a payment.
 
-\section{Privacy-enhancing Cryptocurrencies \label{sec:pre:privacy}}
+\section{Privacy-enhancing Cryptocurrencies} \label{sec:pre:privacy}
 
 \subsection{Zero Knowledge Proofs} \label{sec:pre:privacy:zeroknowlegde}
 
-\subsection{Range Proofs \label{sec:rangeProof}}
+\subsection{Range Proofs} \label{sec:pre:rangeproof}
 
 \begin{definition}[Rangeproof System]
     A Rangeproofs system $\varRProofSystemParam{\varCommitScheme}$ with regards to a homomorphic commitment scheme $\varCommitScheme$ consists of a tupel of functions $(\procRProofSetupId, \procProofId, \procVerfProofId)$.
@@ -265,9 +265,9 @@ easy to request a payment.
 
 For MP proofs \cite{klinec2020privacy}
 
-\section{Mimblewimble \label{sec:pre:mimblewimble}}
+\section{Mimblewimble} \label{sec:pre:mimblewimble}
 In this section we will outline the fundamental properties of the protocols employed in Mimblewimble which are relevant for the thesis and particularily the construction of the Atomic Swap protocol constructed in chapter~\ref{chp:atomicSwap}.
-\subsubsection{Transaction Structure \label{sec:pre:mimblwimble:tx}}
+\subsubsection{Transaction Structure} \label{subsec:pre:mimblwimble-tx}
 
 First we will define the notion of a coin in Mimblewimble which has similarity to an unspent transction output (UTXO) in Bitcoin.
 \begin{definition}[Mimblewimble Coin]
@@ -277,14 +277,14 @@ First we will define the notion of a coin in Mimblewimble which has similarity t
 \end{definition}
 
 A Mimblewimble transaction consists of $\varCoinInp \opAssign (\varCoin_1 \opSeperate \dots \opSeperate \varCoin_n)$ input coins and $\varCoinOut \opAssign (\varCoin'_1 \opSeperate \dots \opSeperate \varCoin'_n)$ output coins.
-\begin{definition}[Transaction well-balancedness]  \label{def:tx-well-balancedness}
+\begin{definition}[Transaction well-balancedness]  \label{def:pre:tx-well-balancedness}
     A transaction is considered \emph{well-balanced} iff $\sum{\varValue'_i} \opSub \sum{\varValue_i} \opEqNoQ 0$ so the sum of all output values subtracted from the sum of input values has to be 0. (Not taking transaction fees into account)
 \end{definition}
 
-\begin{definition}[Transaction validity] \label{def:tx-mw-validity}
+\begin{definition}[Transaction validity] \label{def:pre:tx-mw-validity}
     A transaction is valid if:
     \begin{itemize}
-        \item The transaction is well-balanced as defined in definition~\ref{def:tx-well-balancedness}
+        \item The transaction is well-balanced as defined in definition~\ref{def:pre:tx-well-balancedness}
         \item $\opForAll \; (\varCoin_i \varProof_i) \opIn \varCoinOut \; \procVerfProof{\varProof_i}{\varCoin_i} \opEqNoQ 1$
     \end{itemize}
 \end{definition}
@@ -315,14 +315,14 @@ Then we can build a single merged transaction:
 \[ \varTx_m \opAssign (\varSupply_0 \opAddScalar \varSupply_1 \opSeperate \varCoinInp^0 \opConc \varCoinInp^1,\:\varCoinOut^0 \opConc \varCoinOut^1 \opSeperate (\funList{\varProof_0} \opConc \funList{\varProof_1} \opSeperate
 \funList{\varExcess_0} \opConc \funList{\varExcess_1} \opSeperate \funList{\varSignature_0} \opConc \funList{\varSignature_1}) \]
 We can easily deduce that if $\varTx_0$ and $\varTx_1$ are valid, it must follow that $\varTx_m$ is valid:\\
-If $\varTx_0$ and $\varTx_1$ are valid as of definition~\ref{def:tx-mw-validity} that means $\varCoinInp^0 \opSub \varCoinOut^0 \opSub \funGenH{\varSupply_0} \opEqNoQ \varExcess_0 \opSeperate \funList{\varProof_0}$ contains valid range proofs for the outputs
+If $\varTx_0$ and $\varTx_1$ are valid as of definition~\ref{def:pre:tx-mw-validity} that means $\varCoinInp^0 \opSub \varCoinOut^0 \opSub \funGenH{\varSupply_0} \opEqNoQ \varExcess_0 \opSeperate \funList{\varProof_0}$ contains valid range proofs for the outputs
 $\varCoinOut^0$ and $\funList{\varSignature_0}$ contains a valid signature to $\varExcess_0 \opSub \funGenH{\varSupply_0}$ as public key, the same must hold for $\varTx_1$.
 
 By the rules of arithmetic it then must also hold that
 \[ \varCoinInp^0 \opConc \varCoinInp^1 \opSub \varCoinOut^0 \opConc \varCoinOut^1 \opSub \funGenH{\varSupply_0 \opAddScalar \varSupply_1} \opEqNoQ \varExcess_0 \opAddPoint \varExcess_1  \]
 $\funList{\varProof_0} \opConc \funList{\varProof_1}$ must contain valid range proofs for the output coins and $\funList{\varSignature_0} \opConc \funList{\varSignature_1}$ must contain valid signatures to the respective Excess points, which makes $\varTx_m$ a valid transaction.
 
-\paragraph{Subset Problem \label{sec:pre:mimblewimble:subset}}
+\paragraph{Subset Problem} \label{par:pre:mimblewimble:subset}
 A subtle problem arises with the way transactions are merged in Mimblewimble.
 From the construction shown earlier, it is possible to reconstruct the original separate transactions from a merged one, which can be a privacy issue.
 Given a set of inputs, outputs, and kernels, a subset of these will recombine to reconstruct one of the valid transaction which were aggregated since kernel excess values are not combined.
@@ -343,7 +343,7 @@ Now every time two transactions are merged with the method layed out previously,
 If offsets are picked truly randomly, and the possible range of values is broad enough, the probability of recovering the uncombined offsets from a merged one becomes negligible, making it infeasible to recover original transactions from a merged one~\cite{poelstra2016mimblewimble}.
 
 
-\subsubsection{Cut Through \label{sec:pre:mimblewimble:cut}}
+\paragraph{Cut Through} \label{par:pre:mimblewimble:cut}
 From the way transactions are merged together, we can now learn how to purge spent outputs securely.
 Let's assume $\varCoin_i$ appears as an output in $\varTx_0$ and as an input in $\varTx_1$:
 \begin{gather*}
@@ -351,14 +351,14 @@ Let's assume $\varCoin_i$ appears as an output in $\varTx_0$ and as an input in 
     \varTx_1 \opAssign (\varSupply_1 \opSeperate \varCoinInp^i \opSeperate \varCoinOut^1 \opSeperate (\funList{\varProof_1} \opSeperate \funList{\varExcess_1} \opSeperate \funList{\varSignature_1}) )\\
 \end{gather*}
 Essentially this means $\varTx_1$ spends a coin created in $\varTx_0$.
-Now lets recall the equation given for transaction well-balancedness in~\ref{def:tx-well-balancedness}:
+Now lets recall the equation given for transaction well-balancedness in~\ref{def:pre:tx-well-balancedness}:
 \[ \sum{\varCoinOut} \opSub \sum{\varCoinInp} \opEqNoQ \sum{(\funGen{\varNonce'_i})} \opSub \sum{(\funGen{\varNonce_i})} \]
 If we merge $\varTx_0$ with $\varTx_1$ as done previously the coin $\varCoin_i$ will appear both in $\sum{\varCoinInp}$ and $\sum{\varCoinOut}$.
 Therefore we can erase $\varCoin_i$ from both lists, while maintaining transaction balancedness.
 Informally this means that every time a coin gets spend, it can be erased from the ledger, without breaking the rules of the system.
 This property is employed in the Mimblewimble protocol to reduce the space requirements of the protocol as well as provide a notion of unlinkability, as transaction histories can be erased.
 
-\subsubsection{Transaction Building \label{sec:pre:mimblewimble:txbuild}}
+\subsubsection{Transaction Building} \label{subsec:pre:mimblewimble:txbuild}
 As already pointed out, building transactions in Mimblewimble is an interactive process between the sender and receiver of funds.
 Jedusor, Tom Elvis originally envisioned the following two-step process to build a transaction:~\cite{jedusor2016mimblewimble}
 
@@ -389,27 +389,31 @@ Figure~\ref{fig:txOriginal} depicts the original transaction flow.\\
         \< \< \< \< \text{Finalize transaction $\varTx$} \\
     }
     \caption{Original transaction building process\label{fig:txOriginal}}
-    \todo[inline]{Pedro: Really nice that you created this protocol :) }
 \end{figure}
+
 This protocol however turned out to be insecure as it is vulnerable to the following attack:
-The receiver can spend the change coins $\varCoinOut^A$ by reverting the transaction. Doing this would give the sender his coins back, however as the sender
-might not have the keys for his spent outputs anymore, the coins could then be lost.
+The receiver could spend Alice's change coins $\varCoinOut^A$ by reverting the transaction.
+Doing this would give the sender his coins back, however as the sender might not have the keys for his spent outputs anymore, the coins could then be lost.
 
 In detail this reverting transaction would look like:
 \[ \varTx_{rv} \opAssign (0 \opSeperate \varCoinOut^A \opConc \varCoinOut^B \opSeperate \varCoinInp \opSeperate (\varProof_{rv} \opSeperate \varExcess_{rv} \opSeperate \varSignature_{rv}) ) \]
-Again remembering the construction of the Excess value of this construction would look like this:
+So in essence it is exactly the reverse of the previous transaction.
+Again remembering the construction of the excess value of this construction would look like this:
 \[ \varExcess_{rv} \opAssign \sum{\varCoinOut^A \opConc \varCoinOut^B \opSub \varCoinInp} \]
 The key $\varKey$ originally sent by Alice to Bob is a valid opening to $\sum{\varCoinInp} \opSub \sum{\varCoinOut^A}$. With the inverse of this key $\varKey_{inv}$ we get the opening to $\sum{\varCoinOut^A \opSub \varCoinInp}$.
 Now all Bob has to do is add his key $\funStar{\varKey}$ to get:
 \[ \varKey_{rv} \opAssign -\varKey \opAddScalar \funStar{\varKey} \]
-which is the opening to $\varExcess_{rv}$. \todo{Pedro: Why range proof is not correct here in the first place?}Furthermore obtaining a valid range proofs is trivial, as it once was a valid output the ledger will cointain a valid proof for this coin already.
+which is the opening to $\varExcess_{rv}$.
+Therefore Bob is able to construct a valid signature under $\varExcess_{rv}$.
+Range proofs can just be reused, because this transaction spends to a coin which has already existed on the ledger with the same blinding factor and value, meaning the proof will still be valid.
 
-This means Bob spends the newly created outputs and sends them back to the original input coins, chosen by Alice. It might at first seem unclear why Bob would do that. An example situation could be if Alice
-pays Bob for some good which Bob is selling. Alice decides to pay in advance, but then Bob discovers that he is already out of stock of the good that Alice ordered. To return the funds to Alice, he reverses
-the transaction instead of participating in another interactive process to build a new transaction with new outputs. If Alice already deleted the keys to her initial coins, the funds are now lost.
-The problem was solved in the Grin Cryptocurrency by making the signing process itself a two-party process which will be explained in more detail in chapter~\ref{chp:fixedWitnessSignatures}.
+In essence this means Bob spends the newly created outputs and sends them back to the original input coins, chosen by Alice. It might at first seem unclear why Bob would do that.
+An example situation could be if Alice pays Bob for some good which Bob is selling. Alice decides to pay in advance, but then Bob discovers that he is already out of stock of the good that Alice ordered.
+To return the funds to Alice, he reverses the transaction instead of participating in another interactive process to build a new transaction with new outputs.
+If Alice already deleted the keys to her initial coins, the funds are now lost.
+The problem was solved in the Grin and Beam Mimblewimble implementations by making the signing process itself a two-party process which will be explained in more detail in chapter~\ref{chp:fixedWitnessSignatures}.
 
-Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} proposed the following alternative way to build transactions which would not be vulnerable to this problem.
+Alternatively Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} proposed another way to build transactions which would not be vulnerable to this problem:
 \begin{enumerate}
     \item Alice constructs a full-fledged transaction $\varTx_A$ spending her input coins $\varCoinInp$ and creates her change coins $\varCoinOut^A$, plus a special output coin $\varCoinSpecial \opAssign \funGenH{\varFundValue} \opAddPoint \funGen{\varKey_{sp}}$,
     where $\varFundValue$ is the desired value which should be transferred to Bob and $\varKey_{sp}$ is a randomly choosen key. She proceeds by sending $\varTx_A$ as well as $(\varFundValue \opSeperate \varKey_{sp})$ and the necessary range
@@ -418,7 +422,8 @@ Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} proposed the following alternat
     into $\varTx_m$. He then broadcasts $\varTx_m$ to the network. Note that when the two transactions are merged the intermediate special coin $\varCoinSpecial$ will be both in the coin output and input list
     of the transaction and therfore will be discarded.
 \end{enumerate}
-The only drawback of this approach is that we have two transaction kernels instead of just one because of the merging step, making the transaction slightly bigger.
+One drawback of this approach is that we have two transaction kernels instead of just one because of the merging step, making the transaction slightly bigger, however there is still only one interaction required between Alice and Bob.
+In the solution employed by the Grin and Beam implementations which we will discuss in chapter~\ref{chp:atomicSwap}, at least one additional round of interaction will be required.
 A figure showing the protocol flow is depicted in Figure~\ref{fig:txSalvaged}.
 
 \begin{figure}
@@ -437,11 +442,10 @@ A figure showing the protocol flow is depicted in Figure~\ref{fig:txSalvaged}.
         \< \< \< \< \text{ Merge $\varTxAlice$ and $\varTxBob$ to $\varTx_{m}$ } \\
         \< \< \< \< \text{ Publish $\varTx_{m}$ }
     }
-    \caption{Salvaged tranction protocol by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} \label{fig:txSalvaged}}
-    \todo[inline]{Pedro: put labels inside captions} 
+    \caption{Salvaged transaction protocol by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} \label{fig:txSalvaged}}
 \end{figure}
 
-\section{Scriptless Scripts}\label{sec:pre:scriptlessscripts}
+\section{Scriptless Scripts} \label{sec:pre:scriptless-scripts}
 
-\section{Adaptor Signatures}\label{sec:pre:aptsignatures}
+\section{Adaptor Signatures} \label{sec:pre:aptsignatures}
 
