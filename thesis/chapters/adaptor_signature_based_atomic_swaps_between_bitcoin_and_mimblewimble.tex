@@ -172,7 +172,7 @@ creating new value in the total of $\funStar{\varValue} \opSub \varValue$.
     }
 \end{center}
 
-\begin{definition}[Inflation Resistence]
+\begin{definition}[Inflation Resistence] \label{def:atom:inflation-resistence}
     A Mimblewimbe Transaction Scheme is called inflation resistent if for any value $\varValue$ in a valid range (as defined by the public parameters of the ledger), security
     paramter $\varN$ and a PPT adversary $\cnstAdversary$ the following holds:
     \[ \prob{\procInflate{\varN}{\varValue} \opEqNoQ 1} \opSmEq \funNegl{\varN} \]
@@ -198,7 +198,7 @@ He wins if he can construct a valid transaction $\varTx$ together with the help 
     }
 \end{center}
 
-\begin{definition}[Theft-resistance]
+\begin{definition}[Theft-resistance] \label{def:atom:theft-resistence}
     A Mimblewimble Transaction Scheme is called theft-resistent if for any input coin $\varCoinInp$, security parameter $\varN$ and PPT adversary $\cnstAdversary$ the following holds:
     \[ \prob{\procStealCoin{\varN}{\varCoinInp} \opEqNoQ 1 } \opSmEq \funNegl{\varN} \]
 \end{definition}
@@ -234,14 +234,14 @@ If the adversary manages to choose the correct value of $\varB$ he or she has wo
     }
 \end{center}
 
-\begin{definition}[Transaction indistinguishability]
+\begin{definition}[Transaction indistinguishability] \label{def:atom:tx-indisting}
     We say Transaction Indistinguishability holds for a Mimblewimble Transaction System $\varMWScheme$ if for a PPT adversary $\cnstAdversary$ with access to the transaction oracle $\procOracleTxId$ a
     security parameter $\varN$ and any max value $\varValueMax$ the following must hold:
     \[ \prob{\procTxInd{\varN}{\varValueMax} \opEq 1} \opSmEq 0.5 \opAddScalar \funNegl{\varN} \]
 \end{definition}
 
 
-\section{Mimblewimble instantiation}\label{sec:atom:atomic-inst}
+\section{Instantiation}\label{sec:atom:atomic-inst}
 
 In this section we will provide an instantiation of the transaction scheme definitions found in~\ref{def:atom:mw-tx-scheme},~\ref{def:atom:ext-mw-tx-scheme} and~\ref{def:atom:apt-ext-mw-tx-scheme}. The instantiations can be implemented in a Cryptocurrency based on the Mimblewimble protocol such as Beam and Grin.
 
@@ -296,8 +296,7 @@ intended receiver, the adversary would be able to steal the coins by creating hi
 In $\procRecvCoinsId$ the receiver of a pre-transaction will verify the senders proof $\varProofBob$, create his outputcoin $\varCoinOutBob$, add his parameters to the signature context and then create his partial signature $\varSigBob$.
 The function returns an updated version of the pre-transaction $\varPreTx$ which can be sent back to the sender.
 
-Now in $\procFinTxId$ the original sender will validate the updated pre-transcation $\varPreTx$ sent to him by the receiver. If he finds it as valid, he will only now create his partial signature and finally
-finalize the two partial signatures in the final composite one, with which he can then build the final transaction.
+Now in $\procFinTxId$ the original sender will validate the updated pre-transcation $\varPreTx$ sent to him by the receiver. If he finds it as valid, he will only now create his partial signature and finally finalize the two partial signatures in the final composite one, with which he can then build the final transaction.
 
 In $\procVerfTxId$ a public verifier will verify the rangeproofs for the transactions output coins. If they are found valid she will compute the so-called Excess value $\varExcess$ from the difference between output and input coins
 and use it as the public key for validating the transaction signature. If the signature is now also found to be correct the verifier can deduce that the transaction is well-formed and valid.
@@ -544,6 +543,25 @@ He will send over $\varSigFin$ which lets both parties construct the valid trans
         \caption{Adapted Extended Mimblewimble Transaction Scheme - $\procDAptFinTxId$. \label{fig:inst-apt-mw-tx-fin}}
     \end{figure}
 \end{landscape}
+
+\section{Security \& Correctness} \label{sec:atom:security}
+
+In this section we will prove the correctness and security of the instantiation described in~\ref{sec:atom:atomic-inst}.
+We start by proving Correctness for all three transaction schemes.
+We then continue by showing that all three security definitions (Inflation-Resistence, Theft-Resistence, Transaction indistinguishability) hold for all 3 transaction types.
+The general process will be to find a proof for the basic transaction protocol defined in~\ref{def:atom:mw-tx-scheme} and then reduce the extended and adapted case to the basic one.
+
+\subsection{Correctness} \label{subsec:atom:correctness}
+
+Correctness of the transaction scheme trivially follows from the correctness of the signature scheme used in the transaction protocol as well as the correctness of the range proof system, as those are the two verifications run by the $\procVerfTxId$ algorithm.
+For the correctness of the range proof system we refer the reader again to the bulletproof paper~\cite{bunz2018bulletproofs}.
+The instantiation of the Mimblewimble Transaction Scheme (defined in~\ref{def:atom:mw-tx-scheme} instantiated in figure~\ref{fig:inst-mw-tx}) uses a standard Two-Party Signature Scheme defined in~\ref{def:sig:two-party-sig} for which a correctness proof is available by Maxwell et al. in~\cite{maxwell2019simple}.
+
+For the Extended Mimblewimble Transaction Scheme defined in~\ref{def:atom:ext-mw-tx-scheme} and instantiated in figure~\ref{fig:ext-mim-tx-spend},~\ref{fig:ext-mim-tx-recv} and~\ref{fig:ext-mim-tx-fin} the same signature scheme is used, therefore we can make the same argument as for the previous case.
+
+For the Adapted Extended Mimblewimble Transaction Scheme which we have defined in~\ref{def:atom:apt-ext-mw-tx-scheme} and have shown a instantiation in figure~\ref{fig:inst-apt-mw-tx-recv} and~\ref{fig:inst-apt-mw-tx-fin} the Two Party Fixed Witness Adaptor Schnorr Signature Scheme which we have defined in~\ref{def:sig:two-party-fixed-wit-apt-sig} is used.
+We have already shown correctness of this signature scheme in section~\ref{sec:sig:two-party-apt-security} by proofing that Adaptor Signature Correctness holds.
+Furthermore the scheme used a multiparty version of the bulletproof system for which we refer the reader to~\cite{klinec2020privacy}.
 
 \section{Atomic Swap protocol}\label{sec:atom:atomic-swap}
 
