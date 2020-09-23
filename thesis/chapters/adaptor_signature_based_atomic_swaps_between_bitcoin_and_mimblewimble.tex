@@ -1,5 +1,5 @@
-In this section, we will define Mimblewimble transactions and security properties which must hold for such a transaction system. The formalizations will be similar to those found by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}. However, we will only focus on the transaction protocol
-(transferring value from one or many parties to one or many parties), the notions of transaction aggregation, coin minting and adding transaction to the main ledger also discussed in~\cite{fuchsbauer2019aggregate} will not be topic of this formalization, as
+In this section, we will define Mimblewimble transactions and security properties which must hold for such a transaction system. The formalizations will be similar to those found by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}.
+However, we will only focus on the transaction protocol (transferring value from one or many parties to one or many parties), the notions of transaction aggregation, coin minting and adding transaction to the main ledger also discussed in~\cite{fuchsbauer2019aggregate} will not be topic of this formalization, as
 they are not relevant building blocks for the proposed Atomic Swap protocol.
 
 However, as an extension to the regular transaction protocol transferring value from one sender to a receiver we will define two further protocols. The first of them titled \emph{Extended Mimblewimble Transaction Scheme}
@@ -11,13 +11,12 @@ that the schemes are correct and secure with regards to the defined security pro
 
 Finally, we define a Atomic Swap protocol from these building blocks, allowing two parties to securely and trustlessly swap funds from a Mimblewimble blockchain with those on another blockchain, such as Bitcoin.
 
+\section{Definitions}\label{sec:atom:definitions}
 
-\section{Definitions}\label{sec:atomic-def}
-
-As we have already discussed in section~\ref{sec:Mimblewimble} for the creation of a transaction in Mimblewimble, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
-To construct the transaction protocol we assume that we have access to a two-party signature scheme $\varSigSchemeMP$ as defined in definition~\ref{def:twoPartySig}, a zero-knowledge Rangeproofs system $\varProofSystem$
-such as Bulletproofs, as described in section~\ref{sec:rangeProof} and a homomorphic commitment scheme $\varCommitScheme$ as defined in definition~\ref{def:homomorphicCom} such as
-Pedersen Commitments~\ref{def:pedersenCom}.
+As we have already discussed in section~\ref{sec:pre:mimblewimble} for the creation of a transaction in Mimblewimble, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
+To construct the transaction protocol we assume that we have access to a two-party signature scheme $\varSigSchemeMP$ as defined in definition~\ref{def:sig:two-party-sig}, a zero-knowledge Rangeproofs system $\varProofSystem$
+such as Bulletproofs, as described in section~\ref{sec:pre:rangeproof} and a homomorphic commitment scheme $\varCommitScheme$ as defined in definition~\ref{def:pre:homo-com} such as
+Pedersen Commitments~\ref{def:pre:pedersen}.
 
 Fuchsbauer et al. have defined three procedures $\styleFunction{Send}$, $\styleFunction{Rcv}$ and $\styleFunction{Ldgr}$ with regards to the creation of a transaction. $\styleFunction{Send}$ called by the sender
 will create a pre-transaction, $\styleFunction{Rcv}$ takes the pre-transaction and adds the receivers output and $\styleFunction{Ldgr}$ (again called by the sender) publishes the final transaction to the blockchain ledger.
@@ -26,7 +25,7 @@ functions $\procFinTxId$ and $\procVerfTxId$. $\procFinTxId$ can be called by th
 connected to the blockchain. The $\procVerfTxId$ function is called by nodes (acting as public verifiers) on the blockchain verifying the validity of the transaction, before including them in a block.
 
 \begin{definition}[Mimblewimble Transaction Scheme]
-    \label{def:mw-tx-scheme}
+    \label{def:atom:mw-tx-scheme}
     A Mimblewimble Transaction Scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ with commitment scheme $\varCommitScheme$, two-party signature scheme $\varSigSchemeMP$, and rangeproof system $\varProofSystem$ consists of the following tupel of procedures:
     \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign ( \procSendCoinsId,\procRecvCoinsId,\procFinTxId,\procVerfTxId ) \]
     \begin{itemize}
@@ -46,7 +45,7 @@ connected to the blockchain. The $\procVerfTxId$ function is called by nodes (ac
 We say a Mimblewimble Transaction Scheme is correct if the verification algorithm $\procVerfTxId$ returns 1 if and only if the the transaction is well
 balanced and its signature is valid. More formally:
 \begin{definition}[Transaction Scheme Correctness]
-    \label{def:tx-scheme-correctness}
+    \label{def:atom:tx-scheme-correctness}
     For any list of input coins $\funArray{\varCoinInp}$ with total value $\varValue$ and blinding factors
     $\funArray{\varBlindingFactor}$ and a transaction fund value $\varFundValue$ with $\varFundValue \opSmEq \varValue$ the following must hold:
     \[
@@ -65,7 +64,7 @@ balanced and its signature is valid. More formally:
 \end{definition}
 
 \begin{definition}[Extended Mimblewimble Transaction Scheme]
-    \label{def:ext-mw-tx-scheme}
+    \label{def:atom:ext-mw-tx-scheme}
     An extended Mimblewimble transaction scheme $\varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ is an extension to $\varMWScheme$ with the following two procedures:
     \[ \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc (\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId) \]
     \begin{itemize}
@@ -88,7 +87,7 @@ balanced and its signature is valid. More formally:
 Correctness is given very similar to the standard scheme:
 
 \begin{definition}[Extended Transaction Scheme Correctness]
-    \label{def:ext-tx-scheme-correctness}
+    \label{def:atom:ext-tx-scheme-correctness}
     For any list of input coins $\funArray{\varCoinInp}$ with total value $\varValue$ and split blinding factors
     $(\funArray{\varBlindingFactorAlice}, \funArray{\varBlindingFactorCarol})$ and a transaction fund value $\varFundValue$ with $\varFundValue \opSmEq \varValue$ the following must hold:
     \[
@@ -108,7 +107,7 @@ Correctness is given very similar to the standard scheme:
 \end{definition}
 
 \begin{definition}[Adapted Extended Mimblewimble Transaction Scheme]
-    \label{def:apt-ext-mw-tx-scheme}
+    \label{def:atom:apt-ext-mw-tx-scheme}
     The adapted version of the extended Mimblewimble Transaction Scheme updates the Extended Mimblewimble Transaction Schme by providing a modified version of the single party receive routine and the distributed finalize transaction protocol.
     \[ \varaptMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc \procAptRecvCoinsId, \procDAptFinTxId \]
     \begin{itemize}
@@ -120,7 +119,7 @@ Correctness is given very similar to the standard scheme:
         \item $\langle \varSigAliceBob, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$: The adapted variant of the finalize transaction algorithm is a distributed protocol between the sender(s) and receiver.
         Additionally to the pre-transaction $\funStar{\varPreTx}$ the senders need to input their signing information, Bob needs to input the unadapted version of his partial signature as it is needed for transaction completion.
         This protocol could also be implemented as a three party protocol, two senders controlling a shared coin and a third receiver.
-        However, as in the case we will describe later in~\ref{sec:atomic-swap} one of the two senders is also the receiver, we allowed ourselves to model this protocol as being between only two parties to simplify the formalization.
+        However, as in the case we will describe later in~\ref{sec:atom:atomic-swap} one of the two senders is also the receiver, we allowed ourselves to model this protocol as being between only two parties to simplify the formalization.
         In this version of the protocol only Bob will be able to finalize the transaction, which is different to $\procFinTxId$ and $\procDFinTxId$.
         This has the practical reason that for the atomic swap execution Bob needs to be the one in control of the final transaction.
         If Alice were to build the final transaction before Bob, she might be able to extract the Witness value before the transaction has been published, which in the atomic swap scenario would mean she could steal the funds stored on the other chain.
@@ -131,7 +130,7 @@ Correctness is given very similar to the standard scheme:
 Similar as before we define correctness for the adapted scheme:
 
 \begin{definition}[Adapted Transaction Scheme Correctness]
-    \label{def:apt-tx-scheme-correctness}
+    \label{def:atom:apt-tx-scheme-correctness}
     For any list of input coins $\funArray{\varCoinInp}$ with total value $\varValue$ and blinding factors
     $\funArray{\varBlindingFactor}$ and a transaction fund value $\varFundValue$ with $\varFundValue \opSmEq \varValue$ and any witness value $\varX$ the following must hold:
     \[
@@ -173,7 +172,7 @@ creating new value in the total of $\funStar{\varValue} \opSub \varValue$.
     }
 \end{center}
 
-\begin{definition}[Inflation Resistence]
+\begin{definition}[Inflation Resistence] \label{def:atom:inflation-resistence}
     A Mimblewimbe Transaction Scheme is called inflation resistent if for any value $\varValue$ in a valid range (as defined by the public parameters of the ledger), security
     paramter $\varN$ and a PPT adversary $\cnstAdversary$ the following holds:
     \[ \prob{\procInflate{\varN}{\varValue} \opEqNoQ 1} \opSmEq \funNegl{\varN} \]
@@ -199,7 +198,7 @@ He wins if he can construct a valid transaction $\varTx$ together with the help 
     }
 \end{center}
 
-\begin{definition}[Theft-resistance]
+\begin{definition}[Theft-resistance] \label{def:atom:theft-resistence}
     A Mimblewimble Transaction Scheme is called theft-resistent if for any input coin $\varCoinInp$, security parameter $\varN$ and PPT adversary $\cnstAdversary$ the following holds:
     \[ \prob{\procStealCoin{\varN}{\varCoinInp} \opEqNoQ 1 } \opSmEq \funNegl{\varN} \]
 \end{definition}
@@ -235,22 +234,22 @@ If the adversary manages to choose the correct value of $\varB$ he or she has wo
     }
 \end{center}
 
-\begin{definition}[Transaction indistinguishability]
+\begin{definition}[Transaction indistinguishability] \label{def:atom:tx-indisting}
     We say Transaction Indistinguishability holds for a Mimblewimble Transaction System $\varMWScheme$ if for a PPT adversary $\cnstAdversary$ with access to the transaction oracle $\procOracleTxId$ a
     security parameter $\varN$ and any max value $\varValueMax$ the following must hold:
     \[ \prob{\procTxInd{\varN}{\varValueMax} \opEq 1} \opSmEq 0.5 \opAddScalar \funNegl{\varN} \]
 \end{definition}
 
 
-\section{Mimblewimble instantiation}\label{sec:atomic-inst}
+\section{Instantiation}\label{sec:atom:atomic-inst}
 
-In this section we will provide an instantiation of the transaction scheme definitions found in~\ref{def:mw-tx-scheme},~\ref{def:ext-mw-tx-scheme} and~\ref{def:apt-ext-mw-tx-scheme}. The instantiations can be implemented in a Cryptocurrency based on the Mimblewimble protocol such as Beam and Grin.
+In this section we will provide an instantiation of the transaction scheme definitions found in~\ref{def:atom:mw-tx-scheme},~\ref{def:atom:ext-mw-tx-scheme} and~\ref{def:atom:apt-ext-mw-tx-scheme}. The instantiations can be implemented in a Cryptocurrency based on the Mimblewimble protocol such as Beam and Grin.
 
 \subsection{Mimblewimble Transaction Scheme}
 
 First we provide an instantiation of the simplest form of a transaction in which a sender wants to transfer some value $\varFundValue$ to a receiver.
-For the execution of the protocol we assume to have access to a homomorphic commitment scheme such as Pedersen Commitment $\varCommitScheme$ as defined in definition~\ref{def:pedersenCom}.
-Furthermore we require a Rangeproof system $\varProofSystem$ as defined in~\ref{sec:rangeProof} and a two-party signature scheme $\varSigSchemeMP$ as defined in~\ref{def:twoPartySig}.
+For the execution of the protocol we assume to have access to a homomorphic commitment scheme such as Pedersen Commitment $\varCommitScheme$ as defined in definition~\ref{def:pre:pedersen}.
+Furthermore we require a Rangeproof system $\varProofSystem$ as defined in~\ref{sec:pre:rangeproof} and a two-party signature scheme $\varSigSchemeMP$ as defined in~\ref{def:sig:two-party-sig}.
 
 The make the pseudocode for the transaction protocol easier we first introduce two auxiliary functions $\procCreateCoinId$
 and $\procCreatePreTxId$. The coin creation function will take as input a value $\varValue$ and a blinding factor $\varBlindingFactor$, it will create and output a new coin $\varCoin$ together with a range proof
@@ -287,7 +286,7 @@ In figure~\ref{fig:inst-mw-tx} we provide an instantiation of the Mimblewimble T
 In the $\procSendCoinsId$ function the sender creates his change output coin, which is the difference between the value stored in his input coins and the value which should be transferred to a receiver.
 He sets up the signature context with his parameters and gets a pre-transaction $\varPreTx$, as well as a signing key $\varSecKeyAlice$ and secret nonce $\varNonceAlice$ as output. The pre-transaction can then be sent to a receiver.
 Note that this instantiation differs from the one described by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} in that the sender does not yet sign the transaction during $\procSendCoinsId$. This has
-the reason that in our definition of the Two-Party Signature Scheme~\ref{def:twoPartySig} the signature context $\varSigContext$ requires to be fully setup before a partial signature can be created, therefore
+the reason that in our definition of the Two-Party Signature Scheme~\ref{def:sig:two-party-sig} the signature context $\varSigContext$ requires to be fully setup before a partial signature can be created, therefore
 signing can only start at the recievers turn, after the signature context has been completed. In Fuchsbauer et al. paper it is possible to start the signing earlier, because instead of using the notion
 of a two-party signing protocol, they instead rely on a aggregateable signature scheme. The sender and receiver both will create their signatures which will then be aggregated into the final one. However,
 we find that by relying upon a two-party signature scheme instead we are closer to what is implemented in practice~\footcite{https://medium.com/@brandonarvanaghi/grin-transactions-explained-step-by-step-fdceb905a853} .
@@ -297,8 +296,7 @@ intended receiver, the adversary would be able to steal the coins by creating hi
 In $\procRecvCoinsId$ the receiver of a pre-transaction will verify the senders proof $\varProofBob$, create his outputcoin $\varCoinOutBob$, add his parameters to the signature context and then create his partial signature $\varSigBob$.
 The function returns an updated version of the pre-transaction $\varPreTx$ which can be sent back to the sender.
 
-Now in $\procFinTxId$ the original sender will validate the updated pre-transcation $\varPreTx$ sent to him by the receiver. If he finds it as valid, he will only now create his partial signature and finally
-finalize the two partial signatures in the final composite one, with which he can then build the final transaction.
+Now in $\procFinTxId$ the original sender will validate the updated pre-transcation $\varPreTx$ sent to him by the receiver. If he finds it as valid, he will only now create his partial signature and finally finalize the two partial signatures in the final composite one, with which he can then build the final transaction.
 
 In $\procVerfTxId$ a public verifier will verify the rangeproofs for the transactions output coins. If they are found valid she will compute the so-called Excess value $\varExcess$ from the difference between output and input coins
 and use it as the public key for validating the transaction signature. If the signature is now also found to be correct the verifier can deduce that the transaction is well-formed and valid.
@@ -358,7 +356,7 @@ and use it as the public key for validating the transaction signature. If the si
 
 \subsection{Extended Mimblewimble Transaction Scheme}
 
-So make the formalization of algorithms easier we define a protocol $\procDSignId$ which is a protocol between two-parties running the partial signature creation outlined in section~\ref{sec:schnorrInst}.
+So make the formalization of algorithms easier we define a protocol $\procDSignId$ which is a protocol between two-parties running the partial signature creation outlined in section~\ref{sec:sig:schnorr-inst}.
 Note that we assume that the secret keys as well as nonces are already given as a paramter (which is the case during the transaction protocol) therefore we don't need an additional call to $\procKeyGenPtId$.
 
 \begin{center}
@@ -395,6 +393,7 @@ $\procDSignId$ instead of $\procSignPrtId$ for signature generation. (Apart from
 
 \newgeometry{margin=2cm}
 \begin{landscape}
+    \thispagestyle{plain}
     \begin{figure}
         \fbox{
         \procedure[linenumbering]{$\procDSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValueAlice}{\funArray{\varBlindingFactorCarol}}{\varTime}$}{
@@ -434,6 +433,7 @@ pre-transaction $\varPreTx$ which can be sent back to the sender.
 
 \newgeometry{margin=2cm}
 \begin{landscape}
+    \thispagestyle{plain}
     \begin{figure}
             \fbox{
             \procedure[linenumbering]{$\procDRecvCoins{\varPreTx}{\varFundValue}$} {
@@ -467,6 +467,7 @@ pre-transaction $\varPreTx$ which can be sent back to the sender.
 
 \newgeometry{margin=2cm}
 \begin{landscape}
+    \thispagestyle{plain}
     \begin{figure}
         \fbox{
         \procedure[linenumbering]{$\procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}$} {
@@ -521,49 +522,69 @@ for the $\procFinSigId$ function. Therefore in another round of interaction Alic
 He will send over $\varSigFin$ which lets both parties construct the valid transaction as well as Alice call $\procExtWitId$ to extract the secret witness $\varWit$.
 
 \begin{landscape}
-\begin{figure}
-        \fbox{
-        \procedure[linenumbering]{$\procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyCarol}{\varNonceCarol}{\varSigBob}$} {
-        Alice \< \< Bob \\
-        (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \\
-        \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \< \< \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \\
-        \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
-        \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varCommits[1]}{\varStatement} \opEqNoQ 0 \< \< \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varCommits[1]}{\varStatement} \opEqNoQ 0 \\
-        \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
-        \varSigAliceCarol \opFunResult \procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol} \< \< \\
-        \< \sendmessageright*{\varSigAliceCarol} \< \\
-        \< \< \procVerfPtSig{\varSigAliceCarol}{\varMsg}{\varCommits[0]} \\
-        \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
-        \< \< \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \\
-        \< \< \pcreturn \varTx
-        }
-        }
-    \caption{Adapted Extended Mimblewimble Transaction Scheme - $\procDAptFinTxId$. \label{fig:inst-apt-mw-tx-fin}}
-\end{figure}
+    \thispagestyle{plain}
+    \begin{figure}
+            \fbox{
+            \procedure[linenumbering]{$\procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyCarol}{\varNonceCarol}{\varSigBob}$} {
+            Alice \< \< Bob \\
+            (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \\
+            \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \< \< \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \\
+            \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
+            \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varCommits[1]}{\varStatement} \opEqNoQ 0 \< \< \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varCommits[1]}{\varStatement} \opEqNoQ 0 \\
+            \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
+            \varSigAliceCarol \opFunResult \procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol} \< \< \\
+            \< \sendmessageright*{\varSigAliceCarol} \< \\
+            \< \< \procVerfPtSig{\varSigAliceCarol}{\varMsg}{\varCommits[0]} \\
+            \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
+            \< \< \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \\
+            \< \< \pcreturn \varTx
+            }
+            }
+        \caption{Adapted Extended Mimblewimble Transaction Scheme - $\procDAptFinTxId$. \label{fig:inst-apt-mw-tx-fin}}
+    \end{figure}
 \end{landscape}
 
-\section{Atomic Swap protocol}\label{sec:atomic-swap}
+\section{Security \& Correctness} \label{sec:atom:security}
 
-With the outlined Adapted Mimblewimble Transaction Scheme from definition~\ref{def:apt-ext-mw-tx-scheme} we can now construct an Atomic Swap protocol with another Cryptocurrency.
+In this section we will prove the correctness and security of the instantiation described in~\ref{sec:atom:atomic-inst}.
+We start by proving Correctness for all three transaction schemes.
+We then continue by showing that all three security definitions (Inflation-Resistence, Theft-Resistence, Transaction indistinguishability) hold for all 3 transaction types.
+The general process will be to find a proof for the basic transaction protocol defined in~\ref{def:atom:mw-tx-scheme} and then reduce the extended and adapted case to the basic one.
+
+\subsection{Correctness} \label{subsec:atom:correctness}
+
+Correctness of the transaction scheme trivially follows from the correctness of the signature scheme used in the transaction protocol as well as the correctness of the range proof system, as those are the two verifications run by the $\procVerfTxId$ algorithm.
+For the correctness of the range proof system we refer the reader again to the bulletproof paper~\cite{bunz2018bulletproofs}.
+The instantiation of the Mimblewimble Transaction Scheme (defined in~\ref{def:atom:mw-tx-scheme} instantiated in figure~\ref{fig:inst-mw-tx}) uses a standard Two-Party Signature Scheme defined in~\ref{def:sig:two-party-sig} for which a correctness proof is available by Maxwell et al. in~\cite{maxwell2019simple}.
+
+For the Extended Mimblewimble Transaction Scheme defined in~\ref{def:atom:ext-mw-tx-scheme} and instantiated in figure~\ref{fig:ext-mim-tx-spend},~\ref{fig:ext-mim-tx-recv} and~\ref{fig:ext-mim-tx-fin} the same signature scheme is used, therefore we can make the same argument as for the previous case.
+
+For the Adapted Extended Mimblewimble Transaction Scheme which we have defined in~\ref{def:atom:apt-ext-mw-tx-scheme} and have shown a instantiation in figure~\ref{fig:inst-apt-mw-tx-recv} and~\ref{fig:inst-apt-mw-tx-fin} the Two Party Fixed Witness Adaptor Schnorr Signature Scheme which we have defined in~\ref{def:sig:two-party-fixed-wit-apt-sig} is used.
+We have already shown correctness of this signature scheme in section~\ref{sec:sig:two-party-apt-security} by proofing that Adaptor Signature Correctness holds.
+Furthermore the scheme used a multiparty version of the bulletproof system for which we refer the reader to~\cite{klinec2020privacy}.
+
+\section{Atomic Swap protocol}\label{sec:atom:atomic-swap}
+
+With the outlined Adapted Mimblewimble Transaction Scheme from definition~\ref{def:atom:apt-ext-mw-tx-scheme} we can now construct an Atomic Swap protocol with another Cryptocurrency.
 In this thesis we will explain a swap with Bitcoin, as at present Bitcoin and Bitcoin-like cryptocurrencies are the most widely adopted.
-We will generally refer to the \"Bitcoin side\" and the \"Mimblewimble side\" of the swap to be most generic.
+We will generally refer to the ``Bitcoin side`` and the ``Mimblewimble side`` of the swap to be most generic.
 Upon implementation one has to decide for a specific implementation, for example BTC on the Bitcoin side and Grin on
 the Mimblewimble side.
 On the Bitcoin side we construct two DPT functions ($\procLockAddrId, \procVerifyLockId$).
 \begin{itemize}
-    \item $(\varScriptPubKey) \opFunResult \procLockAddr{\varPubKeyAlice}{\varStatement}{\varPubKeyBob}{\varTime}$:
-    The locking script function lets Bob construct a Bitcoin script only spendable by Alice if she receives the discrete logrithm
-    $\varWit$ of $\varStatement \opEqNoQ \funGen{\varWit}$.
-    Additionally the function requires Bobs' public key $\varPubKeyBob$ and a timelock $\varTime$ (given as a block
+    \item $(\varScriptPubKey) \opFunResult \procLockAddr{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varTime}$:
+    The locking script function lets Bob construct a Bitcoin script only spendable by Alice if she receives the discrete logarithm
+    $\varWit$ of $\varStatement$ with $\varStatement \opEqNoQ \funGen{\varWit}$.
+    Additionally the function requires Bobs public key $\varPubKeyBob$ and a timelock $\varTime$ (given as a block
     number) as input which allows Bob to reclaim his funds after some time if the atomic swap was not
     completed successfully. The function will create and return a Bitcon script $\varScriptPubKey$ to which Bob can send funds using a P2SH transaction.
-    If Alice (knowing her secret key $\varSecKeyAlice$) acquires $\varWit$ with $\varStatement \opEqNoQ \funGen{\varWit}$ she can construct the complete secret key simply
-    by calculating $\varSecKey \opAssign \varSecKeyAlice \opAddScalar \varWit$. This construction is similiar although simpler to the lock described
-    by Malavolta et al. For a in-depth security analysis of this concept we refer the interested reader to their paper ~\cite{malavolta2019anonymous}. For
-    a concrete Bitcoin Script realizing this functionality see section~\ref{chp:implementation}.
+    If Alice (knowing her secret key $\varSecKeyAlice$) acquires $\varWit$, she can construct the complete secret key simply
+    by calculating $\varSecKey \opAssign \varSecKeyAlice \opAddScalar \varWit$.
+    This construction is similiar although simpler to the locking mechanism described by Malavolta et al. For a in-depth security analysis of this concept we refer the interested reader to their paper ~\cite{malavolta2019anonymous}.
+    For a concrete Bitcoin Script realizing this functionality see section~\ref{chp:implementation}.
     \item $\{ 1,0 \} \opFunResult \procVerifyLock{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varValue}{\varTime}$:
-    The lock verification algorithm takes as input Alices',
-    Bobs' public keys and the statement $\varStatement$. The function will compute the Bitcoin lock script 
+    The lock verification algorithm takes as input Alices,
+    Bobs public keys and the statement $\varStatement$. The function will compute the Bitcoin lock script
     $\varScriptPubKey$ as created by $\procLockAddrId$ and then check the Bitcoin blockchain if the value locked
     under the script equals $\varValue$.
     Upon successful verification the function returns 1, otherwise 0.
@@ -571,7 +592,7 @@ On the Bitcoin side we construct two DPT functions ($\procLockAddrId, \procVerif
 
 \subsection{Setup phase}
 
-We assume Alice owns Mimblewimble coins $\varCoinInp$ with a value of $\varValueMW$ and blinding factor $\varBlindingFactorAlice$ and Bob
+We assume Alice owns Mimblewimble coins $\varCoinInp$ with a value of $\varValueMw$ and blinding factor $\varBlindingFactorAlice$ and Bob
 Bitcoin locked in some UTXO $\varUTXO$ with a value of $\varValueBtc$ belonging to him.
 Before the protocol can start the two parties must agree on the value they want to swap, the exchange rate of the currencies and a time after which the swap should be canceled.
 After coming to an agreement the following variables are defined and known by both Alice and Bob:
@@ -588,19 +609,19 @@ We collect this shared variables in an initial swap state $\varSwpState$:
 In practice, we need to consider that exchange rates might fluctuate, furthermore timeouts have to be calculated separately for each chain.
 The problems with cross chain payments are discussed by Tairi et al. in~\cite{tairi2019a2l}, they propose to use a fixed exchange rate for each day and to use a real world timeout like one day and then calculate the specific block numbers by taking the average block time of the blockchain into account.
 In our setup we can also fix the exchange rate at the beginning of the protocol, which stays unchanged during protocol execution.
-If the exchange rate fluctuates and one party is negatively impacted he could still decide to stop being cooperative which means the coins would be returned to the original owners after the timeout.
+If the exchange rate fluctuates and one party is negatively impacted he or she could still decide to stop being cooperative which means the coins would be returned to the original owners after the timeout.
 
 We formalize the protocol $\procSetupSwapId$ in figure~\ref{fig:setup-swap}.
 The protocol takes as input the shared swap state $\varSwpState$ from both parties.
 From Alice her Mimblewimble input coin $\varCoinInp$ together with the required spending information $\varBlindingFactorAlice$ and the coins value $\varValueMw$.
-From Bob we require the UTXO $\varUTXO$ he wants to spend, similar to Alice he needs to provide spending secret $\varScriptSig$ and total value stored in the UTXO $\varValueBtc$.
+From Bob we require the UTXO $\varUTXO$ he wants to spend, similar to Alice he needs to provide spending secret $\varScriptSig$ and total value stored in the UTXO $\varValueBtc$, although this could also be read from the blockchain.
 
 The protocol starts by both parties creating and exchanging keys.
-Bob now creates two new Bitcoin outputs $\varUTXO_{lock}$ and $\varUTXO_{B}$, of which one is the locked Bitcoins which Alice might retrieve later (or Bob after time $\varTimeBTC has passed$), and the other Bobs change output. (Difference between what is stored in the input UTXO and what should be sent to Alice).
-After Bob has published the transaction sending value to the new outputs he will provide Alice with the statement $\varStatement$ und which the Bitcoins' are locked together with Alice's public key.
+Bob now creates two new Bitcoin outputs $\varUTXO_{lock}$ and $\varUTXO_{B}$, of which one is the locked Bitcoins which Alice might retrieve later (or Bob after time $\varTimeBTC$ has passed), and the other Bobs change output. (Difference between what is stored in the input UTXO and what should be sent to Alice).
+After Bob has published the transaction sending value to the new outputs he will provide Alice with the statement $\varStatement$ under which the Bitcoins' are locked together with Alice's public key.
 Alice can now verify that the funds on Bitcoin side are indeed correctly locked.
 After that she will collaborate with Bob to spend her Mimblewimble coins into an output shared by both parties.
-Immediately after both parties collaborate again to spend this shared coin back to Alice with a timelock of $\varTimeMW$.
+Immediately after, both parties collaborate again to spend this shared coin back to Alice with a timelock of $\varTimeMW$.
 It is immanent that Alice does not publish the first transaction (A -> AB) before the timelocked refund transaction (AB -> A) was signed, otherwise her funds are locked in the shared output without the possibility of refund.
 The setup protocol concludes with the funds locked up in both chains and ready to be swapped.
 
@@ -627,7 +648,7 @@ The setup protocol concludes with the funds locked up in both chains and ready t
         \< \< \< \< \varBtcTx \opFunResult \procBuildTransaction{\funArray{\varUTXO_{inp}}}{\funArray{\varUTXO_{lock}, \varUTXO_{B}}}{1}{\cnstEmptySet} \\
         \< \< \< \< \funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\funArray{\varScriptSig}} \\
         \< \< \< \< \procPublishBtc{\funArray{\funStar{\varBtcTx}}} \\
-        \< \sendmessageleftx{4}{\varStatement, \varPubKeyBob} \< \\
+        \< \sendmessageleftx{4}{\varStatement} \< \\
         \pcif \procVerifyLock{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varAmountBtc}{\cnstEmptySet} \opEqNoQ 0 \\
         \t \pcreturn 0 \< \< \< \< \\
         (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoinsId^1 \< \< \< \< \\
@@ -655,20 +676,20 @@ This function will verify that there is sufficient time to execute the atomic sw
 As input it takes a chain paramter $\varChain$ (in our case this could be either BTC or MW) and a block height $\varTime$.
 The routine will verify that the current height of the blockchain is marginally below $\varTime$.
 If this is the case it will return 1, or 0 otherwise.
-How much time exactly should be left for the function to return 1 is implementation specific.
+How much time exactly should be left for the function to return 1 is implementation specific, and could be set to for instance one day.
 We now define a protocol $\procExcSwapId$ to execute the Atomic Swap between some amount $\varAmountBtc$ on the Bitcoin side and some amount on the Mimblewimble side $\varAmountMW$.
-We assume the participants have successfully run the $\procSetupSwapId$ protocl and both know the updated swap state $\varSwpState$ as returned by the setup protocol.
-Alice (Mimblewimble side) needs to provide the part of the blinding factor $\funStar{\varBlindingFactorAlice}$ of the shared Mimblewimble coin $\varCoinShared$ as well as the swap state $\varSwpState$ as protocol inputs.
+We assume the participants have successfully run the $\procSetupSwapId$ protocol and both know the updated swap state $\varSwpState$ as returned by the setup protocol.
+Alice (Mimblewimble side) needs to provide her part of the blinding factor $\funStar{\varBlindingFactorAlice}$ of the shared Mimblewimble coin $\varCoinShared$ as well as the swap state $\varSwpState$ as protocol inputs.
 Bob (Bitcoin side) needs to provide his part of the blinding factor $\funStar{\varBlindingFactorBob}$ of the shared Mimblewimble coin $\varCoinShared$, the secret witness value $\varWit$ and the swap state $\varSwpState$ as protocol inputs.
 The protocol starts with the two parties creating a Mimblewimble transaction with the goal of spending the shared input coin to Bob.
-Bob will call the $\procAptRecvCoinsId$ routine to hide the secret $\varWit$ in his adapted signature $\varSigAptBob$, which Alice can retrieve from the pre-transaction.
-Note that at this point only Bobs know his original partial signature $\varSigBob$.
-Therefore they cooperate again in the $\procDAptFinTxId$ to compute the final Mimblewimble transaction transferring value from the shared coin $\varCoinShared$ to Bob.
+Bob will call the $\procAptRecvCoinsId$ routine to hide the secret $\varWit$ in his adapted signature $\varSigAptBob$, which Alice can retrieve from the final transaction.
+Note that at this point only Bob knows his original partial signature $\varSigBob$.
+Therefore they have to cooperate again in the $\procDAptFinTxId$ to compute the final Mimblewimble transaction transferring value from the shared coin $\varCoinShared$ to Bob.
 After Bob has published the transaction and is now in possession of the swapped funds on the Mimblewimble side, he will send the transaction to Alice (or Alice could retrieve it directly from the blockchain, if Bob would refuse to cooperate).
-Now Alice know all pieces needed to extract the secret witness $\varWit$:
+Now Alice knows all the pieces needed to extract the secret witness $\varWit$:
 \begin{itemize}
     \item The final signature $\varSigFin$.
-    \item Bobs adapted signature containing x $\varSigAptBob$.
+    \item Bobs adapted signature $\varSigAptBob$ previously verified to contain $\varWit$.
     \item Her and Bobs partial signature spending the shared coin $\varSigAliceBob$.
 \end{itemize}
 She can now call $\procExtWitId$ to retrieve $\varWit$ and compute the secret key $\varSecKey_{BTC}$ needed to unlock the Bitcoin funds.
@@ -712,3 +733,16 @@ The procedure returns 1 if the swap was successfully executed or 0 otherwise (wh
 \end{landscape}
 \restoregeometry
 
+\subsection{Refunding}
+
+If one party refused to cooperate or goes offline the coins will be returned to the original owner.
+On the Bitcoin side this is the case as Bob can simply spend the locked output with his private key $\varSecKeyBob$ after the timeout $\varTimeBTC$ has passed.
+He then can simply construct and sign a transaction spending the output to a new UTXO which is in his possession.
+He even could prepare this transaction upfront and broadcast it, once the the blocknumber hits $\varTimeBTC$ the transaction will become valid and get mined.
+Again we stress the importance of using appropriate timeouts, if a timeout is too short the swap might get cancelled if there are some delays, if the timeout is too long the funds might be locked for an unnessary amount of time.
+
+On the Mimblewimble side the second transaction spending the shared output back to Alice guarantees that her funds are returned to her after the timeout $\varTimeMW$ hits.
+Because of this line number 24 in the setup phase is very important.
+Alice here published both the locking of the funds and the refund at the same time.
+If she would publish the locking transaction first, Bob could refuse to cooperate, in which case the funds would stay in the locking output only retrievable if both parties cooperate.
+If the swap executes successful the refund transaction would get discarded by miners, as it then is no longer valid even after the timeout $\varTimeMW$.
