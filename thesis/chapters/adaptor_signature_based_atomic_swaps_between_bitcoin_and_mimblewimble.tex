@@ -42,8 +42,8 @@ connected to the blockchain. The $\procVerfTxId$ function is called by nodes (ac
     \end{itemize}
 \end{definition}
 
-We say a Mimblewimble Transaction Scheme is correct if the verification algorithm $\procVerfTxId$ returns 1 if and only if the the transaction is well
-balanced and its signature is valid. More formally:
+We say a Mimblewimble Transaction Scheme is correct if the verification algorithm $\procVerfTxId$ returns 1 if and only if the transaction is well balanced and its signature is valid.
+More formally:
 \begin{definition}[Transaction Scheme Correctness]
     \label{def:atom:tx-scheme-correctness}
     For any list of input coins $\funArray{\varCoinInp}$ with total value $\varValue$ and blinding factors
@@ -342,11 +342,13 @@ and use it as the public key for validating the transaction signature. If the si
             }
             \procedure[linenumbering]{$\procVerfTx{\varTx}$} {
             (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSignature,\varTime) \opFunResult \varTx \\
+            \pcif \funLength{\varOutputs} \opEqNoQ 0 \opOr \funLength{\varInputs} \opEqNoQ 0 \\
+            \t \pcreturn 0 \\
             \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \\
             \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut[\varIterator]} \opEqNoQ 0 \\
             \t \t \pcreturn 0 \\
             \varPubKey \opAssign \sum \varOutputs \opSub \sum \varInputs \\
-            \pcreturn \procVerf{\varSignature}{\varMsg}{\varPubKey}\\
+            \pcreturn \procVerf{\varSignature}{\varMsg}{\varPubKey}
             }
         \end{varwidth}
         }
@@ -354,7 +356,7 @@ and use it as the public key for validating the transaction signature. If the si
     \caption{Instantiation of Mimblewimble Transaction Scheme. \label{fig:inst-mw-tx}}
 \end{figure}
 
-\subsection{Extended Mimblewimble Transaction Scheme}
+\subsection{Extended Mimblewimble Transaction Scheme}\label{subsec:atom:ext-tx-scheme}
 
 So make the formalization of algorithms easier we define a protocol $\procDSignId$ which is a protocol between two-parties running the partial signature creation outlined in section~\ref{sec:sig:schnorr-inst}.
 Note that we assume that the secret keys as well as nonces are already given as a paramter (which is the case during the transaction protocol) therefore we don't need an additional call to $\procKeyGenPtId$.
@@ -547,21 +549,79 @@ He will send over $\varSigFin$ which lets both parties construct the valid trans
 \section{Security \& Correctness} \label{sec:atom:security}
 
 In this section we will prove the correctness and security of the instantiation described in~\ref{sec:atom:atomic-inst}.
-We start by proving Correctness for all three transaction schemes.
-We then continue by showing that all three security definitions (Inflation-Resistence, Theft-Resistence, Transaction indistinguishability) hold for all 3 transaction types.
+We start by proving \emph{Transaction Scheme Correctness}, \emph{Extended Transaction Scheme Correctness} and \emph{Adapted Transaction Scheme Correctness} for the three outlined transaction schemes $\varMWScheme, \varextMWScheme$ and $\varaptMWScheme$.
+We then continue by showing that all three security definitions (\emph{Inflation-Resistence}, \emph{Theft-Resistence}, \emph{Transaction indistinguishability}) hold again for all three transaction types.
 The general process will be to find a proof for the basic transaction protocol defined in~\ref{def:atom:mw-tx-scheme} and then reduce the extended and adapted case to the basic one.
 
 \subsection{Correctness} \label{subsec:atom:correctness}
 
-Correctness of the transaction scheme trivially follows from the correctness of the signature scheme used in the transaction protocol as well as the correctness of the range proof system, as those are the two verifications run by the $\procVerfTxId$ algorithm.
-For the correctness of the range proof system we refer the reader again to the bulletproof paper~\cite{bunz2018bulletproofs}.
-The instantiation of the Mimblewimble Transaction Scheme (defined in~\ref{def:atom:mw-tx-scheme} instantiated in figure~\ref{fig:inst-mw-tx}) uses a standard Two-Party Signature Scheme defined in~\ref{def:sig:two-party-sig} for which a correctness proof is available by Maxwell et al. in~\cite{maxwell2019simple}.
+We will argue \emph{Transaction Scheme Correctness} follows from the correctness of the commitment scheme $\varCommitScheme$, signature scheme $\varSigScheme$ as well as the correctness of the range proof system $\varProofSystem$ used in the transaction protocol.
+If the transaction was constructed correctly (that is by calling the procedures $\procSendCoinsId, \procRecvCoinsId, \procFinTxId$, the distributed variants $\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId$ or the adapted ones $\procAptRecvCoinsId, \procDAptFinTxId$ with valid inputs) it must follow that the final transaction has correct commitments, rangeproofs and a valid signature and $\procVerfTxId$ will therefore return 1.
+We construct the following theorem:
 
-For the Extended Mimblewimble Transaction Scheme defined in~\ref{def:atom:ext-mw-tx-scheme} and instantiated in figure~\ref{fig:ext-mim-tx-spend},~\ref{fig:ext-mim-tx-recv} and~\ref{fig:ext-mim-tx-fin} the same signature scheme is used, therefore we can make the same argument as for the previous case.
+\newtheorem{theorem}{Theorem}
 
-For the Adapted Extended Mimblewimble Transaction Scheme which we have defined in~\ref{def:atom:apt-ext-mw-tx-scheme} and have shown a instantiation in figure~\ref{fig:inst-apt-mw-tx-recv} and~\ref{fig:inst-apt-mw-tx-fin} the Two Party Fixed Witness Adaptor Schnorr Signature Scheme which we have defined in~\ref{def:sig:two-party-fixed-wit-apt-sig} is used.
-We have already shown correctness of this signature scheme in section~\ref{sec:sig:two-party-apt-security} by proofing that Adaptor Signature Correctness holds.
-Furthermore the scheme used a multiparty version of the bulletproof system for which we refer the reader to~\cite{klinec2020privacy}.
+\begin{theorem}\label{lem:atom:correctness}
+    \emph{Transaction Scheme Correctness}, \emph{Extended Transaction Scheme Correctness} or \emph{Adapted Transaction Scheme Correctness} for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$, $\varextMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ or $\varaptMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ holds if and only if the underlying Commitment Scheme $\varCommitScheme,$ Signature Scheme $\varSigScheme$ and Rangeproof system $\varProofSystem$ are correct.
+\end{theorem}
+
+\begin{proof}
+    We separate between the following cases in which a transaction is invalid and $\procVerfTxId$ should therefore return 0:
+    \begin{enumerate}
+        \item A coin commitment $\varCoin$ was not inside the valid range (for instance by providing negative number as input).
+        \item Ownership of an input coin provided in $\procSendCoinsId$ or $\procDSendCoinsId$ is not given.
+        \item The total output coins value exceeds the total input coins value.
+        \item $\procRecvCoinsId$ or $\procFinTxId$ were not called after the $\procSendCoinsId$ procedure. (Similar for the extended and adapted variant)
+        \item No input or no output coins were constructed.
+    \end{enumerate}
+
+    In the case of 1) a valid rangeproof $\varProof$ can not be constructed, except with neglible probability which follows from the definition of the rangeproof system~\ref{def:pre:rangeproof}
+    Therefore the verification of rangeproofs will fail in $\procVerfTxId$ with overwhealming probabilty.
+
+    Case 2) implies that a blinding factor $\varBlindingFactor$ for at least one of the input coins is not known to Alice.
+    Therefore the signing key $\varSecKeyAlice$ constructed in line 6 of the $\procSendCoinsId$ algorithm would not be a valid share for the final public key which is computed in the $\procVerfTxId$ algorithm at line 5.
+    From this we can conclude that Alice partial signature (computed in $\procFinTxId$ at line 6) would not be valid except with negligee probability and therefore the verification of the signature in $\procVerfTxId$ line 6 will fail with overwhelming probability.
+    The same argument holds in the case that the input keys are shared as in $\procDSendCoinsId$.
+
+    In 3) the transaction would not be well-balanced as defined in~\ref{def:pre:tx-well-balancedness}.
+    That means that the values inside the commitments of $\varOutputs$ and $\varInputs$ would not be cancelled out and a remainder of $\varRemainder$ would be part of $\varPubKey$ computed at line 6 of $\procVerfTxId$.
+    That is $\varPubKey$ would look like this
+    \[
+        \varPubKey \opEqNoQ \funGen{\funStar{\varBlindingFactorAlice} \opAddScalar \funStar{\varBlindingFactorBob} \opSub \sum\funArray{\varBlindingFactorAlice}} \opAddPoint \funGenH{\varRemainder}
+    \]
+    As in the definition of Pedersen commitments~\ref{def:pre:pedersen} we have required that $\varG$ and $\varH$ are adjacent generators, the discrete logarithm $\varX$ of $\varH$ such that $\varG \opEqNoQ \funGenH{\varX}$ is not known.
+    Therefore it follows that without knowing $\varX$ Alice and Bob will not be able to calculate a valid signature to $\varPubKey$ which in turn means that the verification of the signature in $\procVerfTxId$ will fail with overwhelming probability.
+
+    If $\procRecvCoinsId$ or $\procFinTxId$ (or the variants of them) are not called as implied in case 4) either Alice's or Bob's share of the signature will be missing from the final signature and again the signature verification in $\procVerfTxId$ will fail with overwhelming probability.
+
+    In case 5) the check in line 2 of $\procVerfTxId$ would fail and therefore return 0.
+
+    We have proven that in all cases for which a transaction is invalid $\procVerfTxId$ will return 0 and therefore the Theorem~\ref{lem:atom:correctness} must hold.
+\end{proof}
+
+In the remains to show that the commitment scheme, signature scheme and rangeproof system used in the given instantiations of the three transaction schemes are correct.
+
+All three transaction schemes use Pedersen Commitments as the commitment system $\varCommitScheme$, for which a security and correctness evaluation can be found in~\cite{pedersen1991non}.
+For the correctness of the rangeproof system $\varProofSystem$ we refer the reader again to the bulletproof paper~\cite{bunz2018bulletproofs}.
+The instantiation of the Mimblewimble Transaction Scheme $\varMWScheme$ (defined in~\ref{def:atom:mw-tx-scheme} instantiated in figure~\ref{fig:inst-mw-tx}) uses a standard Two-Party Signature Scheme $\varSigSchemeMP$ defined in~\ref{def:sig:two-party-sig} for which a correctness proof is available by Maxwell et al. in~\cite{maxwell2019simple}.
+
+For the Extended Mimblewimble Transaction Scheme $\varextMWScheme$ defined in~\ref{def:atom:ext-mw-tx-scheme} and instantiated in figure~\ref{fig:ext-mim-tx-spend},~\ref{fig:ext-mim-tx-recv} and~\ref{fig:ext-mim-tx-fin} the same signature scheme $\varSigSchemeMP$ and rangeproof system $\varProofSystem$ is used, therefore we can make the same argument as for the previous case to prove \emph{Extended Transaction Scheme Correctness} holds.
+
+For the Adapted Extended Mimblewimble Transaction Scheme $\varaptMWScheme$, which we have defined in~\ref{def:atom:apt-ext-mw-tx-scheme}, and have shown an instantiation in figure~\ref{fig:inst-apt-mw-tx-recv}, and~\ref{fig:inst-apt-mw-tx-fin}, the Two Party Fixed Witness Adaptor Schnorr Signature Scheme $\varSigSchemeApt$, which we have defined in~\ref{def:sig:two-party-fixed-wit-apt-sig}, is used.
+We have already shown correctness of this signature scheme in section~\ref{sec:sig:two-party-apt-security} by proofing that \emph{Adaptor Signature Correctness} holds.
+Furthermore the scheme used a multiparty version of the bulletproof system $\varMPRProofSystem$ for which we refer the reader to~\cite{klinec2020privacy} for a proof of its correctness.
+
+\subsection{Inflation Resistance} \label{subsec:atom:prf-inflation-resistance}
+
+TODO
+
+\subsection{Theft Resistance} \label{subsec:atom:prf-theft-resistance}
+
+TODO
+
+\subsection{Transaction indistinguishability} \label{subsec:atom:prf-tx-indistinguishability}
+
+TODO
 
 \section{Atomic Swap protocol}\label{sec:atom:atomic-swap}
 
@@ -590,7 +650,7 @@ On the Bitcoin side we construct two DPT functions ($\procLockAddrId, \procVerif
     Upon successful verification the function returns 1, otherwise 0.
 \end{itemize}
 
-\subsection{Setup phase}
+\subsection{Setup phase}\label{subsec:atom:setup}
 
 We assume Alice owns Mimblewimble coins $\varCoinInp$ with a value of $\varValueMw$ and blinding factor $\varBlindingFactorAlice$ and Bob
 Bitcoin locked in some UTXO $\varUTXO$ with a value of $\varValueBtc$ belonging to him.
@@ -668,7 +728,7 @@ The setup protocol concludes with the funds locked up in both chains and ready t
 \end{landscape}
 \restoregeometry
 
-\subsection{Execution Phase}
+\subsection{Execution Phase}\label{subsec:atom:exec}
 
 First we need to define an additional auxiliary function $\procVerifyTimeId$ with the following signature:
 \[ \{0,1\} \opFunResult \procVerifyTime{\varChain}{\varTime} \]
@@ -733,7 +793,7 @@ The procedure returns 1 if the swap was successfully executed or 0 otherwise (wh
 \end{landscape}
 \restoregeometry
 
-\subsection{Refunding}
+\subsection{Refunding}\label{subsec:atom:refund}
 
 If one party refused to cooperate or goes offline the coins will be returned to the original owner.
 On the Bitcoin side this is the case as Bob can simply spend the locked output with his private key $\varSecKeyBob$ after the timeout $\varTimeBTC$ has passed.

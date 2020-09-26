@@ -53,6 +53,7 @@
 \newcommand{\funTilde}[1]{\tilde{#1}}
 \newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
 \newcommand{\funArray}[1]{[#1]}
+\newcommand{\funLength}[1]{\styleFunction{len}(#1)}
 
 % variables
 \newcommand{\varScA}{\styleVariable{a}}
@@ -73,6 +74,7 @@
 \newcommand{\varTxBob}{\varTx_{\varBob}}
 \newcommand{\varExcessExp}{\styleVariable{e}}
 \newcommand{\varExcess}{\styleCal{E}}
+\newcommand{\varRemainder}{\styleVariable{rem}}
 \newcommand{\varExcessAlice}{\varExcess_{\varAlice}}
 \newcommand{\varExcessBob}{\varExcess_{\varBob}}
 \newcommand{\varKernel}{\styleVariable{K}}
@@ -108,7 +110,8 @@
 \newcommand{\varProofBobCarol}{\varProof_{\varBob\varCarol}}
 \newcommand{\varProofSystem}{\Pi}
 \newcommand{\varRProofSystemParam}[1]{\varProofSystem[#1]}
-\newcommand{\varMPRProofSystemParam}[1]{\varProofSystem_{mp}[#1]}
+\newcommand{\varMPRProofSystem}{\varProofSystem_{mp}}
+\newcommand{\varMPRProofSystemParam}[1]{\varMPRProofSystem[#1]}
 \newcommand{\varSignature}{\sigma}
 \newcommand{\varInput}{\styleVariable{I}}
 \newcommand{\varFundValue}{\styleVariable{p}}
