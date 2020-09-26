@@ -241,7 +241,7 @@ easy to request a payment.
 
 \subsection{Range Proofs} \label{sec:pre:rangeproof}
 
-\begin{definition}[Rangeproof System]
+\begin{definition}[Rangeproof System]\label{def:pre:rangeproof}
     A Rangeproofs system $\varRProofSystemParam{\varCommitScheme}$ with regards to a homomorphic commitment scheme $\varCommitScheme$ consists of a tupel of functions $(\procRProofSetupId, \procProofId, \procVerfProofId)$.
     \begin{itemize}
         \item $(\varLowerBound,\varUpperBound) \opFunResult \procRProofSetup{\varSecParam}{\varI}{\varJ}$: The rangeproof setup algorithm takes as input a security paramter $\varSecParam$ as well as two numbers
