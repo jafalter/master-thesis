@@ -40,6 +40,7 @@
 \newcommand{\cnstCorrectness}{\ensuremath{\styleFunction{Correctness\;}}}
 \newcommand{\cnstTransaction}{\tau}
 \newcommand{\cnstTrueorFalse}{\{1,0\}}
+\newcommand{\cnstSumOneToN}{\funSum{\varI \opEqNoQ 1}{\varN}}
 
 % functions
 \newcommand{\funHash}[1]{\cnstHash (#1)}
@@ -54,6 +55,7 @@
 \newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
 \newcommand{\funArray}[1]{[#1]}
 \newcommand{\funLength}[1]{\styleFunction{len}(#1)}
+\newcommand{\funSum}[2]{\sum_{#1}^{#2}}
 
 % variables
 \newcommand{\varScA}{\styleVariable{a}}
@@ -74,7 +76,7 @@
 \newcommand{\varTxBob}{\varTx_{\varBob}}
 \newcommand{\varExcessExp}{\styleVariable{e}}
 \newcommand{\varExcess}{\styleCal{E}}
-\newcommand{\varRemainder}{\styleVariable{rem}}
+\newcommand{\varRemainder}{\styleVariable{v_{rem}}}
 \newcommand{\varExcessAlice}{\varExcess_{\varAlice}}
 \newcommand{\varExcessBob}{\varExcess_{\varBob}}
 \newcommand{\varKernel}{\styleVariable{K}}
@@ -224,6 +226,7 @@
 \newcommand{\opAddScalar}{~+~}
 \newcommand{\opAssign}{~:=~}
 \newcommand{\opSub}{~-~}
+\newcommand{\opDiv}{~/~}
 \newcommand{\opNegative}[1]{-#1}
 \newcommand{\opTimesScalar}{~\cdot~}
 \newcommand{\opAddPoint}{~\cdot~}
@@ -247,6 +250,9 @@
 
 \newcommand{\procSetupId}{\styleFunction{keyGen}}
 \newcommand{\procSetup}[1]{\procSetupId(#1)}
+
+\newcommand{\procEUFNZOId}{\styleFunction{EUF-NZO}}
+\newcommand{\procEUFNZO}[1]{\procEUFNZOId_{\varCommitScheme,\varSigScheme}(#1)}
 
 \newcommand{\procSetupComId}{\styleFunction{setup}}
 \newcommand{\procSetupCom}[1]{\procSetupComId (#1)}
@@ -390,3 +396,12 @@
 
 \newcommand{\procExcSwapId}{\styleFunction{execSwap}}
 \newcommand{\procExcSwap}[4]{ \procExcSwapId \langle (#1,#3), (#1,#2,#4)\rangle }
+
+\newcommand{\procGameId}[2]{\styleFunction{Game}_{#1}^{#2}}
+\newcommand{\procGame}[3]{\procGameId{#1}{#2}(#3)}
+
+\newcommand{\procGameInfId}[1]{\procGameId{inf}{#1}}
+\newcommand{\procGameInf}[3]{\procGameInfId{#1}(#2,#3)}
+
+\newcommand{\procExtractXId}{\styleFunction{extract}}
+\newcommand{\procExtractX}[4]{\procExtractXId(#1,#2,#3,4)}

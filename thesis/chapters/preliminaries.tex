@@ -101,6 +101,28 @@ This can be achieved as follows:
 
 \end{definition}
 
+\begin{definition}[EUF-NZO]
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procEUFNZO{\varN}$} {
+            \varPublicParam \opFunResult \procSetupCom{\varSecParam} \\
+            \varSet \opFunResult \cnstEmptySet \\
+            \cnstSumOneToN (\varValue_i, \varBlindingFactor_i) \sample \cnstIntegersPrimeWithoutZero{*} \\
+            \cnstSumOneToN \varCommitment_i \opFunResult \procCommit{\varValue_i}{\varBlindingFactor_i} \\
+            \varPubKey \opFunResult \cnstSumOneToN \opAddPoint \varCommitment_i \\
+            (\varMsg, \varSignature) \opFunResult \cnstAdversary(\varPublicParam) \\
+            \pcreturn \varMsg \opNotIn \varSet \opAnd \procVerf{\varSignature}{\varMsg}{\varPubKey}
+            }
+            \procedure[linenumbering]{$\procSignOracle{\varMsg}{\varPubKey}$} {
+            \varSignature \opFunResult \procSign{\varMsg}{\varSecKey} \\
+            \varSet \opAssign \varSet \opUnion \{ \varMsg \} \\
+            \pcreturn \varSignature
+            }
+        \end{varwidth}
+        }
+    \end{center}
+\end{definition}
 
 \section{Bitcoin} \label{sec:pre:bitcoin}
 

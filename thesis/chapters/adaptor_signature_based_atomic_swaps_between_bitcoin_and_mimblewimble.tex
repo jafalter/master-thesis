@@ -161,12 +161,13 @@ creating new value in the total of $\funStar{\varValue} \opSub \varValue$.
     \fbox{
     \begin{varwidth}{\textwidth}
         \procedure[linenumbering]{$\procInflate{\varN}{\varValue}$} {
-        \varBlindingFactor \sample \cnstIntegersPrimeWithoutZero{\varN} \\
+        \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
         (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactor} \\
-        (\funStar{\varBlindingFactor}, \funStar{\varValue}) \opFunResult \cnstAdversary (\varCoinInp, \varValue) \\
-        (\varCoinOut, \varProof) \opFunResult \procCreateCoin{\funStar{\varValue}}{\funStar{\varBlindingFactor}} \\
-        \varTx \opFunResult\cnstAdversary (\varCoinInp, \varValue, \varCoinOut) \\
-        \pcreturn \funStar{\varValue} \opGreaterThen \varValue \opAnd \procVerfTx{\varTx} \opEqNoQ 1 \opAnd \varTx.out \opEqNoQ \funArray{\varCoinOut} \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
+        (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
+        (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \varPreTx) \opFunResult \cnstAdversary(\varPreTx) \\
+        \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
+        \pcreturn \funStar{\varValue} \opGreaterThen \varValue \opAnd \varCoinOut \opEqNoQ \procCommit{\funStar{\varValue}}{\funStar{\varBlindingFactorBob}} \opAnd \procVerfTx{\varTx} \opEqNoQ 1 \\
+        \opAnd \varCoinOut \opIn \varTx.out \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
         }
     \end{varwidth}
     }
@@ -237,7 +238,7 @@ If the adversary manages to choose the correct value of $\varB$ he or she has wo
 \begin{definition}[Transaction indistinguishability] \label{def:atom:tx-indisting}
     We say Transaction Indistinguishability holds for a Mimblewimble Transaction System $\varMWScheme$ if for a PPT adversary $\cnstAdversary$ with access to the transaction oracle $\procOracleTxId$ a
     security parameter $\varN$ and any max value $\varValueMax$ the following must hold:
-    \[ \prob{\procTxInd{\varN}{\varValueMax} \opEq 1} \opSmEq 0.5 \opAddScalar \funNegl{\varN} \]
+    \[ \prob{\procTxInd{\varN}{\varValueMax} \opEqNoQ 1} \opSmEq 0.5 \opAddScalar \funNegl{\varN} \]
 \end{definition}
 
 
@@ -613,7 +614,112 @@ Furthermore the scheme used a multiparty version of the bulletproof system $\var
 
 \subsection{Inflation Resistance} \label{subsec:atom:prf-inflation-resistance}
 
-TODO
+We will prove the Inflation Resistance property holds for the Mimblewimble Transaction Protocol as seen in figure~\ref{fig:inst-mw-tx} by providing a game-based reduction to the EUF-NZO security
+property of the additive homomorphic commitment scheme $\varCommitScheme$ and signature scheme $\varSigScheme$.
+
+\begin{theorem}\label{theo:atom:infl-resistence}
+\emph{Inflation Resistence} holds for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ if and only if the underlying Commitment Scheme $\varCommitScheme$, Signature Scheme $\varSigScheme$ and Rangeproof system $\varProofSystem$ are correct and additionally the compatible signature scheme $\varSigScheme$ and commitment scheme $\varCommitScheme$ are EUF-NZO secure.
+\end{theorem}
+
+\begin{proof}
+    We will provide a stepwise reduction from the $\procInflateId$ game to EUF-NZO.
+    In each step we will provide a modified game which the adversary $\cnstAdversary$ will be able to win given the assumption that he can win the previous game until we arrive at a contraction.
+    The first game $\procGameInfId{0}$ is very similiar to the original $\procInflateId$ game, just that we replace $\procCommitId$ with it's definition for Pedersen Commitments.
+
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procGameInf{0}{\varN}{\varValue}$} {
+            \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
+            (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactor} \\
+            (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
+            (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \varPreTx) \opFunResult \cnstAdversary(\varPreTx) \\
+            \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
+            \pcreturn \funStar{\varValue} \opGreaterThen \varValue \opAnd \varCoinOut \opEqNoQ \funGenH{\funStar{\varValue}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \opAnd \procVerfTx{\varTx} \opEqNoQ 1 \\
+            \opAnd \varCoinOut \opIn \varTx.out \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
+            }
+        \end{varwidth}
+        }
+    \end{center}
+
+    In $\procGameInfId{1}$ we reduce the winning condition, we require the range proof of the output coins to be valid and the final signature to be valid which both follow from the instantiation of $\procVerfId$.
+    We also move the computation of the final public key $\varPubKey$ from $\procVerfId$ inside the game.
+
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procGameInf{1}{\varN}{\varValue}$} {
+            \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
+            (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactorAlice} \\
+            (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
+            (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \varPreTx) \opFunResult \cnstAdversary(\varPreTx) \\
+            \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
+            \pcforeach \varTx.\varOutputs \textit{ as } (\varIterator => \varCoin_i) \\
+            \t \pcif \procVerfProof{\varTx.\varProofs[\varIterator]}{\varCoin_i} \opEqNoQ 0 \\
+            \t \t \pcreturn 0 \\
+            \varPubKey \opAssign \cnstSumOneToN \varTx.\varOutputs \opSub \cnstSumOneToN \varTx.\varInputs \\
+            \pcreturn \funStar{\varValue} \opGreaterThen \varValue \opAnd \varCoinOut \opEqNoQ \funGenH{\funStar{\varValue}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \procVerf{\varTx.\varSignature}{\varTx.\varMsg}{\varPubKey} \\
+            \opAnd \varCoinOut \opIn \varTx.out \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
+            }
+        \end{varwidth}
+        }
+    \end{center}
+
+    Now given the winning condition that the output coin $\varCoinOut$ has to be part of the outputcoin list $\varOutputs$ and the input coin list $\varInputs$ has to be a single element list with the input coin $\varCoinInp$, we can modify line 6 of the game as follows: (Assuming $\varCoinOut$ is at index 0 of the output coin list, but it could also be any other index)
+    \[ \varPubKey \opAssign \varCoinOut \funSum{\varIterator \opAssign 1}{\varN} \varTx.\varOutputs \opSub \varCoinInp \]
+    Given the construction of Pedersen Commitments from definition~\ref{def:pre:pedersen} and the construction of $\varCoinOut$ and $\varCoinInp$ we can also write the equation like this:
+    \[ \varPubKey \opAssign \funGenH{\funStar{\varValue}} \opAddPoint \funGen{\varBlindingFactorBob} \funSum{\varIterator \opAssign 1}{\varN} \varTx.\varOutputs \opSub \funGenH{\varValue} \opAddPoint \funGen{\varBlindingFactorAlice} \]
+    We also have the winning condition of $\funStar{\varValue} \opGreaterThen \varValue$, we furthermore can assume that none of the additional output values created by the adversary are of negative value, as this would mean their rangeproofs can not be valid.
+    Therefore there has to exist some remainder $\varRemainder \opAssign \funStar{\varValue} \opAddScalar \funSum{\varIterator \opAssign 1}{\varN} v_i \opSub v$.
+    Now we can write the equation like this:
+    \[  \varPubKey \opAssign \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funSum{\varIterator \opAssign 1}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint \funGenH{\varRemainder} \]
+    Again from the definition of Pedersen commitments~\ref{def:pre:pedersen} we know that $\varH$ and $\varG$ are adjacent generators so there exists and unknown variable $\varX$ such that $\varH \opEqNoQ \funGen{x}$.
+    Therefore we arrive at the following equation which we will use in $\procGameInfId{2}$
+    \[  \varPubKey \opAssign \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funSum{\varIterator \opAssign 1}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint \funGen{\varRemainder \opAddScalar \varX} \]
+
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procGameInf{2}{\varN}{\varValue}$} {
+            \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
+            (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactorAlice} \\
+            (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
+            (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \funArray{\varBlindingFactor_i}, \funArray{\varCoin_i}, \varPreTx) \opFunResult \cnstAdversary(\varPreTx) \\
+            \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
+            \pcforeach \varTx.\varOutputs \textit{ as } (\varIterator => \varCoin_i) \\
+            \t \pcif \procVerfProof{\varTx.\varProofs[\varIterator]}{\varCoin_i} \opEqNoQ 0 \\
+            \t \t \pcreturn 0 \\
+            \pcif \varValue \opGreaterThen \funStar{\varValue} \\
+            \t \pcreturn 0 \\
+            \varPubKey \opAssign \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funSum{\varIterator \opAssign 1}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint \funGen{\varRemainder \opAddScalar \varX} \\
+            \pcreturn \varCoinOut \opEqNoQ \funGenH{\funStar{\varValue}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \procVerf{\varTx.\varSignature}{\varTx.\varMsg}{\varPubKey} \\
+            \opAnd \varCoinOut \opIn \varTx.out \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
+            }
+        \end{varwidth}
+        }
+    \end{center}
+
+    If the adversary wins $\procGameInfId{2}$ the challenger (playing Alice) and the adversary (playing Bob) were able to construct the signature $\varSignature$ under the public key $\varPubKey$.
+    That means the exponents $\funStar{\varBlindingFactorBob}$, $\funStar{\varBlindingFactor_i}$, $\varBlindingFactorAlice$, $\varRemainder$ and $\varX$ have to be known by either one of the two parties.
+    Here is where we arrive at a contradiction as by definition of the Pedersen Commitment~\ref{def:pre:pedersen} $\varG$ and $\varH$ have to be adjacent generators, implying $\varX$ cannot be known and therefore breaking the discrete logarithm assumption from definition \ref{def:pre:discretelog}.
+    From $\procGameInfId{2}$ here is how Bob would able to extract x, breaking the discrete logarithm of $\varH \opAssign \funGen{x}$ of the Pedersen commitment:
+    From the instantion of $\procFinTxId$ we know the final signature valid under $\varPubKey$ is computed by calling $\procFinSig{\varSigAlice}{\varSigBob}$ where $\varSigAlice$ is the partial signature of the challenger and $\varSigBob$ the one of Bob.
+    We recall the construction of $\procSignPrtId$ in figure~\ref{fig:twoparty-schnorr}
+    \[ \varS \opAssign \varNonce \opAddScalar \varSecKey \opTimesScalar \varSchnorrChallenge \\ \]
+    In order for Bobs partial signature to be valid $\varSecKey$ has to be constructed like $\varSecKey \opAssign \funStar{\varBlindingFactorBob} \opAddScalar \sum \varBlindingFactor_i \opAddScalar \varRemainder \opAddScalar \varX$.
+
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procExtractX{\varSigBob}{\funStar{\varBlindingFactorBob}}{\funArray{\varBlindingFactor_i}}{\varRemainder}{\varNonceBob}{\varSchnorrChallenge}$} {
+            (\varSBob, \varRandBob) \opFunResult \varSigBob \\
+            \varSecKey \opFunResult (\varSBob \opSub \varNonceBob) \opDiv \varSchnorrChallenge \\
+            \pcreturn \varSecKey \opSub \funStar{\varBlindingFactorBob} \opSub \funArray{\varBlindingFactor_i} \opSub \varRemainder \\
+            }
+        \end{varwidth}
+        }
+    \end{center}
+\end{proof}
 
 \subsection{Theft Resistance} \label{subsec:atom:prf-theft-resistance}
 
