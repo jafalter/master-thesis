@@ -80,6 +80,7 @@
 \newcommand{\varExcessAlice}{\varExcess_{\varAlice}}
 \newcommand{\varExcessBob}{\varExcess_{\varBob}}
 \newcommand{\varKernel}{\styleVariable{K}}
+\newcommand{\varSecret}{\styleVariable{S}}
 \newcommand{\varSecKey}{\styleVariable{sk}}
 \newcommand{\varSecKeyAlice}{\varSecKey_{\varAlice}}
 \newcommand{\varSecKeyBob}{\varSecKey_{\varBob}}
@@ -256,6 +257,7 @@
 
 \newcommand{\procSetupComId}{\styleFunction{setup}}
 \newcommand{\procSetupCom}[1]{\procSetupComId (#1)}
+\newcommand{\procSetupComPed}[2]{\procSetupComId (#1,#2)}
 
 \newcommand{\procCommitId}{\styleFunction{commit}}
 \newcommand{\procCommit}[2]{\procCommitId(#1, #2)}
@@ -405,3 +407,6 @@
 
 \newcommand{\procExtractXId}{\styleFunction{extract}}
 \newcommand{\procExtractX}[4]{\procExtractXId(#1,#2,#3,4)}
+
+\newcommand{\procDiscreteLogGameId}{\styleFunction{gameDLog}}
+\newcommand{\procDiscreteLogGame}[1]{\styleFunction{#1}}

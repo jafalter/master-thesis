@@ -95,33 +95,16 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
 
 This can be achieved as follows:
     $\varCommitSpace_{\varPublicParam} \opAssign \cnstGroup$ of order $\varPrime \opSeperate \varInputSpace_{\varPublicParam} \opSeperate \varRandSpace_{\varPublicParam} \opAssign \cnstIntegersPrime{\varPrime}$.
-    the procedures $(\procSetupId, \procCommitId)$ are then instantiated as:
-    \[ \procSetup{\varSecParam} \opAssign \varG, \varH \sample \cnstGroup\]
-    \[ \procCommit{\varInput}{\varNonce} \opAssign \funGen{\varNonce} \funGenH{\varInput} \]
+    the procedures $(\procSetupComId, \procCommitId)$ are then instantiated as:
+    \begin{gather*}
+        \procSetupComPed{\varG}{\varH} \opAssign \varG, \varH \opFunResult (\varG, \varH)\\
+        \procCommit{\varInput}{\varNonce} \opAssign \funGen{\varNonce} \funGenH{\varInput}\\
+    \end{gather*}
+    An instantiation of the pedersen commitment scheme must pick two adjacent generators $\varG$, $\varH$ for the setup to be secure in terms of hiding and binding.
+    Formally adjacent means that there exists a hard relation between $\varG$ and $\varH$ in terms of the discrete logarithm~\ref{def:pre:discretelog}.
+That means no $\varX$ is known such that $\varH \opEqNoQ \funGen{x}$.
+    In practice this is often achieved by hashing $\varG$ and using the hash output as $\varH$.
 
-\end{definition}
-
-\begin{definition}[EUF-NZO]
-    \begin{center}
-        \fbox{
-        \begin{varwidth}{\textwidth}
-            \procedure[linenumbering]{$\procEUFNZO{\varN}$} {
-            \varPublicParam \opFunResult \procSetupCom{\varSecParam} \\
-            \varSet \opFunResult \cnstEmptySet \\
-            \cnstSumOneToN (\varValue_i, \varBlindingFactor_i) \sample \cnstIntegersPrimeWithoutZero{*} \\
-            \cnstSumOneToN \varCommitment_i \opFunResult \procCommit{\varValue_i}{\varBlindingFactor_i} \\
-            \varPubKey \opFunResult \cnstSumOneToN \opAddPoint \varCommitment_i \\
-            (\varMsg, \varSignature) \opFunResult \cnstAdversary(\varPublicParam) \\
-            \pcreturn \varMsg \opNotIn \varSet \opAnd \procVerf{\varSignature}{\varMsg}{\varPubKey}
-            }
-            \procedure[linenumbering]{$\procSignOracle{\varMsg}{\varPubKey}$} {
-            \varSignature \opFunResult \procSign{\varMsg}{\varSecKey} \\
-            \varSet \opAssign \varSet \opUnion \{ \varMsg \} \\
-            \pcreturn \varSignature
-            }
-        \end{varwidth}
-        }
-    \end{center}
 \end{definition}
 
 \section{Bitcoin} \label{sec:pre:bitcoin}

@@ -614,17 +614,20 @@ Furthermore the scheme used a multiparty version of the bulletproof system $\var
 
 \subsection{Inflation Resistance} \label{subsec:atom:prf-inflation-resistance}
 
-We will prove the Inflation Resistance property holds for the Mimblewimble Transaction Protocol as seen in figure~\ref{fig:inst-mw-tx} by providing a game-based reduction to the EUF-NZO security
-property of the additive homomorphic commitment scheme $\varCommitScheme$ and signature scheme $\varSigScheme$.
+We will prove the Inflation Resistance property holds for the Mimblewimble Transaction Protocol as seen in figure~\ref{fig:inst-mw-tx} by providing a game-based reduction to the discrete logarithm assumption from definition~\ref{def:pre:discretelog}.
+Furthermore for the proof to be valid we must assume that the signature scheme $\varSigScheme$ used in the transaction scheme is correct and EUF-CMA secure.
+Apart from that we also require the employed rangeproof system $\varProofSystem$ and additive homomorphic commitment scheme $\varCommitScheme$ to be correct, as well as the commitment scheme to a additivie homomorphic one (as defined in definition~\ref{def:pre:homo-com}) which is secure under hiding and binding.
+Lastly the rangeproof system has be setup such that proofs are for a strictly positive range, such that commitments to negative numbers are dissallowed.
+From this we arrive at the following Theorem:
 
 \begin{theorem}\label{theo:atom:infl-resistence}
-\emph{Inflation Resistence} holds for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ if and only if the underlying Commitment Scheme $\varCommitScheme$, Signature Scheme $\varSigScheme$ and Rangeproof system $\varProofSystem$ are correct and additionally the compatible signature scheme $\varSigScheme$ and commitment scheme $\varCommitScheme$ are EUF-NZO secure.
+\emph{Inflation Resistence} holds for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ if and only if the underlying additive homomorphic commitment Scheme $\varCommitScheme$, signature scheme $\varSigScheme$ and rangeproof system $\varProofSystem$ with range $[x,y]$ of $x >= 0, y > 0$ are correct, the signature scheme is EUF-CMA secure, and the commitment fulfills hiding and binding.
 \end{theorem}
 
 \begin{proof}
-    We will provide a stepwise reduction from the $\procInflateId$ game to EUF-NZO.
+    We will provide a stepwise reduction from the $\procInflateId$ game to the discrete logarithm assumption.
     In each step we will provide a modified game which the adversary $\cnstAdversary$ will be able to win given the assumption that he can win the previous game until we arrive at a contraction.
-    The first game $\procGameInfId{0}$ is very similiar to the original $\procInflateId$ game, just that we replace $\procCommitId$ with it's definition for Pedersen Commitments.
+    The first game $\procGameInfId{0}$ is very similar to the original $\procInflateId$ game, just that we replace $\procCommitId$ with its implementation for pedersen commitments.
 
     \begin{center}
         \fbox{
@@ -642,8 +645,8 @@ property of the additive homomorphic commitment scheme $\varCommitScheme$ and si
         }
     \end{center}
 
-    In $\procGameInfId{1}$ we reduce the winning condition, we require the range proof of the output coins to be valid and the final signature to be valid which both follow from the instantiation of $\procVerfId$.
-    We also move the computation of the final public key $\varPubKey$ from $\procVerfId$ inside the game.
+    In $\procGameInfId{1}$ we reduce the winning condition, we require the range proof of the output coins to be valid and the final signature to be valid which both follow from the instantiation of $\procVerfTxId$.
+    We also move the computation of the final public key $\varPubKey$ from $\procVerfTxId$ inside the game.
 
     \begin{center}
         \fbox{
@@ -658,23 +661,23 @@ property of the additive homomorphic commitment scheme $\varCommitScheme$ and si
             \t \pcif \procVerfProof{\varTx.\varProofs[\varIterator]}{\varCoin_i} \opEqNoQ 0 \\
             \t \t \pcreturn 0 \\
             \varPubKey \opAssign \cnstSumOneToN \varTx.\varOutputs \opSub \cnstSumOneToN \varTx.\varInputs \\
-            \pcreturn \funStar{\varValue} \opGreaterThen \varValue \opAnd \varCoinOut \opEqNoQ \funGenH{\funStar{\varValue}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \procVerf{\varTx.\varSignature}{\varTx.\varMsg}{\varPubKey} \\
+            \pcreturn \funStar{\varValue} \opGreaterThen \varValue \opAnd \varCoinOut \opEqNoQ \funGenH{\funStar{\varValue}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAnd \procVerf{\varTx.\varSignature}{\varTx.\varMsg}{\varPubKey} \opEqNoQ 1 \\
             \opAnd \varCoinOut \opIn \varTx.out \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
             }
         \end{varwidth}
         }
     \end{center}
 
-    Now given the winning condition that the output coin $\varCoinOut$ has to be part of the outputcoin list $\varOutputs$ and the input coin list $\varInputs$ has to be a single element list with the input coin $\varCoinInp$, we can modify line 6 of the game as follows: (Assuming $\varCoinOut$ is at index 0 of the output coin list, but it could also be any other index)
-    \[ \varPubKey \opAssign \varCoinOut \funSum{\varIterator \opAssign 1}{\varN} \varTx.\varOutputs \opSub \varCoinInp \]
+    Now given the winning condition that the output coin $\varCoinOut$ has to be part of the output coin list $\varOutputs$ and the input coin list $\varInputs$ has to be a single element list with the input coin $\varCoinInp$, we can modify line 6 of the game as follows: (Assuming $\varCoinOut$ is at index 0 of the output coin list, but it could also be any other index)
+    \[ \varPubKey \opAssign \varCoinOut \opAddPoint \funSum{\varIterator \opAssign 1}{\varN} \varTx.\varOutputs \opAddPoint \varCoinInp^{-1} \]
     Given the construction of Pedersen Commitments from definition~\ref{def:pre:pedersen} and the construction of $\varCoinOut$ and $\varCoinInp$ we can also write the equation like this:
     \[ \varPubKey \opAssign \funGenH{\funStar{\varValue}} \opAddPoint \funGen{\varBlindingFactorBob} \funSum{\varIterator \opAssign 1}{\varN} \varTx.\varOutputs \opSub \funGenH{\varValue} \opAddPoint \funGen{\varBlindingFactorAlice} \]
-    We also have the winning condition of $\funStar{\varValue} \opGreaterThen \varValue$, we furthermore can assume that none of the additional output values created by the adversary are of negative value, as this would mean their rangeproofs can not be valid.
+    We also have the winning condition of $\funStar{\varValue} \opGreaterThen \varValue$, we furthermore can assume that none of the additional output values in $\varOutputs$ potentially created by the adversary are of negative value, as this would mean their rangeproofs cannot be valid.
     Therefore there has to exist some remainder $\varRemainder \opAssign \funStar{\varValue} \opAddScalar \funSum{\varIterator \opAssign 1}{\varN} v_i \opSub v$.
     Now we can write the equation like this:
     \[  \varPubKey \opAssign \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funSum{\varIterator \opAssign 1}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint \funGenH{\varRemainder} \]
-    Again from the definition of Pedersen commitments~\ref{def:pre:pedersen} we know that $\varH$ and $\varG$ are adjacent generators so there exists and unknown variable $\varX$ such that $\varH \opEqNoQ \funGen{x}$.
-    Therefore we arrive at the following equation which we will use in $\procGameInfId{2}$
+    Again from the definition of pedersen commitments~\ref{def:pre:pedersen} we know that $\varH$ and $\varG$ are adjacent generators so there exists an unknown variable $\varX$ such that $\varH \opEqNoQ \funGen{x}$.
+    Therefore we arrive at the following equation which we will use in $\procGameInfId{2}$:
     \[  \varPubKey \opAssign \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funSum{\varIterator \opAssign 1}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint \funGen{\varRemainder \opAddScalar \varX} \]
 
     \begin{center}
@@ -699,19 +702,39 @@ property of the additive homomorphic commitment scheme $\varCommitScheme$ and si
         }
     \end{center}
 
-    If the adversary wins $\procGameInfId{2}$ the challenger (playing Alice) and the adversary (playing Bob) were able to construct the signature $\varSignature$ under the public key $\varPubKey$.
-    That means the exponents $\funStar{\varBlindingFactorBob}$, $\funStar{\varBlindingFactor_i}$, $\varBlindingFactorAlice$, $\varRemainder$ and $\varX$ have to be known by either one of the two parties.
-    Here is where we arrive at a contradiction as by definition of the Pedersen Commitment~\ref{def:pre:pedersen} $\varG$ and $\varH$ have to be adjacent generators, implying $\varX$ cannot be known and therefore breaking the discrete logarithm assumption from definition \ref{def:pre:discretelog}.
-    From $\procGameInfId{2}$ here is how Bob would able to extract x, breaking the discrete logarithm of $\varH \opAssign \funGen{x}$ of the Pedersen commitment:
-    From the instantion of $\procFinTxId$ we know the final signature valid under $\varPubKey$ is computed by calling $\procFinSig{\varSigAlice}{\varSigBob}$ where $\varSigAlice$ is the partial signature of the challenger and $\varSigBob$ the one of Bob.
-    We recall the construction of $\procSignPrtId$ in figure~\ref{fig:twoparty-schnorr}
-    \[ \varS \opAssign \varNonce \opAddScalar \varSecKey \opTimesScalar \varSchnorrChallenge \\ \]
-    In order for Bobs partial signature to be valid $\varSecKey$ has to be constructed like $\varSecKey \opAssign \funStar{\varBlindingFactorBob} \opAddScalar \sum \varBlindingFactor_i \opAddScalar \varRemainder \opAddScalar \varX$.
+    If the adversary wins $\procGameInfId{2}$ the challenger (playing Alice) and the adversary (playing Bob) were able to construct a valid signature $\varSignature$ under the public key $\varPubKey$.
+    That means the exponents $\funStar{\varBlindingFactorBob}$, $\funStar{\varBlindingFactor_i}$, $\varBlindingFactorAlice$, $\varRemainder$ and $\varX$ have to be known by at least one of the two parties.
+    Here is where we arrive at a contradiction as by definition of the pedersen Commitment~\ref{def:pre:pedersen} $\varG$ and $\varH$ have to be adjacent generators, implying $\varX$ cannot be known and therefore breaking the discrete logarithm assumption from definition~\ref{def:pre:discretelog}.
 
+
+    In order to break the discrete logarithm of a cyclic group $\cnstGroup_\varPrime$ a PPT adversary $\cnstAdversary$ would have to win the following game:
     \begin{center}
         \fbox{
         \begin{varwidth}{\textwidth}
-            \procedure[linenumbering]{$\procExtractX{\varSigBob}{\funStar{\varBlindingFactorBob}}{\funArray{\varBlindingFactor_i}}{\varRemainder}{\varNonceBob}{\varSchnorrChallenge}$} {
+            \procedure[linenumbering]{$\procDiscreteLogGame{\varPrime}$} {
+            \varG \sample \cnstGroup_\varPrime \\
+            \varX \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \varPubKey \opFunResult \funGen{\varX} \\
+            \funStar{\varX} \opFunResult \cnstAdversary (\varPubKey) \\
+            \pcreturn \varPubKey \opEqNoQ \funGen{\funStar{\varX}}
+            }
+        \end{varwidth}
+        }
+    \end{center}
+    We will now build an extractor function $\procExtractXId$ with which an adversary winning the $\procGameInfId{2}$ game would be able to always win the $\procDiscreteLogGameId$.
+    From the instantiation of $\procFinTxId$ we know the final signature valid under $\varPubKey$ is computed by calling $\procFinSig{\varSigAlice}{\varSigBob}$ where $\varSigAlice$ is the partial signature of the challenger and $\varSigBob$ the one of adversary playing Bob.
+    We recall the construction of $\procSignPrtId$ in figure~\ref{fig:twoparty-schnorr}
+    \[ \varS \opAssign \varNonce \opAddScalar \varSecKey \opTimesScalar \varSchnorrChallenge \\ \]
+    In order for Bobs partial signature to be valid $\varSecKey$ (which is required for the adversary to win the game) it would have to be constructed like $\varSecKey \opAssign \funStar{\varBlindingFactorBob} \opAddScalar \sum \varBlindingFactor_i \opAddScalar \varRemainder \opAddScalar \varX$.
+    The adversary knowing $\varSigBob, \funStar{\varBlindingFactorBob}$, $\sum \varBlindingFactor_i$ and $\varRemainder$, as well as his nonce $\varNonceBob$ chosen during the signature creation, can now extract $\varX$ from the final signature as follows:
+    We collect the adversaries chosen parameters in a object $\varSecret$.
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procExtractX{\varMsg}{\varSignature}{\varPubKey}{\varSecret}$} {
+            (\varS, \varRand) \opFunResult \varSignature \\
+            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc}
+            (\varSigBob,\funStar{\varBlindingFactorBob},\funArray{\varBlindingFactor_i},\varRemainder,\varNonceBob) \opFunResult \varSecret \\
             (\varSBob, \varRandBob) \opFunResult \varSigBob \\
             \varSecKey \opFunResult (\varSBob \opSub \varNonceBob) \opDiv \varSchnorrChallenge \\
             \pcreturn \varSecKey \opSub \funStar{\varBlindingFactorBob} \opSub \funArray{\varBlindingFactor_i} \opSub \varRemainder \\
