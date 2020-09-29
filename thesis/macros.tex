@@ -80,6 +80,9 @@
 \newcommand{\varExcessAlice}{\varExcess_{\varAlice}}
 \newcommand{\varExcessBob}{\varExcess_{\varBob}}
 \newcommand{\varKernel}{\styleVariable{K}}
+\newcommand{\varSecret}{\styleVariable{S}}
+\newcommand{\varRProofParams}{\styleVariable{ps}}
+\newcommand{\varCommitParams}{\styleVariable{rs}}
 \newcommand{\varSecKey}{\styleVariable{sk}}
 \newcommand{\varSecKeyAlice}{\varSecKey_{\varAlice}}
 \newcommand{\varSecKeyBob}{\varSecKey_{\varBob}}
@@ -254,8 +257,9 @@
 \newcommand{\procEUFNZOId}{\styleFunction{EUF-NZO}}
 \newcommand{\procEUFNZO}[1]{\procEUFNZOId_{\varCommitScheme,\varSigScheme}(#1)}
 
-\newcommand{\procSetupComId}{\styleFunction{setup}}
+\newcommand{\procSetupComId}{\styleFunction{setupCom}}
 \newcommand{\procSetupCom}[1]{\procSetupComId (#1)}
+\newcommand{\procSetupComPed}[2]{\procSetupComId (#1,#2)}
 
 \newcommand{\procCommitId}{\styleFunction{commit}}
 \newcommand{\procCommit}[2]{\procCommitId(#1, #2)}
@@ -403,5 +407,8 @@
 \newcommand{\procGameInfId}[1]{\procGameId{inf}{#1}}
 \newcommand{\procGameInf}[3]{\procGameInfId{#1}(#2,#3)}
 
-\newcommand{\procExtractXId}{\styleFunction{extract}}
-\newcommand{\procExtractX}[4]{\procExtractXId(#1,#2,#3,4)}
+\newcommand{\procExtractXId}{\styleFunction{extractDLog}}
+\newcommand{\procExtractX}[4]{\procExtractXId(#1,#2,#3,#4)}
+
+\newcommand{\procDiscreteLogGameId}{\styleFunction{gameDLog}}
+\newcommand{\procDiscreteLogGame}[1]{\styleFunction{\procDiscreteLogGameId}(#1)}

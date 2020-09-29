@@ -25,13 +25,13 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
 \end{definition}
 
 \begin{definition}[Discrete Logarithm]\label{def:pre:discretelog}
-    We define the discirte logarithm in a group $\cnstGroup$ of a number $\varN$ as the number $\varM$ such that for the groups generator $\varG$ the following holds:
+    We define the discrete logarithm in a group $\cnstGroup$ of a number $\varN$ as the number $\varM$ such that for the groups generator $\varG$ the following holds:
     \[ \funGen{\varM} \opEqNoQ \varN \]
     The discrete logarithm is a hard relation as defined in~\ref{def:pre:hard-relation}.
 \end{definition}
 
 \begin{definition}[Signature Scheme]\label{def:pre:signature-scheme}
-    A signature scheme $\varSigScheme$ is a tuple of algorithms $(\procSetupId \opSeperate \procSignId \opSeperate \procVerfId)$ defined as follows: \cite{goldwasser1988digital}
+    A signature scheme $\varSigScheme$ is a tuple of algorithms $(\procSetupId \opSeperate \procSignId \opSeperate \procVerfId)$ defined as follows:~\cite{goldwasser1988digital}
     \[ \varSigScheme = (\procSetupId \opSeperate \procSignId \opSeperate \procVerfId) \]
 
     \begin{itemize}
@@ -44,7 +44,7 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
 
     A valid signature scheme has to fulfill two security properties:
     \begin{itemize}
-        \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold with overwhealming probabillity: $\procVerf{\varPubKey}{\procSign{\varSecKey}{\varMsg}}{\varMsg} \opEq 1$
+        \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold with overwhelming probability: $\procVerf{\varPubKey}{\procSign{\varSecKey}{\varMsg}}{\varMsg} \opEq 1$
         \item Unforgeability (\cnstEUFCMA): Informally the existential unforgeability under chosen message attacks holds if an attacker $\cnstAdversary$ is unable to forge a valid signature for a chosen message.
         A formalization of the property can be found in section~\ref{subsec:sig:secureaptscheme}
     \end{itemize}
@@ -54,11 +54,11 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
     A cryptographic hash function $\cnstHash$ is defined as $\funHash{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$ ~\cite{al2011cryptographic}.
     A secure hashing function has to fulfill the following security properties:
     \begin{itemize}
-        \item Collision-Resistence (CR): Collision-Resistance means that it is computationally infeasible to find two inputs $\varInput_1$ and $\varInput_2$ such that
+        \item Collision-Resistance (CR): Collision-Resistance means that it is computationally infeasible to find two inputs $\varInput_1$ and $\varInput_2$ such that
         $\funHash{\varInput_1} \opAssign \funHash{\varInput_2}$ with $\varInput_1 \opNotEq \varInput_2$.
-        \item Pre-image Resistence (Pre): In a hash function $\cnstHash$ that fulfills Pre-image Resistance it is infeasible to recover the original input $\varInput$ from its hash output $\funHash{\varInput}$.
+        \item Pre-image Resistance (Pre): In a hash function $\cnstHash$ that fulfills Pre-image Resistance it is infeasible to recover the original input $\varInput$ from its hash output $\funHash{\varInput}$.
         If this security property is achieved, the hash function is said to be non-invertible.
-        \item 2nd Pre-image Resistence (Sec):  This property is similar to Collision-Resistance and is sometimes referred to as \textit{Weak Collision-Resistance}.
+        \item 2nd Pre-image Resistance (Sec):  This property is similar to Collision-Resistance and is sometimes referred to as \textit{Weak Collision-Resistance}.
         Given such a hash function $\cnstHash$ and an input $\varInput$, it should be infeasible to find a different input $\funStar{\varInput}$ such that $\varInput \opNotEq \funStar{\varInput}$
         and $\funHash{\varInput} \opEq \funHash{\funStar{\varInput}}$.
     \end{itemize}
@@ -68,7 +68,7 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
 \begin{definition}[Commitment Scheme]\label{def:pre:commitment}
     A cryptographic Commitment Scheme $\varCommitScheme$ is defined by a pair of functions $(\procSetupId, \procCommitId)$~\cite{bunz2018bulletproofs}.
     \begin{itemize}
-        \item $\varPublicParam \opFunResult \procSetupCom{\varSecParam}$: The setup procedure is a DPT function, it takes as input a security parameter $\varSecParam$ and outputs public parameters $\varPublicParam$.
+        \item $\varCommitParams \opFunResult \procSetupCom{\varSecParam}$: The setup procedure is a DPT function, it takes as input a security parameter $\varSecParam$ and outputs public parameters $\varPublicParam$.
         Depending on $\varPublicParam$ we define a input space $\varInputSpace_{\varPublicParam}$, a randomness space $\varRandSpace_{\varPublicParam}$ and a commitment space $\varCommitSpace_{\varPublicParam}$.
         \item $\varCommitment \opFunResult \procCommit{\varInput}{\varNonce}$ The commit routine is DPT function that takes an arbitrary input $\varInput \opIn \varInputSpace_{\varPublicParam}$, a random value $\varNonce \opIn \varRandSpace_{\varPublicParam}$ and
         generates an output $\varCommitment \opIn \varCommitSpace_{\varPublicParam}$.
@@ -95,33 +95,16 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
 
 This can be achieved as follows:
     $\varCommitSpace_{\varPublicParam} \opAssign \cnstGroup$ of order $\varPrime \opSeperate \varInputSpace_{\varPublicParam} \opSeperate \varRandSpace_{\varPublicParam} \opAssign \cnstIntegersPrime{\varPrime}$.
-    the procedures $(\procSetupId, \procCommitId)$ are then instantiated as:
-    \[ \procSetup{\varSecParam} \opAssign \varG, \varH \sample \cnstGroup\]
-    \[ \procCommit{\varInput}{\varNonce} \opAssign \funGen{\varNonce} \funGenH{\varInput} \]
+    the procedures $(\procSetupComId, \procCommitId)$ are then instantiated as:
+    \begin{gather*}
+        \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \opAssign \varG, \varH \opFunResult (\varG, \varH)\\
+        \varCommitment \opFunResult \procCommit{\varInput}{\varNonce} \opAssign \funGen{\varNonce} \funGenH{\varInput}\\
+    \end{gather*}
+    An instantiation of the pedersen commitment scheme must pick two adjacent generators $\varG$, $\varH$ for the setup to be secure in terms of hiding and binding.
+    Formally adjacent means that there exists a hard relation between $\varG$ and $\varH$ in terms of the discrete logarithm~\ref{def:pre:discretelog}.
+That means no $\varX$ is known such that $\varH \opEqNoQ \funGen{x}$.
+    In practice this is often achieved by hashing $\varG$ and using the hash output as $\varH$.
 
-\end{definition}
-
-\begin{definition}[EUF-NZO]
-    \begin{center}
-        \fbox{
-        \begin{varwidth}{\textwidth}
-            \procedure[linenumbering]{$\procEUFNZO{\varN}$} {
-            \varPublicParam \opFunResult \procSetupCom{\varSecParam} \\
-            \varSet \opFunResult \cnstEmptySet \\
-            \cnstSumOneToN (\varValue_i, \varBlindingFactor_i) \sample \cnstIntegersPrimeWithoutZero{*} \\
-            \cnstSumOneToN \varCommitment_i \opFunResult \procCommit{\varValue_i}{\varBlindingFactor_i} \\
-            \varPubKey \opFunResult \cnstSumOneToN \opAddPoint \varCommitment_i \\
-            (\varMsg, \varSignature) \opFunResult \cnstAdversary(\varPublicParam) \\
-            \pcreturn \varMsg \opNotIn \varSet \opAnd \procVerf{\varSignature}{\varMsg}{\varPubKey}
-            }
-            \procedure[linenumbering]{$\procSignOracle{\varMsg}{\varPubKey}$} {
-            \varSignature \opFunResult \procSign{\varMsg}{\varSecKey} \\
-            \varSet \opAssign \varSet \opUnion \{ \varMsg \} \\
-            \pcreturn \varSignature
-            }
-        \end{varwidth}
-        }
-    \end{center}
 \end{definition}
 
 \section{Bitcoin} \label{sec:pre:bitcoin}
@@ -266,7 +249,7 @@ easy to request a payment.
 \begin{definition}[Rangeproof System]\label{def:pre:rangeproof}
     A Rangeproofs system $\varRProofSystemParam{\varCommitScheme}$ with regards to a homomorphic commitment scheme $\varCommitScheme$ consists of a tupel of functions $(\procRProofSetupId, \procProofId, \procVerfProofId)$.
     \begin{itemize}
-        \item $(\varLowerBound,\varUpperBound) \opFunResult \procRProofSetup{\varSecParam}{\varI}{\varJ}$: The rangeproof setup algorithm takes as input a security paramter $\varSecParam$ as well as two numbers
+        \item $\varRProofParams \opFunResult \procRProofSetup{\varSecParam}{\varI}{\varJ}$: The rangeproof setup algorithm takes as input a security paramter $\varSecParam$ as well as two numbers
         $\varI$ and $\varJ$ which are treated as exponents of 2 to define the lower and upper bound of the rangeproof protocol.
         \item $\varProof \opFunResult \procProof{\varCommitment}{\varValue}{\varBlindingFactor}$: The proof algorithm is a DPT function which takes as input a commitment $\varCommitment$ a value $\varValue$ and
         a blinding factor $\varBlindingFactor$. It will output a proof $\varProof$ attesting to the statement that the value $\varValue$ of commitment $\varCommitment$ is in between the range $\langle \varLowerBound, \varUpperBound \rangle$ as
