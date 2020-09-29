@@ -161,10 +161,14 @@ creating new value in the total of $\funStar{\varValue} \opSub \varValue$.
     \fbox{
     \begin{varwidth}{\textwidth}
         \procedure[linenumbering]{$\procInflate{\varN}{\varValue}$} {
+        \varRProofParams \opFunResult \procRProofSetup{\varSecParam}{0}{2^{64}} \\
+        \varPrime \sample \cnstIntegersPrimeWithoutZero{p} \\
+        \varG, \varH \sample \cnstGroup_\varPrime \\
+        \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \\
         \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
         (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactor} \\
         (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
-        (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \varPreTx) \opFunResult \cnstAdversary(\varPreTx) \\
+        (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \funArray{\varBlindingFactor_i}, \funArray{\varCoin_i}, \varNonceBob, \varSigBob, \varPreTx)
         \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
         \pcreturn \funStar{\varValue} \opGreaterThen \varValue \opAnd \varCoinOut \opEqNoQ \procCommit{\funStar{\varValue}}{\funStar{\varBlindingFactorBob}} \opAnd \procVerfTx{\varTx} \opEqNoQ 1 \\
         \opAnd \varCoinOut \opIn \varTx.out \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
@@ -173,9 +177,9 @@ creating new value in the total of $\funStar{\varValue} \opSub \varValue$.
     }
 \end{center}
 
-\begin{definition}[Inflation Resistence] \label{def:atom:inflation-resistence}
-    A Mimblewimbe Transaction Scheme is called inflation resistent if for any value $\varValue$ in a valid range (as defined by the public parameters of the ledger), security
-    paramter $\varN$ and a PPT adversary $\cnstAdversary$ the following holds:
+\begin{definition}[Inflation Resistance] \label{def:atom:inflation-resistance}
+    A Mimblewimbe Transaction Scheme is called inflation resistant if for any value $\varValue$ in a valid range (as defined by the public parameters of the ledger), security
+    parameter $\varN$ and a PPT adversary $\cnstAdversary$ the following holds:
     \[ \prob{\procInflate{\varN}{\varValue} \opEqNoQ 1} \opSmEq \funNegl{\varN} \]
 \end{definition}
 
@@ -614,29 +618,35 @@ Furthermore the scheme used a multiparty version of the bulletproof system $\var
 
 \subsection{Inflation Resistance} \label{subsec:atom:prf-inflation-resistance}
 
-We will prove the Inflation Resistance property holds for the Mimblewimble Transaction Protocol as seen in figure~\ref{fig:inst-mw-tx} by providing a game-based reduction to the discrete logarithm assumption from definition~\ref{def:pre:discretelog}.
-Furthermore for the proof to be valid we must assume that the signature scheme $\varSigScheme$ used in the transaction scheme is correct and EUF-CMA secure.
-Apart from that we also require the employed rangeproof system $\varProofSystem$ and additive homomorphic commitment scheme $\varCommitScheme$ to be correct, as well as the commitment scheme to a additivie homomorphic one (as defined in definition~\ref{def:pre:homo-com}) which is secure under hiding and binding.
-Lastly the rangeproof system has be setup such that proofs are for a strictly positive range, such that commitments to negative numbers are dissallowed.
+To prove that Inflation Resistance as defined in~\ref{def:atom:inflation-resistance} holds we must show that the probability of a PPT adversary $\cnstAdversary$ winning the $\procInflateId$ game is neglible.
+We will prove that the Inflation Resistance property holds for the Mimblewimble Transaction Protocol as seen in figure~\ref{fig:inst-mw-tx} by providing a game-based reduction from $\procInflateId$ to the discrete logarithm assumption from definition~\ref{def:pre:discretelog}.
+
+For the reduction to work we must assume that the signature scheme $\varSigScheme$ used in the transaction scheme is correct and EUF-CMA secure.
+Apart from that we also require the employed rangeproof system $\varProofSystem$ and additive homomorphic commitment scheme $\varCommitScheme$ to be correct, as well as the commitment scheme to be additive homomorphic (as defined in definition~\ref{def:pre:homo-com}) which is secure under hiding and binding.
+Lastly the rangeproof system has to be setup such that proofs are for a strictly positive range, such that commitments to negative numbers are disallowed.
 From this we arrive at the following Theorem:
 
 \begin{theorem}\label{theo:atom:infl-resistence}
-\emph{Inflation Resistence} holds for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ if and only if the underlying additive homomorphic commitment Scheme $\varCommitScheme$, signature scheme $\varSigScheme$ and rangeproof system $\varProofSystem$ with range $[x,y]$ of $x >= 0, y > 0$ are correct, the signature scheme is EUF-CMA secure, and the commitment fulfills hiding and binding.
+\emph{Inflation Resistance} holds for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ if and only if the underlying additive homomorphic commitment Scheme $\varCommitScheme$, signature scheme $\varSigScheme$ and rangeproof system $\varProofSystem$ with range $[x,y]$ of $x >= 0, y > 0$ are correct, the signature scheme is EUF-CMA secure, and the commitment fulfills hiding and binding.
 \end{theorem}
 
-\begin{proof}
+\begin{proof}\label{prf:atom:infl-resistance}
     We will provide a stepwise reduction from the $\procInflateId$ game to the discrete logarithm assumption.
-    In each step we will provide a modified game which the adversary $\cnstAdversary$ will be able to win given the assumption that he can win the previous game until we arrive at a contraction.
+    In each step we will provide a modified game which the PPT adversary $\cnstAdversary$ will be able to win with overwhelming probability given the assumption that he can win the previous game until we arrive at a contraction.
     The first game $\procGameInfId{0}$ is very similar to the original $\procInflateId$ game, just that we replace $\procCommitId$ with its implementation for pedersen commitments.
 
     \begin{center}
         \fbox{
         \begin{varwidth}{\textwidth}
             \procedure[linenumbering]{$\procGameInf{0}{\varN}{\varValue}$} {
+            \varRProofParams \opFunResult \procRProofSetup{\varSecParam}{0}{2^{64}} \\
+            \varPrime \sample \cnstIntegersPrimeWithoutZero{p} \\
+            \varG, \varH \sample \cnstGroup_\varPrime \\
+            \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \\
             \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
             (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactor} \\
             (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
-            (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \varPreTx) \opFunResult \cnstAdversary(\varPreTx) \\
+            (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \funArray{\varBlindingFactor_i}, \funArray{\varCoin_i}, \varNonceBob, \varSigBob, \varPreTx)\opFunResult \cnstAdversary(\varPreTx) \\
             \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
             \pcreturn \funStar{\varValue} \opGreaterThen \varValue \opAnd \varCoinOut \opEqNoQ \funGenH{\funStar{\varValue}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \opAnd \procVerfTx{\varTx} \opEqNoQ 1 \\
             \opAnd \varCoinOut \opIn \varTx.out \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
@@ -645,17 +655,21 @@ From this we arrive at the following Theorem:
         }
     \end{center}
 
-    In $\procGameInfId{1}$ we reduce the winning condition, we require the range proof of the output coins to be valid and the final signature to be valid which both follow from the instantiation of $\procVerfTxId$.
+    In $\procGameInfId{1}$ we reduce the winning condition, we require the range proof of the output coins to be valid, and the final signature to be valid which both follow from the instantiation of $\procVerfTxId$.
     We also move the computation of the final public key $\varPubKey$ from $\procVerfTxId$ inside the game.
 
     \begin{center}
         \fbox{
         \begin{varwidth}{\textwidth}
             \procedure[linenumbering]{$\procGameInf{1}{\varN}{\varValue}$} {
+            \varRProofParams \opFunResult \procRProofSetup{\varSecParam}{0}{2^{64}} \\
+            \varPrime \sample \cnstIntegersPrimeWithoutZero{p} \\
+            \varG, \varH \sample \cnstGroup_\varPrime \\
+            \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \\
             \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
             (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactorAlice} \\
             (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
-            (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \varPreTx) \opFunResult \cnstAdversary(\varPreTx) \\
+            (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \funArray{\varBlindingFactor_i}, \funArray{\varCoin_i}, \varNonceBob, \varSigBob, \varPreTx)\opFunResult \cnstAdversary(\varPreTx) \\
             \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
             \pcforeach \varTx.\varOutputs \textit{ as } (\varIterator => \varCoin_i) \\
             \t \pcif \procVerfProof{\varTx.\varProofs[\varIterator]}{\varCoin_i} \opEqNoQ 0 \\
@@ -670,7 +684,7 @@ From this we arrive at the following Theorem:
 
     Now given the winning condition that the output coin $\varCoinOut$ has to be part of the output coin list $\varOutputs$ and the input coin list $\varInputs$ has to be a single element list with the input coin $\varCoinInp$, we can modify line 6 of the game as follows: (Assuming $\varCoinOut$ is at index 0 of the output coin list, but it could also be any other index)
     \[ \varPubKey \opAssign \varCoinOut \opAddPoint \funSum{\varIterator \opAssign 1}{\varN} \varTx.\varOutputs \opAddPoint \varCoinInp^{-1} \]
-    Given the construction of Pedersen Commitments from definition~\ref{def:pre:pedersen} and the construction of $\varCoinOut$ and $\varCoinInp$ we can also write the equation like this:
+    Given the construction of pedersen commitments from definition~\ref{def:pre:pedersen} and the construction of $\varCoinOut$ and $\varCoinInp$ we can also write the equation like this:
     \[ \varPubKey \opAssign \funGenH{\funStar{\varValue}} \opAddPoint \funGen{\varBlindingFactorBob} \funSum{\varIterator \opAssign 1}{\varN} \varTx.\varOutputs \opSub \funGenH{\varValue} \opAddPoint \funGen{\varBlindingFactorAlice} \]
     We also have the winning condition of $\funStar{\varValue} \opGreaterThen \varValue$, we furthermore can assume that none of the additional output values in $\varOutputs$ potentially created by the adversary are of negative value, as this would mean their rangeproofs cannot be valid.
     Therefore there has to exist some remainder $\varRemainder \opAssign \funStar{\varValue} \opAddScalar \funSum{\varIterator \opAssign 1}{\varN} v_i \opSub v$.
@@ -684,10 +698,14 @@ From this we arrive at the following Theorem:
         \fbox{
         \begin{varwidth}{\textwidth}
             \procedure[linenumbering]{$\procGameInf{2}{\varN}{\varValue}$} {
+            \varRProofParams \opFunResult \procRProofSetup{\varSecParam}{0}{2^{64}} \\
+            \varPrime \sample \cnstIntegersPrimeWithoutZero{p} \\
+            \varG, \varH \sample \cnstGroup_\varPrime \\
+            \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \\
             \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
             (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactorAlice} \\
             (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
-            (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \funArray{\varBlindingFactor_i}, \funArray{\varCoin_i}, \varPreTx) \opFunResult \cnstAdversary(\varPreTx) \\
+            (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \funArray{\varBlindingFactor_i}, \funArray{\varCoin_i}, \varNonceBob, \varSigBob, \varPreTx) \opFunResult \cnstAdversary(\varPreTx) \\
             \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
             \pcforeach \varTx.\varOutputs \textit{ as } (\varIterator => \varCoin_i) \\
             \t \pcif \procVerfProof{\varTx.\varProofs[\varIterator]}{\varCoin_i} \opEqNoQ 0 \\
@@ -704,7 +722,7 @@ From this we arrive at the following Theorem:
 
     If the adversary wins $\procGameInfId{2}$ the challenger (playing Alice) and the adversary (playing Bob) were able to construct a valid signature $\varSignature$ under the public key $\varPubKey$.
     That means the exponents $\funStar{\varBlindingFactorBob}$, $\funStar{\varBlindingFactor_i}$, $\varBlindingFactorAlice$, $\varRemainder$ and $\varX$ have to be known by at least one of the two parties.
-    Here is where we arrive at a contradiction as by definition of the pedersen Commitment~\ref{def:pre:pedersen} $\varG$ and $\varH$ have to be adjacent generators, implying $\varX$ cannot be known and therefore breaking the discrete logarithm assumption from definition~\ref{def:pre:discretelog}.
+    Here is where we arrive at a contradiction as by definition of the pedersen pommitment~\ref{def:pre:pedersen} $\varG$ and $\varH$ have to be adjacent generators, implying $\varX$ cannot be known and therefore breaking the discrete logarithm assumption from definition~\ref{def:pre:discretelog}.
 
 
     In order to break the discrete logarithm of a cyclic group $\cnstGroup_\varPrime$ a PPT adversary $\cnstAdversary$ would have to win the following game:
@@ -721,27 +739,59 @@ From this we arrive at the following Theorem:
         \end{varwidth}
         }
     \end{center}
-    We will now build an extractor function $\procExtractXId$ with which an adversary winning the $\procGameInfId{2}$ game would be able to always win the $\procDiscreteLogGameId$.
+    We will now build an extractor function $\procExtractXId$ with which an adversary winning the $\procGameInfId{2}$ game would be able to win the $\procDiscreteLogGameId$ with overwhelming probability.
     From the instantiation of $\procFinTxId$ we know the final signature valid under $\varPubKey$ is computed by calling $\procFinSig{\varSigAlice}{\varSigBob}$ where $\varSigAlice$ is the partial signature of the challenger and $\varSigBob$ the one of adversary playing Bob.
     We recall the construction of $\procSignPrtId$ in figure~\ref{fig:twoparty-schnorr}
     \[ \varS \opAssign \varNonce \opAddScalar \varSecKey \opTimesScalar \varSchnorrChallenge \\ \]
-    In order for Bobs partial signature to be valid $\varSecKey$ (which is required for the adversary to win the game) it would have to be constructed like $\varSecKey \opAssign \funStar{\varBlindingFactorBob} \opAddScalar \sum \varBlindingFactor_i \opAddScalar \varRemainder \opAddScalar \varX$.
-    The adversary knowing $\varSigBob, \funStar{\varBlindingFactorBob}$, $\sum \varBlindingFactor_i$ and $\varRemainder$, as well as his nonce $\varNonceBob$ chosen during the signature creation, can now extract $\varX$ from the final signature as follows:
-    We collect the adversaries chosen parameters in a object $\varSecret$.
+    In order for Bobs partial signature to be valid $\varSecKey$ (which is required for the adversary to win the game), it would have to be constructed like $\varSecKey \opAssign \funStar{\varBlindingFactorBob} \opAddScalar \sum \varBlindingFactor_i \opAddScalar \varRemainder \opAddScalar \varX$.
+    The adversary knowing $\varSigBob, \funStar{\varBlindingFactorBob}$, $\sum \varBlindingFactor_i$ and $\varRemainder$, as well as his nonce $\varNonceBob$ chosen by him during the game, can now extract $\varX$ from the final signature as follows:
+    We collect the adversaries chosen parameters in an object $\varSecret$.
     \begin{center}
         \fbox{
         \begin{varwidth}{\textwidth}
             \procedure[linenumbering]{$\procExtractX{\varMsg}{\varSignature}{\varPubKey}{\varSecret}$} {
             (\varS, \varRand) \opFunResult \varSignature \\
-            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc}
+            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKey} \\
             (\varSigBob,\funStar{\varBlindingFactorBob},\funArray{\varBlindingFactor_i},\varRemainder,\varNonceBob) \opFunResult \varSecret \\
             (\varSBob, \varRandBob) \opFunResult \varSigBob \\
-            \varSecKey \opFunResult (\varSBob \opSub \varNonceBob) \opDiv \varSchnorrChallenge \\
-            \pcreturn \varSecKey \opSub \funStar{\varBlindingFactorBob} \opSub \funArray{\varBlindingFactor_i} \opSub \varRemainder \\
+            \varSecKey \opAssign (\varSBob \opSub \varNonceBob) \opDiv \varSchnorrChallenge \\
+            \pcreturn \varSecKey \opSub \funStar{\varBlindingFactorBob} \opSub \funArray{\varBlindingFactor_i} \opSub \varRemainder
             }
         \end{varwidth}
         }
     \end{center}
+
+    Given $\procExtractXId$ the adversary now is able to win $\procDiscreteLogGameId$ as follows:
+    Given $\varG$ and $\varPubKey$ by the $\procDiscreteLogGameId$ we can construction a simulation by setting up the commitment scheme during $\procGameInfId{2}$ as follows $\procSetupComPed{\varG}{\varPubKey}$.
+    After the game has completed $\cnstAdversary$ can call the $\procExtractXId$ as follows $\procExtractX{\varPubKey}{\varTx.\varSignature}{\varTx.\varMsg}{\varS}$ where $\varS$ are the collected parameters chosen by the adversary and $\varPubKey$ is calculated as $\varPubKey \opAssign \cnstSumOneToN \varOutputs \opSub \cnstSumOneToN \varInputs$.
+    As we have shown the ouput $\varX$ by $\procExtractXId$ will be the discrete logarithm between the two generators picked for the pedersen commitment.
+    As the commitment scheme is setup with $\varG$ and $\varPubKey$, $\varX$ will therefore be accepted as a solution to the $\procDiscreteLogGameId$ game.
+    We have therefore arrived at a contradiction and can conclude that theorem~\ref{theo:atom:infl-resistence} must hold.
+\end{proof}
+
+We now argue that the same reduction must hold for the instantiation of the extended and adapted mimblewimble transaction scheme from figures~\ref{fig:ext-mim-tx-fin},~\ref{fig:ext-mim-tx-recv},~\ref{fig:ext-mim-tx-spend} and~\ref{fig:inst-apt-mw-tx-fin},~\ref{fig:inst-apt-mw-tx-recv}.
+
+\begin{theorem} \label{theo:atom:inf-resistence-ext}
+    \emph{Inflation Resistance} holds for an \emph{Extended Mimblewimble Transaction Scheme} and \emph{Adapted Mimblewimble Transaction Scheme} iff it holds for \emph{Mimblewimble Transaction Scheme}
+\end{theorem}
+
+\begin{proof}
+    For the proof we look at the additional function included in the extended and adapted variant and proof that if we replace on of the original ones with the new ones the reduction found in~\ref{prf:atom:infl-resistance} still holds.
+
+    \begin{itemize}
+        \item Case 1: $\procDSendCoinsId$ is used instead of $\procSendCoinsId$: This means the key to the input coin would be distributed between two parties, therefore we would modify our game to include a second challenger, holding part of the input coin blinding factor.
+        We would also require to call $\procDFinTxId$ instead of the regular $\procFinTxId$ to complete the transaction.
+        The transaction structure, implementation of $\procVerfTxId$ and behaviour of the adversary is left unchanged, the reduction therefore still holds.
+        \item Case 2: $\procDRecvCoinsId$ is used on the receiver side.
+        Again we have to introduce a second challenger to the game which will run the $\procDRecvCoinsId$ protocol together with the adversary.
+        However, again this does not change our reduction, the transaction structure, as well as $\procVerfTxId$ stays the same and the adversary has access to all parameters needed to run $\procExtractXId$.
+        \item Case 3: $\procAptRecvCoinsId$ is expected to be called by the adversary $\cnstAdversary$.
+        This means the $\cnstAdversary$ has to provide an adapted signature $\varSigAptBob$ which he can simply do by computing $(\varWit, \varStatement) \opFunResult \procGenRId$ and $\varSigAptBob \procAptSig{\varSigBob}{\varWit}$.
+        We then have to modify the game to call the $\procDAptFinTxId$ to finalize the transaction.
+        Again transaction structure, $\procVerfTxId$ is unchanged and Bob has access to all parameters needed for calling $\procExtractXId$.
+    \end{itemize}
+
+    We have shown that by using the functions provided in the extended and adapted Mimblewimble transaction schemes, the properties used in the reduction of \ref{prf:atom:infl-resistance} remain unchanged and therfore theorem \ref{theo:atom:inf-resistence-ext} must hold.
 \end{proof}
 
 \subsection{Theft Resistance} \label{subsec:atom:prf-theft-resistance}
