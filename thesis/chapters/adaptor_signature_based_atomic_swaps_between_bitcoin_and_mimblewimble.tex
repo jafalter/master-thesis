@@ -166,10 +166,10 @@ creating new value in the total of $\funStar{\varValue} \opSub \varValue$.
         \varG, \varH \sample \cnstGroup_\varPrime \\
         \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \\
         \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
-        (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactor} \\
+        (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactorAlice} \\
         (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
-        (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \funArray{\varBlindingFactor_i}, \funArray{\varCoin_i}, \varNonceBob, \varSigBob, \varPreTx)
-        \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
+        (\funStar{\varValue}, (\varCoinOut, \funStar{\varBlindingFactorBob}), \funArray{(\varCoin_i, \funStar{\varBlindingFactor_i})}, (\varSigBob, \varNonceBob), \funStar{\varPreTx}) \opFunResult \cnstAdversary (\varPreTx) \\
+        \varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
         \pcreturn \funStar{\varValue} \opGreaterThen \varValue \opAnd \varCoinOut \opEqNoQ \procCommit{\funStar{\varValue}}{\funStar{\varBlindingFactorBob}} \opAnd \procVerfTx{\varTx} \opEqNoQ 1 \\
         \opAnd \varCoinOut \opIn \varTx.out \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
         }
@@ -644,9 +644,9 @@ From this we arrive at the following Theorem:
             \varG, \varH \sample \cnstGroup_\varPrime \\
             \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \\
             \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
-            (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactor} \\
+            (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactorAlice} \\
             (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
-            (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \funArray{\varBlindingFactor_i}, \funArray{\varCoin_i}, \varNonceBob, \varSigBob, \varPreTx)\opFunResult \cnstAdversary(\varPreTx) \\
+            (\funStar{\varValue}, (\varCoinOut, \funStar{\varBlindingFactorBob}), \funArray{(\varCoin_i, \funStar{\varBlindingFactor_i})}, (\varSigBob, \varNonceBob), \funStar{\varPreTx}) \opFunResult \cnstAdversary (\varPreTx) \\
             \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
             \pcreturn \funStar{\varValue} \opGreaterThen \varValue \opAnd \varCoinOut \opEqNoQ \funGenH{\funStar{\varValue}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \opAnd \procVerfTx{\varTx} \opEqNoQ 1 \\
             \opAnd \varCoinOut \opIn \varTx.out \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
@@ -669,7 +669,7 @@ From this we arrive at the following Theorem:
             \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
             (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactorAlice} \\
             (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
-            (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \funArray{\varBlindingFactor_i}, \funArray{\varCoin_i}, \varNonceBob, \varSigBob, \varPreTx)\opFunResult \cnstAdversary(\varPreTx) \\
+            (\funStar{\varValue}, (\varCoinOut, \funStar{\varBlindingFactorBob}), \funArray{(\varCoin_i, \funStar{\varBlindingFactor_i})}, (\varSigBob, \varNonceBob), \funStar{\varPreTx}) \opFunResult \cnstAdversary (\varPreTx) \\
             \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
             \pcforeach \varTx.\varOutputs \textit{ as } (\varIterator => \varCoin_i) \\
             \t \pcif \procVerfProof{\varTx.\varProofs[\varIterator]}{\varCoin_i} \opEqNoQ 0 \\
@@ -705,12 +705,12 @@ From this we arrive at the following Theorem:
             \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
             (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactorAlice} \\
             (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
-            (\funStar{\varValue}, \funStar{\varBlindingFactorBob}, \varCoinOut, \funArray{\varBlindingFactor_i}, \funArray{\varCoin_i}, \varNonceBob, \varSigBob, \varPreTx) \opFunResult \cnstAdversary(\varPreTx) \\
+            (\funStar{\varValue}, (\varCoinOut, \funStar{\varBlindingFactorBob}), \funArray{(\varCoin_i, \funStar{\varBlindingFactor_i})}, (\varSigBob, \varNonceBob), \funStar{\varPreTx}) \opFunResult \cnstAdversary (\varPreTx) \\
             \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
             \pcforeach \varTx.\varOutputs \textit{ as } (\varIterator => \varCoin_i) \\
             \t \pcif \procVerfProof{\varTx.\varProofs[\varIterator]}{\varCoin_i} \opEqNoQ 0 \\
             \t \t \pcreturn 0 \\
-            \pcif \varValue \opGreaterThen \funStar{\varValue} \\
+            \pcif \varValue \opGreaterEq \funStar{\varValue} \\
             \t \pcreturn 0 \\
             \varPubKey \opAssign \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funSum{\varIterator \opAssign 1}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint \funGen{\varRemainder \opAddScalar \varX} \\
             \pcreturn \varCoinOut \opEqNoQ \funGenH{\funStar{\varValue}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \procVerf{\varTx.\varSignature}{\varTx.\varMsg}{\varPubKey} \\
@@ -743,7 +743,7 @@ From this we arrive at the following Theorem:
     From the instantiation of $\procFinTxId$ we know the final signature valid under $\varPubKey$ is computed by calling $\procFinSig{\varSigAlice}{\varSigBob}$ where $\varSigAlice$ is the partial signature of the challenger and $\varSigBob$ the one of adversary playing Bob.
     We recall the construction of $\procSignPrtId$ in figure~\ref{fig:twoparty-schnorr}
     \[ \varS \opAssign \varNonce \opAddScalar \varSecKey \opTimesScalar \varSchnorrChallenge \\ \]
-    In order for Bobs partial signature to be valid $\varSecKey$ (which is required for the adversary to win the game), it would have to be constructed like $\varSecKey \opAssign \funStar{\varBlindingFactorBob} \opAddScalar \sum \varBlindingFactor_i \opAddScalar \varRemainder \opAddScalar \varX$.
+Due to the fact that we require our challenger (Alice) to be honest for Bobs partial signature to be valid $\varSecKey$ (which is required for the adversary to win the game), it would have to be constructed like $\varSecKey \opAssign \funStar{\varBlindingFactorBob} \opAddScalar \sum \varBlindingFactor_i \opAddScalar \varRemainder \opAddScalar \varX$.
     The adversary knowing $\varSigBob, \funStar{\varBlindingFactorBob}$, $\sum \varBlindingFactor_i$ and $\varRemainder$, as well as his nonce $\varNonceBob$ chosen by him during the game, can now extract $\varX$ from the final signature as follows:
     We collect the adversaries chosen parameters in an object $\varSecret$.
     \begin{center}
@@ -762,8 +762,8 @@ From this we arrive at the following Theorem:
     \end{center}
 
     Given $\procExtractXId$ the adversary now is able to win $\procDiscreteLogGameId$ as follows:
-    Given $\varG$ and $\varPubKey$ by the $\procDiscreteLogGameId$ we can construction a simulation by setting up the commitment scheme during $\procGameInfId{2}$ as follows $\procSetupComPed{\varG}{\varPubKey}$.
-    After the game has completed $\cnstAdversary$ can call the $\procExtractXId$ as follows $\procExtractX{\varPubKey}{\varTx.\varSignature}{\varTx.\varMsg}{\varS}$ where $\varS$ are the collected parameters chosen by the adversary and $\varPubKey$ is calculated as $\varPubKey \opAssign \cnstSumOneToN \varOutputs \opSub \cnstSumOneToN \varInputs$.
+    Given $\varG$ and $\varPubKey$ by the $\procDiscreteLogGameId$ we can construction a simulation by setting up the commitment scheme during $\procGameInfId{2}$ as $\procSetupComPed{\varG}{\varPubKey}$.
+    After the game has completed $\cnstAdversary$ can call the $\procExtractXId$ with $\procExtractX{\varPubKey}{\varTx.\varSignature}{\varTx.\varMsg}{\varSecret}$ where $\varSecret$ are the collected parameters chosen by the adversary and $\varPubKey$ is calculated as $\varPubKey \opAssign \cnstSumOneToN \varOutputs \opSub \cnstSumOneToN \varInputs$.
     As we have shown the ouput $\varX$ by $\procExtractXId$ will be the discrete logarithm between the two generators picked for the pedersen commitment.
     As the commitment scheme is setup with $\varG$ and $\varPubKey$, $\varX$ will therefore be accepted as a solution to the $\procDiscreteLogGameId$ game.
     We have therefore arrived at a contradiction and can conclude that theorem~\ref{theo:atom:infl-resistence} must hold.
@@ -776,7 +776,7 @@ We now argue that the same reduction must hold for the instantiation of the exte
 \end{theorem}
 
 \begin{proof}
-    For the proof we look at the additional function included in the extended and adapted variant and proof that if we replace on of the original ones with the new ones the reduction found in~\ref{prf:atom:infl-resistance} still holds.
+    For the proof we look at the additional function included in the extended and adapted variant and proof that if we replace one of the original ones with the new ones the reduction found in~\ref{prf:atom:infl-resistance} still holds.
 
     \begin{itemize}
         \item Case 1: $\procDSendCoinsId$ is used instead of $\procSendCoinsId$: This means the key to the input coin would be distributed between two parties, therefore we would modify our game to include a second challenger, holding part of the input coin blinding factor.
@@ -786,12 +786,12 @@ We now argue that the same reduction must hold for the instantiation of the exte
         Again we have to introduce a second challenger to the game which will run the $\procDRecvCoinsId$ protocol together with the adversary.
         However, again this does not change our reduction, the transaction structure, as well as $\procVerfTxId$ stays the same and the adversary has access to all parameters needed to run $\procExtractXId$.
         \item Case 3: $\procAptRecvCoinsId$ is expected to be called by the adversary $\cnstAdversary$.
-        This means the $\cnstAdversary$ has to provide an adapted signature $\varSigAptBob$ which he can simply do by computing $(\varWit, \varStatement) \opFunResult \procGenRId$ and $\varSigAptBob \procAptSig{\varSigBob}{\varWit}$.
+        This means that $\cnstAdversary$ has to provide an adapted signature $\varSigAptBob$ and statement $\varStatement$ which he can simply do by computing $(\varWit, \varStatement) \opFunResult \procGenRId$ and $\varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit}$.
         We then have to modify the game to call the $\procDAptFinTxId$ to finalize the transaction.
         Again transaction structure, $\procVerfTxId$ is unchanged and Bob has access to all parameters needed for calling $\procExtractXId$.
     \end{itemize}
 
-    We have shown that by using the functions provided in the extended and adapted Mimblewimble transaction schemes, the properties used in the reduction of \ref{prf:atom:infl-resistance} remain unchanged and therfore theorem \ref{theo:atom:inf-resistence-ext} must hold.
+    We have shown that by using the functions provided in the extended and adapted Mimblewimble transaction schemes, the properties used in the reduction of~\ref{prf:atom:infl-resistance} remain unchanged and therfore theorem~\ref{theo:atom:inf-resistence-ext} must hold.
 \end{proof}
 
 \subsection{Theft Resistance} \label{subsec:atom:prf-theft-resistance}
