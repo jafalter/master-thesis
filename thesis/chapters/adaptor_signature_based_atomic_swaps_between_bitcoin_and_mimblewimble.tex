@@ -542,7 +542,7 @@ He will send over $\varSigFin$ which lets both parties construct the valid trans
             \varSigAliceCarol \opFunResult \procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol} \< \< \\
             \< \sendmessageright*{\varSigAliceCarol} \< \\
             \< \< \procVerfPtSig{\varSigAliceCarol}{\varMsg}{\varCommits[0]} \\
-            \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
+            \< \< \varSigFin \opFunResult \procFinSig{\varSigAliceCarol}{\varSigBob} \\
             \< \< \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \\
             \< \< \pcreturn \varTx
             }
@@ -560,48 +560,89 @@ The general process will be to find a proof for the basic transaction protocol d
 
 \subsection{Correctness} \label{subsec:atom:correctness}
 
-We will argue \emph{Transaction Scheme Correctness} follows from the correctness of the commitment scheme $\varCommitScheme$, signature scheme $\varSigScheme$ as well as the correctness of the range proof system $\varProofSystem$ used in the transaction protocol.
+We will argue \emph{Transaction Scheme Correctness} follows from the correctness of the commitment scheme $\varCommitScheme$, two-party signature scheme $\varSigScheme$ as well as the correctness of the range proof system $\varProofSystem$ used in the transaction protocol.
 If the transaction was constructed correctly (that is by calling the procedures $\procSendCoinsId, \procRecvCoinsId, \procFinTxId$, the distributed variants $\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId$ or the adapted ones $\procAptRecvCoinsId, \procDAptFinTxId$ with valid inputs) it must follow that the final transaction has correct commitments, rangeproofs and a valid signature and $\procVerfTxId$ will therefore return 1.
 We construct the following theorem:
 
 \newtheorem{theorem}{Theorem}
 
 \begin{theorem}\label{lem:atom:correctness}
-    \emph{Transaction Scheme Correctness}, \emph{Extended Transaction Scheme Correctness} or \emph{Adapted Transaction Scheme Correctness} for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$, $\varextMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ or $\varaptMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ holds if and only if the underlying Commitment Scheme $\varCommitScheme,$ Signature Scheme $\varSigScheme$ and Rangeproof system $\varProofSystem$ are correct.
+    \emph{Transaction Scheme Correctness}, \emph{Extended Transaction Scheme Correctness} or \emph{Adapted Transaction Scheme Correctness} for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$, $\varextMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ or $\varaptMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ holds if and only if the underlying Commitment Scheme $\varCommitScheme,$ Two-Party Signature Scheme $\varSigSchemeMP$ and Rangeproof system $\varProofSystem$ are correct.
 \end{theorem}
 
 \begin{proof}
-    We separate between the following cases in which a transaction is invalid and $\procVerfTxId$ should therefore return 0:
+    We assume there are two honest participants Alice and Bob, there exists a list of input coins $\funArray{\varCoinInp}$ with blinding factors $\funArray{\varBlindingFactorAlice}$ and total value $\varValue$ known to Alice, and some amount $\varFundValue$ which Alice wants to transfer to Bob.
+    For \emph{Transaction Scheme Correctness} to hold $\procVerfTx{\varTx}$ must return 1 with overwhealming probability for the two parties creating a transaction $\varTx$ in the following three steps:
     \begin{enumerate}
-        \item A coin commitment $\varCoin$ was not inside the valid range (for instance by providing negative number as input).
-        \item Ownership of an input coin provided in $\procSendCoinsId$ or $\procDSendCoinsId$ is not given.
-        \item The total output coins value exceeds the total input coins value.
-        \item $\procRecvCoinsId$ or $\procFinTxId$ were not called after the $\procSendCoinsId$ procedure. (Similar for the extended and adapted variant)
-        \item No input or no output coins were constructed.
+        \item $(\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValue}{\cnstFalsum}$
+        \item $\funStar{\varPreTx} \opFunResult \procRecvCoins{\varPreTx}{\varFundValue}$
+        \item $\varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}$
+    \end{enumerate}
+    Here are the following three requirements for $\procVerfTx{\varTx}$ to return 1:
+    \begin{enumerate}
+        \item The list of input coins $\varInputs$, as well as output coins $\varOutputs$ must each inlcude at least one element.
+        \item For each output coin $\varCoinOut$ the rangeproof $\varProof$ must verify.
+        \item The transaction signature under the public key $\varPubKey \opAssign \cnstSumZeroToN \varOutputs \opSub \cnstSumZeroToN \varInputs$ must verify.
     \end{enumerate}
 
-    In the case of 1) a valid rangeproof $\varProof$ can not be constructed, except with neglible probability which follows from the definition of the rangeproof system~\ref{def:pre:rangeproof}
-    Therefore the verification of rangeproofs will fail in $\procVerfTxId$ with overwhealming probabilty.
+    Condition 1 must hold trivially, as already in $\procSendCoinsId$ Alice will create the output $\varCoinOutAlice$ and initialize the pre-transaction with $\funArray{\varCoinInp}$ and $\funArray{\varCoinOutAlice}$, thereby already after $\procSendCoinsId$ both input and output lists are non empty and this condition is fulfilled.
 
-    Case 2) implies that a blinding factor $\varBlindingFactor$ for at least one of the input coins is not known to Alice.
-    Therefore the signing key $\varSecKeyAlice$ constructed in line 6 of the $\procSendCoinsId$ algorithm would not be a valid share for the final public key which is computed in the $\procVerfTxId$ algorithm at line 5.
-    From this we can conclude that Alice partial signature (computed in $\procFinTxId$ at line 6) would not be valid except with negligee probability and therefore the verification of the signature in $\procVerfTxId$ line 6 will fail with overwhelming probability.
-    The same argument holds in the case that the input keys are shared as in $\procDSendCoinsId$.
+    Condition 2 follows from the implementation of the $\procCreateCoinId$ function called in $\procSendCoinsId$ as well as $\procRecvCoinsId$.
+    In the function a rangeproof is computed for the new coin $\varCoin$ with value $\varValue$ and blinding factor $\varBlindingFactor$ as $\varProof \opFunResult \procProof{\varCoin}{\varValue}{\varBlindingFactor}$.
+    Given that our Rangeproof system $\varProof$ system has to be correct $\procVerfProof{\varProof}{\varCoin} \opEqNoQ 1$ must hold for all coins created with the $\procCreateCoinId$ routine.
+    Therefore Condition 2 must hold.
 
-    In 3) the transaction would not be well-balanced as defined in~\ref{def:pre:tx-well-balancedness}.
-    That means that the values inside the commitments of $\varOutputs$ and $\varInputs$ would not be cancelled out and a remainder of $\varRemainder$ would be part of $\varPubKey$ computed at line 6 of $\procVerfTxId$.
-    That is $\varPubKey$ would look like this
-    \[
-        \varPubKey \opEqNoQ \funGen{\funStar{\varBlindingFactorAlice} \opAddScalar \funStar{\varBlindingFactorBob} \opSub \sum\funArray{\varBlindingFactorAlice}} \opAddPoint \funGenH{\varRemainder}
-    \]
-    As in the definition of Pedersen commitments~\ref{def:pre:pedersen} we have required that $\varG$ and $\varH$ are adjacent generators, the discrete logarithm $\varX$ of $\varH$ such that $\varG \opEqNoQ \funGenH{\varX}$ is not known.
-    Therefore it follows that without knowing $\varX$ Alice and Bob will not be able to calculate a valid signature to $\varPubKey$ which in turn means that the verification of the signature in $\procVerfTxId$ will fail with overwhelming probability.
+    For condition 3 we must look at how the secret keys $\varSecKeyAlice$ and $\varSecKeyBob$ are constructed.
+    From the instantiation of $\procSendCoinsId$ we can see that Alice's share will be $\varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \cnstSumZeroToN \funArray{\varBlindingFactorAlice}$, where $\funStar{\varBlindingFactorAlice}$ is the blinding factor to her output and $\funArray{\varBlindingFactorAlice}$ are the blinding factors to her input coins.
+    Bobs secret key is constructed like $\varSecKeyBob \opAssign \funStar{\varBlindingFactorBob}$, so it corresponds to the blinding factor of his output.
+    From the construction of the two-party signature scheme in~\ref{def:sig:two-party-sig} we know that therefore the final signature will be valid under the following public key:
+    \[ \funStar{\varPubKey} \opAssign \funGen{\varSecKeyAlice} \opAddPoint \funGen{\varSecKeyBob} \]
+    Given how the secret keys are constructed we arrive at:
+    \[ \funStar{\varPubKey} \opAssign \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \cnstSumZeroToN \funArray{\funGen{- \varBlindingFactorAlice}} \opAddPoint \funGen{\varBlindingFactorBob} \]
+    If we can show that the public key $\varPubKey$ computed in $\procVerfTxId$ is the same as above, $\procVerf{\varMsg}{\varSignature}{\varPubKey} \opEqNoQ 1$ must hold and therefore condition 3 would be proven.
+    We show this by a stepwise conversion of the initial equation computing $\varPubKey$ until we arrive at the equation for $\funStar{\varPubKey}$:
+    \begin{gather}
+        \varPubKey \opEqNoQ \funStar{\varPubKey} \\
+        \cnstSumZeroToN \varOutputs \opSub \cnstSumZeroToN \varInputs \opEqNoQ \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \cnstSumZeroToN \funArray{\funGen{- \varBlindingFactorAlice}} \opAddPoint \funGen{\varBlindingFactorBob} \\
+        \varCoinOutAlice \opAddPoint \varCoinOutBob \opAddPoint \cnstSumZeroToN \funArray{(\varCoinInp)^{-1}}  \opEqNoQ\\
+        (\funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \funGenH{\varValue \opSub \varFundValue}) \opAddPoint
+        (\funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funGenH{\varFundValue}) \opAddPoint
+        \cnstSumZeroToN \funArray{(\funGen{- \varBlindingFactorAlice}, \funGenH{- \varValue_i})} \opEqNoQ \\
+        \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \cnstSumZeroToN \funGen{- \varBlindingFactorAlice} \opEqNoQ \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \cnstSumZeroToN \funGen{- \varBlindingFactorAlice} \\
+        1 \opEqNoQ 1
+    \end{gather}
+    From step 5.3 to 5.4 we replace every coin $\varCoin$ by its instantiation for a pedersen commitment $\varCoin \opEqNoQ \funGen{\varValue} \opAddPoint \funGenH{\varValue}$.
 
-    If $\procRecvCoinsId$ or $\procFinTxId$ (or the variants of them) are not called as implied in case 4) either Alice's or Bob's share of the signature will be missing from the final signature and again the signature verification in $\procVerfTxId$ will fail with overwhelming probability.
+    From step 5.4 to 5.4 we rely on the fact that if Alice is honest $\varValue \opEqNoQ \cnstSumZeroToN \varValue_i$, therefore also $(\varValue \opSub \varFundValue) \opAddScalar\varFundValue \opEqNoQ \cnstSumZeroToN \varValue_i$ must hold.
+    From that we can infer that $\funGenH{\varValue \opSub \varFundValue} \opAddPoint \funGenH{\varFundValue} \opAddPoint \cnstSumZeroToN \funGenH{- \varValue_i}$ must cancel out.
+    We have managed to show that condition 3 must hold and can conclude that \emph{Transaction Scheme Correctness} holds.
 
-    In case 5) the check in line 2 of $\procVerfTxId$ would fail and therefore return 0.
+    We will now argue that the same deriviation holds for \emph{Extended Transaction Scheme Correctness} \emph{Adapted Transaction Scheme Correctness}.
 
-    We have proven that in all cases for which a transaction is invalid $\procVerfTxId$ will return 0 and therefore the Theorem~\ref{lem:atom:correctness} must hold.
+    Condition 1 again follows trivially from the construction of $\procDSendCoinsId$ for the same reasons we have already layed out.
+
+    $\procDSendCoinsId$, $\procDRecvCoinsId$, $\procAptRecvCoinsId$ all rely on the same $\procCreateCoinId$ routine to create output coins, thereby condition 2 will hold for the same reasons as layed out before.
+
+    In the case of \emph{Extended Transaction Scheme Correctness} the blinding factors for the input coins $\funArray{\varCoinInp}$ are shared.
+    However, we can easily reduce this case to the proof for the regular case:
+    In $\procDSendCoinsId$ Alice and Carol construct their secret keys as follows:
+    \begin{gather}
+        \varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \cnstSumZeroToN \varBlindingFactorAlice \\
+        \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \opSub \cnstSumZeroToN \varBlindingFactorCarol
+    \end{gather}
+    $\varSecKeyAlice$ and $\varSecKeyCarol$ are then inputs to $\procDFinTxId$ in which a partial signature $\varSigAliceCarol$ is calculated, by both Alice and Carol signing with their secret key.
+    Assume the general key from before in which we have a single secret key $\varSecKeyAlice$.
+    We can split $\varSecKeyAlice$ into arbitrarily chosen shares $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ with $\varSecKeyAlice \opEqNoQ (\varSecKeyAlice)_1 + (\varSecKeyAlice)_2$.
+    By the definition of Two-Party Signatures~\ref{def:sig:two-party-sig} the combined signature from $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ will be valid under $\funGen{\varSecKeyAlice}$.
+    Thereby we can treat $\varSecKeyAlice$ and $\varSecKeyCarol$ from $\procSendCoinsId$ as arbitrary shares of a combined $\varSecKeyAliceCarol$.
+    It follows from the addtive homomorphic property of the elliptic curve that a signature valid under $\funGen{\varSecKeyAliceCarol}$ must also be valid under $\funGen{\varSecKeyAlice} \opAddPoint \funGen{\varSecKeyCarol}$.
+    The case of two receivers calling $\procDRecvCoinsId$ is symmetric.
+    From this we can conclude that condition 3 must also hold for the \emph{Extended Transaction Scheme}. \\
+    Now for the \emph{Adapted Extended Transaction Scheme} the same argument holds.
+    The only difference in this scheme is that in $\procDAptFinTxId$ Bob (instead of Alice) will call $\procFinSigId$, as only he knows his unadapted partial signature $\varSigBob$.
+    However, the construction of the signature remains unchanged, therefore the reduction we provided before must hold for the same reasons.
+
+    As we have managed to show that all $\procVerfTx{\varTx} \opEqNoQ 1$ must hold for all three transaction schemes, assuming the participants are honest and the underlaying commitment scheme $\varCommitScheme$, two signature scheme $\varSigSchemeMP$ and rangeproof system $\varProofSystem$ are correct theorem~\ref{lem:atom:correctness} must also hold.
 \end{proof}
 
 In the remains to show that the commitment scheme, signature scheme and rangeproof system used in the given instantiations of the three transaction schemes are correct.
@@ -746,6 +787,7 @@ From this we arrive at the following Theorem:
 Due to the fact that we require our challenger (Alice) to be honest for Bobs partial signature to be valid $\varSecKey$ (which is required for the adversary to win the game), it would have to be constructed like $\varSecKey \opAssign \funStar{\varBlindingFactorBob} \opAddScalar \sum \varBlindingFactor_i \opAddScalar \varRemainder \opAddScalar \varX$.
     The adversary knowing $\varSigBob, \funStar{\varBlindingFactorBob}$, $\sum \varBlindingFactor_i$ and $\varRemainder$, as well as his nonce $\varNonceBob$ chosen by him during the game, can now extract $\varX$ from the final signature as follows:
     We collect the adversaries chosen parameters in an object $\varSecret$.
+    \todo[inline]{Pedro think about $\varNonceBob$}
     \begin{center}
         \fbox{
         \begin{varwidth}{\textwidth}
