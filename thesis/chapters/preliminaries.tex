@@ -275,7 +275,7 @@ In this section we will outline the fundamental properties of the protocols empl
 \subsubsection{Transaction Structure} \label{subsec:pre:mimblwimble-tx}
 
 First we will define the notion of a coin in Mimblewimble which has similarity to an unspent transction output (UTXO) in Bitcoin.
-\begin{definition}[Mimblewimble Coin]
+\begin{definition}[Mimblewimble Coin]\label{def:pre:coin}
     For two adjacent elliptic curve generators $\varG$ and $\varH$ a coin in Mimblewimble is a tuple of the form ($\varCoin$, $\varProof$), where $\varCoin \opAssign \funGen{\varValue} \opAddPoint \funGenH{\varNonce}$ is a Pedersen Commitment~\cite{pedersen1991non}
     to the value $\varValue$ with blinding factor $\varNonce$. $\varProof$ is a range proof attesting to the statement that $\varValue$ is in a valid range in zero-knowledge.
     The valid range is defined by the specific implementation, in pratice $\langle 0, 2^{64} -1 \rangle$ is used in the most prominant implementations.
