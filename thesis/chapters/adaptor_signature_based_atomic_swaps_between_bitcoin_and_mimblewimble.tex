@@ -733,7 +733,7 @@ From this we arrive at the following Theorem:
     \[  \varPubKey \opAssign \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funSum{\varIterator \opAssign 1}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint \funGenH{\varRemainder} \]
     Again from the definition of pedersen commitments~\ref{def:pre:pedersen} we know that $\varH$ and $\varG$ are adjacent generators so there exists an unknown variable $\varX$ such that $\varH \opEqNoQ \funGen{x}$.
     Therefore we arrive at the following equation which we will use in $\procGameInfId{2}$:
-    \[  \varPubKey \opAssign \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funSum{\varIterator \opAssign 1}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint \funGen{\varRemainder \opAddScalar \varX} \]
+    \[  \varPubKey \opAssign \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funSum{\varIterator \opAssign 1}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint (\funGen{\varX})^{\varRemainder} \]
 
     \begin{center}
         \fbox{
@@ -753,7 +753,7 @@ From this we arrive at the following Theorem:
             \t \t \pcreturn 0 \\
             \pcif \varValue \opGreaterEq \funStar{\varValue} \\
             \t \pcreturn 0 \\
-            \varPubKey \opAssign \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funSum{\varIterator \opAssign 1}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint \funGen{\varRemainder \opAddScalar \varX} \\
+            \varPubKey \opAssign \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funSum{\varIterator \opAssign 1}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint (\funGen{\varX})^{\varRemainder} \\
             \pcreturn \varCoinOut \opEqNoQ \funGenH{\funStar{\varValue}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \procVerf{\varTx.\varSignature}{\varTx.\varMsg}{\varPubKey} \\
             \opAnd \varCoinOut \opIn \varTx.out \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
             }
@@ -784,7 +784,7 @@ From this we arrive at the following Theorem:
     From the instantiation of $\procFinTxId$ we know the final signature valid under $\varPubKey$ is computed by calling $\procFinSig{\varSigAlice}{\varSigBob}$ where $\varSigAlice$ is the partial signature of the challenger and $\varSigBob$ the one of adversary playing Bob.
     We recall the construction of $\procSignPrtId$ in figure~\ref{fig:twoparty-schnorr}
     \[ \varS \opAssign \varNonce \opAddScalar \varSecKey \opTimesScalar \varSchnorrChallenge \\ \]
-Due to the fact that we require our challenger (Alice) to be honest for Bobs partial signature to be valid $\varSecKey$ (which is required for the adversary to win the game), it would have to be constructed like $\varSecKey \opAssign \funStar{\varBlindingFactorBob} \opAddScalar \sum \varBlindingFactor_i \opAddScalar \varRemainder \opAddScalar \varX$.
+Due to the fact that we require our challenger (Alice) to be honest for Bobs partial signature to be valid $\varSecKey$ (which is required for the adversary to win the game), it would have to be constructed like $\varSecKey \opAssign \funStar{\varBlindingFactorBob} \opAddScalar \sum \varBlindingFactor_i \opAddScalar (\varX \opTimesScalar \varRemainder)$.
     The adversary knowing $\varSigBob, \funStar{\varBlindingFactorBob}$, $\sum \varBlindingFactor_i$ and $\varRemainder$, as well as his nonce $\varNonceBob$ chosen by him during the game, can now extract $\varX$ from the final signature as follows:
     We collect the adversaries chosen parameters in an object $\varSecret$.
     \todo[inline]{Pedro think about $\varNonceBob$}
