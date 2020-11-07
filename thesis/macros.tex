@@ -30,6 +30,7 @@
 \newcommand{\cnstMuToSoTx}{\styleVariable{Shared2SoloTx}}
 \newcommand{\cnstMuToMuTx}{\styleVariable{Shared2SharedTx}}
 \newcommand{\cnstFalsum}{\bot}
+\newcommand{\cnstFunction}{\styleFunction{f}}
 
 \newcommand{\cnstPayToCoin}{\styleVariable{PayToCoin}}
 \newcommand{\cnstPayToSharedCoin}{\styleVariable{PayToMuSigCoin}}
@@ -42,6 +43,11 @@
 \newcommand{\cnstTrueorFalse}{\{1,0\}}
 \newcommand{\cnstSumOneToN}{\funSum{\varI \opEqNoQ 1}{\varN}}
 \newcommand{\cnstSumZeroToN}{\funSum{\varI \opEqNoQ 0}{\varN}}
+\newcommand{\cnstSimulator}{\mathcal{S}}
+\newcommand{\cnstIdeal}{\styleFunction{IDEAL}}
+\newcommand{\cnstReal}{\styleFunction{REAL}}
+\newcommand{\cnstAbort}{\styleFunction{abort}}
+\newcommand{\cnstContinue}{\styleFunction{continue}}
 
 % functions
 \newcommand{\funHash}[1]{\cnstHash (#1)}
@@ -57,6 +63,7 @@
 \newcommand{\funArray}[1]{[#1]}
 \newcommand{\funLength}[1]{\styleFunction{len}(#1)}
 \newcommand{\funSum}[2]{\sum_{#1}^{#2}}
+\newcommand{\funAbs}[1]{|#1|}
 
 % variables
 \newcommand{\varScA}{\styleVariable{a}}
@@ -66,6 +73,9 @@
 \newcommand{\varBob}{\styleVariable{B}}
 \newcommand{\varB}{\styleVariable{b}}
 \newcommand{\varX}{\styleVariable{x}}
+\newcommand{\varY}{\styleVariable{y}}
+\newcommand{\varZ}{\styleVariable{z}}
+\newcommand{\varK}{\styleVariable{k}}
 \newcommand{\varProbability}{\styleVariable{P}}
 \newcommand{\varLanguage}{\styleVariable{L}_\cnstRelation}
 \newcommand{\varPrime}{\styleVariable{p}}
@@ -222,6 +232,8 @@
 \newcommand{\varSwpState}{\mathcal{A}}
 \newcommand{\varChain}{\styleVariable{C}}
 \newcommand{\varOpening}{\styleVariable{o}}
+\newcommand{\varProtocol}{\gamma}
+\newcommand{\varParty}[1]{\styleVariable{P}_{#1}}
 
 % operators
 \newcommand{\opAccess}[2]{#1.#2}
@@ -237,6 +249,7 @@
 \newcommand{\opTimesScalar}{~\cdot~}
 \newcommand{\opAddPoint}{~\cdot~}
 \newcommand{\opEq}{~\stackrel{?}{=}~}
+\newcommand{\opCompInd}{~\equiv_{c}~}
 \newcommand{\opEqNoQ}{~=~}
 \newcommand{\opNotEq}{~\neq~}
 \newcommand{\opSeperate}{,~}
@@ -247,6 +260,7 @@
 \newcommand{\opOr}{~\lor~}
 \newcommand{\opUnion}{~\cup~}
 \newcommand{\opSmEq}{~\leq~}
+\newcommand{\opX}{~\times~}
 \newcommand{\opGreaterThen}{~>~}
 \newcommand{\opGreaterEq}{~\geq~}
 \newcommand{\opForAll}{\;\forall\;}

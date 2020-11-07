@@ -107,6 +107,45 @@ That means no $\varX$ is known such that $\varH \opEqNoQ \funGen{x}$.
 
 \end{definition}
 
+To prove the security of our protocols we define the notion of security in the presence of malicious adversaries, which may deviate from the protocol arbitrarily.
+To construct the definition we must first define two terms, $\cnstIdeal$ the execution in the ideal model and $\cnstReal$, the execution in the real model.
+The following definitions are based on a tutorial paper on simulation proofs by Yehuda Lindell.~\cite{lindell2017simulate}
+
+\paragraph{Execution in the Ideal Model} We have two parties $\varParty{1}$ with input $\varX$ and $\varParty{2}$ with input $\varY$ that cooperate to compute a two-party functionality $\cnstFunction : \cnstBinary{*} \opX \cnstBinary{*} \rightarrowtail \cnstBinary{*} \opX \cnstBinary{*}$.
+The adversary $\cnstAdversary$ either controls $\varParty{1}$ or $\varParty{2}$.
+The ideal execution $\cnstIdeal$ relies on the assumption that we have access to a trusted third party and proceeds in the following steps:
+
+\begin{enumerate}
+    \item \textbf{Inputs:} The input of $\varParty{1}$ is $\varX$ and the input of $\varParty{2}$ is $\varY$.
+    Both parties get an additional auxiliary input $\varZ$.
+    We note that we can generalize the concept to functions which require multiple inputs or even functions which do not require any input.
+    In the case of multiple inputs the inputs of $\varParty{1}$ would then b a list $\funArray{\varX_i}$ and the inputs of $\varParty{2}$ a list $\funArray{\varY_i}$.
+    For the case of simplicity we here describe the case with one single parameter provided by each party.
+    \item \textbf{Send Inputs:} The honest party (the one which is not controlled by $\cnstAdversary$) sends its input $\varX$ (respective $\varY$) to the trusted third party.
+    The malicious party can either abort the execution by sending the symbol $\cnstAbort$ to the trusted third party, or send an arbitrarily chosen string $\varK$ with the same length to $\varX$ and $\varY$ to proceed with the protocol execution.
+    We denote $(\funStar{\varX}, \funStar{\varY})$ as the inputs received by the trusted third party.
+    If $\varParty{1}$ is malicious then $(\funStar{x}, \funStar{y}) \opEqNoQ (\varK, \varY)$, if $\varParty{2}$ is malicious then $(\funStar{x}, \funStar{y}) \opEqNoQ (\varX, \varK)$.
+    \item \textbf{Abort:} If the trusted third party has received $\cnstAbort$ from one of the parties, then it sends $\cnstAbort$ to both parties.
+    \item \textbf{Answer to Adversary:} After having received both inputs the trusted third party computes $\cnstFunction(\funStar{\varX}, \funStar{\varY}) \opEqNoQ (\cnstFunction_1(\funStar{\varX}, \funStar{\varY}), \cnstFunction_2(\funStar{\varX}, \funStar{\varY}))$ and proceeds by sending $\cnstFunction_1(\funStar{\varX}, \funStar{\varY})$ (respective $\cnstFunction_2(\funStar{\varX}, \funStar{\varY})$) to the adversary.
+    \item \textbf{Adversary Instructs Trusted Party:} $\cnstAdversary$ now again has the option of sending $\cnstAbort$ to the trusted third party to stop the execution.
+    Otherwise it may send $\cnstContinue$ which means the output $\cnstFunction_1(\funStar{\varX}, \funStar{\varY})$ (respective $\cnstFunction_2(\funStar{\varX}, \funStar{\varY})$) will be delivered to the honest party.
+    \item \textbf{Outputs:} The honest party outputs the answer of the trusted third party. The malicious party may output an arbitrary function of its input, the auxiliary string $\varZ$, or the answer for the trusted party.
+\end{enumerate}
+
+Let $\cnstAdversary$ be a non-uniform PPT algorithm and $\varI \opIn \{1,2\}$ be the index of the corrupted party.
+We then denote $\cnstIdeal_{\cnstFunction, \styleFunction{P}(\varZ), \varI}(\varX, \varZ)$ as the ideal execution of $\cnstFunction$ on inputs $(\varX, \varY)$ with auxiliary input $\varZ$ to $\cnstAdversary$ and security param $\varSecParam$ defined as the output pair of the honest party and $\cnstAdversary$ from the ideal execution.
+
+\paragraph{Execution in the Real Model} Again let $\cnstAdversary$ be a non-uniform PPT algorithm and $\varI \opIn \{1,2\}$ be the index of the corrupted party.
+Then the real execution of the two-party protocol $\varProtocol$ between $\varParty{1}$ and $\varParty{2}$ on inputs $(\varX, \varY)$ and auxiliary input $\varZ$ to $\cnstAdversary$ and security parameter $\varSecParam$ is denoted by $\cnstReal_{\cnstFunction, \styleFunction{P}(\varZ), \varI}(\varX, \varZ)$ and is defined as the output pair of the honest party and the adversary $\cnstAdversary$ from the real execution of $\varProtocol$.
+
+\begin{definition}[Security in the Malicious Setting]
+    We say a two-party protocol $\varProtocol$ with two parties $(\varParty{1}, \varParty{2})$ securely computes a function $\cnstFunction$ with aborts and inputs $(\varX, \varY)$ in the malicious setting if for every non-uniform PPT algorithm in the real model, there exists a non-uniform PPT algorithm $\cnstSimulator$, refered to as simulator, such that
+    \[
+        \{ \cnstIdeal_{\cnstFunction, \styleFunction{P}(\varZ), \varI}(\varX, \varZ) \opCompInd \cnstReal_{\cnstFunction, \styleFunction{P}(\varZ), \varI}(\varX, \varZ) \}
+    \]
+    where $\funAbs{\varX} \opEqNoQ \funAbs{\varY}$ and $\varZ \opEqNoQ \styleFunction{poly(\funAbs{x})}$.~\cite{lindell2017simulate}
+\end{definition}
+
 \section{Bitcoin} \label{sec:pre:bitcoin}
 
 In this section we will discuss the basics of the Bitcoin transaction protocol.
