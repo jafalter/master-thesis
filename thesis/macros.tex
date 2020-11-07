@@ -221,6 +221,7 @@
 \newcommand{\varMwTx}{\styleVariable{tx_{mw}}}
 \newcommand{\varSwpState}{\mathcal{A}}
 \newcommand{\varChain}{\styleVariable{C}}
+\newcommand{\varOpening}{\styleVariable{o}}
 
 % operators
 \newcommand{\opAccess}[2]{#1.#2}
@@ -248,7 +249,7 @@
 \newcommand{\opSmEq}{~\leq~}
 \newcommand{\opGreaterThen}{~>~}
 \newcommand{\opGreaterEq}{~\geq~}
-\newcommand{\opForAll}{\forall}
+\newcommand{\opForAll}{\;\forall\;}
 
 % procedures
 \newcommand{\procGenRId}{\styleFunction{genRel}}
@@ -411,7 +412,7 @@
 \newcommand{\procGameInf}[3]{\procGameInfId{#1}(#2,#3)}
 
 \newcommand{\procExtractXId}{\styleFunction{extractDLog}}
-\newcommand{\procExtractX}[4]{\procExtractXId(#1,#2,#3,#4)}
+\newcommand{\procExtractX}[2]{\procExtractXId(#1,#2)}
 
 \newcommand{\procDiscreteLogGameId}{\styleFunction{gameDLog}}
 \newcommand{\procDiscreteLogGame}[1]{\styleFunction{\procDiscreteLogGameId}(#1)}
