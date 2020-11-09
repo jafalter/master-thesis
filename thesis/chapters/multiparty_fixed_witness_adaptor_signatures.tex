@@ -236,7 +236,7 @@ First we define a auxiliary function $\procSetupCtxId$ to use for the instantion
     }
 \end{center}
 
-This function helps the particpents to setup and update the signature context shared between them. In figure~\ref{fig:twoparty-schnorr} we show a concrete instantiation of the protocol and functions. In $\procKeyGenPtId$ Alice
+This function helps the participants to setup and update the signature context shared between them. In figure~\ref{fig:twoparty-schnorr} we show a concrete instantiation of the protocol and functions. In $\procKeyGenPtId$ Alice
 and Bob will each randomly chose their secret key and nonce. They further require to create a zero-knowledge proof attesting to the fact that they have generated their key before any message was exchanged. This
 is essential for the scheme to achieve EUF-CMA as described by Lindell et al. ~\cite{lindell2017fast}.
 
@@ -300,24 +300,32 @@ to introduce the slightly adjusted $\procVerfPtSigId$ to be able to verify speci
     \label{fig:twoparty-schnorr}
 \end{figure}
 
-We further show in figure~\ref{fig:twoparty-schnorr-prot} how Alice and Bob can cooperate to produce a final signature which can be verified by the regular verification algorithm in~\ref{def:pre:signature-scheme}.
+We further formalize a protocol $\procDSignId$ which is a protocol between two-parties running the partial signature creation outlined before.
+Note that we assume that the secret keys as well as nonces used in the signatures have already been generated, for example by running the $\procKeyGenPtId$ protocol.
 
-\begin{figure}
-    \centering
-    \pseudocode[codesize=\scriptsize]{
-    \textbf{Alice}  \< \< \textbf{Bob} \\ [][\hline]
-    \< \<  \\
-    \< \text{Public Parameters: } \varMsg \opSeperate \varSecParam \< \\
-    \< ((\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext), (\varSecKeyBob, \varPubKeyBob, \varNonceBob, \varSigContext)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam} \\ \< \\
-    \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \< \< \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
-    \< \sendmessageleft*{\varSigBob} \< \\
-    \< \sendmessageright*{\varSigAlice} \< \\
-    \procVerfPtSig{\varSigBob}{\varMsg}{\varPubKeyBob} \opEq 1 \< \< \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice} \\
-    \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob}
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}$} {
+        Alice \< \< Bob \\
+        \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
+        \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
+        \< \sendmessageright*{\varSigContext, \varPubKeyAlice \opAssign \funGen{\varSecKeyAlice}} \< \\
+        \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyBob}}{\funGen{\varNonceBob}} \< \< \\
+        \< \< \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
+        \< \sendmessageleft*{\varSigBob, \varSigContext, \varPubKeyBob \opAssign \funGen{\varSecKeyBob}} \< \\
+        \pcif \procVerfPtSig{\varSigBob}{\varMsg}{\varPubKeyBob} \opEqNoQ 0 \< \< \\
+        \t \pcreturn \cnstFalsum \< \< \\
+        \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \< \< \\
+        \< \sendmessageright*{\varSigAlice} \< \\
+        \< \< \pcif \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice} \opEqNoQ 0 \\
+        \< \< \t \pcreturn \cnstFalsum \\
+        \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
+        \pcreturn \varSigFin \< \< \pcreturn \varSigFin
+        }
+    \end{varwidth}
     }
-    \caption{Two Party Schnorr Signature Scheme Interaction}
-    \label{fig:twoparty-schnorr-prot}
-\end{figure}
+\end{center}
 
 The final signature is a valid signature to the message $\varMsg$ with the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$.
 A verifier knowing the signed message $\varMsg$, the final signature $\varSigFin$ and the composite public key $\varPubKey$ can now verify the signature using the regular $\procVerfId$ procedure.
