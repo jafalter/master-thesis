@@ -140,7 +140,7 @@ We then denote $\cnstIdeal_{\cnstFunction, \styleFunction{P}(\varZ), \varI}(\var
 In this model a real two-party protocol $\varProtocol$ is executed but the adversary $\cnstAdversary$ sens alls messages in place of the corrupted party, and may follow an arbitrary polynomial-time strategy.
 Then the real execution of the two-party protocol $\varProtocol$ between $\varParty{1}$ and $\varParty{2}$ on inputs $(\varX, \varY)$ and auxiliary input $\varZ$ to $\cnstAdversary$ and security parameter $\varSecParam$ is denoted by $\cnstReal_{\cnstFunction, \styleFunction{P}(\varZ), \varI}(\varX, \varZ)$ and is defined as the output pair of the honest party and the adversary $\cnstAdversary$ from the real execution of $\varProtocol$.
 
-\begin{definition}[Security in the Malicious Setting]
+\begin{definition}[Security in the Malicious Setting]\label{subsec:pre:security}
     We say a two-party protocol $\varProtocol$ securely computes a function $\cnstFunction$ with aborts and inputs $(\varX, \varY)$ in the malicious setting if for every non-uniform PPT adversary $\cnstAdversary$ in the real model, there exists a non-uniform PPT algorithm $\cnstSimulator$, refered to as simulator, such that
     \[
         \{ \cnstIdeal_{\cnstFunction, \cnstSimulator(\varZ), \varI}(\varX, \varZ) \opCompInd \cnstReal_{\cnstFunction, \cnstAdversary(\varZ), \varI}(\varX, \varZ) \}

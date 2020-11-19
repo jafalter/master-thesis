@@ -1,0 +1,210 @@
+We start by providing a general instantiation of a signature scheme (see definition~\ref{def:pre:signature-scheme}):
+We assume we have a group $\cnstGroup$ with prime $\varPrime$, $\cnstHash$ is a secure hash function as defined in definition~\ref{def:pre:hash-function} and $\varMsg \opIn \cnstBinary{*}$ is a message.
+
+
+A concrete implementation can be seen in figure~\ref{fig:schnorr}. The signature scheme is called schnorr signature scheme, first defined in~\cite{schnorr1989efficient} and is widely employed in many cryptography systems.
+\begin{figure}
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procSetup{\varSecParam}$} {
+            \varKey \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \pcreturn (\varSecKey \opAssign \varKey \opSeperate \varPubKey \opAssign \funGen{\varKey})
+            }
+            \procedure[linenumbering]{$\procSign{\varMsg}{\varSecKey}$}{
+            \varNonce \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \varRand \opAssign \funGen{\varNonce} \\
+            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKey} \\
+            \varS \opAssign \varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey \\
+            \pcreturn \varSignature \opAssign (\varS, \varRand)
+            }
+            \procedure[linenumbering]{$\procVerf{\varMsg}{\varSignature}{\varPubKey}$} {
+            (\varS \opSeperate \varRand) \opFunResult \varSignature \\
+            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKey} \\
+            \pcreturn \funGen{\varS} \opEq \varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge}
+            }
+        \end{varwidth}
+        }
+    \end{center}
+    \caption{Schnorr Signature Scheme as first defined in~\cite{schnorr1989efficient}}
+    \label{fig:schnorr}
+\end{figure}
+Correctness of the scheme is easy to derive. As $\varS$ is calculated as $\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey$, when generator $\varG$ is raised to $\varS$, we get
+$\funGen{\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey}$ which we can transform into $\funGen{\varNonce} \opAddPoint \funGen{\varSecKey \opTimesScalar \varSchnorrChallenge}$, and finally
+into $\varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge}$ which is the same as the right side of the equation.
+
+From the regular schnorr signature we now provide an instantiation for the two-party case defined in definition~\ref{def:sig:two-party-sig}. Note that this two-party variant of the scheme is what is
+currently implemented in the mimblewimble-based cryptocurrencies and will provide a basis from which we will build our adapted scheme.
+
+First we define a auxiliary function $\procSetupCtxId$ to use for the instantion:
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procSetupCtx{\varSigContext}{\varPubKeyAlice}{\varRandAlice}$} {
+        \opAccess{\varSigContext}{\varPubKey} \opAssign \opAccess{\varSigContext}{\varPubKey} \opAddPoint \varPubKeyAlice \\
+        \opAccess{\varSigContext}{\varRand} \opAssign \opAccess{\varSigContext}{\varRand} \opAddPoint \varRandAlice \\
+        \pcreturn \varSigContext
+        } \\
+    \end{varwidth}
+    }
+\end{center}
+
+This function helps the participants to setup and update the signature context shared between them. In figure~\ref{fig:twoparty-schnorr} we show a concrete instantiation of the protocol and functions. In $\procKeyGenPtId$ Alice
+and Bob will each randomly chose their secret key and nonce. They further require to create a zero-knowledge proof attesting to the fact that they have generated their key before any message was exchanged. This
+is essential for the scheme to achieve EUF-CMA as described by Lindell et al. ~\cite{lindell2017fast}.
+
+In $\procKeyGenPtId$ Alice will initially setup the signature context and send it to Bob, together with her public and zk-proof.
+Bob verifies the proof (and exits if it is invalid). He will proceed by adding his parameters to the signature context and send it back to Alice, together with his public key and zk-proof, which Alice will verify.
+
+$\procSignPrtId$ and $\procVerfPtSigId$ are generally similiar to the instantiation of the normal schnorr signature scheme. Note however that for computing the schnorr challenge $\varSchnorrChallenge$ the input into
+the hash function will be the combined public key $\varPubKey$ and combined nonce commitment $\varRand$, which the participants can read from the context object $\varSigContext$. This has the effect that the partial
+signature itself are not yet a valid signature (neither under $\varPubKey$ nor under $\varPubKeyAlice$ or $\varPubKeyBob$). This is because to be valid under $\varPubKey$ the partial signatures are missing the $\varS$ values
+from the other participants. They are also not valid under the partial public keys $\varPubKeyAlice$ or $\varPubKeyBob$ because the schnorr challenge is computed already with the combined values. There we have
+to introduce the slightly adjusted $\procVerfPtSigId$ to be able to verify specifically the partial signatures.
+
+\begin{figure}
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procKeyGenPt{\varSecParam}{\varSecParam}$} {
+            \textbf{Alice} \< \< \textbf{Bob} \\
+            \varSecKeyAlice \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \varSecKeyBob \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \varNonceAlice \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \varNonceBob \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \varPubKeyAlice \opAssign \funGen{\varSecKeyAlice} \< \< \varPubKeyBob \opAssign \funGen{\varSecKeyBob} \\
+            \varRandAlice \opAssign \funGen{\varNonceAlice} \< \< \varRandBob \opAssign \funGen{\varNonceBob} \\
+            \varZkpStatementAlice \opAssign \exists \varSecKeyAlice \textit{ s.t. } \funGen{\varSecKeyAlice} \opEqNoQ \varPubKeyAlice \< \< \varZkpStatementBob \opAssign \exists \varSecKeyBob \textit{ s.t. } \funGen{\varSecKeyBob} \opEqNoQ \varPubKeyBob \\
+            \varProofAlice \opFunResult \procZkpProve{\varSecKeyAlice}{\varZkpStatementAlice} \< \< \varProofBob \opFunResult \procZkpProve{\varSecKeyBob}{\varZkpStatementBob} \\
+            \varSigContext \opAssign \langle \varPubKey \opAssign \cnstIdentityElement \opSeperate \varRand \opAssign \cnstIdentityElement \rangle \< \< \\
+            \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\varPubKeyAlice}{\varRandAlice} \< \< \\
+            \< \sendmessageright*{\varSigContext, \varPubKeyAlice, \varProofAlice} \< \\
+            \< \< \pcif \procZkpVerify{\varProofAlice} \opEqNoQ 0 \\
+            \< \< \t \pcreturn \cnstFalsum \\
+            \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\varPubKeyBob}{\varRandBob} \\
+            \< \sendmessageleft*{\varSigContext, \varPubKeyBob, \varProofBob} \< \\
+            \pcif \procZkpVerify{\varProofBob} \opEqNoQ 0 \< \< \\
+            \t \pcreturn \cnstFalsum \< \< \\
+            \pcreturn (\varSecKeyAlice,\varPubKeyAlice,\varNonceAlice,\varSigContext) \< \< \pcreturn (\varSecKeyBob,\varPubKeyBob,\varNonceBob,\varSigContext)
+            } \\
+            \procedure[linenumbering]{$\procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}$} {
+            (\varRand \opSeperate \varPubKey) \opFunResult \varSigContext \\
+            \varRandAlice \opAssign \funGen{\varNonceAlice} \\
+            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKey} \\
+            \varSAlice \opAssign \varNonceAlice \opAddScalar \varSecKeyAlice \opTimesScalar \varSchnorrChallenge \\
+            \pcreturn \varSigAlice \opAssign (\varSAlice, \varRandAlice, \varSigContext)
+            }
+            \procedure[linenumbering]{$\procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice}$} {
+            (\varSAlice \opSeperate \varRandAlice \opSeperate \varSigContext) \opFunResult \varSigAlice \\
+            (\varPubKey \opSeperate \varRand) \opFunResult \varSigContext \\
+            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKey} \\
+            \pcreturn \funGen{\varSAlice} \opEq \varRandAlice \opAddPoint \opPointScalar{\varPubKeyAlice}{\varSchnorrChallenge}
+            }
+            \procedure[linenumbering]{$\procFinSig{\varSigAlice}{\varSigBob}$} {
+            (\varSAlice \opSeperate \varRandAlice \opSeperate \varSigContext) \opFunResult \varSigAlice \\
+            (\varSBob \opSeperate \varRandBob \opSeperate \varSigContext) \opFunResult \varSigBob \\
+            (\varPubKey \opSeperate \varRand) \opFunResult \varSigContext \\
+            \varS \opAssign \varSAlice \opAddScalar \varSBob \\
+            \varSigFin \opAssign (\varS, \varRand) \\
+            \pcreturn \varSigFin
+            }
+        \end{varwidth}
+        }
+    \end{center}
+    \caption{Two Party Schnorr Signature Scheme}
+    \label{fig:twoparty-schnorr}
+\end{figure}
+
+We further formalize a protocol $\procDSignId$ which is a protocol between two-parties running the partial signature creation outlined before.
+Note that we assume that the secret keys as well as nonces used in the signatures have already been generated, for example by running the $\procKeyGenPtId$ protocol.
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}$} {
+        Alice \< \< Bob \\
+        \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
+        \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
+        \< \sendmessageright*{\varSigContext, \varPubKeyAlice \opAssign \funGen{\varSecKeyAlice}} \< \\
+        \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyBob}}{\funGen{\varNonceBob}} \< \< \\
+        \< \< \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
+        \< \sendmessageleft*{\varSigBob, \varSigContext, \varPubKeyBob \opAssign \funGen{\varSecKeyBob}} \< \\
+        \pcif \procVerfPtSig{\varSigBob}{\varMsg}{\varPubKeyBob} \opEqNoQ 0 \< \< \\
+        \t \pcreturn \cnstFalsum \< \< \\
+        \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \< \< \\
+        \< \sendmessageright*{\varSigAlice} \< \\
+        \< \< \pcif \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice} \opEqNoQ 0 \\
+        \< \< \t \pcreturn \cnstFalsum \\
+        \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
+        \pcreturn \varSigFin \< \< \pcreturn \varSigFin
+        }
+    \end{varwidth}
+    }
+\end{center}
+
+The final signature is a valid signature to the message $\varMsg$ with the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$.
+A verifier knowing the signed message $\varMsg$, the final signature $\varSigFin$ and the composite public key $\varPubKey$ can now verify the signature using the regular $\procVerfId$ procedure.
+
+Note that this way of computing schnorr signatures is not new.
+For a proof of its correctness and a more extensive explanation we refer the reader to a paper by Maxwell et al.~\cite{maxwell2019simple}.
+
+In figure~\ref{fig:aptSchnorr} we further provide a schnorr-based instantiation for the fixed witness adapted signature scheme as defined in definition~\ref{def:sig:two-party-fixed-wit-apt-sig}.
+
+$\procAptSigId$ will add the secret witness $\varWit$ to the $\varS$ value of the signature, this means we will not be able to verify the adapted signature using $\procVerfPtSigId$ anymore. Therefore we
+introduce $\procVerifyAptSigId$ which takes as additional parameter the statement $\varStatement$ which will be included in the verifiers equation. Now the function verifies not only validity of the portial
+signature, but also that it indeed has been adapted with the witness value $\varWit$, being the discrete logarithm of $\varStatement$. After obtaining $\varSigFin$, we can then cleverly unpack the secret $\varWit$,
+which is shown in the $\procExpExtId$ function.
+
+\begin{figure}
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procAptSig{\varSigPt}{\varWit}$}{
+            (\varS \opSeperate \varRandAlice \opSeperate \varSigContext) \opFunResult \varSigPt \\
+            \varSStar \opAssign \varS \opAddScalar \varWit \\
+            \pcreturn \varSigApt \opAssign (\varSStar \opSeperate \varRandAlice \opSeperate \varSigContext)
+            } \\
+            \procedure[linenumbering]{$\procVerifyAptSig{\varSigAptAlice}{\varMsg}{\varPubKeyAlice}{\varStatement}$} {
+            (\varSAlice \opSeperate \varRandAlice \opSeperate \varSigContext) \opFunResult \varSigAptAlice \\
+            (\varPubKey \opSeperate \varRand) \opFunResult \varSigContext \\
+            \varSchnorrChallenge \opAssign \funHash{\varMsg \opConc \varRand \opConc \varPubKey} \\
+            \pcreturn \funGen{\varSAlice} \opEq \varRandAlice \opAddPoint \opPointScalar{\varPubKeyAlice}{\varSchnorrChallenge} \opAddPoint \varStatement
+            }
+            \procedure[linenumbering]{$\procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob}$}{
+            (\varS \opSeperate \varRand) \opFunResult \varSigFin \\
+            (\varSAlice \opSeperate \varRandAlice \opSeperate \varSigContext) \opFunResult \varSigAlice \\
+            (\varSAptBob \opSeperate \varRandBob \opSeperate \varSigContext) \opFunResult \varSigAptBob \\
+            \varSBob \opAssign \varS \opSub \varSAlice \\
+            \varWit \opAssign \varSAptBob \opSub \varSBob \\
+            \pcreturn (\varWit)
+            }
+        \end{varwidth}
+        }
+    \end{center}
+    \caption{Fixed Witness Adaptor Schnorr Signature Scheme}
+    \label{fig:aptSchnorr}
+\end{figure}
+
+Again in figure~\ref{fig:apt-schnorr-interaction} we show another example interaction between Alice and Bob creating a signature $\varSigFin$ for the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$
+while Bob will hide his secret $\varWit$ which Alice can extract after the signing process has completed. One thing to note is that in this protocol only Bob is able to call $\procFinSigId$ to create the final signature. This
+is because the function requires Bobs unadapted partial signature $\varSigBob$ as input, which Alice does not know. (She only knows Bobs adapted variant). Therefore one further interaction is needed to send the final
+signature to Alice.
+
+\begin{figure}
+    \pseudocode[codesize=\scriptsize]{
+    \textbf{Alice} \< \< \textbf{Bob}  \\ [][\hline]
+    \< \<  \\
+    \< \text{Public Parameters: } \varMsg \opSeperate \varSecParam \< \\
+    \< ((\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext), (\varSecKeyBob, \varPubKeyBob, \varNonceBob, \varSigContext)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam} \\ \< \\
+    \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \< \< (\varWit \opSeperate \varStatement) \opFunResult \procGenR{\varSecParam} \\
+    \< \< \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
+    \< \< \varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit} \\
+    \< \sendmessageleft*{\varSigAptBob, \varStatement} \< \\
+    \procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEq 1 \< \< \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice}{} \opEq 1 \\
+    \< \sendmessageright*{\varSigAlice} \< \\
+    \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
+    \< \sendmessageleft*{\varSigFin} \< \\
+    \varWit \opFunResult \procExtWit{\varSigFin}{\varSigAlice}{\varSigBob}
+    }
+    \caption{Fixed Witness Adaptor Schnorr Signature Interaction}
+    \label{fig:apt-schnorr-interaction}
+\end{figure}
