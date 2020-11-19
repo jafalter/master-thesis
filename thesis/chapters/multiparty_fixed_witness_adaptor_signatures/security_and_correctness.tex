@@ -49,3 +49,7 @@ schnorr-based instantiation of the signature scheme, whereas $\varSigContext$ is
 
 \subsection{Security}\label{subsec:sig:secureaptscheme}
 
+We have shown that the outline signature scheme is correct, next we have to prove its security.
+We will prove security for both the $\procDSignId$ and $\procDAptSignId$ protocols in the hybrid model which was layed out by Yehuda Lindell in~\cite{lindell2017simulate}.
+In particular we will use the $\procZKfId$-model in which we assume that we have access to a constant-round protocol $\procZKfId$ that computes the zero-knowledge proof of knowledge functionality for any $\cnstNP$ relation $\cnstRelation$.
+

@@ -114,8 +114,11 @@ to introduce the slightly adjusted $\procVerfPtSigId$ to be able to verify speci
     \label{fig:twoparty-schnorr}
 \end{figure}
 
-We further formalize a protocol $\procDSignId$ which is a protocol between two-parties running the partial signature creation outlined before.
+We further formalize a protocol $\procDSignId$ which is a protocol between two parties running the partial signature creation outlined before.
 Note that we assume that the secret keys as well as nonces used in the signatures have already been generated, for example by running the $\procKeyGenPtId$ protocol.
+Both parties input the shared message $\varM$ as well as their secret keys and secret nonces.
+The protocol outputs a signature $\varSigFin$ to the message $\varSigFin$, valid under the composite public key $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
+Additionally to the final signature the protocol also outputs the composite public key $\varPubKey$.
 
 \begin{center}
     \fbox{
@@ -135,7 +138,8 @@ Note that we assume that the secret keys as well as nonces used in the signature
         \< \< \pcif \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice} \opEqNoQ 0 \\
         \< \< \t \pcreturn \cnstFalsum \\
         \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
-        \pcreturn \varSigFin \< \< \pcreturn \varSigFin
+        \varPubKey \opFunResult \varSigContext.\varPubKey \< \< \varPubKey \varSigContext.\varPubKey \\
+        \pcreturn (\varSigFin, \varPubKey) \< \< \pcreturn (\varSigFin, \varPubKey)
         }
     \end{varwidth}
     }
@@ -184,27 +188,41 @@ which is shown in the $\procExpExtId$ function.
     \label{fig:aptSchnorr}
 \end{figure}
 
-Again in figure~\ref{fig:apt-schnorr-interaction} we show another example interaction between Alice and Bob creating a signature $\varSigFin$ for the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$
-while Bob will hide his secret $\varWit$ which Alice can extract after the signing process has completed. One thing to note is that in this protocol only Bob is able to call $\procFinSigId$ to create the final signature. This
-is because the function requires Bobs unadapted partial signature $\varSigBob$ as input, which Alice does not know. (She only knows Bobs adapted variant). Therefore one further interaction is needed to send the final
-signature to Alice.
+We now define a protocol $\procDAptSignId$ between Alice and Bob creating a signature $\varSigFin$ for the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$
+Now Bob will hide his secret $\varWit$ which Alice can extract after the signing process has completed.
+One thing to note is that in this protocol only Bob is able to call $\procFinSigId$ to create the final signature, which is different to the previous protocol.
+This is because the function requires Bobs unadapted partial signature $\varSigBob$ as input, which Alice does not know. (She only knows Bobs adapted variant).
+Therefore, one further interaction is needed to send the final signature to Alice.
+The protocol outputs $(\varWit, (\varSigFin, \varPubKey))$ for Alice as she manages to learn $\varWit$ and $(\varSigFin, \varPubKey)$ for Bob.
 
-\begin{figure}
-    \pseudocode[codesize=\scriptsize]{
-    \textbf{Alice} \< \< \textbf{Bob}  \\ [][\hline]
-    \< \<  \\
-    \< \text{Public Parameters: } \varMsg \opSeperate \varSecParam \< \\
-    \< ((\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext), (\varSecKeyBob, \varPubKeyBob, \varNonceBob, \varSigContext)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam} \\ \< \\
-    \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \< \< (\varWit \opSeperate \varStatement) \opFunResult \procGenR{\varSecParam} \\
-    \< \< \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
-    \< \< \varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit} \\
-    \< \sendmessageleft*{\varSigAptBob, \varStatement} \< \\
-    \procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEq 1 \< \< \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice}{} \opEq 1 \\
-    \< \sendmessageright*{\varSigAlice} \< \\
-    \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
-    \< \sendmessageleft*{\varSigFin} \< \\
-    \varWit \opFunResult \procExtWit{\varSigFin}{\varSigAlice}{\varSigBob}
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procDAptSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}{\varWit}$} {
+        Alice \< \< Bob \\
+        \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
+        \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
+        \< \sendmessageright*{\varSigContext, \varPubKeyAlice \opAssign \funGen{\varSecKeyAlice}} \< \\
+        \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyBob}}{\funGen{\varNonceBob}} \< \< \\
+        \< \< \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
+        \< \< \varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit} \\
+        \< \< \varPubKeyBob \opAssign \funGen{\varSecKeyBob} \\
+        \< \< \varStatement \opAssign \funGen{\varWit} \\
+        \< \sendmessageleft*{\varSigAptBob, \varSigContext, \varPubKeyBob, \varStatement} \< \\
+        \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEqNoQ 0 \< \< \\
+        \t \pcreturn \cnstFalsum \< \< \\
+        \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \< \< \\
+        \< \sendmessageright*{\varSigAlice} \< \\
+        \< \< \pcif \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice} \opEqNoQ 0 \\
+        \< \< \t \pcreturn \cnstFalsum \\
+        \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
+        \< \sendmessageleft*{\varSigFin} \< \\
+        \varPubKey \opFunResult \varSigContext.\varPubKey \< \< \varPubKey \opFunResult \varSigContext.\varPubKey \\
+        \pcif \procVerf{\varMsg}{\varSigFin}{\varPubKey} \opEqNoQ 0 \\
+        \t \pcreturn \cnstFalsum \\
+        \varWit \opFunResult {\varSigFin}{\varSigAlice}{\varSigAptBob} \\
+        \pcreturn (\varWit, (\varSigFin, \varPubKey)) \< \< \pcreturn (\varSigFin, \varPubKey)
+        }
+    \end{varwidth}
     }
-    \caption{Fixed Witness Adaptor Schnorr Signature Interaction}
-    \label{fig:apt-schnorr-interaction}
-\end{figure}
+\end{center}

@@ -48,6 +48,7 @@
 \newcommand{\cnstReal}{\styleFunction{REAL}}
 \newcommand{\cnstAbort}{\styleFunction{abort}}
 \newcommand{\cnstContinue}{\styleFunction{continue}}
+\newcommand{\cnstNP}{\styleFunction{NP}}
 
 % functions
 \newcommand{\funHash}[1]{\cnstHash (#1)}
@@ -285,9 +286,9 @@
 \newcommand{\procSimpleCommit}[1]{\procSimpleCommitId(#1)}
 
 \newcommand{\procSignId}{\styleFunction{sign}}
-\newcommand{\procSign}[2]{ \procSignId(#1 \opSeperate #2) }
+\newcommand{\procSign}[2]{ \procSignId(#1, #2) }
 \newcommand{\procVerfId}{\styleFunction{verf}}
-\newcommand{\procVerf}[3]{ \procVerfId(#1 \opSeperate #2 \opSeperate #3) }
+\newcommand{\procVerf}[3]{ \procVerfId(#1, #2, #3) }
 
 \newcommand{\procCreateUTXOId}{\styleFunction{createUTXO}}
 \newcommand{\procCreateUTXO}[2]{\procCreateUTXOId (#1,#2)}
@@ -305,28 +306,30 @@
 \newcommand{\procVerfProofId}{\styleFunction{vrfRanPrf}}
 \newcommand{\procVerfProof}[2]{\procVerfProofId(#1,#2)}
 
+\newcommand{\procZKfId}{\styleFunction{f}^{\cnstRelation}_{zk}}
+
 \newcommand{\procKeyGenPtId}{\styleFunction{dKeyGen}}
-\newcommand{\procKeyGenPt}[2]{\procKeyGenPtId\langle #1 \opSeperate #2 \rangle}
+\newcommand{\procKeyGenPt}[2]{\procKeyGenPtId\langle #1, #2 \rangle}
 \newcommand{\procSetupCtxId}{\styleFunction{setupCtx}}
-\newcommand{\procSetupCtx}[3]{\procSetupCtxId( #1 \opSeperate #2 \opSeperate #3 )}
+\newcommand{\procSetupCtx}[3]{\procSetupCtxId( #1, #2, #3 )}
 \newcommand{\procSignPtId}{\styleFunction{signPt}}
-\newcommand{\procSignPt}[3]{\procSignPtId<(#1 \opSeperate #2)(#1 \opSeperate #3)>}
-\newcommand{\procSignPtSingle}[2]{\procSignPtId(#1 \opSeperate #2)}
-\newcommand{\procSignPrtId}{\styleFunction{signPrt}}
-\newcommand{\procSignPrt}[4]{\procSignPrtId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
+\newcommand{\procSignPt}[3]{\procSignPtId<(#1, #2)(#1, #3)>}
+\newcommand{\procSignPtSingle}[2]{\procSignPtId(#1, #2)}
+\newcommand{\procSignPrtId}{\styleFunction{signPt}}
+\newcommand{\procSignPrt}[4]{\procSignPrtId(#1, #2, #3, #4)}
 \newcommand{\procVerfPtSigId}{\styleFunction{vrfPt}}
-\newcommand{\procVerfPtSig}[3]{\procVerfPtSigId(#1 \opSeperate #2 \opSeperate #3)}
+\newcommand{\procVerfPtSig}[3]{\procVerfPtSigId(#1, #2, #3)}
 \newcommand{\procFinSigId}{\styleFunction{finSig}}
-\newcommand{\procFinSig}[2]{ \procFinSigId(#1 \opSeperate #2) }
+\newcommand{\procFinSig}[2]{ \procFinSigId(#1, #2) }
 
 \newcommand{\procAptSigId}{\styleFunction{adaptSig}}
-\newcommand{\procAptSig}[2]{\procAptSigId(#1 \opSeperate #2)}
+\newcommand{\procAptSig}[2]{\procAptSigId(#1, #2)}
 \newcommand{\procExtWitId}{\styleFunction{extWit}}
-\newcommand{\procExtWit}[3]{ \procExtWitId(#1 \opSeperate #2 \opSeperate #3) }
-\newcommand{\procVerifyAptSigId}{\styleFunction{verifyAptSig}}
-\newcommand{\procVerifyAptSig}[4]{\procVerifyAptSigId(#1 \opSeperate #2 \opSeperate #3 \opSeperate #4)}
+\newcommand{\procExtWit}[3]{ \procExtWitId(#1, #2, #3) }
+\newcommand{\procVerifyAptSigId}{\styleFunction{vrfAptSig}}
+\newcommand{\procVerifyAptSig}[4]{\procVerifyAptSigId(#1,#2,#3,#4)}
 \newcommand{\procFinAptSigId}{ \styleFunction{finAptPreSig} }
-\newcommand{\procFinAptSig}[5]{ \procFinAptSigId_{#3,#4,#5}(#1 \opSeperate #2) }
+\newcommand{\procFinAptSig}[5]{ \procFinAptSigId_{#3,#4,#5}(#1, #2) }
 
 \newcommand{\procExpForgId}{ \styleFunction{forgeAptSig_{\cnstAdversary}} }
 \newcommand{\procExpForg}[1]{ \procExpForgId(#1) }
@@ -370,14 +373,16 @@
 
 \newcommand{\procDSignId}{\styleFunction{dSign}}
 \newcommand{\procDSign}[5]{\procDSignId \langle(#1,#2,#3),(#1,#4,#5)\rangle}
+\newcommand{\procDAptSignId}{\styleFunction{dAptSign}}
+\newcommand{\procDAptSign}[6]{\procDAptSignId \langle(#1,#2,#3),(#1,#4,#5,#6)}
 \newcommand{\procDRProofId}{\styleFunction{dRanPrf}}
 \newcommand{\procDRProof}[4]{\procDRProofId \langle(#1,#2,#3),(#1,#2,#4)}
 
 \newcommand{\procDSendCoinsId}{\styleFunction{dSpendCoins}}
 \newcommand{\procDSendCoins}[6]{\procDSendCoinsId
-\langle (#1,#2,#3,#4,#6) \opSeperate (#1,#5,#3,#4,#6) \rangle}
+\langle (#1,#2,#3,#4,#6), (#1,#5,#3,#4,#6) \rangle}
 \newcommand{\procDRecvCoinsId}{\styleFunction{dRecvCoins}}
-\newcommand{\procDRecvCoins}[2]{\procDRecvCoinsId \langle(#1,#2) \opSeperate (#1,#2) \rangle}
+\newcommand{\procDRecvCoins}[2]{\procDRecvCoinsId \langle(#1,#2), (#1,#2) \rangle}
 \newcommand{\procDFinTxId}{\styleFunction{dFinTx}}
 \newcommand{\procDFinTx}[5]{\procDFinTxId \langle(#1,#2,#3),(#1,#4,#5)\rangle}
 
