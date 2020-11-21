@@ -306,7 +306,8 @@
 \newcommand{\procVerfProofId}{\styleFunction{vrfRanPrf}}
 \newcommand{\procVerfProof}[2]{\procVerfProofId(#1,#2)}
 
-\newcommand{\procZKfId}{\styleFunction{f}^{\cnstRelation}_{zk}}
+\newcommand{\procZKfId}[1]{\styleFunction{f}^{#1}_{zk}}
+\newcommand{\procZkf}[2]{\procZKfId{#1}(#2)}
 
 \newcommand{\procKeyGenPtId}{\styleFunction{dKeyGen}}
 \newcommand{\procKeyGenPt}[2]{\procKeyGenPtId\langle #1, #2 \rangle}
