@@ -363,33 +363,6 @@ and use it as the public key for validating the transaction signature. If the si
 
 \subsection{Extended Mimblewimble Transaction Scheme}\label{subsec:atom:ext-tx-scheme}
 
-So make the formalization of algorithms easier we define a protocol $\procDSignId$ which is a protocol between two-parties running the partial signature creation outlined in section~\ref{sec:sig:schnorr-inst}.
-Note that we assume that the secret keys as well as nonces are already given as a paramter (which is the case during the transaction protocol) therefore we don't need an additional call to $\procKeyGenPtId$.
-
-\begin{center}
-    \fbox{
-    \begin{varwidth}{\textwidth}
-        \procedure[linenumbering]{$\procDSign{\varMsg}{\varSecKeyAlice}{\varSecKeyBob}{\varNonceAlice}{\varNonceBob}$} {
-        Alice \< \< Bob \\
-        \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
-        \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
-        \< \sendmessageright*{\varSigContext, \varPubKeyAlice \opAssign \funGen{\varSecKeyAlice}} \< \\
-        \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyBob}}{\funGen{\varNonceBob}} \< \< \\
-        \< \< \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
-        \< \sendmessageleft*{\varSigBob, \varSigContext, \varPubKeyBob \opAssign \funGen{\varSecKeyBob}} \< \\
-        \pcif \procVerfPtSig{\varSigBob}{\varMsg}{\varPubKeyBob} \opEqNoQ 0 \< \< \\
-        \t \pcreturn \cnstFalsum \< \< \\
-        \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \< \< \\
-        \< \sendmessageright*{\varSigAlice} \< \\
-        \< \< \pcif \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice} \opEqNoQ 0 \\
-        \< \< \t \pcreturn \cnstFalsum \\
-        \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
-        \pcreturn \varSigFin \< \< \pcreturn \varSigFin
-        }
-    \end{varwidth}
-    }
-\end{center}
-
 Figure~\ref{fig:ext-mim-tx-spend} shows an instantiation of the $\procDSendCoinsId$ function of the Extended Mimblewimble Transaction Scheme. We have one array of input coins which keys are shared between two parties
 Alice and Carol, which should be spent. We use Carol here to not confuse this party with the receiver, which we previously called Bob. Although Carol and $\varBob$ could be the same person, they not necessarily have to be.
 
@@ -563,8 +536,6 @@ The general process will be to find a proof for the basic transaction protocol d
 We will argue \emph{Transaction Scheme Correctness} follows from the correctness of the commitment scheme $\varCommitScheme$, two-party signature scheme $\varSigScheme$ as well as the correctness of the range proof system $\varProofSystem$ used in the transaction protocol.
 If the transaction was constructed correctly (that is by calling the procedures $\procSendCoinsId, \procRecvCoinsId, \procFinTxId$, the distributed variants $\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId$ or the adapted ones $\procAptRecvCoinsId, \procDAptFinTxId$ with valid inputs) it must follow that the final transaction has correct commitments, rangeproofs and a valid signature and $\procVerfTxId$ will therefore return 1.
 We construct the following theorem:
-
-\newtheorem{theorem}{Theorem}
 
 \begin{theorem}\label{lem:atom:correctness}
     \emph{Transaction Scheme Correctness}, \emph{Extended Transaction Scheme Correctness} or \emph{Adapted Transaction Scheme Correctness} for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$, $\varextMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ or $\varaptMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ holds if and only if the underlying Commitment Scheme $\varCommitScheme,$ Two-Party Signature Scheme $\varSigSchemeMP$ and Rangeproof system $\varProofSystem$ are correct.
@@ -799,7 +770,7 @@ From this we arrive at the following Theorem:
     Given $\procExtractXId$ the adversary now is able to win $\procDiscreteLogGameId$ as follows:
     Given $\varG$ and $\varPubKey$ by the $\procDiscreteLogGameId$ we can construct a simulation by setting up the pedersen commitment scheme during $\procGameInfId{2}$ as $\procSetupComPed{\varG}{\varPubKey}$.
     After the game has completed the adversary can compute $\varRemainder \opAssign \cnstSumZeroToN (\varValue_i) \opSub \varValue$ and afterward $\varX \opFunResult \procExtractX{\varOpening}{\varRemainder}$
-    As the commitment scheme is setup with $\varG$ and $\varPubKey$, $\varPubKey \opEqNoQ \funGen{\varX}$ must hold, and $\varX$ will therefore be accepted as a solution to the $\procDiscreteLogGameId$ game.
+    As the commitment scheme is setup with $\varG$ and $\varPubKey$, $\varPubKey \opEqNoQ \funGen{\varX}$ must hold, and $\varX$ will therefore be accepted as a solution to the $\\procDiscreteLogGameId$ game.
     We have therefore arrived at a contradiction and can conclude that theorem~\ref{theo:atom:infl-resistence} must hold.
 \end{proof}
 
