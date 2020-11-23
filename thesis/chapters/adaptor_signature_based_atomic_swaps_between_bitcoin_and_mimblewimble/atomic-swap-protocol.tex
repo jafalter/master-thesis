@@ -58,9 +58,9 @@ Immediately after, both parties collaborate again to spend this shared coin back
 It is immanent that Alice does not publish the first transaction (A -> AB) before the timelocked refund transaction (AB -> A) was signed, otherwise her funds are locked in the shared output without the possibility of refund.
 The setup protocol concludes with the funds locked up in both chains and ready to be swapped.
 
-\footnotetext[1]{$\procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varAmountMW}{\varValueMw}{\cnstFalsum}$}
+\footnotetext[1]{$\procSendCoins{\funArray{\varSpendableCoin}}{\varAmountMW}{\cnstFalsum}$}
 \footnotetext[2]{$\procDRecvCoins{\varPreTx}{\varPreTx}$}
-\footnotetext[3]{$\procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\varTimeMW}$}
+\footnotetext[3]{$\procDSendCoins{\funArray{\varSpendableCoinAlice}}{\funArray{\varSpendableCoinBob}}{\varAmountMW}{\varTimeMW}$}
 \footnotetext[4]{$\procDFinTx{\funStar{\varPreTx_2}}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}$}
 
 \newgeometry{margin=2cm}
@@ -130,7 +130,7 @@ She will now create her own output $\varUTXO_{\varAlice}$, and will transfer the
 After publishing this transaction to the Bitcoin network, Alice is in full possession of the swapped funds on the Bitcoin side.
 The procedure returns 1 if the swap was successfully executed or 0 otherwise (when not enough time was left to safely execute the swap).
 
-\footnotetext[5]{$\procDSendCoins{\funArray{\varCoinShared}}{\funArray{\funStar{\varBlindingFactorAlice}}}{\varAmountMW}{\varAmountMW}{\funArray{\funStar{\varBlindingFactorBob}}}{\cnstFalsum}$}
+\footnotetext[5]{$\procDSendCoins{\funArray{\varSpendableCoinAlice}}{\funArray{\varSpendableCoinBob}}{\varAmountMW}{\cnstFalsum}$}
 \footnotetext[6]{$\procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$}
 
 \newgeometry{margin=2cm}

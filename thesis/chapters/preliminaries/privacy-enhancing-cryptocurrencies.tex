@@ -1,0 +1,27 @@
+\subsection{Zero Knowledge Proofs} \label{sec:pre:privacy:zeroknowlegde}
+
+\subsection{Range Proofs} \label{sec:pre:rangeproof}
+
+\begin{definition}[Rangeproof System]\label{def:pre:rangeproof}
+    A Rangeproofs system $\varRProofSystemParam{\varCommitScheme}$ with regards to a homomorphic commitment scheme $\varCommitScheme$ consists of a tupel of functions $(\procRProofSetupId, \procProofId, \procVerfProofId)$.
+    \begin{itemize}
+        \item $\varRProofParams \opFunResult \procRProofSetup{\varSecParam}{\varI}{\varJ}$: The rangeproof setup algorithm takes as input a security paramter $\varSecParam$ as well as two numbers
+        $\varI$ and $\varJ$ which are treated as exponents of 2 to define the lower and upper bound of the rangeproof protocol.
+        \item $\varProof \opFunResult \procProof{\varCommitment}{\varValue}{\varBlindingFactor}$: The proof algorithm is a DPT function which takes as input a commitment $\varCommitment$ a value $\varValue$ and
+        a blinding factor $\varBlindingFactor$. It will output a proof $\varProof$ attesting to the statement that the value $\varValue$ of commitment $\varCommitment$ is in between the range $\langle \varLowerBound, \varUpperBound \rangle$ as
+        defined during the $\procRProofSetupId$ function.
+        \item $\{1,0\} \opFunResult \procVerfProof{\varProof}{\varCommitment}$: The proof verification algorithm is a DPT function which verifies the validity of the proof $\varProof$ with regards to the commitment
+        $\varCommitment$. It will output 1 upon a successfull verification or 0 otherwise.
+    \end{itemize}
+\end{definition}
+
+\begin{definition}[Multiparty Rangeproof System]
+    A Multiparty Rangeproof Sytem $\varMPRProofSystemParam{\varCommitScheme}$ with regards to a homomorphic commitment scheme $\varCommitScheme$ is an extension of the regular Rangeproof Sytem with the following
+    distributed protocol $\procDRProofId$.
+    \begin{itemize}
+        \item $\varProof \opFunResult \procDRProof{\varCommitment}{\varValue}{\varBlindingFactorAlice}{\varBlindingFactorBob}$: The distributed proof protocol allows two parties Alice and Bob, each owning a share of the
+        commitment $\varCommitment$ to cooperate in order to produce a valid range proof $\varProof$ without a party learning the blinding factor share from the other party.
+    \end{itemize}
+\end{definition}
+
+For MP proofs \cite{klinec2020privacy}

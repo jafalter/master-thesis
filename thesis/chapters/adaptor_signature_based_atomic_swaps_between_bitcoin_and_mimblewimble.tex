@@ -1,20 +1,20 @@
-In this section, we will define Mimblewimble transactions and security properties which must hold for such a transaction system. The formalizations will be similar to those found by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}.
-However, we will only focus on the transaction protocol (transferring value from one or many parties to one or many parties), the notions of transaction aggregation, coin minting and adding transaction to the main ledger also discussed in~\cite{fuchsbauer2019aggregate} will not be topic of this formalization, as
-they are not relevant building blocks for the proposed Atomic Swap protocol.
+In this section, we will define procedures and protocols to construct Mimblewimble transactions and prove their security.
+The formalizations will be similar to those found by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}, in particular the final transactions constructed by our protocols should be valid transactions as by the definitions by Fuchsbauer et al.
+As we will only focus on the transaction protocol (transferring value from one or many parties to one or many parties), the notions of transaction aggregation, coin minting and adding transaction to the main ledger discussed in~\cite{fuchsbauer2019aggregate} will not be topic of this formalization, as they are not relevant building blocks for the proposed Atomic Swap protocol.
 
-However, as an extension to the regular transaction protocol transferring value from one sender to a receiver we will define two further protocols. The first of them titled \emph{Extended Mimblewimble Transaction Scheme}
-will provide additional functions to create and spend coins owned by two parties instead of just one. The second extended definition is called \emph{Adapted Extended Mimblewimble Transaction Scheme} and will allow the receiver
-of a coin to hide a secret witness value $\varWit$ in his signature, in a way that the sender (or the senders) can redeem this secret after the protocol has completed.
+As an extension to the regular transaction protocol transferring value from one sender to a receiver we will define two further protocols.
+The first of them titled \emph{Extended Mimblewimble Transaction Scheme} will provide additional functions to create and spend coins owned by two parties instead of just one, thereby enabling coins owned by mutliple parties at once, which is similar to a mutlisig address in Bitcoin~\cite{antonopoulos2014mastering}.
+The second extended definition is called \emph{Script Mimblewimble Transaction Scheme} and will allow the receiver
+of a coin to hide a secret witness value $\varWit$ in his part if the transaction, in a way that the sender (or the senders) can redeem this secret after the protocol has completed and the final transaction is available.
 
-We will proceed by providing an instantiation of the three transactions schemes which can be implemented and deployed on a Mimblewimble based Cryptocurrency such as Beam or Grin. Furthermore we provide proofs
-that the schemes are correct and secure with regards to the defined security properties.
-
-Finally, we define a Atomic Swap protocol from these building blocks, allowing two parties to securely and trustlessly swap funds from a Mimblewimble blockchain with those on another blockchain, such as Bitcoin.
+We will proceed by providing an instantiation of the three transactions schemes in section~\ref{sec:atom:inst} which can be implemented and deployed on a Mimblewimble based Cryptocurrency such as Beam or Grin.
+Furthermore we provide proofs that the schemes are correct and secure in the malicious setting as defined in~\ref{subsec:pre:security}.
+Finally, we define a Atomic Swap protocol from these building blocks, allowing two parties to securely and trustlessly swap funds from a Mimblewimble blockchain with those on another blockchain, such as Bitcoin in section~\ref{sec:atom:atomic-swap}.
 
 \section{Definitions}\label{sec:atom:definitions}
 \input{chapters/adaptor_signature_based_atomic_swaps_between_bitcoin_and_mimblewimble/definitions}
 
-\section{Instantiation}\label{sec:atom:atomic-inst}
+\section{Instantiation}\label{sec:atom:inst}
 \input{chapters/adaptor_signature_based_atomic_swaps_between_bitcoin_and_mimblewimble/instantiation}
 
 \section{Security \& Correctness} \label{sec:atom:security}
