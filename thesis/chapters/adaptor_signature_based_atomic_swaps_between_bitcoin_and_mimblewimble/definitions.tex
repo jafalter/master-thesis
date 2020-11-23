@@ -1,0 +1,231 @@
+As we have already discussed in section~\ref{sec:pre:mimblewimble} for the creation of a transaction in Mimblewimble, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
+To construct the transaction protocol we assume that we have access to a two-party signature scheme $\varSigSchemeMP$ as defined in definition~\ref{def:sig:two-party-sig}, a zero-knowledge Rangeproofs system $\varProofSystem$
+such as Bulletproofs, as described in section~\ref{sec:pre:rangeproof} and a homomorphic commitment scheme $\varCommitScheme$ as defined in definition~\ref{def:pre:homo-com} such as
+Pedersen Commitments~\ref{def:pre:pedersen}.
+
+Fuchsbauer et al. have defined three procedures $\styleFunction{Send}$, $\styleFunction{Rcv}$ and $\styleFunction{Ldgr}$ with regards to the creation of a transaction. $\styleFunction{Send}$ called by the sender
+will create a pre-transaction, $\styleFunction{Rcv}$ takes the pre-transaction and adds the receivers output and $\styleFunction{Ldgr}$ (again called by the sender) publishes the final transaction to the blockchain ledger.
+As we have already pointed out in this thesis we won't discuss the transaction publishing phase therefore we will not cover the functionality of the $\styleFunction{Ldgr}$ procedure, instead we introduce two
+functions $\procFinTxId$ and $\procVerfTxId$. $\procFinTxId$ can be called by the transaction sender to finalize a pre-transaction into final valid transaction, which then could be broadcast with a node
+connected to the blockchain. The $\procVerfTxId$ function is called by nodes (acting as public verifiers) on the blockchain verifying the validity of the transaction, before including them in a block.
+
+\begin{definition}[Mimblewimble Transaction Scheme]
+    \label{def:atom:mw-tx-scheme}
+    A Mimblewimble Transaction Scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ with commitment scheme $\varCommitScheme$, two-party signature scheme $\varSigSchemeMP$, and rangeproof system $\varProofSystem$ consists of the following tupel of procedures:
+    \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign ( \procSendCoinsId,\procRecvCoinsId,\procFinTxId,\procVerfTxId ) \]
+    \begin{itemize}
+        \item $(\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactor}}{\varFundValue}{\varValue}{\varTime}$: The spendCoins algorithm is a DPT function called by the sending party to initiate the spending of some input coins.
+        As input it takes a list of coins $\funArray{\varCoinInp}$ which should be spent, the respective blinding factors $\funArray{\varBlindingFactor}$ to the input coins, and a value $\varFundValue$ which should be transferred to the receiver as well as a value $\varValue$ which is the total value stored in the input coins.
+        Optionally a sender can pass a block height $\varTime$ when this transaction should become valid.
+        It outputs a pre-transaction $\varPreTx$ which can be send to a receiver, as well as the senders signing key and secret nonce later used for signing $(\varSecKeyAlice, \varNonceAlice)$.
+        \item $(\funStar{\varPreTx}, (\varCoinOutBob, \varBlindingFactorBob)) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue}$: The receiveCoins algorithm is a DPT routine called by the receiver and takes as input a pre-transaction $\varPreTx$ and a fund value
+        $\varFundValue$. It will construct the receivers output coin and output a modified pre-transaction $\funStar{\varPreTx}$ together with the new outputcoin $\varCoinOutBob$ and its blinding factor $\varBlindingFactorBob$.
+        \item $\varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}$: The finalize algorithm is a DPT routine again called by the transaction sender that takes as input a pre-transaction $\varPreTx$ and the senders signing key $\varSecKeyAlice$ and nonce $\varNonceAlice$.
+        The function will output a finalized transaction $\varTx$, which can be published to the blockchain.
+        \item $\{1,0\} \opFunResult \procVerfTx{\varTx}$: The transaction verification algorithm is a DPT function which can be called by a public verifier and takes as input a transaction $\varTx$. It
+        outputs either 1 on verification success or 0 otherwise.
+    \end{itemize}
+\end{definition}
+
+We say a Mimblewimble Transaction Scheme is correct if the verification algorithm $\procVerfTxId$ returns 1 if and only if the transaction is well balanced and its signature is valid.
+More formally:
+\begin{definition}[Transaction Scheme Correctness]
+    \label{def:atom:tx-scheme-correctness}
+    For any list of input coins $\funArray{\varCoinInp}$ with total value $\varValue$ and blinding factors
+    $\funArray{\varBlindingFactor}$ and a transaction fund value $\varFundValue$ with $\varFundValue \opSmEq \varValue$ the following must hold:
+    \[
+        \Pr\left[
+        \begin{array}{c}
+            \: \procVerfTx{\varTx} \opEqNoQ 1
+        \end{array}
+        \middle\vert
+        \begin{array}{l}
+            (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactor}}{\varFundValue}{\varValue}{\cnstFalsum} \\
+            (\funStar{\varPreTx}, \cdot) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue}                                                          \\
+            \varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}
+        \end{array}
+        \right]=1.
+    \]
+\end{definition}
+
+\begin{definition}[Extended Mimblewimble Transaction Scheme]
+    \label{def:atom:ext-mw-tx-scheme}
+    An extended Mimblewimble transaction scheme $\varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ is an extension to $\varMWScheme$ with the following two procedures:
+    \[ \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc (\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId) \]
+    \begin{itemize}
+        \item $\langle (\varPreTx,(\varSecKeyAlice,\varNonceAlice)), (\varPreTx,(\varSecKeyCarol,\varNonceCarol)) \rangle \\
+        \opFunResult \procDSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValue}{\funArray{\varBlindingFactorCarol}}{\varTime}$:
+        The distributed coin spending algorithm takes as input a list of input coins, as well as a list of blinding factors from each Alice and Carol, and the to be transferred value $\varFundValue$ and total value of input coins $\varValue$.
+        Note that for each provided input coin $\varCoinInp$ the blinding factor is composed by combining the shares from Alice and Carol like
+        $\varBlindingFactor \opAssign \varBlindingFactorAlice \opAddScalar \varBlindingFactorCarol$.
+        Again optionally a block height $\varTime$ can be given to time lock the transaction.
+        \item $\langle (\funStar{\varPreTx}, (\varCoinShared, \funStar{\varBlindingFactorBob})), (\funStar{\varPreTx}, (\varCoinShared, \funStar{\varBlindingFactorCarol})) \rangle \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue}$: The distributed coin receive procedure takes as input a pre-transaction $\varPreTx$ and a value $\varFundValue$ which should be transferred during the course of the transaction.
+        The distributed algorithm will generate a output coin owned by both Alice and Carol. (each owning a share of the key).
+        The output will be an updated pre-transaction $\funStar{\varPreTx}$, the shared output coin $\varCoinShared$ and the respective shares of the blinding factor.
+        Note that $\varCoinShared$ will only be spendable if both owners cooperate running the $\procDSendCoinsId$ protocol.
+        \item $\langle \varTx, \varTx \rangle \opFunResult \procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}$: The distributed finalized transaction protocol has to be used if we are creating a transaction spending a shared coin (i.e. the transaction was created with the $\procDSendCoinsId$ algorithm).
+        In this case we require signing information from both Alice and Carol.
+        Again an optional locktime $\varTime$ can be provided.
+    \end{itemize}
+\end{definition}
+
+Correctness is given very similar to the standard scheme:
+
+\begin{definition}[Extended Transaction Scheme Correctness]
+    \label{def:atom:ext-tx-scheme-correctness}
+    For any list of input coins $\funArray{\varCoinInp}$ with total value $\varValue$ and split blinding factors
+    $(\funArray{\varBlindingFactorAlice}, \funArray{\varBlindingFactorCarol})$ and a transaction fund value $\varFundValue$ with $\varFundValue \opSmEq \varValue$ the following must hold:
+    \[
+        \Pr\left[
+        \begin{array}{c}
+            \: \procVerfTx{\varTx} \opEqNoQ 1
+        \end{array}
+        \middle\vert
+        \begin{array}{l}
+            \langle (\varPreTx, (\varSecKeyAlice, \varNonceAlice)), (\varPreTx, (\varSecKeyCarol, \varNonceCarol)) \rangle \opFunResult \\
+            \procDSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValue}{\funArray{\varBlindingFactorCarol}}{\cnstFalsum} \\
+            \langle (\funStar{\varPreTx}, \cdot)(\funStar{\varPreTx}, \cdot) \rangle \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue} \\
+            \varTx \opFunResult \procDFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}
+        \end{array}
+        \right]=1.
+    \]
+\end{definition}
+
+\begin{definition}[Adapted Extended Mimblewimble Transaction Scheme]
+    \label{def:atom:apt-ext-mw-tx-scheme}
+    The adapted version of the extended Mimblewimble Transaction Scheme updates the Extended Mimblewimble Transaction Schme by providing a modified version of the single party receive routine and the distributed finalize transaction protocol.
+    \[ \varaptMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc \procAptRecvCoinsId, \procDAptFinTxId \]
+    \begin{itemize}
+        \item $(\funStar{\varPreTx}, (\varCoinOutBob,\varBlindingFactorBob), \varSigBob) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$: The adapted variant of the receive function takes an additional input a secret witness value
+        $\varWit$ which will be hidden in the transactions signature and extractable by the other party after the protocols' completion.
+        Note that the routine also returns Bob's unadapted partial signature.
+        The reason for this is that we later still need the unadapted version to complete the signature und thereby finalize the transaction.
+        By not sharing this unadapted signature with Alice, Bob is the one who gets to finalize the transaction which is different from the simpler protocol and is an important feature for our atomic swap protocol.
+        \item $\langle \varSigAliceBob, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$: The adapted variant of the finalize transaction algorithm is a distributed protocol between the sender(s) and receiver.
+        Additionally to the pre-transaction $\funStar{\varPreTx}$ the senders need to input their signing information, Bob needs to input the unadapted version of his partial signature as it is needed for transaction completion.
+        This protocol could also be implemented as a three party protocol, two senders controlling a shared coin and a third receiver.
+        However, as in the case we will describe later in~\ref{sec:atom:atomic-swap} one of the two senders is also the receiver, we allowed ourselves to model this protocol as being between only two parties to simplify the formalization.
+        In this version of the protocol only Bob will be able to finalize the transaction, which is different to $\procFinTxId$ and $\procDFinTxId$.
+        This has the practical reason that for the atomic swap execution Bob needs to be the one in control of the final transaction.
+        If Alice were to build the final transaction before Bob, she might be able to extract the Witness value before the transaction has been published, which in the atomic swap scenario would mean she could steal the funds stored on the other chain.
+        This is why the protocol does not return the final transaction $\varTx$ to Alice, instead the protocol will output the senders partial signature, which Alice can later use to extract a witness value.
+    \end{itemize}
+\end{definition}
+
+Similar as before we define correctness for the adapted scheme:
+
+\begin{definition}[Adapted Transaction Scheme Correctness]
+    \label{def:atom:apt-tx-scheme-correctness}
+    For any list of input coins $\funArray{\varCoinInp}$ with total value $\varValue$ and blinding factors
+    $\funArray{\varBlindingFactor}$ and a transaction fund value $\varFundValue$ with $\varFundValue \opSmEq \varValue$ and any witness value $\varX$ the following must hold:
+    \[
+        \Pr\left[
+        \begin{array}{c}
+            \: \procVerfTx{\varTx} \opEqNoQ 1
+        \end{array}
+        \middle\vert
+        \begin{array}{l}
+            (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactor}}{\varFundValue}{\varValue}{\cnstFalsum} \\
+            (\funStar{\varPreTx}, (\varCoinOutBob,\varBlindingFactorBob), \varSigBob) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit} \\
+            \langle \varSigAliceCarol, \varTx \rangle \opFunResult \procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyCarol}{\varNonceCarol}{\varSigBob}
+        \end{array}
+        \right]=1.
+    \]
+\end{definition}
+
+\emph{Resistance against inflation}: We first define a security property which informally states that a transactions output value can only be less or equal to the value of its input coins (if less then the miner of the transaction can extract fees).
+In other words a transaction in our definition shall only transfer existing but never generate any new value. We call this security property \emph{Inflation Resistance}.
+In order to define this property we first have to define a cryptographic game $\procInflateId$ which takes as input a security parameter $\varN$ and a value $\varValue$ which the Adversary
+$\cnstAdversary$ tries to inflate.
+
+We define the game $\procInflateId$ as follows, whereas a challenger creates a input coin with value $\varValue$ given as a parameter to the game. The adversary then chooses a value $\funStar{\varValue}$ with
+$\funStar{\varValue} \opGreaterThen \varValue$ and creates a new output coin $\varCoinOut$. The adversary wins if he can construct a valid transaction spending the challengers input coin $\varCoinInp$ to $\varCoinOut$ and thereby
+creating new value in the total of $\funStar{\varValue} \opSub \varValue$.
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procInflate{\varN}{\varValue}$} {
+        \varRProofParams \opFunResult \procRProofSetup{\varSecParam}{0}{2^{64}} \\
+        \varPrime \sample \cnstIntegersPrimeWithoutZero{p} \\
+        \varG, \varH \sample \cnstGroup_\varPrime \\
+        \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \\
+        \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
+        (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactorAlice} \\
+        (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
+        (\funStar{\varPreTx}, \funArray{(\varCoin_0, \varValue_0, \funStar{\varBlindingFactor_0}),..,(\varCoin_n, \varValue_n, \funStar{\varBlindingFactor_n})}) \opFunResult \cnstAdversary (\varPreTx) \\
+        \varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
+        \pcreturn (\cnstSumZeroToN \varValue_i) \opGreaterThen \varValue \opAnd \opForAll_{i=0}^{n} \varCoin_i \opIn \varOutputs \opEqNoQ \procCommit{\varValue_i}{\funStar{\varBlindingFactor_i}} \opAnd \procVerfTx{\varTx} \opEqNoQ 1 \\
+        \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
+        }
+    \end{varwidth}
+    }
+\end{center}
+
+\begin{definition}[Inflation Resistance] \label{def:atom:inflation-resistance}
+    A Mimblewimbe Transaction Scheme is called inflation resistant if for any value $\varValue$ in a valid range (as defined by the public parameters of the ledger), security
+    parameter $\varN$ and a PPT adversary $\cnstAdversary$ the following holds:
+    \[ \prob{\procInflate{\varN}{\varValue} \opEqNoQ 1} \opSmEq \funNegl{\varN} \]
+\end{definition}
+
+\emph{Resistance against Coin theft}: In a Mimblewimble transaction scheme a coins ownership is given by the knowledge of its blinding factor $\varBlindingFactor$. To spend the coin the sender would also have to know the coins value $\varValue$ in addition
+to the blinding factor, however as the possible values for $\varValue$ in practice is restriced by the blockchains public parameters, it is trivial to guess.
+Therefore we assume that knowledge of the blinding factor $\varBlindingFactor$ alone implies ownership of the coin.
+
+We define a game $\procStealCoinId$ which takes as input a security parameter $\varN$ and a coin $\varCoinInp$. A PPT adversary $\cnstAdversary$ is given the challenge to spend the input coin given in the parameter.
+He wins if he can construct a valid transaction $\varTx$ together with the help of a challenger spending the input coin $\varCoinInp$ and thereby transferring its value.
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procStealCoin{\varN}{\varCoinInp}$} {
+        (\varPreTx, \varSecKey, \varFundValue) \opFunResult \cnstAdversary (\varCoinInp) \\
+        \funStar{\varPreTx} \opFunResult \procRecvCoins{\varPreTx}{\varFundValue} \\
+        \varTx \opFunResult \cnstAdversary (\funStar{\varPreTx}) \\
+        \pcreturn \procVerfTx{\varTx} \opEqNoQ 1 \opAnd \varCoinInp \opIn \varTx.inp
+        }
+    \end{varwidth}
+    }
+\end{center}
+
+\begin{definition}[Theft-resistance] \label{def:atom:theft-resistence}
+    A Mimblewimble Transaction Scheme is called theft-resistent if for any input coin $\varCoinInp$, security parameter $\varN$ and PPT adversary $\cnstAdversary$ the following holds:
+    \[ \prob{\procStealCoin{\varN}{\varCoinInp} \opEqNoQ 1 } \opSmEq \funNegl{\varN} \]
+\end{definition}
+
+\emph{Transaction indistinguishability}: The third security property for a Mimblewimble Transaction System is related to transaction amounts. Due to the use of homomorphic commitments instead of plaintext values,
+an adversary should be unable to extract plaintext amounts from the final transaction. To formalize the property we define the game $\procTxIndId$:
+A PPT adversary $\cnstAdversary$ gets access to a transaction oracle $\procOracleTxId$ to which he can send two sets of values, one being the input value, the other the output value. We require all values to be in
+a valid range as defined by the game parameter $\varValueMax$, furthermore we require the transaction to be balanced, so the output values can not be higher then input values. The oracle will select one of the two
+sets depending on the bit $\varB$ chosen by the challenger and construct a transaction spending a coin with value $\varValue_b$ to a output coin of value $\varFundValue_b$ (as well as a change coin with the remainder).
+From the returned transaction the adversary has to guess the value of $\varB$.
+If the adversary manages to choose the correct value of $\varB$ he or she has won the game.
+
+\begin{center}
+    \fbox{
+    \begin{varwidth}{\textwidth}
+        \procedure[linenumbering]{$\procTxInd{\varN}{\varValueMax}$} {
+        \varB \sample \{0,1\} \\
+        \funStar{\varB} \opFunResult \cnstAdversary^{\procOracleTx{\cdot}{\cdot}{\cdot}{\cdot}} \\
+        \pcreturn \varB \opEq \funStar{\varB}
+        }
+        \procedure[linenumbering]{$\procOracleTx{\varValue_1}{\varFundValue_1}{\varValue_2}{\varFundValue_2}$} {
+        \pcif (\varValue_1, \varFundValue_1, \varValue_2, \varFundValue_2) \opNotIn [0, \varValueMax]*) \\
+        \t \pcreturn \cnstFalsum \\
+        \pcif \varFundValue_1 \opGreaterThen \varValue_1 \opOr \varFundValue_2 \opGreaterThen \varValue_2 \\
+        \t \pcreturn \cnstFalsum \\
+        \varBlindingFactor \sample \cnstIntegersPrimeWithoutZero{\varSecParam} \\
+        \varCoinInp \opFunResult \procCreateCoin{\varValue_b}{\varBlindingFactor} \\
+        (\varPreTx, \varSecKey, \varNonce) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactor}}{\varFundValue_b}{\varValue_b}{\cnstFalsum} \\
+        \funStar{\varPreTx} \opFunResult \procRecvCoins{\varPreTx}{\varFundValue_b} \\
+        \pcreturn \procFinTx{\funStar{\varPreTx}}{\varSecKey}{\varNonce}
+        }
+    \end{varwidth}
+    }
+\end{center}
+
+\begin{definition}[Transaction indistinguishability] \label{def:atom:tx-indisting}
+    We say Transaction Indistinguishability holds for a Mimblewimble Transaction System $\varMWScheme$ if for a PPT adversary $\cnstAdversary$ with access to the transaction oracle $\procOracleTxId$ a
+    security parameter $\varN$ and any max value $\varValueMax$ the following must hold:
+    \[ \prob{\procTxInd{\varN}{\varValueMax} \opEqNoQ 1} \opSmEq 0.5 \opAddScalar \funNegl{\varN} \]
+\end{definition}

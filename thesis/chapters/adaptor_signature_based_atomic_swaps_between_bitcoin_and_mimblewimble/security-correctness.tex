@@ -1,0 +1,280 @@
+In this section we will prove the correctness and security of the instantiation described in~\ref{sec:atom:atomic-inst}.
+We start by proving \emph{Transaction Scheme Correctness}, \emph{Extended Transaction Scheme Correctness} and \emph{Adapted Transaction Scheme Correctness} for the three outlined transaction schemes $\varMWScheme, \varextMWScheme$ and $\varaptMWScheme$.
+We then continue by showing that all three security definitions (\emph{Inflation-Resistence}, \emph{Theft-Resistence}, \emph{Transaction indistinguishability}) hold again for all three transaction types.
+The general process will be to find a proof for the basic transaction protocol defined in~\ref{def:atom:mw-tx-scheme} and then reduce the extended and adapted case to the basic one.
+
+\subsection{Correctness} \label{subsec:atom:correctness}
+
+We will argue \emph{Transaction Scheme Correctness} follows from the correctness of the commitment scheme $\varCommitScheme$, two-party signature scheme $\varSigScheme$ as well as the correctness of the range proof system $\varProofSystem$ used in the transaction protocol.
+If the transaction was constructed correctly (that is by calling the procedures $\procSendCoinsId, \procRecvCoinsId, \procFinTxId$, the distributed variants $\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId$ or the adapted ones $\procAptRecvCoinsId, \procDAptFinTxId$ with valid inputs) it must follow that the final transaction has correct commitments, rangeproofs and a valid signature and $\procVerfTxId$ will therefore return 1.
+We construct the following theorem:
+
+\begin{theorem}\label{lem:atom:correctness}
+    \emph{Transaction Scheme Correctness}, \emph{Extended Transaction Scheme Correctness} or \emph{Adapted Transaction Scheme Correctness} for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$, $\varextMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ or $\varaptMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ holds if and only if the underlying Commitment Scheme $\varCommitScheme,$ Two-Party Signature Scheme $\varSigSchemeMP$ and Rangeproof system $\varProofSystem$ are correct.
+\end{theorem}
+
+\begin{proof}
+    We assume there are two honest participants Alice and Bob, there exists a list of input coins $\funArray{\varCoinInp}$ with blinding factors $\funArray{\varBlindingFactorAlice}$ and total value $\varValue$ known to Alice, and some amount $\varFundValue$ which Alice wants to transfer to Bob.
+    For \emph{Transaction Scheme Correctness} to hold $\procVerfTx{\varTx}$ must return 1 with overwhealming probability for the two parties creating a transaction $\varTx$ in the following three steps:
+    \begin{enumerate}
+        \item $(\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\funArray{\varBlindingFactorAlice}}{\varFundValue}{\varValue}{\cnstFalsum}$
+        \item $\funStar{\varPreTx} \opFunResult \procRecvCoins{\varPreTx}{\varFundValue}$
+        \item $\varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}$
+    \end{enumerate}
+    Here are the following three requirements for $\procVerfTx{\varTx}$ to return 1:
+    \begin{enumerate}
+        \item The list of input coins $\varInputs$, as well as output coins $\varOutputs$ must each inlcude at least one element.
+        \item For each output coin $\varCoinOut$ the rangeproof $\varProof$ must verify.
+        \item The transaction signature under the public key $\varPubKey \opAssign \cnstSumZeroToN \varOutputs \opSub \cnstSumZeroToN \varInputs$ must verify.
+    \end{enumerate}
+
+    Condition 1 must hold trivially, as already in $\procSendCoinsId$ Alice will create the output $\varCoinOutAlice$ and initialize the pre-transaction with $\funArray{\varCoinInp}$ and $\funArray{\varCoinOutAlice}$, thereby already after $\procSendCoinsId$ both input and output lists are non empty and this condition is fulfilled.
+
+    Condition 2 follows from the implementation of the $\procCreateCoinId$ function called in $\procSendCoinsId$ as well as $\procRecvCoinsId$.
+    In the function a rangeproof is computed for the new coin $\varCoin$ with value $\varValue$ and blinding factor $\varBlindingFactor$ as $\varProof \opFunResult \procProof{\varCoin}{\varValue}{\varBlindingFactor}$.
+    Given that our Rangeproof system $\varProof$ system has to be correct $\procVerfProof{\varProof}{\varCoin} \opEqNoQ 1$ must hold for all coins created with the $\procCreateCoinId$ routine.
+    Therefore Condition 2 must hold.
+
+    For condition 3 we must look at how the secret keys $\varSecKeyAlice$ and $\varSecKeyBob$ are constructed.
+    From the instantiation of $\procSendCoinsId$ we can see that Alice's share will be $\varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \cnstSumZeroToN \funArray{\varBlindingFactorAlice}$, where $\funStar{\varBlindingFactorAlice}$ is the blinding factor to her output and $\funArray{\varBlindingFactorAlice}$ are the blinding factors to her input coins.
+    Bobs secret key is constructed like $\varSecKeyBob \opAssign \funStar{\varBlindingFactorBob}$, so it corresponds to the blinding factor of his output.
+    From the construction of the two-party signature scheme in~\ref{def:sig:two-party-sig} we know that therefore the final signature will be valid under the following public key:
+    \[ \funStar{\varPubKey} \opAssign \funGen{\varSecKeyAlice} \opAddPoint \funGen{\varSecKeyBob} \]
+    Given how the secret keys are constructed we arrive at:
+    \[ \funStar{\varPubKey} \opAssign \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \cnstSumZeroToN \funArray{\funGen{- \varBlindingFactorAlice}} \opAddPoint \funGen{\varBlindingFactorBob} \]
+    If we can show that the public key $\varPubKey$ computed in $\procVerfTxId$ is the same as above, $\procVerf{\varMsg}{\varSignature}{\varPubKey} \opEqNoQ 1$ must hold and therefore condition 3 would be proven.
+    We show this by a stepwise conversion of the initial equation computing $\varPubKey$ until we arrive at the equation for $\funStar{\varPubKey}$:
+    \begin{gather}
+        \varPubKey \opEqNoQ \funStar{\varPubKey} \\
+        \cnstSumZeroToN \varOutputs \opSub \cnstSumZeroToN \varInputs \opEqNoQ \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \cnstSumZeroToN \funArray{\funGen{- \varBlindingFactorAlice}} \opAddPoint \funGen{\varBlindingFactorBob} \\
+        \varCoinOutAlice \opAddPoint \varCoinOutBob \opAddPoint \cnstSumZeroToN \funArray{(\varCoinInp)^{-1}}  \opEqNoQ\\
+        (\funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \funGenH{\varValue \opSub \varFundValue}) \opAddPoint
+        (\funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funGenH{\varFundValue}) \opAddPoint
+        \cnstSumZeroToN \funArray{(\funGen{- \varBlindingFactorAlice}, \funGenH{- \varValue_i})} \opEqNoQ \\
+        \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \cnstSumZeroToN \funGen{- \varBlindingFactorAlice} \opEqNoQ \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \cnstSumZeroToN \funGen{- \varBlindingFactorAlice} \\
+        1 \opEqNoQ 1
+    \end{gather}
+    From step 5.3 to 5.4 we replace every coin $\varCoin$ by its instantiation for a pedersen commitment $\varCoin \opEqNoQ \funGen{\varValue} \opAddPoint \funGenH{\varValue}$.
+
+    From step 5.4 to 5.4 we rely on the fact that if Alice is honest $\varValue \opEqNoQ \cnstSumZeroToN \varValue_i$, therefore also $(\varValue \opSub \varFundValue) \opAddScalar\varFundValue \opEqNoQ \cnstSumZeroToN \varValue_i$ must hold.
+    From that we can infer that $\funGenH{\varValue \opSub \varFundValue} \opAddPoint \funGenH{\varFundValue} \opAddPoint \cnstSumZeroToN \funGenH{- \varValue_i}$ must cancel out.
+    We have managed to show that condition 3 must hold and can conclude that \emph{Transaction Scheme Correctness} holds.
+
+    We will now argue that the same deriviation holds for \emph{Extended Transaction Scheme Correctness} \emph{Adapted Transaction Scheme Correctness}.
+
+    Condition 1 again follows trivially from the construction of $\procDSendCoinsId$ for the same reasons we have already layed out.
+
+    $\procDSendCoinsId$, $\procDRecvCoinsId$, $\procAptRecvCoinsId$ all rely on the same $\procCreateCoinId$ routine to create output coins, thereby condition 2 will hold for the same reasons as layed out before.
+
+    In the case of \emph{Extended Transaction Scheme Correctness} the blinding factors for the input coins $\funArray{\varCoinInp}$ are shared.
+    However, we can easily reduce this case to the proof for the regular case:
+    In $\procDSendCoinsId$ Alice and Carol construct their secret keys as follows:
+    \begin{gather}
+        \varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \cnstSumZeroToN \varBlindingFactorAlice \\
+        \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \opSub \cnstSumZeroToN \varBlindingFactorCarol
+    \end{gather}
+    $\varSecKeyAlice$ and $\varSecKeyCarol$ are then inputs to $\procDFinTxId$ in which a partial signature $\varSigAliceCarol$ is calculated, by both Alice and Carol signing with their secret key.
+    Assume the general key from before in which we have a single secret key $\varSecKeyAlice$.
+    We can split $\varSecKeyAlice$ into arbitrarily chosen shares $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ with $\varSecKeyAlice \opEqNoQ (\varSecKeyAlice)_1 + (\varSecKeyAlice)_2$.
+    By the definition of Two-Party Signatures~\ref{def:sig:two-party-sig} the combined signature from $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ will be valid under $\funGen{\varSecKeyAlice}$.
+    Thereby we can treat $\varSecKeyAlice$ and $\varSecKeyCarol$ from $\procSendCoinsId$ as arbitrary shares of a combined $\varSecKeyAliceCarol$.
+    It follows from the addtive homomorphic property of the elliptic curve that a signature valid under $\funGen{\varSecKeyAliceCarol}$ must also be valid under $\funGen{\varSecKeyAlice} \opAddPoint \funGen{\varSecKeyCarol}$.
+    The case of two receivers calling $\procDRecvCoinsId$ is symmetric.
+    From this we can conclude that condition 3 must also hold for the \emph{Extended Transaction Scheme}. \\
+    Now for the \emph{Adapted Extended Transaction Scheme} the same argument holds.
+    The only difference in this scheme is that in $\procDAptFinTxId$ Bob (instead of Alice) will call $\procFinSigId$, as only he knows his unadapted partial signature $\varSigBob$.
+    However, the construction of the signature remains unchanged, therefore the reduction we provided before must hold for the same reasons.
+
+    As we have managed to show that all $\procVerfTx{\varTx} \opEqNoQ 1$ must hold for all three transaction schemes, assuming the participants are honest and the underlaying commitment scheme $\varCommitScheme$, two signature scheme $\varSigSchemeMP$ and rangeproof system $\varProofSystem$ are correct theorem~\ref{lem:atom:correctness} must also hold.
+\end{proof}
+
+In the remains to show that the commitment scheme, signature scheme and rangeproof system used in the given instantiations of the three transaction schemes are correct.
+
+All three transaction schemes use Pedersen Commitments as the commitment system $\varCommitScheme$, for which a security and correctness evaluation can be found in~\cite{pedersen1991non}.
+For the correctness of the rangeproof system $\varProofSystem$ we refer the reader again to the bulletproof paper~\cite{bunz2018bulletproofs}.
+The instantiation of the Mimblewimble Transaction Scheme $\varMWScheme$ (defined in~\ref{def:atom:mw-tx-scheme} instantiated in figure~\ref{fig:inst-mw-tx}) uses a standard Two-Party Signature Scheme $\varSigSchemeMP$ defined in~\ref{def:sig:two-party-sig} for which a correctness proof is available by Maxwell et al. in~\cite{maxwell2019simple}.
+
+For the Extended Mimblewimble Transaction Scheme $\varextMWScheme$ defined in~\ref{def:atom:ext-mw-tx-scheme} and instantiated in figure~\ref{fig:ext-mim-tx-spend},~\ref{fig:ext-mim-tx-recv} and~\ref{fig:ext-mim-tx-fin} the same signature scheme $\varSigSchemeMP$ and rangeproof system $\varProofSystem$ is used, therefore we can make the same argument as for the previous case to show \emph{Extended Transaction Scheme Correctness} holds.
+
+For the Adapted Extended Mimblewimble Transaction Scheme $\varaptMWScheme$, which we have defined in~\ref{def:atom:apt-ext-mw-tx-scheme}, and have shown an instantiation in figure~\ref{fig:inst-apt-mw-tx-recv}, and~\ref{fig:inst-apt-mw-tx-fin}, the Two Party Fixed Witness Adaptor Schnorr Signature Scheme $\varSigSchemeApt$, which we have defined in~\ref{def:sig:two-party-fixed-wit-apt-sig}, is used.
+We have already shown correctness of this signature scheme in section~\ref{sec:sig:two-party-apt-security} by proofing that \emph{Adaptor Signature Correctness} holds.
+Furthermore, the scheme used a multiparty version of the bulletproof system $\varMPRProofSystem$ for which we refer the reader to~\cite{klinec2020privacy} for a proof of its correctness.
+
+\subsection{Inflation Resistance} \label{subsec:atom:prf-inflation-resistance}
+
+To prove that Inflation Resistance as defined in~\ref{def:atom:inflation-resistance} holds we must show that the probability of a PPT adversary $\cnstAdversary$ winning the $\procInflateId$ game is neglible.
+We will prove that the Inflation Resistance property holds for the Mimblewimble Transaction Protocol as seen in figure~\ref{fig:inst-mw-tx} by providing a game-based reduction from $\procInflateId$ to the discrete logarithm assumption from definition~\ref{def:pre:discretelog}.
+
+For the reduction to work we must assume that the signature scheme $\varSigScheme$ used in the transaction scheme is correct and EUF-CMA secure.
+Apart from that we also require the employed rangeproof system $\varProofSystem$ and additive homomorphic commitment scheme $\varCommitScheme$ to be correct, as well as the commitment scheme to be additive homomorphic (as defined in definition~\ref{def:pre:homo-com}) which is secure under hiding and binding.
+Lastly the rangeproof system has to be setup such that proofs are for a strictly positive range, such that commitments to negative numbers are disallowed.
+From this we arrive at the following Theorem:
+
+\begin{theorem}\label{theo:atom:infl-resistence}
+\emph{Inflation Resistance} holds for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ if and only if the underlying additive homomorphic commitment Scheme $\varCommitScheme$, signature scheme $\varSigScheme$ and rangeproof system $\varProofSystem$ with range $[x,y]$ of $x >= 0, y > 0$ are correct, the signature scheme is EUF-CMA secure, and the commitment fulfills hiding and binding.
+\end{theorem}
+
+\begin{proof}\label{prf:atom:infl-resistance}
+    We will provide a stepwise reduction from the $\procInflateId$ game to the discrete logarithm assumption.
+    In each step we will provide a modified game which the PPT adversary $\cnstAdversary$ will be able to win with overwhelming probability given the assumption that he can win the previous game until we arrive at a contraction.
+    The first game $\procGameInfId{0}$ is very similar to the original $\procInflateId$ game, just that we replace $\procCommitId$ with its implementation for pedersen commitments.
+
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procGameInf{0}{\varN}{\varValue}$} {
+            \varRProofParams \opFunResult \procRProofSetup{\varSecParam}{0}{2^{64}} \\
+            \varPrime \sample \cnstIntegersPrimeWithoutZero{p} \\
+            \varG, \varH \sample \cnstGroup_\varPrime \\
+            \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \\
+            \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
+            (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactorAlice} \\
+            (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
+            (\funStar{\varPreTx}, \funArray{(\varCoin_i, \varValue_i, \funStar{\varBlindingFactor_i})}) \opFunResult \cnstAdversary (\varPreTx) \\
+            \varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
+            \pcreturn (\cnstSumZeroToN \varValue_i) \opGreaterThen \varValue \opAnd \opForAll_{i=0}^{n} \varCoin_i \opIn \varOutputs \opEqNoQ \funGenH{\varValue_i} \opAddPoint \funGen{\funStar{\varBlindingFactor_i}} \opAnd \procVerfTx{\varTx} \opEqNoQ 1 \\
+            \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
+            }
+        \end{varwidth}
+        }
+    \end{center}
+
+    In $\procGameInfId{1}$ we reduce the winning condition, we require the range proof of the output coins to be valid, and the final signature to be valid which both follow from the instantiation of $\procVerfTxId$.
+    We also move the computation of the final public key $\varPubKey$ from $\procVerfTxId$ inside the game.
+
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procGameInf{1}{\varN}{\varValue}$} {
+            \varRProofParams \opFunResult \procRProofSetup{\varSecParam}{0}{2^{64}} \\
+            \varPrime \sample \cnstIntegersPrimeWithoutZero{p} \\
+            \varG, \varH \sample \cnstGroup_\varPrime \\
+            \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \\
+            \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
+            (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactorAlice} \\
+            (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
+            (\funStar{\varPreTx}, \funArray{(\varCoin_i, \varValue_i, \funStar{\varBlindingFactor_i})}) \opFunResult \cnstAdversary (\varPreTx) \\
+            \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
+            \pcforeach \varTx.\varOutputs \textit{ as } (\varIterator => \varCoin_i) \\
+            \t \pcif \procVerfProof{\varTx.\varProofs[\varIterator]}{\varCoin_i} \opEqNoQ 0 \\
+            \t \t \pcreturn 0 \\
+            \varPubKey \opAssign \cnstSumOneToN \varTx.\varOutputs \opSub \cnstSumOneToN \varTx.\varInputs \\
+            \pcreturn (\cnstSumZeroToN \varValue_i) \opGreaterThen \varValue \opAnd \opForAll_{i=0}^{n} \varCoin_i \opIn \varOutputs \opEqNoQ \funGenH{\varValue_i} \opAddPoint \funGen{\funStar{\varBlindingFactor_i}} \opAnd \procVerf{\varTx.\varSignature}{\varTx.\varMsg}{\varPubKey} \opEqNoQ 1 \\
+            \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp}
+            }
+        \end{varwidth}
+        }
+    \end{center}
+
+    Knowing how $\varOutputs$ and $\varInputs$ has to look like we can also write $\varPubKey$ as:
+    \[ \varPubKey \opAssign \funSum{\varIterator \opAssign 0}{\varN} \varTx.\varOutputs \opAddPoint \varCoinInp^{-1} \]
+    Given the construction of pedersen commitments from definition~\ref{def:pre:pedersen} and the definition of a Mimblewimble coin~\ref{def:pre:coin} we can also write the equation like this:
+    \[ \varPubKey \opAssign \funSum{\varIterator \opAssign 0}{\varN} (\funGenH{\varValue_i} \opAddPoint \funGen{\funStar{\varBlindingFactor_i}}) \opAddPoint \funGenH{- \varValue} \opAddPoint \funGen{- \varBlindingFactorAlice} \]
+    We also have the winning condition of $(\cnstSumZeroToN \varValue_i) \opGreaterThen \varValue$, that means the sum of all output values has to be greater then the input value $\varValue$.
+    Therefore there has to exist some remainder $\varRemainder \opAssign \funSum{\varIterator \opAssign 0}{\varN}(v_i) \opSub v$.
+    Now we can write the equation like this:
+    \[  \varPubKey \opAssign \funSum{\varIterator \opAssign 0}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint \funGenH{\varRemainder} \]
+    Again from the definition of pedersen commitments~\ref{def:pre:pedersen} we know that $\varH$ and $\varG$ are adjacent generators so there exists an unknown exponent $\varX$ such that $\varH \opEqNoQ \funGen{x}$.
+    Therefore we arrive at the following equation:
+    \[  \varPubKey \opAssign \funSum{\varIterator \opAssign 0}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint (\funGen{\varX})^{\varRemainder} \]
+    We modify our game with this equation, additionally we require the adversary to reveal an opening $\varOpening \opEqNoQ \varX \opTimesScalar \varRemainder$.
+    We add the following win condition $\funGen{\varOpening} \opEqNoQ \funGenH{\varRemainder}$ to check the validity of the opening.
+
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procGameInf{2}{\varN}{\varValue}$} {
+            \varRProofParams \opFunResult \procRProofSetup{\varSecParam}{0}{2^{64}} \\
+            \varPrime \sample \cnstIntegersPrimeWithoutZero{p} \\
+            \varG, \varH \sample \cnstGroup_\varPrime \\
+            \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \\
+            \varBlindingFactorAlice \sample \cnstIntegersPrimeWithoutZero{\varN} \\
+            (\varCoinInp, \varProof) \opFunResult \procCreateCoin{\varValue}{\varBlindingFactorAlice} \\
+            (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varCoinInp}}{\varBlindingFactorAlice}{\varValue}{\varValue}{\cnstFalsum} \\
+            (\funStar{\varPreTx}, \funArray{(\varCoin_i, \varValue_i, \funStar{\varBlindingFactor_i})}, \varOpening) \opFunResult \cnstAdversary (\varPreTx) \\
+            \varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice} \\
+            \pcforeach \varTx.\varOutputs \textit{ as } (\varIterator => \varCoin_i) \\
+            \t \pcif \procVerfProof{\varTx.\varProofs[\varIterator]}{\varCoin_i} \opEqNoQ 0 \\
+            \t \t \pcreturn 0 \\
+            \varRemainder \opAssign \cnstSumZeroToN (\varValue_i) \opSub \varValue \\
+            \t \pcreturn 0 \\
+            \varPubKey \opAssign \funSum{\varIterator \opAssign 0}{\varN} \funGen{\funStar{\varBlindingFactor_i}} \opAddPoint \funGen{- \varBlindingFactorAlice} \opAddPoint (\funGen{\varX})^{\varRemainder} \\
+            \pcreturn \varRemainder \opGreaterThen 0 \opAnd \opForAll_{i=0}^{n} \varCoin_i \opIn \varOutputs \opEqNoQ \funGenH{\varValue_i} \opAddPoint \funGen{\funStar{\varBlindingFactor_i}} \opAnd \procVerf{\varTx.\varSignature}{\varTx.\varMsg}{\varPubKey} \\
+            \opAnd \varTx.inp \opEqNoQ \funArray{\varCoinInp} \opAnd \funGen{\varOpening} \opEqNoQ \funGenH{\varRemainder}
+            }
+        \end{varwidth}
+        }
+    \end{center}
+
+    We argue that if the adversary can win $\procGameInfId{1}$ he also can win $\procGameInfId{2}$.
+    As we have layed out before, to produce a valid signature under $\varPubKey$ the following values have to be known $\varBlindingFactorAlice^{-1}$, $\funArray{\varBlindingFactor_i}$, $\varRemainder$ and $\varX$.
+    Since Alice will provide the signature under $\funGen{\varBlindingFactorAlice^{-1}}$, Bob has to provide his signature under $\cnstSumZeroToN (\funGen{\varBlindingFactor_i}) \funGen{\varRemainder \opTimesScalar \varX}$, which means he must know the opening $\varRemainder \opTimesScalar \varX$.
+    However, here is where we arrive at a contradiction, as by the definition of pedersen commitments~\ref{def:pre:pedersen} a $\varX$ such that $\varH \opEqNoQ \funGen{\varX}$ must not be known.
+    We show that given this contradiction, an adversary $\cnstAdversary$ is able to consistently break the discrete logarithm game by giving a simulation via the $\procGameInfId{2}$ game.
+
+    In order to break the discrete logarithm of a cyclic group $\cnstGroup_\varPrime$ a PPT adversary $\cnstAdversary$ would have to win the following game:
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procDiscreteLogGame{\varPrime}$} {
+            \varG \sample \cnstGroup_\varPrime \\
+            \varX \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \varPubKey \opFunResult \funGen{\varX} \\
+            \funStar{\varX} \opFunResult \cnstAdversary (\varPubKey) \\
+            \pcreturn \varPubKey \opEqNoQ \funGen{\funStar{\varX}}
+            }
+        \end{varwidth}
+        }
+    \end{center}
+
+    We construct the following extractor function $\procExtractXId$, which let's us extract $\varX$, given the opening $\varOpening$ and the remainder $\varRemainder$ of the $\procGameInfId{2}$:
+
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering]{$\procExtractX{\varOpening}{\varRemainder}$} {
+            \pcreturn \varOpening \opSub \varRemainder
+            }
+        \end{varwidth}
+        }
+    \end{center}
+
+    Given $\procExtractXId$ the adversary now is able to win $\procDiscreteLogGameId$ as follows:
+    Given $\varG$ and $\varPubKey$ by the $\procDiscreteLogGameId$ we can construct a simulation by setting up the pedersen commitment scheme during $\procGameInfId{2}$ as $\procSetupComPed{\varG}{\varPubKey}$.
+    After the game has completed the adversary can compute $\varRemainder \opAssign \cnstSumZeroToN (\varValue_i) \opSub \varValue$ and afterward $\varX \opFunResult \procExtractX{\varOpening}{\varRemainder}$
+    As the commitment scheme is setup with $\varG$ and $\varPubKey$, $\varPubKey \opEqNoQ \funGen{\varX}$ must hold, and $\varX$ will therefore be accepted as a solution to the $\\procDiscreteLogGameId$ game.
+    We have therefore arrived at a contradiction and can conclude that theorem~\ref{theo:atom:infl-resistence} must hold.
+\end{proof}
+
+We now argue that the same reduction must hold for the instantiation of the extended and adapted mimblewimble transaction scheme from figures~\ref{fig:ext-mim-tx-fin},~\ref{fig:ext-mim-tx-recv},~\ref{fig:ext-mim-tx-spend} and~\ref{fig:inst-apt-mw-tx-fin},~\ref{fig:inst-apt-mw-tx-recv}.
+
+\begin{theorem} \label{theo:atom:inf-resistence-ext}
+    \emph{Inflation Resistance} holds for an \emph{Extended Mimblewimble Transaction Scheme} and \emph{Adapted Mimblewimble Transaction Scheme} iff it holds for \emph{Mimblewimble Transaction Scheme}
+\end{theorem}
+
+\begin{proof}
+    For the proof we look at the additional function included in the extended and adapted variant and proof that if we replace one of the original ones with the new ones the reduction found in~\ref{prf:atom:infl-resistance} still holds.
+
+    \begin{itemize}
+        \item Case 1: $\procDSendCoinsId$ is used instead of $\procSendCoinsId$: This means the key to the input coin would be distributed between two parties, therefore we would modify our game to include a second challenger, holding part of the input coin blinding factor.
+        We would also require to call $\procDFinTxId$ instead of the regular $\procFinTxId$ to complete the transaction.
+        The transaction structure, implementation of $\procVerfTxId$ and behaviour of the adversary is left unchanged, the reduction therefore still holds.
+        \item Case 2: $\procDRecvCoinsId$ is used on the receiver side.
+        Again we have to introduce a second challenger to the game which will run the $\procDRecvCoinsId$ protocol together with the adversary.
+        However, again this does not change our reduction, the transaction structure, as well as $\procVerfTxId$ stays the same and the adversary has access to all parameters needed to run $\procExtractXId$.
+        \item Case 3: $\procAptRecvCoinsId$ is expected to be called by the adversary $\cnstAdversary$.
+        This means that $\cnstAdversary$ has to provide an adapted signature $\varSigAptBob$ and statement $\varStatement$ which he can simply do by computing $(\varWit, \varStatement) \opFunResult \procGenRId$ and $\varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit}$.
+        We then have to modify the game to call the $\procDAptFinTxId$ to finalize the transaction.
+        Again transaction structure, $\procVerfTxId$ is unchanged and Bob has access to all parameters needed for calling $\procExtractXId$.
+    \end{itemize}
+
+    We have shown that by using the functions provided in the extended and adapted Mimblewimble transaction schemes, the properties used in the reduction of~\ref{prf:atom:infl-resistance} remain unchanged and therfore theorem~\ref{theo:atom:inf-resistence-ext} must hold.
+\end{proof}
+
+\subsection{Theft Resistance} \label{subsec:atom:prf-theft-resistance}
+
+TODO
+
+\subsection{Transaction indistinguishability} \label{subsec:atom:prf-tx-indistinguishability}
+
+TODO
