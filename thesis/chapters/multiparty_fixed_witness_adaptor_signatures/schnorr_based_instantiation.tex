@@ -220,7 +220,7 @@ The protocol outputs $(\varWit, (\varSigFin, \varPubKey))$ for Alice as she mana
         \varPubKey \opFunResult \varSigContext.\varPubKey \< \< \varPubKey \opFunResult \varSigContext.\varPubKey \\
         \pcif \procVerf{\varMsg}{\varSigFin}{\varPubKey} \opEqNoQ 0 \\
         \t \pcreturn \cnstFalsum \\
-        \varWit \opFunResult {\varSigFin}{\varSigAlice}{\varSigAptBob} \\
+        \varWit \opFunResult \procFinSig{\varSigAlice}{\varSigAptBob} \\
         \pcreturn (\varWit, (\varSigFin, \varPubKey)) \< \< \pcreturn (\varSigFin, \varPubKey)
         }
     \end{varwidth}
