@@ -267,6 +267,7 @@
 \newcommand{\opOr}{~\lor~}
 \newcommand{\opUnion}{~\cup~}
 \newcommand{\opSmEq}{~\leq~}
+\newcommand{\opSm}{~<~}
 \newcommand{\opX}{~\times~}
 \newcommand{\opGreaterThen}{~>~}
 \newcommand{\opGreaterEq}{~\geq~}
@@ -370,8 +371,8 @@
 \newcommand{\procFinTx}[3]{\procFinTxId(#1,#2,#3)}
 \newcommand{\procVerfTxId}{\styleFunction{verfTx}}
 \newcommand{\procVerfTx}[1]{\procVerfTxId(#1)}
-\newcommand{\procLedgrId}{\styleFunction{Ledgr}}
-\newcommand{\procLedgr}[2]{}
+\newcommand{\procLedgrId}{\styleFunction{ledgr}}
+\newcommand{\procLedgr}[2]{\procLedgrId(#1,#2)}
 
 \newcommand{\procBuildTransactionId}{\styleFunction{buildTransaction}}
 \newcommand{\procBuildTransaction}[4]{\procBuildTransactionId(#1,#2,#3,#4)}

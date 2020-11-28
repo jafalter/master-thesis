@@ -3,11 +3,12 @@ To construct the transaction protocol we assume that we have access to a two-par
 such as Bulletproofs, as described in section~\ref{sec:pre:rangeproof} and a homomorphic commitment scheme $\varCommitScheme$ as defined in definition~\ref{def:pre:homo-com} such as Pedersen Commitments~\ref{def:pre:pedersen}.
 
 Fuchsbauer et al. have defined three procedures $\styleFunction{Send}$, $\styleFunction{Rcv}$ and $\styleFunction{Ldgr}$ with regards to the creation of a transaction.
-$\styleFunction{Send}$ called by the sender will create a pre-transaction, $\styleFunction{Rcv}$ takes the pre-transaction and adds the receivers output and $\styleFunction{Ldgr}$ (again called by the sender) publishes the final transaction to the blockchain ledger.
-As we have already pointed out in this thesis we won't discuss the transaction publishing phase therefore we will not cover the functionality of the $\styleFunction{Ldgr}$ procedure, however the transactions created by our protocol must be compatible with the $\procLedgrId$ functionality formalized by Fuchsbauer et at.
-We redefine the $\styleFunction{Send}$ and $\styleFunction{Rcv}$ functionality in out paper, making small adjustments to the original definitions to fit with our requirements.
+$\styleFunction{Send}$ called by the sender will create a pre-transaction, $\styleFunction{Rcv}$ takes the pre-transaction and adds the receivers output and $\styleFunction{Ldgr}$ (again called by the sender) verifies and publishes the final transaction to the blockchain ledger.
+As we have already pointed out in this thesis we won't discuss the transaction publishing phase therefore we will not cover the publishing functionality of the $\styleFunction{Ldgr}$ procedure, however we will use the verification capabilities of the algorithm.
+That means the transactions created by our protocol must be compatible with the $\procLedgrId$ functionality formalized by Fuchsbauer et at.
+We redefine the $\styleFunction{Send}$ and $\styleFunction{Rcv}$ functionality in our paper, making small adjustments to the original definitions to fit with our requirements.
 
-To improve the readability of our formalizations we introduce a wrapper $\varSpendableCoin$ which represents a spendable coin and contains a reference to the coin commitment as defined in~\ref{def:pre:coin} as well as its (secret) spending information which consist of the coins value and blinding factor and its rangeproof $\varProof$.
+To improve the readability of our formalizations we introduce a wrapper $\varSpendableCoin$ which represents a spendable coin and contains a reference to the coin commitment and rangeproof as defined in~\ref{def:pre:coin} as well as its (secret) spending information which consist of the coins value and blinding factor.
 \[ \varSpendableCoin \opAssign \{ \varCommitment, \varValue, \varBlindingFactor, \varProof \} \]
 If we want to indicate that a spendable coin is a output coin of a transaction we write $\funStar{\varSpendableCoin}$.
 
@@ -16,27 +17,28 @@ If we want to indicate that a spendable coin is a output coin of a transaction w
     A Mimblewimble Transaction Scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ with commitment scheme $\varCommitScheme$, two-party signature scheme $\varSigSchemeMP$, and rangeproof system $\varProofSystem$ consists of the following tupel of procedures:
     \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign ( \procSendCoinsId,\procRecvCoinsId,\procFinTxId,\procLedgrId ) \]
     \begin{itemize}
-        \item $(\varPreTx, \funStar{\varSpendableCoinAlice} (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$: The spendCoins algorithm is a DPT function called by the sending party to initiate the spending of some input coins.
+        \item $(\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$: The spendCoins algorithm is a DPT function called by the sending party to initiate the spending of some input coins.
         As input, it takes a list of spendable coins $\funArray{\varSpendableCoin}$ and a value $\varFundValue$ which should be transferred to the receiver.
-        Optionally a sender can pass a block height $\varTime$ when this transaction should become valid.
-        It outputs a pre-transaction $\varPreTx$ which can be send to a receiver, Alice spendable change output coin $\funStar{\varSpendableCoinAlice}$ as well as the senders signing key and secret nonce $(\varSecKeyAlice, \varNonceAlice)$ later used for transaction signing.
+        Optionally a sender can pass a block height $\varTime$ to make this transaction only valid after a specific time.
+        It outputs a pre-transaction $\varPreTx$ which can be send to a receiver, Alice spendable change output coin $\funStar{\varSpendableCoinAlice}$ as well as the senders signing key and secret nonce $(\varSecKeyAlice, \varNonceAlice)$ later used in the transaction signing process.
         \item $(\funStar{\varPreTx}, \funStar{\varSpendableCoinBob}) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue}$: The receiveCoins algorithm is a DPT routine called by the receiver and takes as input a pre-transaction $\varPreTx$ and a fund value
         $\varFundValue$.
-        It will construct the receivers output coin and output a modified pre-transaction $\funStar{\varPreTx}$ together with Bobs new spendable output coin $\funStar{\varSpendableCoinBob}$.
+        It will output a modified pre-transaction $\funStar{\varPreTx}$ together with Bobs new spendable output coin $\funStar{\varSpendableCoinBob}$ which has been added to the transaction.
+        At this stage the transaction already has to be partially signed. (by the receiver)
         \item $\varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}$: The finalize algorithm is a DPT routine again called by the transaction sender that takes as input a pre-transaction $\varPreTx$ and the senders signing key $\varSecKeyAlice$ and nonce $\varNonceAlice$.
-        The function will output a finalized transaction $\varTx$, which can be published to the ledger using the
-        \item $\{\varLedger, \cnstFalsum\} \opFunResult \procLedgr{\varLedger}{\varTx}$: The ledger algorithm is taken from the Fuchsbauer et al. paper and can be used to publish a valid transaction.
+        The function will output a finalized signed transaction $\varTx$.
+        \item $\{\varLedger, \cnstFalsum\} \opFunResult \procLedgr{\varLedger}{\varTx}$: The ledger algorithm is taken from the Fuchsbauer et al. paper and can be used to verify and publish a valid transaction.
         If an invalid transaction is passed it will output $\cnstFalsum$, otherwise it will output the updated ledger.
+        As input it takes the current state of the ledger $\varLedger$ and the transaction $\varTx$.
         We assume that every protocol participant can access the current ledger $\varLedger$, as it is publicly available by running a node.
     \end{itemize}
 \end{definition}
 
-We say a Mimblewimble Transaction Scheme is correct if the ledger algorithm $\procLedgrId$ returns and updated $\varLedger$ if and only if the transaction is well balanced and its signature is valid.
+We say a Mimblewimble Transaction Scheme is correct if the ledger algorithm $\procLedgrId$ returns and updated $\varLedger$ if and only if the added transaction is well balanced and its signature is valid.
 More formally:
 \begin{definition}[Transaction Scheme Correctness]
     \label{def:atom:tx-scheme-correctness}
-    For any list of input coins $\funArray{\varCoinInp}$ with total value $\varValue$ and blinding factors
-    $\funArray{\varBlindingFactor}$ and a transaction fund value $\varFundValue$ with $\varFundValue \opSmEq \varValue$ the following must hold:
+    For any transaction fund value $\varFundValue$ and list of spendable input coins $\funArray{\varSpendableCoin}$ transaction with combined value $\varValue \opGreaterEq \varFundValue$ the following must hold:
     \[
         \Pr\left[
         \begin{array}{c}
@@ -44,6 +46,7 @@ More formally:
         \end{array}
         \middle\vert
         \begin{array}{l}
+            \varFundValue \opSmEq \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_{i}.\varValue) \\
             (\varPreTx, \cdot, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varValue}{\cnstFalsum} \\
             (\funStar{\varPreTx}, \cdot) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue} \\
             \varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}
@@ -57,13 +60,14 @@ More formally:
     An extended Mimblewimble transaction scheme $\varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ is an extension to $\varMWScheme$ with the following two procedures:
     \[ \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc (\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId) \]
     \begin{itemize}
-        \item $\langle (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice,\varNonceAlice)), (\varPreTx,(\varSecKeyCarol,\varNonceCarol)) \rangle$ \\
+        \item $\langle (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice,\varNonceAlice)), (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyCarol,\varNonceCarol)) \rangle$ \\
         $\opFunResult \procDSendCoins{\funArray{\varSpendableCoinAlice}}{\funArray{\varSpendableCoinCarol}}{\varFundValue}{\varTime}$:
         The distributed coin spending algorithm takes as input a list of spendable input coins which ownership is shared between Alice and Carol.
         Note that for each provided input coin Alice and Carol have only a share to the blinding factor.
-        The coins full blinding factor can then be calculated as:
+        A coins full blinding factor can then be calculated as:
         $\varBlindingFactor \opAssign \varBlindingFactorAlice \opAddScalar \varBlindingFactorCarol$.
         Again optionally a block height $\varTime$ can be given to time lock the transaction.
+        Similar to the single party version of the function its outputs are a pretransaction $\varPreTx$ and change coin for each party, as well as their signing information.
         \item $\langle (\funStar{\varPreTx}, \funStar{\varSpendableCoinBob}), (\funStar{\varPreTx}, \funStar{\varSpendableCoinCarol}) \rangle \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue}$: The distributed coin receive procedure takes as input a pre-transaction $\varPreTx$ and a value $\varFundValue$ which should be transferred with the transaction.
         The distributed algorithm will generate a output coin owned by both Alice and Carol. (each owning a share of the key).
         The output will be an updated pre-transaction $\funStar{\varPreTx}$, the shared output coin $\varCoinShared$ with the respective shares of the blinding factor added as $\funStar{\varSpendableCoinBob}$, $\funStar{\varSpendableCoinCarol}$.
@@ -77,8 +81,7 @@ Correctness is given very similar to the standard scheme:
 
 \begin{definition}[Extended Transaction Scheme Correctness]
     \label{def:atom:ext-tx-scheme-correctness}
-    For any list of spendable coins $\funArray{\varSpendableCoin}$ with total value and split blinding factors
-    $(\funArray{\varBlindingFactorAlice}, \funArray{\varBlindingFactorCarol})$ and a transaction fund value $\varFundValue$ with the following must hold:
+    For any list of spendable coins $\funArray{\varSpendableCoin}$ with total value $\varValue$ greater then the transaction fund value $\varFundValue$ and split blinding factors $(\funArray{\varBlindingFactorAlice}, \funArray{\varBlindingFactorCarol})$ the following must hold:
     \[
         \Pr\left[
         \begin{array}{c}
@@ -86,6 +89,7 @@ Correctness is given very similar to the standard scheme:
         \end{array}
         \middle\vert
         \begin{array}{l}
+            \varFundValue \opSmEq \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_{i}.\varValue) \\
             \langle (\varPreTx, \cdot, (\varSecKeyAlice, \varNonceAlice)), (\varPreTx, (\varSecKeyCarol, \varNonceCarol)) \rangle \opFunResult \\
             \procDSendCoins{\funArray{\varSpendableCoinAlice}}{\funArray{\varSpendableCoinCarol}}{\varFundValue}{\cnstFalsum} \\
             \langle (\funStar{\varPreTx}, \cdot)(\funStar{\varPreTx}, \cdot) \rangle \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue} \\
@@ -110,7 +114,7 @@ Correctness is given very similar to the standard scheme:
         This protocol could also be implemented as a three party protocol, two senders controlling a shared coin and a third receiver.
         However, as in the case we will describe later in~\ref{sec:atom:atomic-swap} one of the two senders is also the receiver, we allowed ourselves to model this protocol as being between only two parties to simplify the formalization.
         In this version of the protocol only Bob will be able to finalize the transaction, which is different to $\procFinTxId$ and $\procDFinTxId$.
-        This has the practical reason that for the atomic swap execution Bob needs to be the one in control of the final transaction.
+        This has the practical reason that for the atomic swap execution Bob needs to be the one in control of building the final transaction.
         If Alice were to build the final transaction before Bob, she might be able to extract the Witness value before the transaction has been published, which in the atomic swap scenario would mean she could steal the funds stored on the other chain.
         This is why the protocol does not return the final transaction $\varTx$ to Alice, instead the protocol will output the senders partial signature, which Alice can later use to extract a witness value.
     \end{itemize}
@@ -120,7 +124,7 @@ Similar as before we define correctness for the adapted scheme:
 
 \begin{definition}[Adapted Transaction Scheme Correctness]
     \label{def:atom:apt-tx-scheme-correctness}
-    For any list of input coins $\funArray{\varSpendableCoin}$ and a transaction fund value $\varFundValue$ with and any witness value $\varX \opIn \cnstIntegersPrimeWithoutZero{*}$ the following must hold:
+    For any transaction fund value $\varFundValue$ and list of input coins $\funArray{\varSpendableCoin}$ with combined value $\varValue \opGreaterEq \varFundValue$ and any witness value $\varX \opIn \cnstIntegersPrimeWithoutZero{*}$ the following must hold:
     \[
         \Pr\left[
         \begin{array}{c}
@@ -128,6 +132,7 @@ Similar as before we define correctness for the adapted scheme:
         \end{array}
         \middle\vert
         \begin{array}{l}
+            \varFundValue \opSmEq \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_{i}.\varValue) \\
             (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\cnstFalsum} \\
             (\funStar{\varPreTx}, \funStar{\varSpendableCoinBob}, \varSigBob) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit} \\
             \langle \varSigAliceCarol, \varTx \rangle \opFunResult \procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyCarol}{\varNonceCarol}{\varSigBob}
