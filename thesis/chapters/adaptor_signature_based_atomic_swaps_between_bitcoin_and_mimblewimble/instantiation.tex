@@ -109,7 +109,7 @@ Figure~\ref{fig:d-build-mw-tx} show the implementation of a two party protocol u
     \fbox{
     \begin{varwidth}{\textwidth}
         \procedure[linenumbering]{$\procDBuildMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
-        Alice \< \< Carol \\
+        Alice \< \< Bob \\
         (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \\ \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \\
         \< \sendmessageright*{\varPreTx} \< \\
         \< \< (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinBob}) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue} \\

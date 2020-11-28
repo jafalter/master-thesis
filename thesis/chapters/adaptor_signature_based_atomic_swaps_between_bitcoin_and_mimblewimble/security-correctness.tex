@@ -108,19 +108,21 @@ In particular we show that the distributed protocols for constructing transactio
 \textbf{Hybrid functionalities}: The parties have access to a trusted third party that computes the zero-knowledge proof of knowledge functionalities $\procZKfId{\cnstRelation_1}$, $\procZKfId{\cnstRelation_2}$ and $\procZKfId{\cnstRelation_2*}$.
 $\cnstRelation_1$ is the relation between a secret key $\varSecKey$ and its public key $\varPubKey \opEqNoQ \funGen{\varSecKey}$ for the curve generator $\varG$.
 $\cnstRelation_2$ is the relation between two secret inputs $\varBlindingFactor, \varValue$ and its pedersen commitment $\varCommitment \opEqNoQ \funGen{\varBlindingFactor} \opAddPoint \funGenH{\varValue}$ for two adjacent generators $\varG, \varH$ as defined in~\ref{def:pre:pedersen}.
+We shorten the call by the prover to just provide $\varSpendableCoin$ because it is a wrapper that contains the coin commitment, as well as the its openings.
 $\cnstRelation_2*$ is the same as $\cnstRelation_2$ just for a list of secrets inputs $\funArray{(\varBlindingFactor, \varValue)}$ and its list of commitments $\funArray{\varCommitment}$.
+Again to shorten the calls by the prover we simply the call to $\procZkf{\cnstRelation_2*}{\funArray{\varSpendableCoin}}$.
 
 \textbf{Proof Idea}: We extend the protocol $\procDBuildMwTxId$ defined in section~\ref{sec:atom:inst} with the following calls to the zero-knowledge proof of knowledge functionalities:
 
 \fbox{
 \begin{varwidth}{\textwidth}
     \procedure[linenumbering]{$\procDBuildMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
-    Alice \< \< Carol \\
-    \procZkf{\cnstRelation_2*}{\funArray{(\varSpendableCoin.\varCommitment, (\varSpendableCoin.\varBlindingFactor, \varSpendableCoin\varValue))}} \\
+    Alice \< \< Bob \\
+    \procZkf{\cnstRelation_2*}{\funArray{\varSpendableCoin}} \\
     (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \\ \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \\
     \procZkf{\cnstRelation_1}{(\varSecKeyAlice, \funGen{\varSecKeyAlice})} \\
-    \procZkf{\cnstRelation_2}{(\varNonceAlice, \funGen{\varNonceAlice})} \\
-    \procZkf{\cnstRelation_2}{(\funStar{\varSpendableCoinAlice}.\varCoin), (\funStar{\varSpendableCoinAlice}.\varBlindingFactor, \funStar{\varSpendableCoinAlice}.\varValue)} \\
+    \procZkf{\cnstRelation_1}{(\varNonceAlice, \funGen{\varNonceAlice})} \\
+    \procZkf{\cnstRelation_2}{\funStar{\varSpendableCoinAlice}} \\
     \< \sendmessageright*{\varPreTx} \< \\
     \< \< \pcif \procZkf{\cnstRelation_2*}{\varTx.\varInputs} \opEqNoQ 0 \\
     \< \< \t \pcreturn \cnstFalsum \\
@@ -131,11 +133,11 @@ $\cnstRelation_2*$ is the same as $\cnstRelation_2$ just for a list of secrets i
     \< \< \pcif \procZkf{\cnstRelation_2}{\varTx.\varOutputs[0]} \opEqNoQ 0 \\
     \< \< \t \pcreturn \cnstFalsum \\
     \< \< (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinBob}) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue} \\
-    \< \< \procZkf{\cnstRelation_2}{(\funStar{\varSpendableCoinBob}.\varCoin), (\funStar{\varSpendableCoinBob}.\varBlindingFactor, \funStar{\varSpendableCoinBob}.\varValue)} \\
+    \< \< \procZkf{\cnstRelation_2}{\funStar{\varSpendableCoinBob}} \\
     \< \sendmessageleft*{\funStarAlt{\varPreTx}} \\
     \pcif \procZkf{\cnstRelation_2}{\varTx.\varOutputs[1]} \opEqNoQ 0 \\
     \t \pcreturn \cnstFalsum \\
-    \varTx \procFinTx{\funStarAlt{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
+    \varTx \opFunResult \procFinTx{\funStarAlt{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
     \< \sendmessageright*{\varTx} \\
     \pcreturn (\varTx, \funStar{\varSpendableCoinAlice}) \< \< \pcreturn (\varTx, \funStar{\varSpendableCoinBob})
     }
@@ -149,7 +151,45 @@ $\cnstRelation_2*$ is the same as $\cnstRelation_2$ just for a list of secrets i
 \begin{proof}
     We proof the security of $\procDBuildMwTxId$ by constructing a simulator $\cnstSimulator$ with access to a TTP computing the protocol in the ideal setting upon receiving the inputs for the participants.
     The TTP returns the outputs $(\varTx, \funStar{\varSpendableCoinAlice})$ (resp. $(\varTx, \funStar{\varSpendableCoinBob})$) from which he has to construct a transcript that is indistinguishable from the protcol transcript in the real world. The simulator uses the calls to $\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}, \procZKfId{\cnstRelation_2*}$ to achieve this.
-    We proof that the transcript is indistinguishable in the cases that either Alice or Bob is corrupt.
+    We proof that the transcript is indistinguishable in the cases that either Alice or Bob is corrupt and controlled by a deterministic polynomial adversary $\cnstAdversary$.
 
     \textbf{Alice is corrupt}: Simulator $\cnstSimulator$ works as follows:
+    \begin{enumerate}
+        \item $\cnstSimulator$ invokes $\cnstAdversary$ and once it calls $\procZKfId{\cnstRelation_2*}, \procZKfId{\cnstRelation_1}$ $\procZKfId{\cnstRelation_2}$ saves the values $\funArray{\varSpendableCoin}, \varSecKeyAlice, \varNonceAlice, \funStar{\varSpendableCoinAlice}$.
+        \item $\cnstSimulator$ calculates the transaction value $\varFundValue$ as follows:
+        \begin{gather*}
+            \varValue \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_i.\varValue) \\
+            \varFundValue \opEqNoQ \varValue \opSub \funStar{\varSpendableCoinAlice}.\varValue
+        \end{gather*}
+        \item $\cnstSimulator$ receives $\varPreTx$ from $\cnstAdversary$ and checks for every transaction input if $\varPreTx.\varInputs \opEqNoQ \varSpendableCoin.\varCoin$, and that $\varTx.\varOutputs \opEqNoQ \funArray{\varSpendableCoinAlice.\varCoin}$.
+        He also compares $\varTx.\varSigContext.\varPubKey \opEqNoQ \funGen{\varSecKeyAlice}$ and $\varTx.\varSigContext.\varRand \opEqNoQ \funGen{\varNonceAlice}$.
+        If any of the equalities were invalid $\cnstSimulator$ sends $\cnstAbort$ to the TTP computing $\procDBuildMwTxId$ and returns $\cnstFalsum$.
+        Otherwise he extracts $\varTime \opEqNoQ \varTx.\varTime$ and sends the inputs $(\funArray{\varSpendableCoin}, \varFundValue, \varTime)$ to the TTP and receives back the outputs $(\varTx, \funStar{\varSpendableCoinAlice})$.
+        \item The simulators task is it now to construct $\funStarAlt{\varPreTx}$ and $\funStar{\varSpendableCoinBob}$ which he can achieve in the following steps:
+        \begin{enumerate}
+            \item He takes the signature context $\varSigContext$ and final signature $\varSigFin$ from the final transaction $\varSigContext \opEqNoQ \varTx.\varSigContext$ and $\varSigFin \opEqNoQ \varTx.\varSignature$.
+            \item He computes the adversaries partial signature as $\varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}$
+            \item He further computes
+            \begin{gather*}
+                \varPubKey \opFunResult \varSigContext.\varPubKey \\
+                \varPubKeyAlice \opEqNoQ \funGen{\varSecKeyAlice} \\
+                (\varSAlice, \varRandAlice, \varSigContext) \opFunResult \varSigAlice \\
+                (\varS, \varRand) \opFunResult \varSigFin \\
+                \varSBob \opEqNoQ \varS \opSub \varSAlice \\
+                \varRandBob \opEqNoQ \varRand \opAddPoint \varRandAlice^{-1} \\
+                \varPubKeyBob \opEqNoQ \varPubKey \opAddPoint \varPubKeyAlice^{-1} \\
+                \varSigBob \opEqNoQ (\varSBob, \varRandBob, \varSigContext)
+            \end{gather*}
+            \item He takes further values from the final transaction:
+            \begin{gather*}
+                \varCoinOutBob \opEqNoQ \varTx.\varOutputs[1] \\
+                \varProofBob \opEqNoQ \varTx.\varProof[1] \\
+                \varCommitment_\varBob \opEqNoQ \varTx.\varCommits[1]
+            \end{gather*}
+            \item Now he can compute $\funStarAlt{\varPreTx} \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutBob}{\varProofs \opConc \varProofBob}{\varSigContext}{\varCommits \opConc \varCommitment_\varBob}{\varSigBob}{\varTime}$
+        \end{enumerate}
+        Finally $\cnstSimulator$ will send $\funStarAlt{\varPreTx}$ as if coming from Bob and send $\cnstContinue$ to the TTP.
+        \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_2}$ he check equality to $\varCoinOutBob$ and returns either 0 or 1.
+        \item Eventually $\cnstAdversary$ will send a $\funStarAlt{\varTx}$ which the simulator outputs.
+    \end{enumerate}
 \end{proof}
