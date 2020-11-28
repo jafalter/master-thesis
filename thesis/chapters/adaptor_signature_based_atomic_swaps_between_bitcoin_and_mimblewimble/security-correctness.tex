@@ -100,6 +100,56 @@ For the Adapted Extended Mimblewimble Transaction Scheme $\varaptMWScheme$, whic
 We have already shown correctness of this signature scheme in section~\ref{sec:sig:two-party-apt-security} by proofing that \emph{Adaptor Signature Correctness} holds.
 Furthermore, the scheme used a multiparty version of the bulletproof system $\varMPRProofSystem$ for which we refer the reader to~\cite{klinec2020privacy} for a proof of its correctness.
 
-\subsection{Security}
+\subsection{Security}\label{subsec:atom:security}
 
-TODO
+We now prove the security of our transaction schemes in the malicious setting as defined in~\ref{subsec:pre:security}.
+In particular we show that the distributed protocols for constructing transactions are secure in the hybrid $\procZKfId{\cnstRelation}$-model as already explained in~\ref{subsec:sig:secureaptscheme}.
+
+\textbf{Hybrid functionalities}: The parties have access to a trusted third party that computes the zero-knowledge proof of knowledge functionalities $\procZKfId{\cnstRelation_1}$, $\procZKfId{\cnstRelation_2}$ and $\procZKfId{\cnstRelation_2*}$.
+$\cnstRelation_1$ is the relation between a secret key $\varSecKey$ and its public key $\varPubKey \opEqNoQ \funGen{\varSecKey}$ for the curve generator $\varG$.
+$\cnstRelation_2$ is the relation between two secret inputs $\varBlindingFactor, \varValue$ and its pedersen commitment $\varCommitment \opEqNoQ \funGen{\varBlindingFactor} \opAddPoint \funGenH{\varValue}$ for two adjacent generators $\varG, \varH$ as defined in~\ref{def:pre:pedersen}.
+$\cnstRelation_2*$ is the same as $\cnstRelation_2$ just for a list of secrets inputs $\funArray{(\varBlindingFactor, \varValue)}$ and its list of commitments $\funArray{\varCommitment}$.
+
+\textbf{Proof Idea}: We extend the protocol $\procDBuildMwTxId$ defined in section~\ref{sec:atom:inst} with the following calls to the zero-knowledge proof of knowledge functionalities:
+
+\fbox{
+\begin{varwidth}{\textwidth}
+    \procedure[linenumbering]{$\procDBuildMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
+    Alice \< \< Carol \\
+    \procZkf{\cnstRelation_2*}{\funArray{(\varSpendableCoin.\varCommitment, (\varSpendableCoin.\varBlindingFactor, \varSpendableCoin\varValue))}} \\
+    (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \\ \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \\
+    \procZkf{\cnstRelation_1}{(\varSecKeyAlice, \funGen{\varSecKeyAlice})} \\
+    \procZkf{\cnstRelation_2}{(\varNonceAlice, \funGen{\varNonceAlice})} \\
+    \procZkf{\cnstRelation_2}{(\funStar{\varSpendableCoinAlice}.\varCoin), (\funStar{\varSpendableCoinAlice}.\varBlindingFactor, \funStar{\varSpendableCoinAlice}.\varValue)} \\
+    \< \sendmessageright*{\varPreTx} \< \\
+    \< \< \pcif \procZkf{\cnstRelation_2*}{\varTx.\varInputs} \opEqNoQ 0 \\
+    \< \< \t \pcreturn \cnstFalsum \\
+    \< \< \pcif \procZkf{\cnstRelation_1}{\varTx.\varSigContext.\varPubKey} \opEqNoQ 0 \\
+    \< \< \t \pcreturn \cnstFalsum \\
+    \< \< \pcif \procZkf{\cnstRelation_1}{\varTx.\varSigContext.\varNonce} \opEqNoQ 0 \\
+    \< \< \t \pcreturn \cnstFalsum \\
+    \< \< \pcif \procZkf{\cnstRelation_2}{\varTx.\varOutputs[0]} \opEqNoQ 0 \\
+    \< \< \t \pcreturn \cnstFalsum \\
+    \< \< (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinBob}) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue} \\
+    \< \< \procZkf{\cnstRelation_2}{(\funStar{\varSpendableCoinBob}.\varCoin), (\funStar{\varSpendableCoinBob}.\varBlindingFactor, \funStar{\varSpendableCoinBob}.\varValue)} \\
+    \< \sendmessageleft*{\funStarAlt{\varPreTx}} \\
+    \pcif \procZkf{\cnstRelation_2}{\varTx.\varOutputs[1]} \opEqNoQ 0 \\
+    \t \pcreturn \cnstFalsum \\
+    \varTx \procFinTx{\funStarAlt{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
+    \< \sendmessageright*{\varTx} \\
+    \pcreturn (\varTx, \funStar{\varSpendableCoinAlice}) \< \< \pcreturn (\varTx, \funStar{\varSpendableCoinBob})
+    }
+\end{varwidth}
+}
+
+\begin{theorem}
+    Let $\varCommitScheme$ be a correct and secure pedersen commitment schemes, $\varProofSystem$ be a correct and secure rangeproof system and $\varSigSchemeMP$ be a secure and correct two-party signature scheme, then $\procDBuildMwTxId$ securly computes a Mimblewimble transaction transfering the value $\varFundValue$ from a sender (denoted as Alice) to a receiver (denoted as Bob) in the hybrid $\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}$-model.
+\end{theorem}
+
+\begin{proof}
+    We proof the security of $\procDBuildMwTxId$ by constructing a simulator $\cnstSimulator$ with access to a TTP computing the protocol in the ideal setting upon receiving the inputs for the participants.
+    The TTP returns the outputs $(\varTx, \funStar{\varSpendableCoinAlice})$ (resp. $(\varTx, \funStar{\varSpendableCoinBob})$) from which he has to construct a transcript that is indistinguishable from the protcol transcript in the real world. The simulator uses the calls to $\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}, \procZKfId{\cnstRelation_2*}$ to achieve this.
+    We proof that the transcript is indistinguishable in the cases that either Alice or Bob is corrupt.
+
+    \textbf{Alice is corrupt}: Simulator $\cnstSimulator$ works as follows:
+\end{proof}

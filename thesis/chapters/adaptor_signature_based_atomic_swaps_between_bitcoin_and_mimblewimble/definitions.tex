@@ -55,6 +55,9 @@ More formally:
     \]
 \end{definition}
 
+Finally we define a two-party protocol $\procDBuildMwTxId$ which takes as input a list of spendable coins $\funArray{\varSpendableCoin}$, a transaction value $\varFundValue$ and a optional timelock $\varTime$ and uses the functions defined earlier to output a valid transaction $\varTx$ as well as the newly spendable coins to both parties.
+\[ \langle (\varTx, \funStar{\varSpendableCoinAlice}), (\varTx \funStar{\varSpendableCoinBob}) \rangle \opFunResult \procDBuildMwTx{\funStar{\varSpendableCoin}}{\varFundValue}{\varTime} \]
+
 \begin{definition}[Extended Mimblewimble Transaction Scheme]
     \label{def:atom:ext-mw-tx-scheme}
     An extended Mimblewimble transaction scheme $\varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ is an extension to $\varMWScheme$ with the following two procedures:

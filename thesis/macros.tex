@@ -373,6 +373,8 @@
 \newcommand{\procVerfTx}[1]{\procVerfTxId(#1)}
 \newcommand{\procLedgrId}{\styleFunction{ledgr}}
 \newcommand{\procLedgr}[2]{\procLedgrId(#1,#2)}
+\newcommand{\procDBuildMwTxId}{\styleFunction{dBuildMWTx}}
+\newcommand{\procDBuildMwTx}[3]{\procDBuildMwTxId \langle(#1,#2,#3), (#2)\rangle}
 
 \newcommand{\procBuildTransactionId}{\styleFunction{buildTransaction}}
 \newcommand{\procBuildTransaction}[4]{\procBuildTransactionId(#1,#2,#3,#4)}
