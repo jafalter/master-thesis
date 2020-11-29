@@ -104,10 +104,10 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
 
 \begin{proof}
     We proof security of the protocol by constructing a simulator $\cnstSimulator$ who is given output $(\varSigFin, \varPubKey)$ from a TTP (trusted third party) that securely computes the protocol in the ideal world, receiving the inputs from Alice and Bob.
-    From this output the simulator $\cnstSimulator$ will output a transcript which is indistinguishable from the protocol transcript in the real world.
+    From this output the simulator $\cnstSimulator$ will output a transcript which is indistinguishable from the protocol transcript in the real world in which the corrupted party is controlled by a deterministic polynomial adversary $\cnstAdversary$.
     The simulator uses the calls to $(\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}, \procZKfId{\cnstRelation_3}, \procZKfId{\cnstRelation_4})$ in order to do this.
     Furthermore we assume that the message $\varMsg$ is known to both Alice and Bob.
-    We have to proof two cases, one in which Alice is the corrupted party and one in which Bob is corrupted.
+    We have to proof two cases, one in which Alice and one in which Bob is the corrupted party.
     
     \textbf{Alice is corrupted: } Simulator $\cnstSimulator$ works as follows:
     \begin{enumerate}
