@@ -1,0 +1,19 @@
+{type}:{chapter}:{id}
+
+type can be:
+* ch
+* subsec
+* sec
+* subsubsec
+* fig
+* teo
+* prf
+* def
+
+chapter can be:
+* int
+* pre
+* sig
+* atom
+* imp
+* con

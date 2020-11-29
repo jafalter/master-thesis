@@ -14,7 +14,7 @@ On the Bitcoin side we construct two DPT functions ($\procLockAddrId, \procVerif
     If Alice (knowing her secret key $\varSecKeyAlice$) acquires $\varWit$, she can construct the complete secret key simply
     by calculating $\varSecKey \opAssign \varSecKeyAlice \opAddScalar \varWit$.
     This construction is similiar although simpler to the locking mechanism described by Malavolta et al. For a in-depth security analysis of this concept we refer the interested reader to their paper ~\cite{malavolta2019anonymous}.
-    For a concrete Bitcoin Script realizing this functionality see section~\ref{chp:implementation}.
+    For a concrete Bitcoin Script realizing this functionality see section~\ref{ch:implementation}.
     \item $\{ 1,0 \} \opFunResult \procVerifyLock{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varValue}{\varTime}$:
     The lock verification algorithm takes as input Alices,
     Bobs public keys and the statement $\varStatement$. The function will compute the Bitcoin lock script

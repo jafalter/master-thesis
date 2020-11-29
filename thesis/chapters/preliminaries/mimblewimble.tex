@@ -1,4 +1,4 @@
-In this section we will outline the fundamental properties of the protocols employed in Mimblewimble which are relevant for the thesis and particularly the construction of the Atomic Swap protocol constructed in chapter~\ref{chp:atomicSwap}.
+In this section we will outline the fundamental properties of the protocols employed in Mimblewimble which are relevant for the thesis and particularly the construction of the Atomic Swap protocol constructed in chapter~\ref{ch:atomicswap}.
 \subsubsection{Transaction Structure} \label{subsec:pre:mimblwimble-tx}
 
 First we will define the notion of a coin in Mimblewimble which has similarity to an unspent transction output (UTXO) in Bitcoin.
@@ -143,7 +143,7 @@ In essence this means Bob spends the newly created outputs and sends them back t
 An example situation could be if Alice pays Bob for some good which Bob is selling. Alice decides to pay in advance, but then Bob discovers that he is already out of stock of the good that Alice ordered.
 To return the funds to Alice, he reverses the transaction instead of participating in another interactive process to build a new transaction with new outputs.
 If Alice already deleted the keys to her initial coins, the funds are now lost.
-The problem was solved in the Grin and Beam Mimblewimble implementations by making the signing process itself a two-party process which will be explained in more detail in chapter~\ref{chp:fixedWitnessSignatures}.
+The problem was solved in the Grin and Beam Mimblewimble implementations by making the signing process itself a two-party process which will be explained in more detail in chapter~\ref{ch:fixedwitnesssignatures}.
 
 Alternatively Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} proposed another way to build transactions which would not be vulnerable to this problem:
 \begin{enumerate}
@@ -155,7 +155,7 @@ Alternatively Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} proposed another 
     of the transaction and therfore will be discarded.
 \end{enumerate}
 One drawback of this approach is that we have two transaction kernels instead of just one because of the merging step, making the transaction slightly bigger, however there is still only one interaction required between Alice and Bob.
-In the solution employed by the Grin and Beam implementations which we will discuss in chapter~\ref{chp:atomicSwap}, at least one additional round of interaction will be required.
+In the solution employed by the Grin and Beam implementations which we will discuss in chapter~\ref{ch:atomicswap}, at least one additional round of interaction will be required.
 A figure showing the protocol flow is depicted in Figure~\ref{fig:txSalvaged}.
 
 \begin{figure}
