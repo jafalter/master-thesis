@@ -108,9 +108,9 @@ In particular we show that the distributed protocols for constructing transactio
 \textbf{Hybrid functionalities}: The parties have access to a trusted third party that computes the zero-knowledge proof of knowledge functionalities $\procZKfId{\cnstRelation_1}$, $\procZKfId{\cnstRelation_2}$ and $\procZKfId{\cnstRelation_2*}$.
 $\cnstRelation_1$ is the relation between a secret key $\varSecKey$ and its public key $\varPubKey \opEqNoQ \funGen{\varSecKey}$ for the curve generator $\varG$.
 $\cnstRelation_2$ is the relation between two secret inputs $\varBlindingFactor, \varValue$ and its pedersen commitment $\varCommitment \opEqNoQ \funGen{\varBlindingFactor} \opAddPoint \funGenH{\varValue}$ for two adjacent generators $\varG, \varH$ as defined in~\ref{def:pre:pedersen}.
-We shorten the call by the prover to just provide $\varSpendableCoin$ because it is a wrapper that contains the coin commitment, as well as the its openings.
+We shorten the call by the prover to just provide $\varSpendableCoin$ because it is a wrapper that contains the coin commitment, as well as its openings.
 $\cnstRelation_2*$ is the same as $\cnstRelation_2$ just for a list of secrets inputs $\funArray{(\varBlindingFactor, \varValue)}$ and its list of commitments $\funArray{\varCommitment}$.
-Again to shorten the calls by the prover we simply the call to $\procZkf{\cnstRelation_2*}{\funArray{\varSpendableCoin}}$.
+Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnstRelation_2*}{\funArray{\varSpendableCoin}}$.
 
 \textbf{Proof Idea}: We extend the protocol $\procDBuildMwTxId$ defined in section~\ref{sec:atom:inst} with the following calls to the zero-knowledge proof of knowledge functionalities:
 
@@ -128,7 +128,7 @@ Again to shorten the calls by the prover we simply the call to $\procZkf{\cnstRe
     \< \< \t \pcreturn \cnstFalsum \\
     \< \< \pcif \procZkf{\cnstRelation_1}{\varTx.\varSigContext.\varPubKey} \opEqNoQ 0 \\
     \< \< \t \pcreturn \cnstFalsum \\
-    \< \< \pcif \procZkf{\cnstRelation_1}{\varTx.\varSigContext.\varNonce} \opEqNoQ 0 \\
+    \< \< \pcif \procZkf{\cnstRelation_1}{\varTx.\varSigContext.\varRand} \opEqNoQ 0 \\
     \< \< \t \pcreturn \cnstFalsum \\
     \< \< \pcif \procZkf{\cnstRelation_2}{\varTx.\varOutputs[0]} \opEqNoQ 0 \\
     \< \< \t \pcreturn \cnstFalsum \\
@@ -145,7 +145,7 @@ Again to shorten the calls by the prover we simply the call to $\procZkf{\cnstRe
 }
 
 \begin{theorem} \label{theo:atom:sec-tx}
-    Let $\varCommitScheme$ be a correct and secure pedersen commitment schemes, $\varProofSystem$ be a correct and secure rangeproof system and $\varSigSchemeMP$ be a secure and correct two-party signature scheme, then $\procDBuildMwTxId$ securly computes a Mimblewimble transaction transfering the value $\varFundValue$ from a sender (denoted as Alice) to a receiver (denoted as Bob) in the hybrid $\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}$-model.
+    Let $\varCommitScheme$ be a correct and secure pedersen commitment scheme, $\varProofSystem$ be a correct and secure rangeproof system and $\varSigSchemeMP$ be a secure and correct two-party signature scheme, then $\procDBuildMwTxId$ securly computes a Mimblewimble transaction transfering the value $\varFundValue$ from a sender (denoted as Alice) to a receiver (denoted as Bob) in the hybrid $\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}$-model.
 \end{theorem}
 
 \begin{proof}
@@ -158,14 +158,14 @@ Again to shorten the calls by the prover we simply the call to $\procZkf{\cnstRe
         \item $\cnstSimulator$ invokes $\cnstAdversary$ and once it calls $\procZKfId{\cnstRelation_2*}, \procZKfId{\cnstRelation_1}$ $\procZKfId{\cnstRelation_2}$ saves the values $\funArray{\varSpendableCoin}, \varSecKeyAlice, \varNonceAlice, \funStar{\varSpendableCoinAlice}$.
         \item $\cnstSimulator$ calculates the transaction value $\varFundValue$ as follows:
         \begin{gather*}
-            \varValue \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_i.\varValue) \\
+            \varValue \opEqNoQ \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_i.\varValue) \\
             \varFundValue \opEqNoQ \varValue \opSub \funStar{\varSpendableCoinAlice}.\varValue
         \end{gather*}
-        \item $\cnstSimulator$ receives $\varPreTx$ from $\cnstAdversary$ and checks for every transaction input if $\varPreTx.\varInputs \opEqNoQ \varSpendableCoin.\varCoin$, and that $\varTx.\varOutputs \opEqNoQ \funArray{\varSpendableCoinAlice.\varCoin}$.
-        He also compares $\varTx.\varSigContext.\varPubKey \opEqNoQ \funGen{\varSecKeyAlice}$ and $\varTx.\varSigContext.\varRand \opEqNoQ \funGen{\varNonceAlice}$.
+        \item $\cnstSimulator$ receives $\varPreTx$ from $\cnstAdversary$ and checks for every transaction input $\varI$ if $\varPreTx.\varInputs[\varI] \opEqNoQ \varSpendableCoin[\varI].\varCoin$, and that $\varTx.\varOutputs \opEqNoQ \funArray{\funStar{\varSpendableCoinAlice}.\varCoin}$.
+        He also compares $\varTx.\varSigContext.\varPubKey \opEqNoQ \funGen{\varSecKeyAlice}$, $\varTx.\varSigContext.\varRand \opEqNoQ \funGen{\varNonceAlice}$, $\varTx.\varProof[0] \opEqNoQ \funStar{\varSpendableCoinAlice}.\varProof$ and $\varTx.\varCommits[0] \opEqNoQ \funGen{\varSecKeyAlice}$.
         If any of the equalities were invalid $\cnstSimulator$ sends $\cnstAbort$ to the TTP computing $\procDBuildMwTxId$ and returns $\cnstFalsum$.
         Otherwise he extracts $\varTime \opEqNoQ \varTx.\varTime$ and sends the inputs $(\funArray{\varSpendableCoin}, \varFundValue, \varTime)$ to the TTP and receives back the outputs $(\varTx, \funStar{\varSpendableCoinAlice})$.
-        \item The simulators task is it now to construct $\funStarAlt{\varPreTx}$ and $\funStar{\varSpendableCoinBob}$ which he can achieve in the following steps:
+        \item The simulators task is it now to construct $\funStarAlt{\varPreTx}$ which he can achieve in the following steps:
         \begin{enumerate}
             \item He takes the signature context $\varSigContext$ and final signature $\varSigFin$ from the final transaction $\varSigContext \opEqNoQ \varTx.\varSigContext$ and $\varSigFin \opEqNoQ \varTx.\varSignature$.
             \item He computes the adversaries partial signature as $\varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}$
@@ -188,23 +188,23 @@ Again to shorten the calls by the prover we simply the call to $\procZkf{\cnstRe
             \end{gather*}
             \item Now he can compute $\funStarAlt{\varPreTx} \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutBob}{\varProofs \opConc \varProofBob}{\varSigContext}{\varCommits \opConc \varCommitment_\varBob}{\varSigBob}{\varTime}$
         \end{enumerate}
-        Finally $\cnstSimulator$ will send $\funStarAlt{\varPreTx}$ as if coming from Bob and send $\cnstContinue$ to the TTP.
-        \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_2}$ he check equality to $\varCoinOutBob$ and returns either 0 or 1.
+        Finally $\cnstSimulator$ will send $\funStarAlt{\varPreTx}$ as if coming from Bob and sends $\cnstContinue$ to the TTP.
+        \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_2}$ he checks equality to $\varCoinOutBob$ and returns either 0 or 1.
         \item Eventually $\cnstAdversary$ will send a $\funStarAlt{\varTx}$ which the simulator outputs.
     \end{enumerate}
     Next we need to proof that the transcript produced by $\cnstSimulator$ is indistinguishable from a real one in every phase of the protocol.
     We find the following three phases:
     \textbf{Phase 1}: Alice sends her input coins, signing key and nonce as well as her change output coin to $\procZKfId{\cnstRelation_1}$ and $\procZKfId{\cnstRelation_2}$ and sends the pre-transaction $\varPreTx$ to Bob.
     \textbf{Phase 2}: Bob calls $\procZKfId{\cnstRelation_1}$ and $\procZKfId{\cnstRelation_2}$ as the verifier, after which he calls $\procZKfId{\cnstRelation_2}$ as the prover and proceeds by sending the updated pre-transaction $\funStarAlt{\varPreTx}$ to Alice.
-    \textbf{Phase 3}: Alice calls $\procZKfId{\cnstRelation_2}$ as the verifier and sends back the final transaction $\varTx$ to Bob which she then outputs.
+    \textbf{Phase 3}: Alice calls $\procZKfId{\cnstRelation_2}$ as the verifier and sends back the final transaction $\varTx$ to Bob which they then both output.
 
     \begin{itemize}
         \item \textit{Phase 1}: Due to the deterministic nature of $\cnstAdversary$ we can conclude that this phase has to be indistinguishable as there is not yet any simulation required.
         \item \textit{Phase 2}: If any of the values that $\cnstAdversary$ send to the trusted party computing the zero-knowledge proofs of knowledge are different from the value that $\cnstAdversary$ sends in the pre-transaction the equality checks done by $\cnstSimulator$ will fail in which case he will output $\cnstFalsum$ which is identical to what happens in the real execution.
         We further argue that the updated pre-transaction $\funStarAlt{\varPreTx}$ is identical to the one send in the real execution by Bob.
         The signatures $\varSigAlice$ and $\varSigBob$ have to add up to $\varSigFin$ which is the final signature.
-        $\cnstSimulator$ can read $\varSigFin$ from the transaction in the output he received previously, he can further calculate the adversaries signature because he knows their signing secrets.
-        From those two values he can then compute the value that $\varSigBob$ must have such that it will be completed to $\varSigFin$ when added to Alice's part of the signature.
+        $\cnstSimulator$ can read $\varSigFin$ from the transaction in the output he received from the TTP, he can further calculate the adversaries signature because he knows their signing secrets.
+        From those two values he can then compute the value that $\varSigBob$ must have such that it will complete to $\varSigFin$ when added to Alice's part of the signature.
         All the other values $\cnstSimulator$ needs to build $\funStarAlt{\varPreTx}$ he can simply read from the final transaction $\varTx$.
         Therefore $\funStarAlt{\varPreTx}$ is identical to the one sent in the real execution.
         \item \textit{Phase 3}: When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_2}$ as the verifier, $\cnstSimulator$ can simply check equality with the correct value and return 0 or 1, which is identical to the real execution.
@@ -238,28 +238,29 @@ Again to shorten the calls by the prover we simply the call to $\procZkf{\cnstRe
         \item Next the simulator rewinds to the first step of the simulation but instead of choosing the values for the pre-transacion now he uses $\varTx.\varInputs$ as the pre-transaction input values, $\varTx.\varOutputs[0]$ as the single output value, $\varTx.\varProofs[0]$ as the single rangeproof value and $\varTx.\varCommits[0]$ as the single value in the commitment field.
         Furthermore he constructs the initial signature context as:
         \begin{gather*}
-            \varSigContext \opAssign \{ \varPubKey \opEqNoQ 1, \varRand \opEqNoQ \} \\
-            \varSigContext \procSetupCtx{\varSigContext}{\varPubKeyAlice}{\varRandAlice}
+            \varSigContext \opAssign \{ \varPubKey \opEqNoQ 1, \varRand \opEqNoQ 1 \} \\
+            \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\varPubKeyAlice}{\varRandAlice}
         \end{gather*}
-        And again send the pre-transaction to $\cnstAdversary$ as if coming from Alice.
-        \item The simulator repeats the steps until the part where he rewinded earlier, instead of rewinding $\cnstSimulator$ now sends $\varTx$ as if coming from Alice and ouputs $\varTx$.
+        And again sends the pre-transaction to $\cnstAdversary$ as if coming from Alice.
+        \item The simulator repeats the steps until 5. where he rewinded earlier, now instead of rewinding $\cnstSimulator$ sends $\cnstContinue$ to the TTP and sends $\varTx$ as if coming from Alice, and finally outputs $\varTx$.
     \end{enumerate}
 
     Again we now claim that the simulation is indistinguishable from a real execution in all three phases.
-    Note that due to the rewind we need to consider both the message sent both before and after the rewind.
+    Note that due to the rewind we need to consider both the message sent before and after the rewind.
 
     \begin{itemize}
-        \item \textit{Phase 1:} In the first iteration the simulator chooses the input values $\funArray{\varSpendableCoin}$ and transaction value $\varFundValue$ and construct the pre-transaction using those chosen value rather than the real ones.
-        We claim that the adversary can not extract to which value the input and output coins commit. (Except with neglible probability)
+        \item \textit{Phase 1:} In the first iteration the simulator constructs the input values $\funArray{\varSpendableCoin}$ from random values and also chooses a random transaction value $\varFundValue$.
+        $\cnstSimulator$ constructs the pre-transaction using those chosen value rather than the real ones.
+        We claim that the adversary cannot distinguish the chose from the real coin commitments (Except with neglible probability).
         If we assume that he would be able to do so, that means he could distinguish for two pedersen commitments $\varCommitment_1 \opEqNoQ \funGen{\varBlindingFactor_1} \opAddPoint \funGenH{\varValue}, \varCommitment_2 \opEqNoQ \funGen{\varBlindingFactor_2} \opAddPoint \funGenH{\funStarAlt{\varValue}}$ which one commits to $\varValue$, from which follows that he could break the hiding property of perdersen commitments.
-        Not being able to extract the coin values the adversary has no chance of knowing if they are correctly chosen at this point.
+        Not being able to extract the coin values, the adversary has no chance of knowing if they are correct at this point.
         For the same reasons the pre-transaction sent by $\cnstSimulator$ after the rewind will be indistinguishable from a real one.
-        However, as this time the pre-transaction is constructed from the real value which $\cnstSimulator$ received from the TTP, the pre-transaction is in fact identical to the pre-transaction sent in the real execution.
+        However, as this time the pre-transaction is constructed from the real $\varTx$ which $\cnstSimulator$ received from the TTP, the pre-transaction is in fact identical to the pre-transaction sent in the real execution.
         The calls to $\procZKfId{\cnstRelation_1}$ and $\procZKfId{\cnstRelation_2}$ also behave identically to the real execution in which the parties have access to a TTP computing those protocols.
         \item \textit{Phase 2:} This phase will be identical to the real execution due to the fact that the adversary is deterministic.
         \item \textit{Phase 3:} The transaction sent to $\cnstAdversary$ in this phase is the one received from the TTP and is therefore identical to what would have been sent in the real execution, given $\cnstAdversary$ sends correct values. (Otherwise the execution would have halted with $\cnstFalsum$).
-        We like to emphasize that in the case that we wouldn't have done the rewind step $\cnstAdversary$ would be able to distinguish the transcript from the real one because he can identify differences in the inputs, outputs, proofs and commitment, as well as the signature context of the final transaction $\varTx$ and the pre-transaction $\varPreTx$ sent in the first phase.
-        For instance inputs which are spend in the final transaction where not present in the pre-transaction.
+        We like to emphasize that in the case that we wouldn't have done the rewind step, $\cnstAdversary$ would be able to distinguish the transcript from the real one because he can identify differences in the inputs, outputs, proofs and commitment, as well as the signature context of the final transaction $\varTx$ and the pre-transaction $\varPreTx$ sent in the first phase.
+        For instance inputs which are spend in the final transaction are not present in the pre-transaction.
         However, due to the rewinding step $\cnstSimulator$ manages to construct the correct pre-transaction which will finalize into $\varTx$ such that $\cnstAdversary$ again has no chance of distinguishing the two transcripts.
     \end{itemize}
 
