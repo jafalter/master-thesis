@@ -6,7 +6,7 @@ The general process will be to find a proof for the basic transaction protocol d
 \subsection{Correctness} \label{subsec:atom:correctness}
 
 We will argue \emph{Transaction Scheme Correctness} follows from the correctness of the commitment scheme $\varCommitScheme$, two-party signature scheme $\varSigScheme$ as well as the correctness of the range proof system $\varProofSystem$ used in the transaction protocol.
-If the transaction was constructed correctly (that is by calling the procedures $\procSendCoinsId, \procRecvCoinsId, \procFinTxId$, the distributed variants $\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId$ or the adapted ones $\procAptRecvCoinsId, \procDAptFinTxId$ with valid inputs) it must follow that the final transaction has correct commitments, rangeproofs and a valid signature and $\procVerfTxId$ will therefore return 1.
+If the transaction was constructed correctly (that is by calling the procedures $\procSendCoinsId, \procRecvCoinsId, \procFinTxId$, the distributed variants $\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId$ or the adapted ones $\procAptRecvCoinsId, \procDAptFinTxId$ with valid inputs) it must follow that the final transaction has correct commitments, rangeproofs and a valid signature and $\procLedgrId$ will therefore return $\varLedger$.
 We construct the following theorem:
 
 \begin{theorem}\label{lem:atom:correctness}
@@ -14,16 +14,16 @@ We construct the following theorem:
 \end{theorem}
 
 \begin{proof}
-    We assume there are two honest participants Alice and Bob, there exists a list of input coins $\funArray{\varCoinInp}$ with blinding factors $\funArray{\varBlindingFactorAlice}$ and total value $\varValue$ known to Alice, and some amount $\varFundValue$ which Alice wants to transfer to Bob.
-    For \emph{Transaction Scheme Correctness} to hold $\procVerfTx{\varTx}$ must return 1 with overwhealming probability for the two parties creating a transaction $\varTx$ in the following three steps:
+    We assume there are two honest participants Alice and Bob, there exists a list of input coins $\funArray{\varCoinInp}$ with blinding factors $\funArray{\varBlindingFactor_i}$ and values $\funArray{\varValue_i}$ wrapped inside a list $\funArray{\varSpendableCoin}$ known to Alice, and some amount $\varFundValue$ which Alice wants to transfer to Bob.
+    For \emph{Transaction Scheme Correctness} to hold $\procLedgr{\varLedger}{\varTx}$ must return an updated ledger $\funStar{\varLedger}$ with overwhealming probability for the two parties creating the transaction $\varTx$ in the following three steps:
     \begin{enumerate}
         \item $(\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\cnstFalsum}$
         \item $\funStar{\varPreTx} \opFunResult \procRecvCoins{\varPreTx}{\varFundValue}$
         \item $\varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}$
     \end{enumerate}
-    Here are the following three requirements for $\procVerfTx{\varTx}$ to return 1:
+    Here are the requirements for $\procLedgr{\varLedger, \varTx}$ to return an updated ledger $\funStar{\varLedger}$ taken from~\cite{fuchsbauer2019aggregate}.
     \begin{enumerate}
-        \item The list of input coins $\varInputs$, as well as output coins $\varOutputs$ must each inlcude at least one element.
+        \item The current ledger $\varLedger$ passed as input must be valid (empty inputset) and the inputs used in $\varTx$ must be valid outputs in $\varLedger$.
         \item For each output coin $\varCoinOut$ the rangeproof $\varProof$ must verify.
         \item The transaction signature under the public key $\varPubKey \opAssign \cnstSumZeroToN \varOutputs \opSub \cnstSumZeroToN \varInputs$ must verify.
     \end{enumerate}

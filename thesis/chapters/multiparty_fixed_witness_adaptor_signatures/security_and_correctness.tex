@@ -1,8 +1,8 @@
-We now prove that the outlined schnorr-based instantiation is correct, i.e. Adaptor Signature Correctness holds, as well as secure with regards to the definition~\ref{subsec:pre:security}.
+We now prove that the outlined schnorr-based instantiation is correct, i.e. Adaptor Signature Correctness holds, and is secure with regards to the definition~\ref{subsec:pre:security}.
 
 \subsection{Adaptor Signature Correctness}\label{subsec:sig:aptsig-correctness}
 
-To prove that Adaptor Signature Correctness holds we have 3 statements to prove, first we prove that $\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPubKey} \opEq 1$ holds in our
+To prove that Adaptor Signature Correctness holds we have 3 statements to prove, first we prove that $\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPubKey} \opEqNoQ 1$ holds in our
 schnorr-based instantiation of the signature scheme, whereas $\varSigContext$ is setup such that $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
 
 \begin{proof}
@@ -19,11 +19,11 @@ schnorr-based instantiation of the signature scheme, whereas $\varSigContext$ is
         1 & \opEqNoQ 1
     \end{align}
 
-    It remains to prove that with the same setup $\procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEq 1$ and
-    $(\varStatement \opSeperate \funStar{\varWit}) \opIn \cnstRelation$ hold.
+    It remains to prove that with the same setup $\procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEqNoQ 1$ and
+    $(\varStatement \opSeperate \varWit) \opIn \cnstRelation$ (whereas $\varWit$ is the output for the $\procExtWitId$ function) hold.
 
     \[
-        \procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEq 1
+        \procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEqNoQ 1
     \]
     The proof is by continuous substitutions in the equation checked by the verifier:
     \begin{align}
@@ -36,14 +36,16 @@ schnorr-based instantiation of the signature scheme, whereas $\varSigContext$ is
     \end{align}
     We now continue to prove the last equation required:
     \[
-        ((\varStatement \opSeperate \funStar{\varWit}) \opIn \cnstRelation)
+        (\varStatement \opSeperate \varWit) \opIn \cnstRelation
     \]
     We do this by showing that $\varWit$ is calculated correctly in $\procExtWitId$:
+    $\varSAptBob$ is the $\varS$ value in Bobs adapted partial signature
     \begin{align}
-        \varWit \opAssign & \varSApt \opSub (\varS \opSub \varSAlice) \\
-        & \varSApt \opSub ((\varSAlice \opAddScalar \varSBob ) \opSub \varSAlice ) \\
+        \varWit \opEqNoQ & \varSApt \opSub (\varS \opSub \varSAlice) \\
+        & \varSAptBob \opSub ((\varSAlice \opAddScalar \varSBob ) \opSub \varSAlice ) \\
         & \varSBob \opAddScalar \varWit \opSub (\varSBob) \\
-        \varWit \opAssign & \varWit \\
+        \varWit \opEqNoQ & \varWit \\
+        1 \opEqNoQ & 1
     \end{align}
 \end{proof}
 
