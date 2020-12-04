@@ -103,10 +103,10 @@ Furthermore, the scheme used a multiparty version of the bulletproof system $\va
 \subsection{Security}\label{subsec:atom:security}
 
 We now prove the security of our transaction schemes in the malicious setting as defined in~\ref{subsec:pre:security}.
-In particular we show that the distributed protocols for constructing transactions are secure in the hybrid $\procZKfId{\cnstRelation}$-model as already explained in~\ref{subsec:sig:secureaptscheme}.
+In particular we show that the distributed protocol for constructing transactions are secure in the hybrid $\procZKfId{\cnstRelation}$-model as already explained in~\ref{subsec:sig:secureaptscheme}.
 
 \textbf{Hybrid functionalities}: The parties have access to a trusted third party that computes the zero-knowledge proof of knowledge functionalities $\procZKfId{\cnstRelation_1}$, $\procZKfId{\cnstRelation_2}$ and $\procZKfId{\cnstRelation_2*}$.
-$\cnstRelation_1$ is the relation between a secret key $\varSecKey$ and its public key $\varPubKey \opEqNoQ \funGen{\varSecKey}$ for the curve generator $\varG$.
+$\cnstRelation_1$ is the relation between a secret key $\varSecKey$ and its public key $\varPubKey \opEqNoQ \funGen{\varSecKey}$ for the elliptic curve generator point $\varG$.
 $\cnstRelation_2$ is the relation between two secret inputs $\varBlindingFactor, \varValue$ and its pedersen commitment $\varCommitment \opEqNoQ \funGen{\varBlindingFactor} \opAddPoint \funGenH{\varValue}$ for two adjacent generators $\varG, \varH$ as defined in~\ref{def:pre:pedersen}.
 We shorten the call by the prover to just provide $\varSpendableCoin$ because it is a wrapper that contains the coin commitment, as well as its openings.
 $\cnstRelation_2*$ is the same as $\cnstRelation_2$ just for a list of secrets inputs $\funArray{(\varBlindingFactor, \varValue)}$ and its list of commitments $\funArray{\varCommitment}$.
@@ -149,13 +149,14 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
 \end{theorem}
 
 \begin{proof}
-    We proof the security of $\procDBuildMwTxId$ by constructing a simulator $\cnstSimulator$ with access to a TTP computing the protocol in the ideal setting upon receiving the inputs for the participants.
+    We proof the security of $\procDBuildMwTxId$ by constructing a simulator $\cnstSimulator$ with access to a TTP computing the protocol in the ideal setting upon receiving the inputs from the participants.
+    For this the simulator has to extract the inputs used by the adversary.
     The TTP returns the outputs $(\varTx, \funStar{\varSpendableCoinAlice})$ (resp. $(\varTx, \funStar{\varSpendableCoinBob})$) from which he has to construct a transcript that is indistinguishable from the protcol transcript in the real world. The simulator uses the calls to $\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}, \procZKfId{\cnstRelation_2*}$ to achieve this.
     We proof that the transcript is indistinguishable in the cases that either Alice or Bob is corrupt and controlled by a deterministic polynomial adversary $\cnstAdversary$.
 
     \textbf{Alice is corrupt}: Simulator $\cnstSimulator$ works as follows:
     \begin{enumerate}
-        \item $\cnstSimulator$ invokes $\cnstAdversary$ and once it calls $\procZKfId{\cnstRelation_2*}, \procZKfId{\cnstRelation_1}$ $\procZKfId{\cnstRelation_2}$ saves the values $\funArray{\varSpendableCoin}, \varSecKeyAlice, \varNonceAlice, \funStar{\varSpendableCoinAlice}$.
+        \item $\cnstSimulator$ invokes $\cnstAdversary$ and once it calls $\procZKfId{\cnstRelation_2*}, \procZKfId{\cnstRelation_1}$ $\procZKfId{\cnstRelation_2}$ saves the values $\funArray{\varSpendableCoin}, \varSecKeyAlice, \varNonceAlice, \funStar{\varSpendableCoinAlice}$ to its memory.
         \item $\cnstSimulator$ calculates the transaction value $\varFundValue$ as follows:
         \begin{gather*}
             \varValue \opEqNoQ \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_i.\varValue) \\
@@ -190,10 +191,10 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
         \end{enumerate}
         Finally $\cnstSimulator$ will send $\funStarAlt{\varPreTx}$ as if coming from Bob and sends $\cnstContinue$ to the TTP.
         \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_2}$ he checks equality to $\varCoinOutBob$ and returns either 0 or 1.
-        \item Eventually $\cnstAdversary$ will send a $\funStarAlt{\varTx}$ which the simulator outputs.
+        \item Eventually $\cnstAdversary$ will send a $\funStarAlt{\varTx}$ after which the simulator will output whatever $\cnstAdversary$ outputs.
     \end{enumerate}
     Next we need to proof that the transcript produced by $\cnstSimulator$ is indistinguishable from a real one in every phase of the protocol.
-    We find the following three phases:
+    We seperate between the following three phases:
     \textbf{Phase 1}: Alice sends her input coins, signing key and nonce as well as her change output coin to $\procZKfId{\cnstRelation_1}$ and $\procZKfId{\cnstRelation_2}$ and sends the pre-transaction $\varPreTx$ to Bob.
     \textbf{Phase 2}: Bob calls $\procZKfId{\cnstRelation_1}$ and $\procZKfId{\cnstRelation_2}$ as the verifier, after which he calls $\procZKfId{\cnstRelation_2}$ as the prover and proceeds by sending the updated pre-transaction $\funStarAlt{\varPreTx}$ to Alice.
     \textbf{Phase 3}: Alice calls $\procZKfId{\cnstRelation_2}$ as the verifier and sends back the final transaction $\varTx$ to Bob which they then both output.
@@ -205,7 +206,7 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
         The signatures $\varSigAlice$ and $\varSigBob$ have to add up to $\varSigFin$ which is the final signature.
         $\cnstSimulator$ can read $\varSigFin$ from the transaction in the output he received from the TTP, he can further calculate the adversaries signature because he knows their signing secrets.
         From those two values he can then compute the value that $\varSigBob$ must have such that it will complete to $\varSigFin$ when added to Alice's part of the signature.
-        All the other values $\cnstSimulator$ needs to build $\funStarAlt{\varPreTx}$ he can simply read from the final transaction $\varTx$.
+        All further values $\cnstSimulator$ needs to build $\funStarAlt{\varPreTx}$ he can simply read from the final transaction $\varTx$.
         Therefore $\funStarAlt{\varPreTx}$ is identical to the one sent in the real execution.
         \item \textit{Phase 3}: When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_2}$ as the verifier, $\cnstSimulator$ can simply check equality with the correct value and return 0 or 1, which is identical to the real execution.
     \end{itemize}
@@ -223,12 +224,12 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
         Now he can call $\procSendCoinsId$ and get:
         \[ (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \]
         \item The simulator invokes $\cnstAdversary$ and sends $\varPreTx$ as if coming from Alice.
-        \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_1},\procZKfId{\cnstRelation_2}$ as the verifier $\cnstSimulator$ simply checks equality we the values he sent and returns either 0 or one.
+        \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_1},\procZKfId{\cnstRelation_2}$ as the verifier $\cnstSimulator$ simply checks equality we the values he sent and returns either 0 or 1.
         The adversary proceeds by calling $\procZkf{\cnstRelation_2}{\funStar{\varSpendableCoinBob}}$, $\cnstSimulator$ saves $\funStar{\varSpendableCoinBob}$ and extracts $\varFundValue \opEqNoQ \funStar{\varSpendableCoinBob}.\varValue$
         He then calls the TTP computing $\procDBuildMwTxId$ with the input $\varFundValue$ and receives $(\varTx, \funStar{\varSpendableCoinBob})$.
         \item Next $\cnstAdversary$ sends an updated pre-transaction $\funStarAlt{\varPreTx}$.
-        $\cnstSimulator$ verifies the output coin added by $\cnstAdversary$ matches with $\funStarAlt{\varSpendableCoinBob}$, if it does not he sends $\cnstAbort$ to the TTP and outputs $\cnstFalsum$.
-        Now $\cnstSimulator$ computes the following values from the signature context $\varSigContext$ provided in the final transaction and $\funStarAlt{\varSigContext}$ provided by $\cnstAdversary$:
+        $\cnstSimulator$ verifies the output coin added by $\cnstAdversary$ matches with $\funStar{\varSpendableCoinBob}$, if it does not he sends $\cnstAbort$ to the TTP and outputs $\cnstFalsum$.
+        Otherwise $\cnstSimulator$ computes the following values from the signature context $\varSigContext$ provided in the final transaction and $\funStarAlt{\varSigContext}$ provided by $\cnstAdversary$:
         \begin{gather*}
             \varPubKeyBob \opEqNoQ \funStarAlt{\varSigContext}.\varPubKey \opAddPoint {\funGen{\varSecKeyAlice}}^{-1} \\
             \varRandBob \opEqNoQ \funStarAlt{\varSigContext}.\varRand \opAddPoint {\funGen{\varNonceAlice}}^{-1} \\
@@ -242,20 +243,20 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
             \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\varPubKeyAlice}{\varRandAlice}
         \end{gather*}
         And again sends the pre-transaction to $\cnstAdversary$ as if coming from Alice.
-        \item The simulator repeats the steps until 5. where he rewinded earlier, now instead of rewinding $\cnstSimulator$ sends $\cnstContinue$ to the TTP and sends $\varTx$ as if coming from Alice, and finally outputs $\varTx$.
+        \item The simulator repeats the steps until step 5. where he rewinded earlier, now instead of rewinding $\cnstSimulator$ sends $\cnstContinue$ to the TTP and sends $\varTx$ as if coming from Alice, and finally outputs whatever $\cnstAdversary$ outputs.
     \end{enumerate}
 
     Again we now claim that the simulation is indistinguishable from a real execution in all three phases.
-    Note that due to the rewind we need to consider both the message sent before and after the rewind.
+    Note that due to the rewinding step we need to consider both the message sent before and after the rewind.
 
     \begin{itemize}
         \item \textit{Phase 1:} In the first iteration the simulator constructs the input values $\funArray{\varSpendableCoin}$ from random values and also chooses a random transaction value $\varFundValue$.
         $\cnstSimulator$ constructs the pre-transaction using those chosen value rather than the real ones.
-        We claim that the adversary cannot distinguish the chose from the real coin commitments (Except with neglible probability).
+        We claim that the adversary cannot distinguish the chosen from the real coin commitments (Except with neglible probability).
         If we assume that he would be able to do so, that means he could distinguish for two pedersen commitments $\varCommitment_1 \opEqNoQ \funGen{\varBlindingFactor_1} \opAddPoint \funGenH{\varValue}, \varCommitment_2 \opEqNoQ \funGen{\varBlindingFactor_2} \opAddPoint \funGenH{\funStarAlt{\varValue}}$ which one commits to $\varValue$, from which follows that he could break the hiding property of perdersen commitments.
         Not being able to extract the coin values, the adversary has no chance of knowing if they are correct at this point.
         For the same reasons the pre-transaction sent by $\cnstSimulator$ after the rewind will be indistinguishable from a real one.
-        However, as this time the pre-transaction is constructed from the real $\varTx$ which $\cnstSimulator$ received from the TTP, the pre-transaction is in fact identical to the pre-transaction sent in the real execution.
+            However, as this time the pre-transaction is constructed from the real $\varTx$ which $\cnstSimulator$ received from the TTP, the pre-transaction is in fact identical to the pre-transaction sent in the real execution.
         The calls to $\procZKfId{\cnstRelation_1}$ and $\procZKfId{\cnstRelation_2}$ also behave identically to the real execution in which the parties have access to a TTP computing those protocols.
         \item \textit{Phase 2:} This phase will be identical to the real execution due to the fact that the adversary is deterministic.
         \item \textit{Phase 3:} The transaction sent to $\cnstAdversary$ in this phase is the one received from the TTP and is therefore identical to what would have been sent in the real execution, given $\cnstAdversary$ sends correct values. (Otherwise the execution would have halted with $\cnstFalsum$).
