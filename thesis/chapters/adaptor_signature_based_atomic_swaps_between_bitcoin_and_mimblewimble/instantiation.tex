@@ -85,7 +85,7 @@ If he finds it as valid, he will only now create his partial signature and final
             \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
             \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutBob}{\varProofs \opConc \varProofBob}{\varSigContext}{\varCommits \opConc \funGen{\varSecKeyBob}}{\varSigBob}{\varTime} \\
             \pcreturn (\varPreTx, \funStar{\varSpendableCoinBob})
-            }
+            } \\
             \procedure[linenumbering]{$\procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}$} {
             (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \\
             \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \\
@@ -96,31 +96,17 @@ If he finds it as valid, he will only now create his partial signature and final
             \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
             \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \\
             \pcreturn \varTx
+            } \\
+            \procedure[linenumbering]{$\procVerfTx{\varTx}$} {
+            (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSignature,\varTime) \opFunResult \varTx \\
+            \varExcess \opEqNoQ \sum(\varOutputs) \opSub \sum(\varInputs) \\
+            \pcreturn (\opForAll \varI \opNotEq \varJ : \varInputs[\varI] \opNotEq \varInputs[\varJ] \opAnd \varOutputs[\varI] \opNotEq \varOutputs[\varJ]) \text{ and } \\
+                    \varInputs \opUnion \varOutputs \opEqNoQ \cnstEmptySet \text{ and } (\opForAll \varI : \procVerfProof{\varProofs[\varI]}{\varOutputs[\varI]}) \text{ and } \procVerf{\varMsg}{\varSignature}{\varExcess}
             }
         \end{varwidth}
         }
     \end{center}
     \caption{Instantiation of Mimblewimble Transaction Scheme. \label{fig:inst-mw-tx}}
-\end{figure}
-
-Figure~\ref{fig:d-build-mw-tx} show the implementation of a two party protocol using the routines instantiated in~\ref{fig:inst-mw-tx} to build a Mimblewimble transaction transfering $\varFundValue$ from a sender owning the coins $\funStar{\varSpendableCoin}$ to a receiver.
-
-\begin{figure}
-    \fbox{
-    \begin{varwidth}{\textwidth}
-        \procedure[linenumbering]{$\procDBuildMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
-        Alice \< \< Bob \\
-        (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \\ \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \\
-        \< \sendmessageright*{\varPreTx} \< \\
-        \< \< (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinBob}) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue} \\
-        \< \sendmessageleft*{\funStarAlt{\varPreTx}} \\
-        \varTx \procFinTx{\funStarAlt{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
-        \< \sendmessageright*{\varTx} \\
-        \pcreturn (\varTx, \funStar{\varSpendableCoinAlice}) \< \< \pcreturn (\varTx, \funStar{\varSpendableCoinBob})
-        }
-    \end{varwidth}
-    }
-    \caption{$\procDBuildMwTxId$ two-party protocol to build a new transaction} \label{fig:d-build-mw-tx}
 \end{figure}
 
 \subsection{Extended Mimblewimble Transaction Scheme}\label{subsec:atom:ext-tx-scheme}
@@ -139,7 +125,7 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
     \thispagestyle{plain}
     \begin{figure}
         \fbox{
-        \procedure[linenumbering]{$\procDSendCoins{\funArray{\varSpendableCoinAlice}}{\funArray{\varSpendableCoinCarol}}{\varFundValue}{\varTime}$}{
+        \procedure[linenumbering]{$\procDSendCoins{\funArray{\varPtSpendableCoinAlice}}{\funArray{\varPtSpendableCoinCarol}}{\varFundValue}{\varTime}$}{
         Alice \< \< Carol \\
         \varValue \opFunResult \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_{i}.\varValue) \< \< \varValue \opFunResult \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_{i}.\varValue) \\
         \pcif \varFundValue \opGreaterThen \varValue \< \< \pcif \varFundValue \opGreaterThen \varValue \\

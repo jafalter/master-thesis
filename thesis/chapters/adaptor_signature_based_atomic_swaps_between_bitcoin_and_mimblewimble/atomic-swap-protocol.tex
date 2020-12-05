@@ -3,7 +3,7 @@ In this thesis we will explain a swap with Bitcoin, as at present Bitcoin and Bi
 We will generally refer to the ``Bitcoin side`` and the ``Mimblewimble side`` of the swap to be most generic.
 Upon implementation one has to decide for a specific implementation, for example BTC on the Bitcoin side and Grin on
 the Mimblewimble side.
-On the Bitcoin side we construct two DPT functions ($\procLockAddrId, \procVerifyLockId$).
+On the Bitcoin side we define three DPT functions $(\procLockAddrId, \procVerifyLockId, \procSpendBtcId)$.
 \begin{itemize}
     \item $(\varScriptPubKey) \opFunResult \procLockAddr{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varTime}$:
     The locking script function lets Bob construct a Bitcoin script only spendable by Alice if she receives the discrete logarithm
@@ -21,12 +21,16 @@ On the Bitcoin side we construct two DPT functions ($\procLockAddrId, \procVerif
     $\varScriptPubKey$ as created by $\procLockAddrId$ and then check the Bitcoin blockchain if the value locked
     under the script equals $\varValue$.
     Upon successful verification the function returns 1, otherwise 0.
+    \item $\varTx \opFunResult \procSpendBtc{\varInputs}{\varOutputs}{\varSecKey}$:
+    The spend Bitcoin functionality is a wrapper around the $\procBuildTransactionId, \procSignTransactionId$ defined in~\ref{subsec:pre:bitcointx}.
+    It constructs and signs a transaction spending the UTXOs given in $\varInputs$ and creates the fresh UTXOs in $\varOutputs$.
+    It returns the transaction which then can be broadcast
 \end{itemize}
 
 \subsection{Setup phase}\label{subsec:atom:setup}
 
-We assume Alice owns Mimblewimble coins $\varCoinInp$ with a value of $\varValueMw$ and blinding factor $\varBlindingFactorAlice$ and Bob
-Bitcoin locked in some UTXO $\varUTXO$ with a value of $\varValueBtc$ belonging to him.
+We assume Alice owns Mimblewimble coins $\funArray{\varSpendableCoin}$ with the total value $\varValueMw$ and Bob
+Bitcoin locked in some UTXO $\varUTXO$ with a value of $\varValueBtc$ and secret key $\varSecKey_{btc}$.
 Before the protocol can start the two parties must agree on the value they want to swap, the exchange rate of the currencies and a time after which the swap should be canceled.
 After coming to an agreement the following variables are defined and known by both Alice and Bob:
 \begin{itemize}
@@ -44,10 +48,14 @@ The problems with cross chain payments are discussed by Tairi et al. in~\cite{ta
 In our setup we can also fix the exchange rate at the beginning of the protocol, which stays unchanged during protocol execution.
 If the exchange rate fluctuates and one party is negatively impacted he or she could still decide to stop being cooperative which means the coins would be returned to the original owners after the timeout.
 
+There is furthermore the problem of transaction fees, which we do not consider for this formalization
+Depending on the current network load the participants need to agree on a fee that they are willing to pay for each network.
+If the fees are picked to low, then it might take time for transactions to be confirmed, and the swap will take longer, if the fees are picked high the participants will loose funds.
+
 We formalize the protocol $\procSetupSwapId$ in figure~\ref{fig:setup-swap}.
 The protocol takes as input the shared swap state $\varSwpState$ from both parties.
-From Alice her Mimblewimble input coin $\varCoinInp$ together with the required spending information $\varBlindingFactorAlice$ and the coins value $\varValueMw$.
-From Bob we require the UTXO $\varUTXO$ he wants to spend, similar to Alice he needs to provide spending secret $\varScriptSig$ and total value stored in the UTXO $\varValueBtc$, although this could also be read from the blockchain.
+From Alice her Mimblewimble input coins $\funArray{\varSpendableCoin}$.
+From Bob we require the UTXO $\varUTXO$ he wants to spend, he also needs to provide the spending key $\varSecKey_{btc}$ and total value stored in the UTXO $\varValueBtc$, although this could also be read from the blockchain.
 
 The protocol starts by both parties creating and exchanging keys.
 Bob now creates two new Bitcoin outputs $\varUTXO_{lock}$ and $\varUTXO_{B}$, of which one is the locked Bitcoins which Alice might retrieve later (or Bob after time $\varTimeBTC$ has passed), and the other Bobs change output. (Difference between what is stored in the input UTXO and what should be sent to Alice).
@@ -58,17 +66,12 @@ Immediately after, both parties collaborate again to spend this shared coin back
 It is immanent that Alice does not publish the first transaction (A -> AB) before the timelocked refund transaction (AB -> A) was signed, otherwise her funds are locked in the shared output without the possibility of refund.
 The setup protocol concludes with the funds locked up in both chains and ready to be swapped.
 
-\footnotetext[1]{$\procSendCoins{\funArray{\varSpendableCoin}}{\varAmountMW}{\cnstFalsum}$}
-\footnotetext[2]{$\procDRecvCoins{\varPreTx}{\varPreTx}$}
-\footnotetext[3]{$\procDSendCoins{\funArray{\varSpendableCoinAlice}}{\funArray{\varSpendableCoinBob}}{\varAmountMW}{\varTimeMW}$}
-\footnotetext[4]{$\procDFinTx{\funStar{\varPreTx_2}}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}$}
-
 \newgeometry{margin=2cm}
 \begin{landscape}
     \thispagestyle{plain}
     \begin{figure}
         \fbox{
-        \procedure[linenumbering]{$\procSetupSwap{\varSwpState}{\varCoinInp}{\varBlindingFactorAlice}{\varValueMw}{\varUTXO}{\varScriptSig}{\varValueBtc}$} {
+        \procedure[linenumbering]{$\procSetupSwap{\varSwpState}{\funArray{\varSpendableCoin}}{\varValueMw}{\funArray{\varUTXO}}{\funArray{\varSecKey_{btc}}}{\varValueBtc}$} {
         Alice \< \< \< \< Bob \\
         \varKeyPairAlice \opFunResult \procSetup{\varSecParam} \< \< \< \< \varKeyPairBob \opFunResult \procSetup{\varSecParam} \\
         \< \< \< \< (\varWit, \varStatement) \opFunResult \procSetup{\varSecParam} \\
@@ -76,24 +79,18 @@ The setup protocol concludes with the funds locked up in both chains and ready t
         \< \sendmessageleftx{4}{\varPubKeyBob} \< \\
         \< \< \< \< \varScriptPubKey \opFunResult \procLockAddr{\varPubKeyAlice}{\varStatement}{\varPubKeyBob}{\varTimeBTC} \\
         \< \< \< \< \varUTXO_{lock} \opFunResult \procCreateUTXO{\varAmountBtc}{\varScriptPubKey} \\
-        \< \< \< \< \varSwpState \opAssign \varSwpState \opUnion \varUTXO_{lock} \opUnion \varStatement \\
         \< \< \< \< \varUTXO_{B} \opFunResult \procCreateUTXO{\varValueBtc - \varAmountBtc}{\varPubKeyBob} \\
-        \< \< \< \< \varBtcTx \opFunResult \procBuildTransaction{\funArray{\varUTXO_{inp}}}{\funArray{\varUTXO_{lock}, \varUTXO_{B}}}{1}{\cnstEmptySet} \\
-        \< \< \< \< \funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\funArray{\varScriptSig}} \\
+        \< \< \< \< \varBtcTx \opFunResult \procSpendBtc{\funArray{\varUTXO}}{\funArray{\varUTXO_{lock}, \varUTXO_{B}}}{\funArray{\varSecKey_{btc}}}
         \< \< \< \< \procPublishBtc{\funArray{\funStar{\varBtcTx}}} \\
         \< \sendmessageleftx{4}{\varStatement} \< \\
         \pcif \procVerifyLock{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varAmountBtc}{\cnstEmptySet} \opEqNoQ 0 \\
-        \t \pcreturn 0 \< \< \< \< \\
-        (\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoinsId^1 \< \< \< \< \\
-        \< \sendmessagerightx{4}{\varPreTx} \< \\
-        \< \langle (\funStar{\varPreTx}, (\varCoinShared,\funStar{\varBlindingFactorAlice})), (\funStar{\varPreTx}, (\varCoinShared,\funStar{\varBlindingFactorBob})) \rangle \opFunResult \procDRecvCoinsId^2 \< \\
-        \< \varSwpState \opAssign \varSwpState \opUnion \varCoinShared \< \\
-        \varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \< \< \< \< \\
-        \< \langle (\varPreTx_2, (\varSecKeyAlice, \varNonceAlice)), (\varPreTx_2, (\varSecKeyBob, \varNonceBob))  \rangle \opFunResult \procDSendCoinsId^3 \< \\
-        \funStar{\varPreTx_2} \opFunResult \procRecvCoins{\varPreTx_2}{\varAmountMW} \< \< \< \< \\
-        \< \langle \varTx_2, \varTx_2 \rangle \opFunResult \procDFinTxId^4 \< \\
-        \procPublishMW{\funArray{\varTx, \varTx_2}} \< \< \< \< \\
-        \pcreturn \varSwpState \< \< \< \< \pcreturn \varSwpState \\
+        \t \pcreturn \cnstFalsum \< \< \< \< \\
+        (\varMwFundTx, \funStar{\varSpendableCoinAlice},\funStar{\varPtSpendableCoinAlice}) \< \< \< \< (\varMwFundTx, \funStar{\varPtSpendableCoinBob}) \\
+        \opFunResult \procDSharedOutputMwTxL{\funArray{\varSpendableCoin}}{\varAmountMW}{\cnstFalsum} \< \< \< \< \opFunResult \procDSharedOutputMwTxR{\varAmountMW} \\
+        (\varMwRefundTx, \funStarAlt{\varSpendableCoinAlice}) \< \< \< \< \varMwRefundTx \\
+        \opFunResult \procDSharedInpMwTxL{\funStar{\varPtSpendableCoinAlice}}{\varAmountMW}{\varTimeMW} \< \< \< \< \opFunResult \procDSharedInpMwTxR{\funStar{\varPtSpendableCoinBob}}{\varAmountMW} \\
+        \procPublishMW{\funArray{\varMwFundTx,\varMwRefundTx}}  \\
+        \pcreturn \varSwpState \< \< \< \< \pcreturn \varSwpState
         }
         }
         \caption{Atomic Swap - $\procSetupSwapId$. \label{fig:setup-swap}}
