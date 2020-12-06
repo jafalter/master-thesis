@@ -5,7 +5,7 @@ such as Bulletproofs, as described in section~\ref{sec:pre:rangeproof} and a hom
 Fuchsbauer et al. have defined three procedures $\styleFunction{Send}$, $\styleFunction{Rcv}$ and $\styleFunction{Ldgr}$ with regards to the creation of a transaction.
 $\styleFunction{Send}$ called by the sender will create a pre-transaction, $\styleFunction{Rcv}$ takes the pre-transaction and adds the receivers output and $\styleFunction{Ldgr}$ (again called by the sender) verifies and publishes the final transaction to the blockchain ledger.
 As we have already pointed out in this thesis we won't discuss the transaction publishing phase therefore we will not cover the publishing functionality of the $\styleFunction{Ldgr}$ procedure, however we will use the verification capabilities of the algorithm.
-That means the transactions created by our protocol must be compatible with the $\procLedgrId$ functionality formalized by Fuchsbauer et at.
+That means the transactions created by our protocol must be compatible with the $\styleFunction{MW.Ver(\varSecParam, \varTx)}$ functionality formalized by Fuchsbauer et at.
 We redefine the $\styleFunction{Send}$ and $\styleFunction{Rcv}$ functionality in our paper, making small adjustments to the original definitions to fit with our requirements.
 
 To improve the readability of our formalizations we introduce a wrapper $\varSpendableCoin$ which represents a spendable coin and contains a reference to the coin commitment and rangeproof as defined in~\ref{def:pre:coin} as well as its (secret) spending information which consist of the coins value and blinding factor.
@@ -15,7 +15,7 @@ If we want to indicate that a spendable coin is a output coin of a transaction w
 \begin{definition}[Mimblewimble Transaction Scheme]
     \label{def:atom:mw-tx-scheme}
     A Mimblewimble Transaction Scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ with commitment scheme $\varCommitScheme$, two-party signature scheme $\varSigSchemeMP$, and rangeproof system $\varProofSystem$ consists of the following tupel of procedures:
-    \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign ( \procSendCoinsId,\procRecvCoinsId,\procFinTxId,\procLedgrId ) \]
+    \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign ( \procSendCoinsId,\procRecvCoinsId,\procFinTxId,\procVerfTxId ) \]
     \begin{itemize}
         \item $(\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$: The spendCoins algorithm is a DPT function called by the sending party to initiate the spending of some input coins.
         As input, it takes a list of spendable coins $\funArray{\varSpendableCoin}$ and a value $\varFundValue$ which should be transferred to the receiver.
@@ -27,14 +27,19 @@ If we want to indicate that a spendable coin is a output coin of a transaction w
         At this stage the transaction already has to be partially signed. (by the receiver)
         \item $\varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}$: The finalize algorithm is a DPT routine again called by the transaction sender that takes as input a pre-transaction $\varPreTx$ and the senders signing key $\varSecKeyAlice$ and nonce $\varNonceAlice$.
         The function will output a finalized signed transaction $\varTx$.
-        \item $\{\varLedger, \cnstFalsum\} \opFunResult \procLedgr{\varLedger}{\varTx}$: The ledger algorithm is taken from the Fuchsbauer et al. paper and can be used to verify and publish a valid transaction.
-        If an invalid transaction is passed it will output $\cnstFalsum$, otherwise it will output the updated ledger.
-        As input it takes the current state of the ledger $\varLedger$ and the transaction $\varTx$.
-        We assume that every protocol participant can access the current ledger $\varLedger$, as it is publicly available by running a node.
+        \item $\{1,0\} \opFunResult \procVerfTx{\varTx}$: The verification algorithm is taken from the Fuchsbauer et al. paper \cite{fuchsbauer2019aggregate} (there it is named $\styleFunction{MW.Ver}$) and can be used to verify mimblewimble transactions.
+        If an invalid transaction is passed it will output 0, otherwise 1.
+        The routine verifies four conditions:
+        \begin{enumerate}
+            \item Condition 1: Every input and output coin only appears once in the transaction.
+            \item Condition 2: The union of input and output coins is the empty set.
+            \item Condition 3: The transaction signature verifies with the excess value of the transaction as public key, which is calculated by summing up the output coins and subtracting the input coins. (See~\ref{sec:pre:mimblewimble})
+            \item Condition 4:For every output coin the range proof verifies.
+        \end{enumerate}
     \end{itemize}
 \end{definition}
 
-We say a Mimblewimble Transaction Scheme is correct if the ledger algorithm $\procLedgrId$ returns and updated $\varLedger$ if and only if the added transaction is well balanced and its signature is valid.
+We say a Mimblewimble Transaction Scheme is correct if the verification algorithm $\procVerfTxId$ returns 1 if and only if the added transaction is well balanced and its signature is valid.
 More formally:
 \begin{definition}[Transaction Scheme Correctness]
     \label{def:atom:tx-scheme-correctness}
@@ -42,7 +47,7 @@ More formally:
     \[
         \Pr\left[
         \begin{array}{c}
-            \: \procLedgr{\varLedger}{\varTx} \opNotEq \cnstFalsum
+            \: \procVerfTx{\varTx} \opEqNoQ 1
         \end{array}
         \middle\vert
         \begin{array}{l}
@@ -54,9 +59,6 @@ More formally:
         \right]=1.
     \]
 \end{definition}
-
-Finally we define a two-party protocol $\procDBuildMwTxId$ which takes as input a list of spendable coins $\funArray{\varSpendableCoin}$, a transaction value $\varFundValue$ and a optional timelock $\varTime$ and uses the functions defined earlier to output a valid transaction $\varTx$ as well as the newly spendable coins to both parties.
-\[ \langle (\varTx, \funStar{\varSpendableCoinAlice}), (\varTx \funStar{\varSpendableCoinBob}) \rangle \opFunResult \procDBuildMwTx{\funStar{\varSpendableCoin}}{\varFundValue}{\varTime} \]
 
 \begin{definition}[Extended Mimblewimble Transaction Scheme]
     \label{def:atom:ext-mw-tx-scheme}
@@ -71,7 +73,7 @@ Finally we define a two-party protocol $\procDBuildMwTxId$ which takes as input 
         $\varBlindingFactor \opAssign \varBlindingFactorAlice \opAddScalar \varBlindingFactorCarol$.
         Again optionally a block height $\varTime$ can be given to time lock the transaction.
         Similar to the single party version of the function its outputs are a pretransaction $\varPreTx$ and change coin for each party, as well as their signing information.
-        \item $\langle (\funStar{\varPreTx}, \funStar{\varSpendableCoinBob}), (\funStar{\varPreTx}, \funStar{\varSpendableCoinCarol}) \rangle \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue}$: The distributed coin receive procedure takes as input a pre-transaction $\varPreTx$ and a value $\varFundValue$ which should be transferred with the transaction.
+        \item $\langle (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinBob}), (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinCarol}) \rangle \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue}$: The distributed coin receive procedure takes as input a pre-transaction $\varPreTx$ and a value $\varFundValue$ which should be transferred with the transaction.
         The distributed algorithm will generate a output coin owned by both Alice and Carol. (each owning a share of the key).
         The output will be an updated pre-transaction $\funStar{\varPreTx}$, the shared output coin $\varCoinShared$ with the respective shares of the blinding factor added as $\funStar{\varSpendableCoinBob}$, $\funStar{\varSpendableCoinCarol}$.
         Note that $\varCoinShared$ will only be spendable if both owners cooperate running the $\procDSendCoinsId$ protocol.
@@ -88,7 +90,7 @@ Correctness is given very similar to the standard scheme:
     \[
         \Pr\left[
         \begin{array}{c}
-            \: \procLedgr{\varLedger}{\varTx} \opNotEq \cnstFalsum
+            \: \procVerfTx{\varTx} \opEqNoQ 1
         \end{array}
         \middle\vert
         \begin{array}{l}
@@ -102,17 +104,17 @@ Correctness is given very similar to the standard scheme:
     \]
 \end{definition}
 
-\begin{definition}[Script Mimblewimble Transaction Scheme]
+\begin{definition}[Contract Mimblewimble Transaction Scheme]
     \label{def:atom:apt-ext-mw-tx-scheme}
-    The script version of the extended Mimblewimble Transaction Scheme updates the Extended Mimblewimble Transaction Schme by providing a modified version of the single party receive routine and the distributed finalize transaction protocol.
+    The contract version of the extended Mimblewimble Transaction Scheme updates the Extended Mimblewimble Transaction Schme by providing a modified version of the single party receive routine and the distributed finalize transaction protocol.
     \[ \varaptMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc \procAptRecvCoinsId, \procDAptFinTxId \]
     \begin{itemize}
-        \item $(\funStar{\varPreTx}, \funStar{\varSpendableCoinBob}, \varSigBob) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$: The script variant of the receive function takes an additional input a secret witness value
+        \item $(\funStar{\varPreTx}, \funStar{\varSpendableCoinBob}, \varSigBob) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$: The contract variant of the receive function takes an additional input a secret witness value
         $\varWit$ which will be hidden in the transactions signature and extractable by the other party after the protocols' completion.
         Note that the routine also returns Bob's unadapted partial signature.
         The reason for this is that we later still need the unadapted version to complete the signature und thereby finalize the transaction.
         By not sharing this unadapted signature with Alice, Bob is the one who gets to finalize the transaction which is different from the simpler protocol and is an important feature for our atomic swap protocol.
-        \item $\langle \varSigAliceBob, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$: The script variant of the finalize transaction algorithm is a distributed protocol between the sender(s) and receiver.
+        \item $\langle \varSigAliceBob, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$: The contract variant of the finalize transaction algorithm is a distributed protocol between the sender(s) and receiver.
         Additionally to the pre-transaction $\funStar{\varPreTx}$ the senders need to input their signing information, Bob needs to input the unadapted version of his partial signature as it is needed for transaction completion.
         This protocol could also be implemented as a three party protocol, two senders controlling a shared coin and a third receiver.
         However, as in the case we will describe later in~\ref{sec:atom:atomic-swap} one of the two senders is also the receiver, we allowed ourselves to model this protocol as being between only two parties to simplify the formalization.
@@ -125,13 +127,13 @@ Correctness is given very similar to the standard scheme:
 
 Similar as before we define correctness for the adapted scheme:
 
-\begin{definition}[Adapted Transaction Scheme Correctness]
+\begin{definition}[Script Transaction Scheme Correctness]
     \label{def:atom:apt-tx-scheme-correctness}
     For any transaction fund value $\varFundValue$ and list of input coins $\funArray{\varSpendableCoin}$ with combined value $\varValue \opGreaterEq \varFundValue$ and any witness value $\varX \opIn \cnstIntegersPrimeWithoutZero{*}$ the following must hold:
     \[
         \Pr\left[
         \begin{array}{c}
-            \: \procLedgr{\varLedger}{\varTx} \opNotEq \cnstFalsum
+            \: \procVerfTx{\varTx} \opEqNoQ 1
         \end{array}
         \middle\vert
         \begin{array}{l}

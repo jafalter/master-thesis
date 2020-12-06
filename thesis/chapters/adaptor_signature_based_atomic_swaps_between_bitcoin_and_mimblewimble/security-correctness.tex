@@ -1,7 +1,6 @@
 In this section we will prove the correctness and security of the instantiation described in~\ref{sec:atom:atomic-inst}.
 We start by proving \emph{Transaction Scheme Correctness}, \emph{Extended Transaction Scheme Correctness} and \emph{Adapted Transaction Scheme Correctness} for the three outlined transaction schemes $\varMWScheme, \varextMWScheme$ and $\varaptMWScheme$.
-We then continue by showing that all three security definitions (\emph{Inflation-Resistence}, \emph{Theft-Resistence}, \emph{Transaction indistinguishability}) hold again for all three transaction types.
-The general process will be to find a proof for the basic transaction protocol defined in~\ref{def:atom:mw-tx-scheme} and then reduce the extended and adapted case to the basic one.
+We then continue by showing that all protocols described in~\ref{sec:atom:protocols} are secure in the malicious models as defined in~\ref{subsec:pre:security}.
 
 \subsection{Correctness} \label{subsec:atom:correctness}
 
@@ -14,28 +13,25 @@ We construct the following theorem:
 \end{theorem}
 
 \begin{proof}
-    We assume there are two honest participants Alice and Bob, there exists a list of input coins $\funArray{\varCoinInp}$ with blinding factors $\funArray{\varBlindingFactorAlice}$ and total value $\varValue$ known to Alice, and some amount $\varFundValue$ which Alice wants to transfer to Bob.
-    For \emph{Transaction Scheme Correctness} to hold $\procVerfTx{\varTx}$ must return 1 with overwhealming probability for the two parties creating a transaction $\varTx$ in the following three steps:
+    We assume there are two honest participants Alice and Bob, there exists a list of input coins $\funArray{\varCoinInp}$ with blinding factors $\funArray{\varBlindingFactor_i}$ and values $\funArray{\varValue_i}$ wrapped inside a list $\funArray{\varSpendableCoin}$ known to Alice, and some amount $\varFundValue$ which Alice wants to transfer to Bob.
+    For \emph{Transaction Scheme Correctness} to hold $\procVerfTx{\varTx}$ must return 1 with overwhealming probability for the two parties creating the transaction $\varTx$ in the following three steps:
     \begin{enumerate}
         \item $(\varPreTx, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\cnstFalsum}$
         \item $\funStar{\varPreTx} \opFunResult \procRecvCoins{\varPreTx}{\varFundValue}$
         \item $\varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}$
     \end{enumerate}
-    Here are the following three requirements for $\procVerfTx{\varTx}$ to return 1:
-    \begin{enumerate}
-        \item The list of input coins $\varInputs$, as well as output coins $\varOutputs$ must each inlcude at least one element.
-        \item For each output coin $\varCoinOut$ the rangeproof $\varProof$ must verify.
-        \item The transaction signature under the public key $\varPubKey \opAssign \cnstSumZeroToN \varOutputs \opSub \cnstSumZeroToN \varInputs$ must verify.
-    \end{enumerate}
+    We recall the conditions for $\procVerfTx{\varTx}$ to return 1 found in~\ref{def:atom:mw-tx-scheme} and show that each of them must hold:
 
-    Condition 1 must hold trivially, as already in $\procSendCoinsId$ Alice will create the output $\varCoinOutAlice$ and initialize the pre-transaction with $\funArray{\varCoinInp}$ and $\funArray{\varCoinOutAlice}$, thereby already after $\procSendCoinsId$ both input and output lists are non empty and this condition is fulfilled.
+    Condition 1 and 2 both must hold if the participants are honest.
+    In the case that the sending party provides duplicate inputs the check at the beginning of the $\procSendCoinsId$ procedure will fail and consequently $\procVerfTx{\varTx}$ will return 0.
+    The blinding factors to the ouput coins created in $\procSendCoinsId$ and $\procRecvCoinsId$ are generated randomly, which means a duplication can only appear with negligible probability.
 
-    Condition 2 follows from the implementation of the $\procCreateCoinId$ function called in $\procSendCoinsId$ as well as $\procRecvCoinsId$.
+    Condition 3 follows from the implementation of the $\procCreateCoinId$ function called in $\procSendCoinsId$ as well as $\procRecvCoinsId$.
     In the function a rangeproof is computed for the new coin $\varCoin$ with value $\varValue$ and blinding factor $\varBlindingFactor$ as $\varProof \opFunResult \procProof{\varCoin}{\varValue}{\varBlindingFactor}$.
     Given that our Rangeproof system $\varProof$ system has to be correct $\procVerfProof{\varProof}{\varCoin} \opEqNoQ 1$ must hold for all coins created with the $\procCreateCoinId$ routine.
-    Therefore Condition 2 must hold.
+    Therefore Condition 2 must hold if the transaction is computed honestly.
 
-    For condition 3 we must look at how the secret keys $\varSecKeyAlice$ and $\varSecKeyBob$ are constructed.
+    For condition 4 we must look at how the secret keys $\varSecKeyAlice$ and $\varSecKeyBob$ are constructed.
     From the instantiation of $\procSendCoinsId$ we can see that Alice's share will be $\varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \cnstSumZeroToN \funArray{\varBlindingFactorAlice}$, where $\funStar{\varBlindingFactorAlice}$ is the blinding factor to her output and $\funArray{\varBlindingFactorAlice}$ are the blinding factors to her input coins.
     Bobs secret key is constructed like $\varSecKeyBob \opAssign \funStar{\varBlindingFactorBob}$, so it corresponds to the blinding factor of his output.
     From the construction of the two-party signature scheme in~\ref{def:sig:two-party-sig} we know that therefore the final signature will be valid under the following public key:
@@ -57,14 +53,15 @@ We construct the following theorem:
     From step 5.3 to 5.4 we replace every coin $\varCoin$ by its instantiation for a pedersen commitment $\varCoin \opEqNoQ \funGen{\varValue} \opAddPoint \funGenH{\varValue}$.
 
     From step 5.4 to 5.4 we rely on the fact that if Alice is honest $\varValue \opEqNoQ \cnstSumZeroToN \varValue_i$, therefore also $(\varValue \opSub \varFundValue) \opAddScalar\varFundValue \opEqNoQ \cnstSumZeroToN \varValue_i$ must hold.
-    From that we can infer that $\funGenH{\varValue \opSub \varFundValue} \opAddPoint \funGenH{\varFundValue} \opAddPoint \cnstSumZeroToN \funGenH{- \varValue_i}$ must cancel out.
-    We have managed to show that condition 3 must hold and can conclude that \emph{Transaction Scheme Correctness} holds.
+    From that we can infer that $\funGenH{\varValue \opSub \varFundValue} \opAddPoint \funGenH{\varFundValue} \opAddPoint \cnstSumZeroToN \funGenH{- \varValue_i}$ must cancel out, otherwise the transaction would either create or burn value, which is not allowed and in which case $\procVerfTxId$ should again return 0.
 
-    We will now argue that the same deriviation holds for \emph{Extended Transaction Scheme Correctness} \emph{Adapted Transaction Scheme Correctness}.
+    We have managed to show that condition 1-4 must hold for a valid transaction and can conclude that \emph{Transaction Scheme Correctness} holds for $\varMWSchemeParams{\varCommitScheme}{\varProofSystem}{\varSigSchemeMP}$.
 
-    Condition 1 again follows trivially from the construction of $\procDSendCoinsId$ for the same reasons we have already layed out.
+    We will now argue that the same deriviation holds for \emph{Extended Transaction Scheme Correctness} and \emph{Adapted Transaction Scheme Correctness}.
 
-    $\procDSendCoinsId$, $\procDRecvCoinsId$, $\procAptRecvCoinsId$ all rely on the same $\procCreateCoinId$ routine to create output coins, thereby condition 2 will hold for the same reasons as layed out before.
+    Condition 1-2 again follow trivially from the construction of $\procDSendCoinsId$ and $\procDRecvCoinsId$ for the same reasons we have already layed out in the previous proof.
+
+    $\procDSendCoinsId$, $\procDRecvCoinsId$, $\procAptRecvCoinsId$ all rely on the same $\procCreateCoinId$ routine to create output coins, thereby condition 3 also holds for valid transactions with the same argument as for the previous proof.
 
     In the case of \emph{Extended Transaction Scheme Correctness} the blinding factors for the input coins $\funArray{\varCoinInp}$ are shared.
     However, we can easily reduce this case to the proof for the regular case:
@@ -74,39 +71,27 @@ We construct the following theorem:
         \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \opSub \cnstSumZeroToN \varBlindingFactorCarol
     \end{gather}
     $\varSecKeyAlice$ and $\varSecKeyCarol$ are then inputs to $\procDFinTxId$ in which a partial signature $\varSigAliceCarol$ is calculated, by both Alice and Carol signing with their secret key.
-    Assume the general key from before in which we have a single secret key $\varSecKeyAlice$.
+    Assume the general key from before, in which we have a single secret key $\varSecKeyAlice$.
     We can split $\varSecKeyAlice$ into arbitrarily chosen shares $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ with $\varSecKeyAlice \opEqNoQ (\varSecKeyAlice)_1 + (\varSecKeyAlice)_2$.
     By the definition of Two-Party Signatures~\ref{def:sig:two-party-sig} the combined signature from $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ will be valid under $\funGen{\varSecKeyAlice}$.
     Thereby we can treat $\varSecKeyAlice$ and $\varSecKeyCarol$ from $\procSendCoinsId$ as arbitrary shares of a combined $\varSecKeyAliceCarol$.
     It follows from the addtive homomorphic property of the elliptic curve that a signature valid under $\funGen{\varSecKeyAliceCarol}$ must also be valid under $\funGen{\varSecKeyAlice} \opAddPoint \funGen{\varSecKeyCarol}$.
     The case of two receivers calling $\procDRecvCoinsId$ is symmetric.
-    From this we can conclude that condition 3 must also hold for the \emph{Extended Transaction Scheme}. \\
+    From this we can conclude that condition 4 must also hold for the \emph{Extended Transaction Scheme}. \\
     Now for the \emph{Adapted Extended Transaction Scheme} the same argument holds.
     The only difference in this scheme is that in $\procDAptFinTxId$ Bob (instead of Alice) will call $\procFinSigId$, as only he knows his unadapted partial signature $\varSigBob$.
     However, the construction of the signature remains unchanged, therefore the reduction we provided before must hold for the same reasons.
 
-    As we have managed to show that all $\procVerfTx{\varTx} \opEqNoQ 1$ must hold for all three transaction schemes, assuming the participants are honest and the underlaying commitment scheme $\varCommitScheme$, two signature scheme $\varSigSchemeMP$ and rangeproof system $\varProofSystem$ are correct theorem~\ref{lem:atom:correctness} must also hold.
+    We have thereby proven that if $\varCommitScheme, \varProofSystem, \varSigSchemeMP$ are correct and the participants behave honestly (that is by providing valid inputs and calling the respective routines in the given order) $\procVerfTx{\varTx}$ will return 1 for the resulting transaction $\varTx$ and therefore theorem~\ref{lem:atom:correctness} holds.
 \end{proof}
-
-In the remains to show that the commitment scheme, signature scheme and rangeproof system used in the given instantiations of the three transaction schemes are correct.
-
-All three transaction schemes use Pedersen Commitments as the commitment system $\varCommitScheme$, for which a security and correctness evaluation can be found in~\cite{pedersen1991non}.
-For the correctness of the rangeproof system $\varProofSystem$ we refer the reader again to the bulletproof paper~\cite{bunz2018bulletproofs}.
-The instantiation of the Mimblewimble Transaction Scheme $\varMWScheme$ (defined in~\ref{def:atom:mw-tx-scheme} instantiated in figure~\ref{fig:inst-mw-tx}) uses a standard Two-Party Signature Scheme $\varSigSchemeMP$ defined in~\ref{def:sig:two-party-sig} for which a correctness proof is available by Maxwell et al. in~\cite{maxwell2019simple}.
-
-For the Extended Mimblewimble Transaction Scheme $\varextMWScheme$ defined in~\ref{def:atom:ext-mw-tx-scheme} and instantiated in figure~\ref{fig:ext-mim-tx-spend},~\ref{fig:ext-mim-tx-recv} and~\ref{fig:ext-mim-tx-fin} the same signature scheme $\varSigSchemeMP$ and rangeproof system $\varProofSystem$ is used, therefore we can make the same argument as for the previous case to show \emph{Extended Transaction Scheme Correctness} holds.
-
-For the Adapted Extended Mimblewimble Transaction Scheme $\varaptMWScheme$, which we have defined in~\ref{def:atom:apt-ext-mw-tx-scheme}, and have shown an instantiation in figure~\ref{fig:inst-apt-mw-tx-recv}, and~\ref{fig:inst-apt-mw-tx-fin}, the Two Party Fixed Witness Adaptor Schnorr Signature Scheme $\varSigSchemeApt$, which we have defined in~\ref{def:sig:two-party-fixed-wit-apt-sig}, is used.
-We have already shown correctness of this signature scheme in section~\ref{sec:sig:two-party-apt-security} by proofing that \emph{Adaptor Signature Correctness} holds.
-Furthermore, the scheme used a multiparty version of the bulletproof system $\varMPRProofSystem$ for which we refer the reader to~\cite{klinec2020privacy} for a proof of its correctness.
 
 \subsection{Security}\label{subsec:atom:security}
 
 We now prove the security of our transaction schemes in the malicious setting as defined in~\ref{subsec:pre:security}.
-In particular we show that the distributed protocols for constructing transactions are secure in the hybrid $\procZKfId{\cnstRelation}$-model as already explained in~\ref{subsec:sig:secureaptscheme}.
+In particular we show that the distributed protocol for constructing transactions are secure in the hybrid $\procZKfId{\cnstRelation}$-model as already explained in~\ref{subsec:sig:secureaptscheme}.
 
 \textbf{Hybrid functionalities}: The parties have access to a trusted third party that computes the zero-knowledge proof of knowledge functionalities $\procZKfId{\cnstRelation_1}$, $\procZKfId{\cnstRelation_2}$ and $\procZKfId{\cnstRelation_2*}$.
-$\cnstRelation_1$ is the relation between a secret key $\varSecKey$ and its public key $\varPubKey \opEqNoQ \funGen{\varSecKey}$ for the curve generator $\varG$.
+$\cnstRelation_1$ is the relation between a secret key $\varSecKey$ and its public key $\varPubKey \opEqNoQ \funGen{\varSecKey}$ for the elliptic curve generator point $\varG$.
 $\cnstRelation_2$ is the relation between two secret inputs $\varBlindingFactor, \varValue$ and its pedersen commitment $\varCommitment \opEqNoQ \funGen{\varBlindingFactor} \opAddPoint \funGenH{\varValue}$ for two adjacent generators $\varG, \varH$ as defined in~\ref{def:pre:pedersen}.
 We shorten the call by the prover to just provide $\varSpendableCoin$ because it is a wrapper that contains the coin commitment, as well as its openings.
 $\cnstRelation_2*$ is the same as $\cnstRelation_2$ just for a list of secrets inputs $\funArray{(\varBlindingFactor, \varValue)}$ and its list of commitments $\funArray{\varCommitment}$.
@@ -116,7 +101,7 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
 
 \fbox{
 \begin{varwidth}{\textwidth}
-    \procedure[linenumbering]{$\procDBuildMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
+    \procedure[linenumbering,skipfirstln]{$\procDBuildMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
     Alice \< \< Bob \\
     \procZkf{\cnstRelation_2*}{\funArray{\varSpendableCoin}} \\
     (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \\ \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \\
@@ -149,13 +134,14 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
 \end{theorem}
 
 \begin{proof}
-    We proof the security of $\procDBuildMwTxId$ by constructing a simulator $\cnstSimulator$ with access to a TTP computing the protocol in the ideal setting upon receiving the inputs for the participants.
+    We proof the security of $\procDBuildMwTxId$ by constructing a simulator $\cnstSimulator$ with access to a TTP computing the protocol in the ideal setting upon receiving the inputs from the participants.
+    For this the simulator has to extract the inputs used by the adversary.
     The TTP returns the outputs $(\varTx, \funStar{\varSpendableCoinAlice})$ (resp. $(\varTx, \funStar{\varSpendableCoinBob})$) from which he has to construct a transcript that is indistinguishable from the protcol transcript in the real world. The simulator uses the calls to $\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}, \procZKfId{\cnstRelation_2*}$ to achieve this.
     We proof that the transcript is indistinguishable in the cases that either Alice or Bob is corrupt and controlled by a deterministic polynomial adversary $\cnstAdversary$.
 
     \textbf{Alice is corrupt}: Simulator $\cnstSimulator$ works as follows:
     \begin{enumerate}
-        \item $\cnstSimulator$ invokes $\cnstAdversary$ and once it calls $\procZKfId{\cnstRelation_2*}, \procZKfId{\cnstRelation_1}$ $\procZKfId{\cnstRelation_2}$ saves the values $\funArray{\varSpendableCoin}, \varSecKeyAlice, \varNonceAlice, \funStar{\varSpendableCoinAlice}$.
+        \item $\cnstSimulator$ invokes $\cnstAdversary$ and once it calls $\procZKfId{\cnstRelation_2*}, \procZKfId{\cnstRelation_1}$ $\procZKfId{\cnstRelation_2}$ saves the values $\funArray{\varSpendableCoin}, \varSecKeyAlice, \varNonceAlice, \funStar{\varSpendableCoinAlice}$ to its memory.
         \item $\cnstSimulator$ calculates the transaction value $\varFundValue$ as follows:
         \begin{gather*}
             \varValue \opEqNoQ \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_i.\varValue) \\
@@ -190,10 +176,10 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
         \end{enumerate}
         Finally $\cnstSimulator$ will send $\funStarAlt{\varPreTx}$ as if coming from Bob and sends $\cnstContinue$ to the TTP.
         \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_2}$ he checks equality to $\varCoinOutBob$ and returns either 0 or 1.
-        \item Eventually $\cnstAdversary$ will send a $\funStarAlt{\varTx}$ which the simulator outputs.
+        \item Eventually $\cnstAdversary$ will send a $\funStarAlt{\varTx}$ after which the simulator will output whatever $\cnstAdversary$ outputs.
     \end{enumerate}
     Next we need to proof that the transcript produced by $\cnstSimulator$ is indistinguishable from a real one in every phase of the protocol.
-    We find the following three phases:
+    We seperate between the following three phases:
     \textbf{Phase 1}: Alice sends her input coins, signing key and nonce as well as her change output coin to $\procZKfId{\cnstRelation_1}$ and $\procZKfId{\cnstRelation_2}$ and sends the pre-transaction $\varPreTx$ to Bob.
     \textbf{Phase 2}: Bob calls $\procZKfId{\cnstRelation_1}$ and $\procZKfId{\cnstRelation_2}$ as the verifier, after which he calls $\procZKfId{\cnstRelation_2}$ as the prover and proceeds by sending the updated pre-transaction $\funStarAlt{\varPreTx}$ to Alice.
     \textbf{Phase 3}: Alice calls $\procZKfId{\cnstRelation_2}$ as the verifier and sends back the final transaction $\varTx$ to Bob which they then both output.
@@ -205,7 +191,7 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
         The signatures $\varSigAlice$ and $\varSigBob$ have to add up to $\varSigFin$ which is the final signature.
         $\cnstSimulator$ can read $\varSigFin$ from the transaction in the output he received from the TTP, he can further calculate the adversaries signature because he knows their signing secrets.
         From those two values he can then compute the value that $\varSigBob$ must have such that it will complete to $\varSigFin$ when added to Alice's part of the signature.
-        All the other values $\cnstSimulator$ needs to build $\funStarAlt{\varPreTx}$ he can simply read from the final transaction $\varTx$.
+        All further values $\cnstSimulator$ needs to build $\funStarAlt{\varPreTx}$ he can simply read from the final transaction $\varTx$.
         Therefore $\funStarAlt{\varPreTx}$ is identical to the one sent in the real execution.
         \item \textit{Phase 3}: When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_2}$ as the verifier, $\cnstSimulator$ can simply check equality with the correct value and return 0 or 1, which is identical to the real execution.
     \end{itemize}
@@ -223,12 +209,12 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
         Now he can call $\procSendCoinsId$ and get:
         \[ (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \]
         \item The simulator invokes $\cnstAdversary$ and sends $\varPreTx$ as if coming from Alice.
-        \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_1},\procZKfId{\cnstRelation_2}$ as the verifier $\cnstSimulator$ simply checks equality we the values he sent and returns either 0 or one.
+        \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_1},\procZKfId{\cnstRelation_2}$ as the verifier $\cnstSimulator$ simply checks equality we the values he sent and returns either 0 or 1.
         The adversary proceeds by calling $\procZkf{\cnstRelation_2}{\funStar{\varSpendableCoinBob}}$, $\cnstSimulator$ saves $\funStar{\varSpendableCoinBob}$ and extracts $\varFundValue \opEqNoQ \funStar{\varSpendableCoinBob}.\varValue$
         He then calls the TTP computing $\procDBuildMwTxId$ with the input $\varFundValue$ and receives $(\varTx, \funStar{\varSpendableCoinBob})$.
         \item Next $\cnstAdversary$ sends an updated pre-transaction $\funStarAlt{\varPreTx}$.
-        $\cnstSimulator$ verifies the output coin added by $\cnstAdversary$ matches with $\funStarAlt{\varSpendableCoinBob}$, if it does not he sends $\cnstAbort$ to the TTP and outputs $\cnstFalsum$.
-        Now $\cnstSimulator$ computes the following values from the signature context $\varSigContext$ provided in the final transaction and $\funStarAlt{\varSigContext}$ provided by $\cnstAdversary$:
+        $\cnstSimulator$ verifies the output coin added by $\cnstAdversary$ matches with $\funStar{\varSpendableCoinBob}$, if it does not he sends $\cnstAbort$ to the TTP and outputs $\cnstFalsum$.
+        Otherwise $\cnstSimulator$ computes the following values from the signature context $\varSigContext$ provided in the final transaction and $\funStarAlt{\varSigContext}$ provided by $\cnstAdversary$:
         \begin{gather*}
             \varPubKeyBob \opEqNoQ \funStarAlt{\varSigContext}.\varPubKey \opAddPoint {\funGen{\varSecKeyAlice}}^{-1} \\
             \varRandBob \opEqNoQ \funStarAlt{\varSigContext}.\varRand \opAddPoint {\funGen{\varNonceAlice}}^{-1} \\
@@ -242,20 +228,20 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
             \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\varPubKeyAlice}{\varRandAlice}
         \end{gather*}
         And again sends the pre-transaction to $\cnstAdversary$ as if coming from Alice.
-        \item The simulator repeats the steps until 5. where he rewinded earlier, now instead of rewinding $\cnstSimulator$ sends $\cnstContinue$ to the TTP and sends $\varTx$ as if coming from Alice, and finally outputs $\varTx$.
+        \item The simulator repeats the steps until step 5. where he rewinded earlier, now instead of rewinding $\cnstSimulator$ sends $\cnstContinue$ to the TTP and sends $\varTx$ as if coming from Alice, and finally outputs whatever $\cnstAdversary$ outputs.
     \end{enumerate}
 
     Again we now claim that the simulation is indistinguishable from a real execution in all three phases.
-    Note that due to the rewind we need to consider both the message sent before and after the rewind.
+    Note that due to the rewinding step we need to consider both the message sent before and after the rewind.
 
     \begin{itemize}
         \item \textit{Phase 1:} In the first iteration the simulator constructs the input values $\funArray{\varSpendableCoin}$ from random values and also chooses a random transaction value $\varFundValue$.
         $\cnstSimulator$ constructs the pre-transaction using those chosen value rather than the real ones.
-        We claim that the adversary cannot distinguish the chose from the real coin commitments (Except with neglible probability).
+        We claim that the adversary cannot distinguish the chosen from the real coin commitments (Except with neglible probability).
         If we assume that he would be able to do so, that means he could distinguish for two pedersen commitments $\varCommitment_1 \opEqNoQ \funGen{\varBlindingFactor_1} \opAddPoint \funGenH{\varValue}, \varCommitment_2 \opEqNoQ \funGen{\varBlindingFactor_2} \opAddPoint \funGenH{\funStarAlt{\varValue}}$ which one commits to $\varValue$, from which follows that he could break the hiding property of perdersen commitments.
         Not being able to extract the coin values, the adversary has no chance of knowing if they are correct at this point.
         For the same reasons the pre-transaction sent by $\cnstSimulator$ after the rewind will be indistinguishable from a real one.
-        However, as this time the pre-transaction is constructed from the real $\varTx$ which $\cnstSimulator$ received from the TTP, the pre-transaction is in fact identical to the pre-transaction sent in the real execution.
+            However, as this time the pre-transaction is constructed from the real $\varTx$ which $\cnstSimulator$ received from the TTP, the pre-transaction is in fact identical to the pre-transaction sent in the real execution.
         The calls to $\procZKfId{\cnstRelation_1}$ and $\procZKfId{\cnstRelation_2}$ also behave identically to the real execution in which the parties have access to a TTP computing those protocols.
         \item \textit{Phase 2:} This phase will be identical to the real execution due to the fact that the adversary is deterministic.
         \item \textit{Phase 3:} The transaction sent to $\cnstAdversary$ in this phase is the one received from the TTP and is therefore identical to what would have been sent in the real execution, given $\cnstAdversary$ sends correct values. (Otherwise the execution would have halted with $\cnstFalsum$).

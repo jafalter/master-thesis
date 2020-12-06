@@ -145,9 +145,13 @@
 \newcommand{\varCoinShared}{\varCoinOut^{\styleVariable{sh}}}
 \newcommand{\varCoinSpecial}{\varCoinOut^{\styleVariable{sp}}}
 \newcommand{\varSpendableCoin}{\styleVariable{sp}\varCoin}
+\newcommand{\varPtSpendableCoin}{\styleVariable{psp}\varCoin}
 \newcommand{\varSpendableCoinAlice}{\varSpendableCoin_{\varAlice}}
+\newcommand{\varPtSpendableCoinAlice}{\varPtSpendableCoin_{\varAlice}}
 \newcommand{\varSpendableCoinBob}{\varSpendableCoin_{\varBob}}
+\newcommand{\varPtSpendableCoinBob}{\varPtSpendableCoin_{\varBob}}
 \newcommand{\varSpendableCoinCarol}{\varSpendableCoin_{\varCarol}}
+\newcommand{\varPtSpendableCoinCarol}{\varPtSpendableCoin_{\varCarol}}
 \newcommand{\varValue}{\styleVariable{v}}
 \newcommand{\varValueAlice}{\varValue_{\varAlice}}
 \newcommand{\varValueCarol}{\varValue_{\varCarol}}
@@ -235,6 +239,8 @@
 \newcommand{\varBtcOutpus}{\varUTXOSet_{out}}
 \newcommand{\varBtcTx}{\styleVariable{tx_{btc}}}
 \newcommand{\varMwTx}{\styleVariable{tx_{mw}}}
+\newcommand{\varMwRefundTx}{\varMwTx^{\styleVariable{rfnd}}}
+\newcommand{\varMwFundTx}{\varMwTx^{\styleVariable{fnd}}}
 \newcommand{\varSwpState}{\mathcal{A}}
 \newcommand{\varChain}{\styleVariable{C}}
 \newcommand{\varOpening}{\styleVariable{o}}
@@ -272,6 +278,7 @@
 \newcommand{\opGreaterThen}{~>~}
 \newcommand{\opGreaterEq}{~\geq~}
 \newcommand{\opForAll}{\;\forall\;}
+\newcommand{\opExists}{\;\exists\;}
 
 % procedures
 \newcommand{\procGenRId}{\styleFunction{genRel}}
@@ -375,6 +382,18 @@
 \newcommand{\procLedgr}[2]{\procLedgrId(#1,#2)}
 \newcommand{\procDBuildMwTxId}{\styleFunction{dBuildMWTx}}
 \newcommand{\procDBuildMwTx}[3]{\procDBuildMwTxId \langle(#1,#2,#3), (#2)\rangle}
+\newcommand{\procDSharedOutputMwTxId}{\styleFunction{dsharedOutMWTx}}
+\newcommand{\procDSharedOutputMwTx}[3]{\procDSharedOutputMwTxId \langle(#1,#2,#3), (#2) \rangle}
+\newcommand{\procDSharedOutputMwTxL}[3]{\procDSharedOutputMwTxId(#1,#2,#3)}
+\newcommand{\procDSharedOutputMwTxR}[1]{\procDSharedOutputMwTxId(#1)}
+\newcommand{\procDSharedInpMwTxId}{\styleFunction{dsharedInpMWTx}}
+\newcommand{\procDSharedInpMwTx}[4]{\procDSharedInpMwTxId \langle(#1,#2,#3), (#4,#2) \rangle}
+\newcommand{\procDSharedInpMwTxL}[3]{\procDSharedInpMwTxId (#1,#2,#3)}
+\newcommand{\procDSharedInpMwTxR}[2]{\procDSharedInpMwTxId (#1,#2)}
+\newcommand{\procDScriptMwTxId}{\styleFunction{dcontractMWTx}}
+\newcommand{\procDScriptMwTx}[6]{\procDScriptMwTxId \langle(#1,#2,#3,#4) (#5,#2,#6) \rangle}
+\newcommand{\procDScriptMwTxL}[4]{\procDScriptMwTxId (#1,#2,#3,#4)}
+\newcommand{\procDScriptMwTxR}[3]{\procDScriptMwTxId (#1,#2,#3)}
 
 \newcommand{\procBuildTransactionId}{\styleFunction{buildTransaction}}
 \newcommand{\procBuildTransaction}[4]{\procBuildTransactionId(#1,#2,#3,#4)}
@@ -391,18 +410,25 @@
 \newcommand{\procDRProof}[4]{\procDRProofId \langle(#1,#2,#3),(#1,#2,#4)}
 
 \newcommand{\procDSendCoinsId}{\styleFunction{dSpendCoins}}
-\newcommand{\procDSendCoins}[4]{\procDSendCoinsId
-\langle (#1,#3,#4), (#2,#3,#4) \rangle}
+\newcommand{\procDSendCoins}[4]{\procDSendCoinsId \langle (#1,#3,#4), (#2,#3,#4) \rangle}
+\newcommand{\procDSendCoinsL}[3]{\procDSendCoinsId (#1,#2,#3)}
+\newcommand{\procDSendCoinsR}[3]{\procDSendCoinsId (#1,#2,#3)}
 \newcommand{\procDRecvCoinsId}{\styleFunction{dRecvCoins}}
 \newcommand{\procDRecvCoins}[2]{\procDRecvCoinsId \langle(#1,#2), (#1,#2) \rangle}
+\newcommand{\procDRecvCoinsL}[2]{\procDRecvCoinsId(#1,#2)}
+\newcommand{\procDRecvCoinsR}[2]{\procDRecvCoinsId(#1,#2)}
 \newcommand{\procDFinTxId}{\styleFunction{dFinTx}}
 \newcommand{\procDFinTx}[5]{\procDFinTxId \langle(#1,#2,#3),(#1,#4,#5)\rangle}
+\newcommand{\procDFinTxL}[3]{\procDFinTxId (#1,#2,#3)}
+\newcommand{\procDFinTxR}[3]{\procDFinTxId (#1,#2,#3)}
 
 \newcommand{\procAptRecvCoinsId}{\styleFunction{aptRecvCoins}}
 \newcommand{\procAptRecvCoins}[3]{\procAptRecvCoinsId(#1,#2,#3)}
 
 \newcommand{\procDAptFinTxId}{\styleFunction{dAptFinTx}}
 \newcommand{\procDAptFinTx}[7]{\procDAptFinTxId \langle (#1,#2,#3,#4), (#1,#5,#6,#7) \rangle}
+\newcommand{\procDAptFinTxL}[4]{\procDAptFinTxId(#1,#2,#3,#4)}
+\newcommand{\procDAptFinTxR}[4]{\procDAptFinTxId(#1,#2,#3,#4)}
 
 \newcommand{\procInflateId}{\styleFunction{inflate}}
 \newcommand{\procInflate}[2]{\procInflateId (#1,#2)}
@@ -419,7 +445,9 @@
 \newcommand{\procLockAddrId}{\styleFunction{lockBtcScript}}
 \newcommand{\procLockAddr}[4]{\procLockAddrId (#1,#2,#3,#4)}
 \newcommand{\procVerifyLockId}{\styleFunction{verifyLock}}
-\newcommand{\procVerifyLock}[5]{\procVerifyLockId (#1,#2,#3,#4,#5)}
+\newcommand{\procVerifyLock}[6]{\procVerifyLockId (#1,#2,#3,#4,#5,#6)}
+\newcommand{\procSpendBtcId}{\styleFunction{spendBtc}}
+\newcommand{\procSpendBtc}[3]{\procSpendBtcId(#1,#2,#3)}
 
 \newcommand{\procPublishBtcId}{\styleFunction{publish_{BTC}}}
 \newcommand{\procPublishBtc}[1]{\procPublishBtcId(#1)}
@@ -428,13 +456,13 @@
 \newcommand{\procPublishMW}[1]{\procPublishMWId(#1)}
 
 \newcommand{\procSetupSwapId}{\styleFunction{setupSwp}}
-\newcommand{\procSetupSwap}[7]{\procSetupSwapId \langle(#1,#2,#3,#4)(#1,#5,#6,#7)\rangle}
+\newcommand{\procSetupSwap}[6]{\procSetupSwapId \langle(#1,#2,#3)(#1,#4,#5,#6)\rangle}
 
 \newcommand{\procVerifyTimeId}{\styleFunction{verfTime}}
 \newcommand{\procVerifyTime}[2]{\procVerifyTimeId (#1,#2)}
 
 \newcommand{\procExcSwapId}{\styleFunction{execSwap}}
-\newcommand{\procExcSwap}[4]{ \procExcSwapId \langle (#1,#3), (#1,#2,#4)\rangle }
+\newcommand{\procExcSwap}[5]{ \procExcSwapId \langle (#1,#2,#3), (#1,#4,#5)\rangle }
 
 \newcommand{\procGameId}[2]{\styleFunction{Game}_{#1}^{#2}}
 \newcommand{\procGame}[3]{\procGameId{#1}{#2}(#3)}

@@ -67,7 +67,7 @@ to introduce the slightly adjusted $\procVerfPtSigId$ to be able to verify speci
     \begin{center}
         \fbox{
         \begin{varwidth}{\textwidth}
-            \procedure[linenumbering]{$\procKeyGenPt{\varSecParam}{\varSecParam}$} {
+            \procedure[linenumbering,skipfirstln]{$\procKeyGenPt{\varSecParam}{\varSecParam}$} {
             \textbf{Alice} \< \< \textbf{Bob} \\
             \varSecKeyAlice \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \varSecKeyBob \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
             \varNonceAlice \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \varNonceBob \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
@@ -123,7 +123,7 @@ Additionally to the final signature the protocol also outputs the composite publ
 \begin{center}
     \fbox{
     \begin{varwidth}{\textwidth}
-        \procedure[linenumbering]{$\procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}$} {
+        \procedure[linenumbering,skipfirstln]{$\procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}$} {
         Alice \< \< Bob \\
         \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
         \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
@@ -198,7 +198,7 @@ The protocol outputs $(\varWit, (\varSigFin, \varPubKey))$ for Alice as she mana
 \begin{center}
     \fbox{
     \begin{varwidth}{\textwidth}
-        \procedure[linenumbering]{$\procDAptSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}{\varWit}$} {
+        \procedure[linenumbering,skipfirstln]{$\procDAptSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}{\varWit}$} {
         Alice \< \< Bob \\
         \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
         \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
