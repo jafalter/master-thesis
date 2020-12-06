@@ -61,7 +61,9 @@ If he finds it as valid, he will only now create his partial signature and final
         \begin{varwidth}{\textwidth}
             \procedure[linenumbering]{$\procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$} {
             \varValue \opFunResult \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_{i}.\varValue) \\
-            \pcif \varFundValue \opGreaterThen \varValue \\
+            \pcif \varFundValue \opGreaterThen \varValue
+            \t \pcreturn \cnstFalsum \\
+            \pcif \opExists \varI \opNotEq \varJ : \varSpendableCoin[\varI] \opEqNoQ \varSpendableCoin[\varJ]
             \t \pcreturn \cnstFalsum \\
             \varMsg \opAssign \cnstBinary{*} \\
             (\funStar{\varBlindingFactorAlice}, \varNonceAlice) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \\
@@ -100,8 +102,8 @@ If he finds it as valid, he will only now create his partial signature and final
             \procedure[linenumbering]{$\procVerfTx{\varTx}$} {
             (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSignature,\varTime) \opFunResult \varTx \\
             \varExcess \opEqNoQ \sum(\varOutputs) \opSub \sum(\varInputs) \\
-            \pcreturn (\opForAll \varI \opNotEq \varJ : \varInputs[\varI] \opNotEq \varInputs[\varJ] \opAnd \varOutputs[\varI] \opNotEq \varOutputs[\varJ]) \text{ and } \\
-                    \varInputs \opUnion \varOutputs \opEqNoQ \cnstEmptySet \text{ and } (\opForAll \varI : \procVerfProof{\varProofs[\varI]}{\varOutputs[\varI]}) \text{ and } \procVerf{\varMsg}{\varSignature}{\varExcess}
+            \pcreturn (\opForAll \varI \opNotEq \varJ : \varInputs[\varI] \opNotEq \varInputs[\varJ] \opAnd \varOutputs[\varI] \opNotEq \varOutputs[\varJ]) \text{ and } \pcskipln \\
+                \t \varInputs \opUnion \varOutputs \opEqNoQ \cnstEmptySet \text{ and } (\opForAll \varI : \procVerfProof{\varProofs[\varI]}{\varOutputs[\varI]}) \text{ and } \procVerf{\varMsg}{\varSignature}{\varExcess}
             }
         \end{varwidth}
         }
@@ -125,11 +127,13 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
     \thispagestyle{plain}
     \begin{figure}
         \fbox{
-        \procedure[linenumbering]{$\procDSendCoins{\funArray{\varPtSpendableCoinAlice}}{\funArray{\varPtSpendableCoinCarol}}{\varFundValue}{\varTime}$}{
+        \procedure[linenumbering,skipfirstln]{$\procDSendCoins{\funArray{\varPtSpendableCoinAlice}}{\funArray{\varPtSpendableCoinCarol}}{\varFundValue}{\varTime}$}{
         Alice \< \< Carol \\
         \varValue \opFunResult \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_{i}.\varValue) \< \< \varValue \opFunResult \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_{i}.\varValue) \\
         \pcif \varFundValue \opGreaterThen \varValue \< \< \pcif \varFundValue \opGreaterThen \varValue \\
         \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
+        \pcif \opExists \varI \opNotEq \varJ : \varPtSpendableCoinAlice[\varI] \opEqNoQ \varPtSpendableCoinAlice[\varJ] \< \< \pcif \opExists \varI \opNotEq \varJ : \varPtSpendableCoinCarol[\varI] \opEqNoQ \varPtSpendableCoinCarol[\varJ] \\
+        \t \pcreturn \cnstFalsum \< \< \pcreturn \cnstFalsum \\
         \varMsg \opAssign \cnstBinary{*} \\
         (\funStar{\varBlindingFactorAlice}, \varNonceAlice) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< (\funStar{\varBlindingFactorCarol}, \varNonceCarol) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
         \varSpendableCoinAlice \opFunResult \procCreateCoin{\varValueAlice}{\funStar{\varBlindingFactorAlice}} \< \< \varSpendableCoinCarol \opFunResult \procCreateCoin{\varValueCarol}{\funStar{\varBlindingFactorCarol}} \\
@@ -137,7 +141,7 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
         \varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \sum \funArray{\varBlindingFactorAlice} \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \opSub \sum \funArray{\varBlindingFactorCarol} \\
         \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
         \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
-        \varPreTx \opFunResult \\
+        \varPreTx \opFunResult \pcskipln \\
         \procCreatePreTx{\varMsg}{\funArray{\varCoinInp}}{\funArray{\varCoinOutAlice}}{\funArray{\varProofAlice}}{\varSigContext}{\funArray{\funGen{\varNonceAlice}}}{\cnstEmptySet}{\varTime} \< \< \\
         \< \sendmessageright*{\varPreTx} \< \\
         \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\funStar{\varTime}) \opFunResult \varPreTx \\
@@ -148,7 +152,7 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
         \< \sendmessageleft*{\varPreTx} \< \\
         \pcif \procVerfProof{\varPreTx.\varProofs[1]}{\varPreTx.\varOutputs[1]} \opEqNoQ 0 \< \< \\
         \t \pcreturn \cnstFalsum \< \< \\
-        \pcreturn (\varPreTx, \varSpendableCoinAlice, (\varSecKeyAlice, \varNonceAlice)) \< \< \pcreturn (\varPreTx, \varSpendableCoinCarol, (\varSecKeyCarol, \varNonceCarol)) \\
+        \pcreturn (\varPreTx, \varSpendableCoinAlice, (\varSecKeyAlice, \varNonceAlice)) \< \< \pcreturn (\varPreTx, \varSpendableCoinCarol, (\varSecKeyCarol, \varNonceCarol))
         }
         }
         \caption{Extended Mimblewimble Transaction Scheme - $\procDSendCoinsId$ \label{fig:ext-mim-tx-spend}}
@@ -167,7 +171,7 @@ pre-transaction $\varPreTx$ which can be sent back to the sender.
     \thispagestyle{plain}
     \begin{figure}
         \fbox{
-        \procedure[linenumbering]{$\procDRecvCoins{\varPreTx}{\varFundValue}$} {
+        \procedure[linenumbering,skipfirstln]{$\procDRecvCoins{\varPreTx}{\varFundValue}$} {
         Bob \< \< \< \< Carol \\
         (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \< \< \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \\
         \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \< \< \< \< \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \\
@@ -201,7 +205,7 @@ pre-transaction $\varPreTx$ which can be sent back to the sender.
     \thispagestyle{plain}
     \begin{figure}
         \fbox{
-        \procedure[linenumbering]{$\procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}$} {
+        \procedure[linenumbering,skipfirstln]{$\procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}$} {
         Alice \< \< Carol \\
         (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \\
         \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \< \< \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \\
@@ -256,7 +260,7 @@ He will send over $\varSigFin$ which lets both parties construct the valid trans
     \thispagestyle{plain}
     \begin{figure}
         \fbox{
-        \procedure[linenumbering]{$\procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyCarol}{\varNonceCarol}{\varSigBob}$} {
+        \procedure[linenumbering,skipfirstln]{$\procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyCarol}{\varNonceCarol}{\varSigBob}$} {
         Alice \< \< Bob \\
         (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \\
         \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \< \< \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \\

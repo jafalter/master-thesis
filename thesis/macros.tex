@@ -278,6 +278,7 @@
 \newcommand{\opGreaterThen}{~>~}
 \newcommand{\opGreaterEq}{~\geq~}
 \newcommand{\opForAll}{\;\forall\;}
+\newcommand{\opExists}{\;\exists\;}
 
 % procedures
 \newcommand{\procGenRId}{\styleFunction{genRel}}
@@ -390,8 +391,8 @@
 \newcommand{\procDSharedInpMwTxL}[3]{\procDSharedInpMwTxId (#1,#2,#3)}
 \newcommand{\procDSharedInpMwTxR}[2]{\procDSharedInpMwTxId (#1,#2)}
 \newcommand{\procDScriptMwTxId}{\styleFunction{dcontractMWTx}}
-\newcommand{\procDScriptMwTx}[5]{\procDScriptMwTxId \langle(#1,#2,#3) (#4,#2,#5) \rangle}
-\newcommand{\procDScriptMwTxL}[3]{\procDScriptMwTxId (#1,#2,#3)}
+\newcommand{\procDScriptMwTx}[6]{\procDScriptMwTxId \langle(#1,#2,#3,#4) (#5,#2,#6) \rangle}
+\newcommand{\procDScriptMwTxL}[4]{\procDScriptMwTxId (#1,#2,#3,#4)}
 \newcommand{\procDScriptMwTxR}[3]{\procDScriptMwTxId (#1,#2,#3)}
 
 \newcommand{\procBuildTransactionId}{\styleFunction{buildTransaction}}
@@ -444,7 +445,7 @@
 \newcommand{\procLockAddrId}{\styleFunction{lockBtcScript}}
 \newcommand{\procLockAddr}[4]{\procLockAddrId (#1,#2,#3,#4)}
 \newcommand{\procVerifyLockId}{\styleFunction{verifyLock}}
-\newcommand{\procVerifyLock}[5]{\procVerifyLockId (#1,#2,#3,#4,#5)}
+\newcommand{\procVerifyLock}[6]{\procVerifyLockId (#1,#2,#3,#4,#5,#6)}
 \newcommand{\procSpendBtcId}{\styleFunction{spendBtc}}
 \newcommand{\procSpendBtc}[3]{\procSpendBtcId(#1,#2,#3)}
 
@@ -455,13 +456,13 @@
 \newcommand{\procPublishMW}[1]{\procPublishMWId(#1)}
 
 \newcommand{\procSetupSwapId}{\styleFunction{setupSwp}}
-\newcommand{\procSetupSwap}[6]{\procSetupSwapId \langle(#1,#2,#3,#4)(#1,#5,#6)\rangle}
+\newcommand{\procSetupSwap}[6]{\procSetupSwapId \langle(#1,#2,#3)(#1,#4,#5,#6)\rangle}
 
 \newcommand{\procVerifyTimeId}{\styleFunction{verfTime}}
 \newcommand{\procVerifyTime}[2]{\procVerifyTimeId (#1,#2)}
 
 \newcommand{\procExcSwapId}{\styleFunction{execSwap}}
-\newcommand{\procExcSwap}[4]{ \procExcSwapId \langle (#1,#3), (#1,#2,#4)\rangle }
+\newcommand{\procExcSwap}[5]{ \procExcSwapId \langle (#1,#2,#3), (#1,#4,#5)\rangle }
 
 \newcommand{\procGameId}[2]{\styleFunction{Game}_{#1}^{#2}}
 \newcommand{\procGame}[3]{\procGameId{#1}{#2}(#3)}

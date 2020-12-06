@@ -11,13 +11,14 @@ Figure~\ref{fig:d-build-mw-tx} show the implementation of the $\procDBuildMwTxId
 \begin{figure}
     \fbox{
     \begin{varwidth}{\textwidth}
-        \procedure[linenumbering]{$\procDBuildMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
+        \procedure[linenumbering,skipfirstln]{$\procDBuildMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
         Alice \< \< Bob \\
-        (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \\ \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \\
+        (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \pcskipln \\
+        \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \\
         \< \sendmessageright*{\varPreTx} \< \\
         \< \< (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinBob}) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue} \\
         \< \sendmessageleft*{\funStarAlt{\varPreTx}} \\
-        \varTx \procFinTx{\funStarAlt{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
+        \varTx \opFunResult \procFinTx{\funStarAlt{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
         \< \sendmessageright*{\varTx} \\
         \pcreturn (\varTx, \funStar{\varSpendableCoinAlice}) \< \< \pcreturn (\varTx, \funStar{\varSpendableCoinBob})
         }
@@ -43,15 +44,16 @@ Figure~\ref{fig:d-shared-out-mw-tx} shows the implementation of the protocol.
 \begin{figure}
     \fbox{
     \begin{varwidth}{\textwidth}
-        \procedure[linenumbering]{$\procDSharedOutputMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
+        \procedure[linenumbering,skipfirstln]{$\procDSharedOutputMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
         Alice \< \< Bob \\
-        (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \\ \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \\
+        (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \pcskipln \\
+        \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \\
         \< \sendmessageright*{\varPreTx} \< \\
-        (\funStarAlt{\varPreTx}, \funStar{\varPtSpendableCoinAlice}) \< \< (\funStarAlt{\varPreTx}, \funStar{\varPtSpendableCoinBob}) \\
+        (\funStarAlt{\varPreTx}, \funStar{\varPtSpendableCoinAlice}) \< \< (\funStarAlt{\varPreTx}, \funStar{\varPtSpendableCoinBob}) \pcskipln \\
         \opFunResult \procDRecvCoinsL{\varPreTx}{\varFundValue}  \< \< \opFunResult \procDRecvCoinsR{\varPreTx}{\varFundValue} \\
         \varTx \opFunResult \procFinTx{\funStarAlt{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
         \< \sendmessageright*{\varTx} \\
-        \pcreturn (\varTx, \funStar{\varSpendableCoinAlice}, \funStar{\varPtSpendableCoinAlice}) \< \< \pcreturn (\varTx, \funStar{\varPtSpendableCoinBob})
+        \pcreturn (\varTx, \funStar{\varSpendableCoinAlice}, \funStar{\varPtSpendableCoinAlice}) \< \< \pcreturn (\funStar{\varPtSpendableCoinBob})
         }
     \end{varwidth}
     }
@@ -74,9 +76,9 @@ Figure~\ref{fig:d-shared-inp-mw-tx} shows the implementation of the protocol.
 \begin{figure}
     \fbox{
     \begin{varwidth}{\textwidth}
-        \procedure[linenumbering]{$\procDSharedInpMwTx{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime}{\funArray{\varPtSpendableCoinBob}}$}{
+        \procedure[linenumbering,skipfirstln]{$\procDSharedInpMwTx{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime}{\funArray{\varPtSpendableCoinBob}}$}{
         Alice \< \< Bob \\
-        (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \< \< (\varPreTx, (\varSecKeyBob, \varNonceBob)) \\
+        (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \< \< (\varPreTx, (\varSecKeyBob, \varNonceBob)) \pcskipln \\
         \opFunResult \procDSendCoinsL{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime} \< \< \opFunResult \procDSendCoinsL{\funArray{\varPtSpendableCoinBob}}{\varFundValue}{\varTime} \\
         \< \< (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinBob}) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue} \\
         \< \sendmessageleft*{\funStarAlt{\varPreTx}} \\
@@ -94,22 +96,24 @@ $\procDScriptMwTxId$ is a protocol between a sender and a receiver for the Scrip
 Similar to the $\procDSharedInpMwTxId$ it spends an input coin which is shared between the sender and receiver.
 Additionally, we utilize the adapted signature protocol from~\ref{def:sig:two-party-fixed-wit-apt-sig} to let the receiver hide a secret witness value $\varWit$ in the transaction signature which the sender can extract from the final transaction, thereby allowing the construction of primitive contracts.
 
-\[ \langle (\varTx, \funStar{\varSpendableCoinAlice}, \varWit), (\varTx, \funStar{\varSpendableCoinBob}) \rangle \opFunResult \procDScriptMwTx{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime}{\funArray{\varPtSpendableCoinBob}}{\varWit} \]
+\[ \langle (\varTx, \funStar{\varSpendableCoinAlice}, \varWit), (\varTx, \funStar{\varSpendableCoinBob}) \rangle \opFunResult \procDScriptMwTx{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime}{\varStatement}{\funArray{\varPtSpendableCoinBob}}{\varWit} \]
 
 Figure~\ref{fig:d-script-tx} shows the implementation of the protocol.
 
 \begin{figure}
     \fbox{
     \begin{varwidth}{\textwidth}
-        \procedure[linenumbering]{$\procDScriptMwTx{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime}{\funArray{\varPtSpendableCoinBob}}{\varWit}$}{
+        \procedure[linenumbering,skipfirstln]{$\procDScriptMwTx{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime}{\varStatement}{\funArray{\varPtSpendableCoinBob}}{\varWit}$}{
         Alice \< \< Bob \\
-        (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \< \< (\varPreTx, (\varSecKeyBob, \varNonceBob)) \\
+        (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \< \< (\varPreTx, (\varSecKeyBob, \varNonceBob)) \pcskipln \\
         \opFunResult \procDSendCoinsL{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime} \< \< \opFunResult \procDSendCoinsL{\funArray{\varPtSpendableCoinBob}}{\varFundValue}{\varTime} \\
-        \< \< (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinBob}, \varSigBob)  \\
+        \< \< (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinBob}, \varSigBob)  \pcskipln \\
         \< \< \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}  \\
-        \< \sendmessageleft*{\funStarAlt{\varPreTx}, \varStatement} \\
+        \< \sendmessageleft*{\funStarAlt{\varPreTx}, \funStarAlt{\varStatement}} \\
+        \pcif \varStatement \opNotEq \cnstFalsum \opAnd \varStatement \opNotEq \funStarAlt{\varStatement} \\
+        \t \pcreturn \cnstFalsum \\
         \varSigAptBob \opFunResult \funStarAlt{\varPreTx}.\varSignature \\
-        \varSigAliceBob \< \< \varTx \\
+        \varSigAliceBob \< \< \varTx \pcskipln \\
         \opFunResult \procDAptFinTxL{\funStarAlt{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement} \< \< \opFunResult \procDAptFinTxR{\funStarAlt{\varPreTx}}{\varSecKeyBob}{\varNonceBob}{\varSigBob} \\
         \< \sendmessageleft*{\varTx} \\
         \varWit \opFunResult \procExtWit{\varTx.\varSignature}{\varSigAliceBob}{\varSigAptBob} \\

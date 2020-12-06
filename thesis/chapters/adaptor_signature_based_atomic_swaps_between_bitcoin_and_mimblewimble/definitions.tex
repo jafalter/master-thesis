@@ -27,14 +27,14 @@ If we want to indicate that a spendable coin is a output coin of a transaction w
         At this stage the transaction already has to be partially signed. (by the receiver)
         \item $\varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}$: The finalize algorithm is a DPT routine again called by the transaction sender that takes as input a pre-transaction $\varPreTx$ and the senders signing key $\varSecKeyAlice$ and nonce $\varNonceAlice$.
         The function will output a finalized signed transaction $\varTx$.
-        \item $\{1,0\} \opFunResult \procVerfTx{\varTx}$: The verification algorithm is taken from the Fuchsbauer et al. paper (there it is named $\styleFunction{MW.Ver}$) and can be used to verify mimblewimble transactions.
+        \item $\{1,0\} \opFunResult \procVerfTx{\varTx}$: The verification algorithm is taken from the Fuchsbauer et al. paper \cite{fuchsbauer2019aggregate} (there it is named $\styleFunction{MW.Ver}$) and can be used to verify mimblewimble transactions.
         If an invalid transaction is passed it will output 0, otherwise 1.
-        The routine verifies four statements:
+        The routine verifies four conditions:
         \begin{enumerate}
-            \item Every input and output coin only appears once in the transaction.
-            \item The union of input and output coins is the empty set.
-            \item The transaction signature verifies with the excess value of the transaction as public key, which is calculated by summing up to output coins and subtracting the input coins. (See~\ref{sec:pre:mimblewimble})
-            \item For every output coin the range proof verifies.
+            \item Condition 1: Every input and output coin only appears once in the transaction.
+            \item Condition 2: The union of input and output coins is the empty set.
+            \item Condition 3: The transaction signature verifies with the excess value of the transaction as public key, which is calculated by summing up the output coins and subtracting the input coins. (See~\ref{sec:pre:mimblewimble})
+            \item Condition 4:For every output coin the range proof verifies.
         \end{enumerate}
     \end{itemize}
 \end{definition}
@@ -104,17 +104,17 @@ Correctness is given very similar to the standard scheme:
     \]
 \end{definition}
 
-\begin{definition}[Script Mimblewimble Transaction Scheme]
+\begin{definition}[Contract Mimblewimble Transaction Scheme]
     \label{def:atom:apt-ext-mw-tx-scheme}
-    The script version of the extended Mimblewimble Transaction Scheme updates the Extended Mimblewimble Transaction Schme by providing a modified version of the single party receive routine and the distributed finalize transaction protocol.
+    The contract version of the extended Mimblewimble Transaction Scheme updates the Extended Mimblewimble Transaction Schme by providing a modified version of the single party receive routine and the distributed finalize transaction protocol.
     \[ \varaptMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc \procAptRecvCoinsId, \procDAptFinTxId \]
     \begin{itemize}
-        \item $(\funStar{\varPreTx}, \funStar{\varSpendableCoinBob}, \varSigBob) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$: The script variant of the receive function takes an additional input a secret witness value
+        \item $(\funStar{\varPreTx}, \funStar{\varSpendableCoinBob}, \varSigBob) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$: The contract variant of the receive function takes an additional input a secret witness value
         $\varWit$ which will be hidden in the transactions signature and extractable by the other party after the protocols' completion.
         Note that the routine also returns Bob's unadapted partial signature.
         The reason for this is that we later still need the unadapted version to complete the signature und thereby finalize the transaction.
         By not sharing this unadapted signature with Alice, Bob is the one who gets to finalize the transaction which is different from the simpler protocol and is an important feature for our atomic swap protocol.
-        \item $\langle \varSigAliceBob, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$: The script variant of the finalize transaction algorithm is a distributed protocol between the sender(s) and receiver.
+        \item $\langle \varSigAliceBob, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$: The contract variant of the finalize transaction algorithm is a distributed protocol between the sender(s) and receiver.
         Additionally to the pre-transaction $\funStar{\varPreTx}$ the senders need to input their signing information, Bob needs to input the unadapted version of his partial signature as it is needed for transaction completion.
         This protocol could also be implemented as a three party protocol, two senders controlling a shared coin and a third receiver.
         However, as in the case we will describe later in~\ref{sec:atom:atomic-swap} one of the two senders is also the receiver, we allowed ourselves to model this protocol as being between only two parties to simplify the formalization.

@@ -1,7 +1,6 @@
 In this section we will prove the correctness and security of the instantiation described in~\ref{sec:atom:atomic-inst}.
 We start by proving \emph{Transaction Scheme Correctness}, \emph{Extended Transaction Scheme Correctness} and \emph{Adapted Transaction Scheme Correctness} for the three outlined transaction schemes $\varMWScheme, \varextMWScheme$ and $\varaptMWScheme$.
-We then continue by showing that all three security definitions (\emph{Inflation-Resistence}, \emph{Theft-Resistence}, \emph{Transaction indistinguishability}) hold again for all three transaction types.
-The general process will be to find a proof for the basic transaction protocol defined in~\ref{def:atom:mw-tx-scheme} and then reduce the extended and adapted case to the basic one.
+We then continue by showing that all protocols described in~\ref{sec:atom:protocols} are secure in the malicious models as defined in~\ref{subsec:pre:security}.
 
 \subsection{Correctness} \label{subsec:atom:correctness}
 
@@ -21,16 +20,18 @@ We construct the following theorem:
         \item $\funStar{\varPreTx} \opFunResult \procRecvCoins{\varPreTx}{\varFundValue}$
         \item $\varTx \opFunResult \procFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}$
     \end{enumerate}
-    We recall the four conditions for $\procVerfTx{\varTx}$ to return 1 and show that each of them must hold:
+    We recall the conditions for $\procVerfTx{\varTx}$ to return 1 found in~\ref{def:atom:mw-tx-scheme} and show that each of them must hold:
 
-    Condition 1 must hold trivially, as already in $\procSendCoinsId$ Alice will create the output $\varCoinOutAlice$ and initialize the pre-transaction with $\funArray{\varCoinInp}$ and $\funArray{\varCoinOutAlice}$, thereby already after $\procSendCoinsId$ both input and output lists are non empty and this condition is fulfilled.
+    Condition 1 and 2 both must hold if the participants are honest.
+    In the case that the sending party provides duplicate inputs the check at the beginning of the $\procSendCoinsId$ procedure will fail and consequently $\procVerfTx{\varTx}$ will return 0.
+    The blinding factors to the ouput coins created in $\procSendCoinsId$ and $\procRecvCoinsId$ are generated randomly, which means a duplication can only appear with negligible probability.
 
-    Condition 2 follows from the implementation of the $\procCreateCoinId$ function called in $\procSendCoinsId$ as well as $\procRecvCoinsId$.
+    Condition 3 follows from the implementation of the $\procCreateCoinId$ function called in $\procSendCoinsId$ as well as $\procRecvCoinsId$.
     In the function a rangeproof is computed for the new coin $\varCoin$ with value $\varValue$ and blinding factor $\varBlindingFactor$ as $\varProof \opFunResult \procProof{\varCoin}{\varValue}{\varBlindingFactor}$.
     Given that our Rangeproof system $\varProof$ system has to be correct $\procVerfProof{\varProof}{\varCoin} \opEqNoQ 1$ must hold for all coins created with the $\procCreateCoinId$ routine.
-    Therefore Condition 2 must hold.
+    Therefore Condition 2 must hold if the transaction is computed honestly.
 
-    For condition 3 we must look at how the secret keys $\varSecKeyAlice$ and $\varSecKeyBob$ are constructed.
+    For condition 4 we must look at how the secret keys $\varSecKeyAlice$ and $\varSecKeyBob$ are constructed.
     From the instantiation of $\procSendCoinsId$ we can see that Alice's share will be $\varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \cnstSumZeroToN \funArray{\varBlindingFactorAlice}$, where $\funStar{\varBlindingFactorAlice}$ is the blinding factor to her output and $\funArray{\varBlindingFactorAlice}$ are the blinding factors to her input coins.
     Bobs secret key is constructed like $\varSecKeyBob \opAssign \funStar{\varBlindingFactorBob}$, so it corresponds to the blinding factor of his output.
     From the construction of the two-party signature scheme in~\ref{def:sig:two-party-sig} we know that therefore the final signature will be valid under the following public key:
@@ -52,14 +53,15 @@ We construct the following theorem:
     From step 5.3 to 5.4 we replace every coin $\varCoin$ by its instantiation for a pedersen commitment $\varCoin \opEqNoQ \funGen{\varValue} \opAddPoint \funGenH{\varValue}$.
 
     From step 5.4 to 5.4 we rely on the fact that if Alice is honest $\varValue \opEqNoQ \cnstSumZeroToN \varValue_i$, therefore also $(\varValue \opSub \varFundValue) \opAddScalar\varFundValue \opEqNoQ \cnstSumZeroToN \varValue_i$ must hold.
-    From that we can infer that $\funGenH{\varValue \opSub \varFundValue} \opAddPoint \funGenH{\varFundValue} \opAddPoint \cnstSumZeroToN \funGenH{- \varValue_i}$ must cancel out.
-    We have managed to show that condition 3 must hold and can conclude that \emph{Transaction Scheme Correctness} holds.
+    From that we can infer that $\funGenH{\varValue \opSub \varFundValue} \opAddPoint \funGenH{\varFundValue} \opAddPoint \cnstSumZeroToN \funGenH{- \varValue_i}$ must cancel out, otherwise the transaction would either create or burn value, which is not allowed and in which case $\procVerfTxId$ should again return 0.
 
-    We will now argue that the same deriviation holds for \emph{Extended Transaction Scheme Correctness} \emph{Adapted Transaction Scheme Correctness}.
+    We have managed to show that condition 1-4 must hold for a valid transaction and can conclude that \emph{Transaction Scheme Correctness} holds for $\varMWSchemeParams{\varCommitScheme}{\varProofSystem}{\varSigSchemeMP}$.
 
-    Condition 1 again follows trivially from the construction of $\procDSendCoinsId$ for the same reasons we have already layed out.
+    We will now argue that the same deriviation holds for \emph{Extended Transaction Scheme Correctness} and \emph{Adapted Transaction Scheme Correctness}.
 
-    $\procDSendCoinsId$, $\procDRecvCoinsId$, $\procAptRecvCoinsId$ all rely on the same $\procCreateCoinId$ routine to create output coins, thereby condition 2 will hold for the same reasons as layed out before.
+    Condition 1-2 again follow trivially from the construction of $\procDSendCoinsId$ and $\procDRecvCoinsId$ for the same reasons we have already layed out in the previous proof.
+
+    $\procDSendCoinsId$, $\procDRecvCoinsId$, $\procAptRecvCoinsId$ all rely on the same $\procCreateCoinId$ routine to create output coins, thereby condition 3 also holds for valid transactions with the same argument as for the previous proof.
 
     In the case of \emph{Extended Transaction Scheme Correctness} the blinding factors for the input coins $\funArray{\varCoinInp}$ are shared.
     However, we can easily reduce this case to the proof for the regular case:
@@ -69,31 +71,19 @@ We construct the following theorem:
         \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \opSub \cnstSumZeroToN \varBlindingFactorCarol
     \end{gather}
     $\varSecKeyAlice$ and $\varSecKeyCarol$ are then inputs to $\procDFinTxId$ in which a partial signature $\varSigAliceCarol$ is calculated, by both Alice and Carol signing with their secret key.
-    Assume the general key from before in which we have a single secret key $\varSecKeyAlice$.
+    Assume the general key from before, in which we have a single secret key $\varSecKeyAlice$.
     We can split $\varSecKeyAlice$ into arbitrarily chosen shares $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ with $\varSecKeyAlice \opEqNoQ (\varSecKeyAlice)_1 + (\varSecKeyAlice)_2$.
     By the definition of Two-Party Signatures~\ref{def:sig:two-party-sig} the combined signature from $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ will be valid under $\funGen{\varSecKeyAlice}$.
     Thereby we can treat $\varSecKeyAlice$ and $\varSecKeyCarol$ from $\procSendCoinsId$ as arbitrary shares of a combined $\varSecKeyAliceCarol$.
     It follows from the addtive homomorphic property of the elliptic curve that a signature valid under $\funGen{\varSecKeyAliceCarol}$ must also be valid under $\funGen{\varSecKeyAlice} \opAddPoint \funGen{\varSecKeyCarol}$.
     The case of two receivers calling $\procDRecvCoinsId$ is symmetric.
-    From this we can conclude that condition 3 must also hold for the \emph{Extended Transaction Scheme}. \\
+    From this we can conclude that condition 4 must also hold for the \emph{Extended Transaction Scheme}. \\
     Now for the \emph{Adapted Extended Transaction Scheme} the same argument holds.
     The only difference in this scheme is that in $\procDAptFinTxId$ Bob (instead of Alice) will call $\procFinSigId$, as only he knows his unadapted partial signature $\varSigBob$.
     However, the construction of the signature remains unchanged, therefore the reduction we provided before must hold for the same reasons.
 
-    As we have managed to show that all $\procVerfTx{\varTx} \opEqNoQ 1$ must hold for all three transaction schemes, assuming the participants are honest and the underlaying commitment scheme $\varCommitScheme$, two signature scheme $\varSigSchemeMP$ and rangeproof system $\varProofSystem$ are correct theorem~\ref{lem:atom:correctness} must also hold.
+    We have thereby proven that if $\varCommitScheme, \varProofSystem, \varSigSchemeMP$ are correct and the participants behave honestly (that is by providing valid inputs and calling the respective routines in the given order) $\procVerfTx{\varTx}$ will return 1 for the resulting transaction $\varTx$ and therefore theorem~\ref{lem:atom:correctness} holds.
 \end{proof}
-
-In the remains to show that the commitment scheme, signature scheme and rangeproof system used in the given instantiations of the three transaction schemes are correct.
-
-All three transaction schemes use Pedersen Commitments as the commitment system $\varCommitScheme$, for which a security and correctness evaluation can be found in~\cite{pedersen1991non}.
-For the correctness of the rangeproof system $\varProofSystem$ we refer the reader again to the bulletproof paper~\cite{bunz2018bulletproofs}.
-The instantiation of the Mimblewimble Transaction Scheme $\varMWScheme$ (defined in~\ref{def:atom:mw-tx-scheme} instantiated in figure~\ref{fig:inst-mw-tx}) uses a standard Two-Party Signature Scheme $\varSigSchemeMP$ defined in~\ref{def:sig:two-party-sig} for which a correctness proof is available by Maxwell et al. in~\cite{maxwell2019simple}.
-
-For the Extended Mimblewimble Transaction Scheme $\varextMWScheme$ defined in~\ref{def:atom:ext-mw-tx-scheme} and instantiated in figure~\ref{fig:ext-mim-tx-spend},~\ref{fig:ext-mim-tx-recv} and~\ref{fig:ext-mim-tx-fin} the same signature scheme $\varSigSchemeMP$ and rangeproof system $\varProofSystem$ is used, therefore we can make the same argument as for the previous case to show \emph{Extended Transaction Scheme Correctness} holds.
-
-For the Adapted Extended Mimblewimble Transaction Scheme $\varaptMWScheme$, which we have defined in~\ref{def:atom:apt-ext-mw-tx-scheme}, and have shown an instantiation in figure~\ref{fig:inst-apt-mw-tx-recv}, and~\ref{fig:inst-apt-mw-tx-fin}, the Two Party Fixed Witness Adaptor Schnorr Signature Scheme $\varSigSchemeApt$, which we have defined in~\ref{def:sig:two-party-fixed-wit-apt-sig}, is used.
-We have already shown correctness of this signature scheme in section~\ref{sec:sig:two-party-apt-security} by proofing that \emph{Adaptor Signature Correctness} holds.
-Furthermore, the scheme used a multiparty version of the bulletproof system $\varMPRProofSystem$ for which we refer the reader to~\cite{klinec2020privacy} for a proof of its correctness.
 
 \subsection{Security}\label{subsec:atom:security}
 
@@ -111,7 +101,7 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
 
 \fbox{
 \begin{varwidth}{\textwidth}
-    \procedure[linenumbering]{$\procDBuildMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
+    \procedure[linenumbering,skipfirstln]{$\procDBuildMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
     Alice \< \< Bob \\
     \procZkf{\cnstRelation_2*}{\funArray{\varSpendableCoin}} \\
     (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \\ \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \\

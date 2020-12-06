@@ -77,7 +77,7 @@ That means if the prover first sends the pair $(\varWit_1, \varStatement_1)$ and
 \begin{center}
     \fbox{
     \begin{varwidth}{\textwidth}
-        \procedure[linenumbering]{$\procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}$} {
+        \procedure[linenumbering,skipfirstln]{$\procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}$} {
         Alice \< \< Bob \\
         \cdots \< \< \\
         \procZkf{\cnstRelation}{(\varSecKeyAlice, \varPubKeyAlice)} \\
@@ -90,7 +90,7 @@ That means if the prover first sends the pair $(\varWit_1, \varStatement_1)$ and
         \< \< \procZkf{\cnstRelation}{(\varNonceBob, \varRandBob)} \\
         \< \sendmessageleft*{\varSigBob, \varSigContext, \varPubKeyBob} \< \\
         \cdots \< \< \\
-        \pcif \procZkf{\cnstRelation}{\varPubKeyBob} \opEqNoQ 0 \opOr \\
+        \pcif \procZkf{\cnstRelation}{\varPubKeyBob} \opEqNoQ 0 \opOr \pcskipln \\
         \t \procZkf{\cnstRelation}{\varSigContext.\varRand \opAddPoint \varRandAlice^{-1}} \opEqNoQ 0 \\
         \t \pcreturn \cnstFalsum \\
         \< \cdots \< \\
@@ -202,7 +202,7 @@ The relation $\cnstRelation$ is equally defined as in the previous proof.
 \begin{center}
     \fbox{
     \begin{varwidth}{\textwidth}
-        \procedure[linenumbering]{$\procDAptSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}{\varWit}$} {
+        \procedure[linenumbering,skipfirstln]{$\procDAptSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}{\varWit}$} {
         Alice \< \< Bob \\
         \cdots \< \< \\
         \procZkf{\cnstRelation}{(\varSecKeyAlice, \varPubKeyAlice)} \\
@@ -216,8 +216,8 @@ The relation $\cnstRelation$ is equally defined as in the previous proof.
         \< \< \procZkf{\cnstRelation}{(\varWit, \varStatement)} \\
         \< \sendmessageleft*{\varSigBob, \varSigContext, \varPubKeyBob, \varStatement} \< \\
         \cdots \< \< \\
-        \pcif \procZkf{\cnstRelation}{\varPubKeyBob} \opEqNoQ 0 \opOr \\
-        \t \procZkf{\cnstRelation}{\varSigContext.\varRand \opAddPoint \varRandAlice^{-1}} \opEqNoQ 0 \opOr \\
+        \pcif \procZkf{\cnstRelation}{\varPubKeyBob} \opEqNoQ 0 \opOr \pcskipln \\
+        \t \procZkf{\cnstRelation}{\varSigContext.\varRand \opAddPoint \varRandAlice^{-1}} \opEqNoQ 0 \opOr \pcskipln \\
         \t \procZkf{\cnstRelation
         }{\varStatement} \opEqNoQ 0 \opOr \\
         \t \pcreturn \cnstFalsum \\
