@@ -179,6 +179,7 @@
 \newcommand{\varSStar}{\funStar{\varS}}
 \newcommand{\varSAlice}{\styleVariable{s}_\varAlice}
 \newcommand{\varSBob}{\styleVariable{s}_\varBob}
+\newcommand{\varSBobCarol}{\styleVariable{s}_{\varBob\varCarol}}
 \newcommand{\varKey}{\styleVariable{x}}
 \newcommand{\varKeyVerf}{\varKey_{\styleVariable{p1}}}
 \newcommand{\varKeyProv}{\varKey_{\styleVariable{p2}}}
@@ -404,10 +405,14 @@
 
 \newcommand{\procDSignId}{\styleFunction{dSign}}
 \newcommand{\procDSign}[5]{\procDSignId \langle(#1,#2,#3),(#1,#4,#5)\rangle}
+\newcommand{\procDSignL}[3]{\procDSignId (#1,#2,#3)}
+\newcommand{\procDSignR}[3]{\procDSignId (#1,#2,#3)}
 \newcommand{\procDAptSignId}{\styleFunction{dAptSign}}
 \newcommand{\procDAptSign}[6]{\procDAptSignId \langle(#1,#2,#3),(#1,#4,#5,#6)\rangle}
 \newcommand{\procDRProofId}{\styleFunction{dRanPrf}}
-\newcommand{\procDRProof}[4]{\procDRProofId \langle(#1,#2,#3),(#1,#2,#4)}
+\newcommand{\procDRProof}[4]{\procDRProofId \langle(#1,#2,#3),(#1,#2,#4)\rangle}
+\newcommand{\procDRProofL}[3]{\procDRProofId (#1,#2,#3)}
+\newcommand{\procDRProofR}[3]{\procDRProofId (#1,#2,#3)}
 
 \newcommand{\procDSendCoinsId}{\styleFunction{dSpendCoins}}
 \newcommand{\procDSendCoins}[4]{\procDSendCoinsId \langle (#1,#3,#4), (#2,#3,#4) \rangle}
