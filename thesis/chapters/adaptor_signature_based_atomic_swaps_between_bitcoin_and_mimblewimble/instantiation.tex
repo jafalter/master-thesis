@@ -138,7 +138,7 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
         \t \pcreturn \cnstFalsum \< \< \pcreturn \cnstFalsum \\
         \varMsg \opAssign \cnstBinary{*} \\
         (\funStar{\varBlindingFactorAlice}, \varNonceAlice) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< (\funStar{\varBlindingFactorCarol}, \varNonceCarol) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-        \varSpendableCoinAlice \opFunResult \procCreateCoin{\varValueAlice}{\funStar{\varBlindingFactorAlice}} \< \< \varSpendableCoinCarol \opFunResult \procCreateCoin{\varValueCarol}{\funStar{\varBlindingFactorCarol}} \\
+        \funStar{\varSpendableCoinAlice} \opFunResult \procCreateCoin{\varValueAlice}{\funStar{\varBlindingFactorAlice}} \< \< \funStar{\varSpendableCoinCarol} \opFunResult \procCreateCoin{\varValueCarol}{\funStar{\varBlindingFactorCarol}} \\
         \{ \varCoinOutAlice, \funStar{\varBlindingFactorAlice}, \varValueAlice, \varProofAlice \} \opFunResult \funStar{\varSpendableCoinAlice} \< \< \{ \varCoinOutCarol, \funStar{\varBlindingFactorCarol}, \varValueCarol, \varProofCarol \} \opFunResult \funStar{\varSpendableCoinCarol} \\
         \varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \sum \funArray{\varBlindingFactorAlice} \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \opSub \sum \funArray{\varBlindingFactorCarol} \\
         \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
@@ -150,11 +150,11 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
         \< \< \pcif \procVerfProof{\varProofs[0]}{\varOutputs[0]} \opEqNoQ 0 \opOr \varTime \opNotEq \funStar{\varTime} \\
         \< \< \t \pcreturn \cnstFalsum \\
         \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyCarol}}{\funGen{\varNonceCarol}} \\
-        \< \< \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutCarol}{\varProof \opConc \varProofCarol}{\varSigContext}{\varCommits \opConc \funGen{\varNonceCarol}}{\cnstEmptySet}{\varTime} \\
-        \< \sendmessageleft*{\varPreTx} \< \\
-        \pcif \procVerfProof{\varPreTx.\varProofs[1]}{\varPreTx.\varOutputs[1]} \opEqNoQ 0 \< \< \\
+        \< \< \funStarAlt{\varPreTx} \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutCarol}{\varProof \opConc \varProofCarol}{\varSigContext}{\varCommits \opConc \funGen{\varNonceCarol}}{\cnstEmptySet}{\varTime} \\
+        \< \sendmessageleft*{\funStarAlt{\varPreTx}} \< \\
+        \pcif \procVerfProof{\funStarAlt{\varPreTx}.\varProofs[1]}{\funStarAlt{\varPreTx}.\varOutputs[1]} \opEqNoQ 0 \< \< \\
         \t \pcreturn \cnstFalsum \< \< \\
-        \pcreturn (\varPreTx, \varSpendableCoinAlice, (\varSecKeyAlice, \varNonceAlice)) \< \< \pcreturn (\varPreTx, \varSpendableCoinCarol, (\varSecKeyCarol, \varNonceCarol))
+        \pcreturn (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \< \< \pcreturn (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinCarol}, (\varSecKeyCarol, \varNonceCarol))
         }
         }
         \caption{Extended Mimblewimble Transaction Scheme - $\procDSendCoinsId$ \label{fig:ext-mim-tx-spend}}
@@ -177,18 +177,20 @@ Finally they create the updated pre-transaction $\varPreTx$ which can be sent ba
         \fbox{
         \procedure[linenumbering,skipfirstln]{$\procDRecvCoins{\varPreTx}{\varFundValue}$} {
         Bob \< \< \< \< Carol \\
-        (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \< \< \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \\
+        (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\cnstEmptySet,\varTime) \opFunResult \varPreTx \\
         \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \< \< \< \< \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \\
         \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut[\varIterator]} \opEqNoQ 0 \< \< \< \< \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut[\varIterator]} \opEqNoQ 0 \\
         \t \pcreturn \cnstFalsum \< \< \< \< \t \pcreturn \cnstFalsum \\
         (\funStar{\varBlindingFactorBob}, \varNonceBob) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \< \< \\
         (\varCoinShared, \cdot, \cdot, \cdot) \opFunResult \procCreateCoin{\varFundValue}{\funStar{\varBlindingFactorBob}} \< \< \< \< \\
         \varSecKeyBob \opAssign \funStar{\varBlindingFactorBob} \< \< \< \< \\
-        \< \sendmessagerightx{4}{\varCoinShared} \< \\
+        \< \sendmessagerightx{4}{\varPreTx, \varCoinShared} \< \\
         \< \< \< \< (\funStar{\varBlindingFactorCarol}, \varNonceCarol) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
         \< \< \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \\
-        \< \< \< \< \funStarAlt{\varCoinShared} \opAssign \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \\
-        \< \sendmessageleftx{4}{\funStarAlt{\varCoinShared}, \funGen{\varSecKeyCarol}} \< \\
+        \< \< \< \< \funStarAlt{\varCoinShared} \opAssign \varCoinShared \opAddPoint \funGen{\varBlindingFactorCarol} \\
+        \< \< \< \< \varPreTx.\varOutputs[] \opAssign \funStarAlt{\varCoinShared} \\
+        \< \sendmessageleftx{4}{\varPreTx, \funGen{\varSecKeyCarol}} \< \\
+        \{\cdots \funStarAlt{\varCoinShared}\} \opFunResult \varPreTx.\varOutputs \< \< \< \< \\
         \pcif \funStarAlt{\varCoinShared} \opNotEq \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \< \< \< \< \\
         \t \pcreturn \cnstFalsum \< \< \< \< \\
         \varProofBobCarol \opFunResult \procDRProofL{\funStarAlt{\varCoinShared}}{\varFundValue}{\varSecKeyBob} \< \< \< \< \varProofBobCarol \opFunResult \procDRProofL{\funStarAlt{\varCoinShared}}{\varFundValue}{\varSecKeyCarol} \\

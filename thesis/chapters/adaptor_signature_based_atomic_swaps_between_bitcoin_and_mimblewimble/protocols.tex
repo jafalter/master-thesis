@@ -50,7 +50,7 @@ Figure~\ref{fig:d-shared-out-mw-tx} shows the implementation of the protocol.
         \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \\
         \< \sendmessageright*{\varPreTx} \< \\
         (\funStarAlt{\varPreTx}, \funStar{\varPtSpendableCoinAlice}) \< \< (\funStarAlt{\varPreTx}, \funStar{\varPtSpendableCoinBob}) \pcskipln \\
-        \opFunResult \procDRecvCoinsL{\varPreTx}{\varFundValue}  \< \< \opFunResult \procDRecvCoinsR{\varPreTx}{\varFundValue} \\
+        \opFunResult \procDRecvCoinsL{\varPreTx}{\varFundValue}  \< \< \opFunResult \procDRecvCoinsR{\varFundValue} \\
         \varTx \opFunResult \procFinTx{\funStarAlt{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
         \< \sendmessageright*{\varTx} \\
         \pcreturn (\varTx, \funStar{\varSpendableCoinAlice}, \funStar{\varPtSpendableCoinAlice}) \< \< \pcreturn (\funStar{\varPtSpendableCoinBob})
