@@ -398,7 +398,7 @@ We extend our model by including the $\procDSignId$ protocol for which security 
     \< \< \< \< \t \pcreturn \cnstFalsum \\
     \< \< \< \< \cdots \\
     \< \< \< \< \procZkf{\cnstRelation_1}{(\varSecKeyCarol, \funGen{\varSecKeyCarol})} \\
-    \< \sendmessageleft*{\varPreTx, \funGen{\varSecKeyCarol}} \< \\
+    \< \sendmessageleft*{\funStarAlt{\varPreTx}, \funGen{\varSecKeyCarol}} \< \\
     \pcif \procZkf{\cnstRelation_1}{\funGen{\varSecKeyCarol}} \opEqNoQ 0 \\
     \t \pcreturn \cnstFalsum \\
     \cdots \< \< \< \< \cdots \\
@@ -406,7 +406,7 @@ We extend our model by including the $\procDSignId$ protocol for which security 
     (\varSigBobCarol, \varPubKeyBobCarol) \opFunResult \< \< \< \< (\varSigBobCarol, \varPubKeyBobCarol) \opFunResult \pcskipln \\
     \procDSignL{\varMsg}{\varSecKeyBob}{\varNonceBob} \< \< \< \< \procDSignR{\varMsg}{\varSecKeyCarol}{\varNonceCarol} \\
     \cdots \< \< \< \< \cdots \\
-    \pcreturn (\varPreTx, \funStar{\varPtSpendableCoinBob}) \< \< \< \< \pcreturn (\varPreTx, \funStar{\varPtSpendableCoinCarol})
+    \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinBob}) \< \< \< \< \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinCarol})
     }
 \end{varwidth}
 }
@@ -425,12 +425,12 @@ We extend our model by including the $\procDSignId$ protocol for which security 
         \item $\cnstSimulator$ invokes $\cnstAdversary$ and saves ($\varCoinShared$, ($\varFundValue, \funStar{\varBlindingFactorBob}$)) when the adversary calls $\procZKfId{\cnstRelation_2}$.
         \item $\cnstAdversary$ sends $(\varPreTx,\varCoinShared)$.
         The simulator then compares $\varCoinShared$ with the values saved in its memory and sends $\cnstAbort$ to the TTP and outputs $\cnstFalsum$ if they don't match.
-        Otherwise he sends $(\varPreTx, \varFundValue)$ to the TTP computing $\procRecvCoinsId$ and receives the outputs $(\varPreTx, \funStar{\varPtSpendableCoinBob})$.
-        \item $\cnstSimulator$ proceeds by taking the last output $\funStarAlt{\varCoinShared}$ from $\varPreTx$ (received from the TTP) and computes $\funGen{\varSecKeyCarol} \opAssign \funStarAlt{\varCoinShared} \opAddPoint {\varCoinShared}^{-1}$.
-        The simulator now sends $\varPreTx$ (as received from the TTP) and $\funGen{\varSecKeyCarol}$ to $\cnstAdversary$ as if coming from Carol and sends $\cnstContinue$ to the TTP.
+        Otherwise he sends $(\varPreTx, \varFundValue)$ to the TTP computing $\procRecvCoinsId$ and receives the outputs $(\funStar{\varPreTx}, \funStar{\varPtSpendableCoinBob})$.
+        \item $\cnstSimulator$ proceeds by taking the last output $\funStarAlt{\varCoinShared}$ from $\funStar{\varPreTx}.\varOutputs$ and computes $\funGen{\varSecKeyCarol} \opAssign \funStarAlt{\varCoinShared} \opAddPoint {\varCoinShared}^{-1}$.
+        The simulator computes $\funStarAlt{\varPreTx}$ by adding $\funStarAlt{\varCoinShared}$ to $\varPreTx$ and sends it together with $\funGen{\varSecKeyCarol}$ to $\cnstAdversary$ as if coming from Carol and sends $\cnstContinue$ to the TTP.
         \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_1}$ as the verifier $\cnstSimulator$ check equality with the correct value and returns either 0 or 1.
-        \item When the adversary calls $\procDRProofId$ the simulator saves $\varSecKeyBob$ to its memory and returns the last element of $\varPreTx.\varProofs$ as received from the TTP.
-        \item For the the call to $\procDSignId$ the simulator returns the $\varPreTx.\varSignature$ as the signature and $\funGen{\varSecKeyBob} \opAddPoint \funGen{\varSecKeyCarol}$ as the public key.
+        \item When the adversary calls $\procDRProofId$ the simulator saves $\varSecKeyBob$ to its memory and returns the last element of $\funStar{\varPreTx}.\varProofs$ as received from the TTP.
+        \item For the call to $\procDSignId$ the simulator returns the $\varPreTx.\varSignature$ as the signature and $\funGen{\varSecKeyBob} \opAddPoint \funGen{\varSecKeyCarol}$ as the public key.
         \item $\cnstSimulator$ concludes by outputting whatever $\cnstAdversary$ outputs.
     \end{enumerate}
 
@@ -443,22 +443,41 @@ We extend our model by including the $\procDSignId$ protocol for which security 
     \begin{itemize}
         \item \textit{Phase 1}: No simulation is done during this phase, and the transcript is therby indistinguishable by the deterministic nature of $\cnstAdversary$.
         \item \textit{Phase 2}: In case $\cnstAdversary$ sends an invalid value for $\varCoinShared$ the execution will stop with output $\cnstFalsum$ which is identical to what would happen in the real execution.
-        The simulator can then send the updated pre-transaction as received from the TTP and the extracted real value for $\funGen{\varSecKeyCarol}$.
+        The simulator can then send the updated pre-transaction as the honest Carol would do and the extracted real value for $\funGen{\varSecKeyCarol}$.
         \item \textit{Phase 3}: $\cnstAdversary$ will receiver 0 or 1 to the call to $\procZKfId{\cnstRelation_1}$ as in the real execution.
         The simulator further manages to reconstruct the real output values for $\procDRProofId$ and $\procDSignId$ again making the transcript identical in this phase.
     \end{itemize}
 
     \textbf{Carol is corrupted}: The simulator works as follows:
     \begin{enumerate}
-        \item Since Carol does not have any inputs in this protocol $\cnstSimulator$ can simply send $\cnstEmptySet$ to the TTP and receives ($\varPreTx, \funStar{\varSpendableCoinCarol}$) from which he extracts Carols bliding factor (and secret key) as $\varSecKeyCarol \opAssign \funStar{\varSpendableCoinCarol}.\varBlindingFactor$.
-        He can now create the initial shared coin $\varCoinShared$ by taking the last output of $\varPreTx$ as $\funStarAlt{\varCoinShared}$ and calculating $\varCoinShared \opAssign \funStarAlt{\varCoinShared} \opAddPoint {\funGen{\varSecKeyCarol}}^{-1}$.
-        he can further create the initial pre-transaction by removing the last entry of the output coin list, last entry of the proof list and signature from $\varPreTx$ received by the TTP.
+        \item Since Carol does not have any inputs in this protocol $\cnstSimulator$ can simply send $\cnstEmptySet$ to the TTP and receives ($\funStar{\varPreTx}, \funStar{\varSpendableCoinCarol}$) from which he extracts Carols bliding factor (and secret key) as $\varSecKeyCarol \opAssign \funStar{\varSpendableCoinCarol}.\varBlindingFactor$.
+        He can now create the initial shared coin $\varCoinShared$ by taking the last output of $\funStar{\varPreTx}.\varOutputs$ as $\funStarAlt{\varCoinShared}$ and calculating $\varCoinShared \opAssign \funStarAlt{\varCoinShared} \opAddPoint {\funGen{\varSecKeyCarol}}^{-1}$.
+        he can further create the initial pre-transaction by removing the last entry of the output coin list, last entry of the proof list and signature from $\funStar{\varPreTx}$.
         \item $\cnstSimulator$ invokes $\cnstAdversary$ and send $\varPreTx, \varCoinShared$ (as calculated in step 1) as if coming from Bob.
         \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_2}$ as the verifier the simulator checks for equality with what he send in the last step and returns either 0 or 1.
-        \item The adversary then sends the updated $\varPreTx$ which the simulator compares to the pre-transaction received from the TTP.
-        If the two transaction are found not to match $\cnstSimulator$ will output $\cnstFalsum$ and send $\cnstAbort$ to the TTP halting the execution, otherwise he will send $\cnstContinue$.
-        \item Upon the adversary calling $\procDRProofId$ the simulator will return the proof at the last position in the proofs array of $\varPreTx$ received from the TTP.
-        \item The simulator then extracts $\varFundValue \opAssign \funStar{\varPtSpendableCoinCarol}$ and computes $\varPubKeyBob \opAssign \varCoinShared \opAddPoint {\funGenH{\varValue}}^{-1}$ and returns $\varPreTx.\varSignature$ and $\funStar{\varSecKeyCarol} \opAddPoint \varPubKeyBob$ when $\cnstAdversary$ calls $\procDSignId$.
+        \item The adversary then sends the updated $\funStarAlt{\varPreTx}$ which the simulator validates by checking if the last entry in $\funStarAlt{\varPreTx}.\varOutputs$ equals $\funStarAlt{\varCoinShared}$.
+        If they don't $\cnstSimulator$ will output $\cnstFalsum$ and send $\cnstAbort$ to the TTP halting the execution, otherwise he will send $\cnstContinue$.
+        \item Upon the adversary calling $\procDRProofId$ the simulator will return the proof at the last position in the proofs array of $\funStar{\varPreTx}.\varProofs$ received from the TTP.
+        \item The simulator then extracts $\varFundValue \opAssign \funStar{\varPtSpendableCoinCarol}$ and computes $\varPubKeyBob \opAssign \varCoinShared \opAddPoint {\funGenH{\varValue}}^{-1}$ and returns $\funStar{\varPreTx}.\varSignature$ and $\funStar{\varSecKeyCarol} \opAddPoint \varPubKeyBob$ when $\cnstAdversary$ calls $\procDSignId$.
         \item The simulation completes with $\cnstSimulator$ outputting whatever $\cnstAdversary$ outputs.
     \end{enumerate}
+
+    We now argue why in each of the three phases the transcript produced by $\cnstSimulator$ is indistinguishable from a real transcript.
+
+    \begin{itemize}
+        \item \textit{Phase 1}: Because $\cnstSimulator$ as able to call the TTP already in the first step he is able to receive the protocol outputs.
+        The simulator can then extracts carols secret key $\varSecKeyCarol$ from Carols $\funStar{\varPtSpendableCoinCarol}$ output, which must also be her blinding factor in $\funStarAlt{\varCoinShared}$.
+        He therefore can reconstruct $\varCoinShared$ which must be sent by Bob in this phase, simply by subtracting Carols part from the output which is present in $\funStar{\varPreTx}.\varOutputs$.
+        $\cnstSimulator$ is further able to reconstruct the $\varPreTx$ which must be sent by Bob in this phase simply by removing the values from $\funStar{\varPreTx}$ which get added at a later point in the protocol.
+        The transcript is therefore identical to a real one in this phase.
+        \item \textit{Phase 2}: If $\cnstAdversary$ tries do cheat by sending an invalid value to $\procZKfId{\cnstRelation_2}$ as the verifier he will receive 0 as a response and 1 otherwise, which is identical to the real case.
+        Similarity the execution will halt with $\cnstFalsum$ if $\cnstAdversary$ sends invalid values as $\funStarAlt{\varPreTx}$ and $\funGen{\varSecKeyCarol}$, again identical to a real execution.
+        \item \textit{Phase 3}: $\cnstSimulator$ is able to read the output values for $\varProofBobCarol$ and $\varSigBobCarol$ from $\funStar{\varPreTx}$, he further is able to calculate $\varPubKeyBobCarol$ as he knows $\funGen{\varSecKeyCarol}$ and is further able to reconstruct $\varPubKeyBob$ from $\varCoinShared$.
+        Therefore the simulation again is perfect in this phase.
+    \end{itemize}
+
+    Both in the case the Bob and Carol is corrupted $\cnstSimulator$ is able to produce a transcript indistinguishable from a transcript produced on a real execution we can therefore conclude that the protocol is secure in the $\procZKfId{\cnstRelation_1}$,$\procZKfId{\cnstRelation_2}$,$\procDSignId$,$\procDRProofId$-model and theorem~\ref{teo:atom:sec-drecv} holds.
 \end{proof}
+
+We claim that the security of the protocols $\procDFinTxId$ and $\procDAptFinTxId$ can be reduced to the security of $\procDSignId$ as all interaction between the two parties happens in the call to $\procDSignId$.
+We have already proven the security of $\procDSignId$ in section~\ref{sec:sig:two-party-apt-security} and can reuse the simulator constructed there for the protcols $\procDFinTxId$ and $\procDAptFinTxId$.

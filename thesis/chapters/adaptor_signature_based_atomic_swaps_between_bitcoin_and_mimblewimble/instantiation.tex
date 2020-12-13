@@ -188,9 +188,10 @@ Finally they create the updated pre-transaction $\varPreTx$ which can be sent ba
         \< \< \< \< (\funStar{\varBlindingFactorCarol}, \varNonceCarol) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
         \< \< \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \\
         \< \< \< \< \funStarAlt{\varCoinShared} \opAssign \varCoinShared \opAddPoint \funGen{\varBlindingFactorCarol} \\
-        \< \< \< \< \varPreTx.\varOutputs[] \opAssign \funStarAlt{\varCoinShared} \\
-        \< \sendmessageleftx{4}{\varPreTx, \funGen{\varSecKeyCarol}} \< \\
-        \{\cdots \funStarAlt{\varCoinShared}\} \opFunResult \varPreTx.\varOutputs \< \< \< \< \\
+        \< \< \< \< \funStarAlt{\varPreTx} \opAssign \varPreTx \\
+        \< \< \< \< \funStarAlt{\varPreTx}.\varOutputs[] \opAssign \funStarAlt{\varCoinShared} \\
+        \< \sendmessageleftx{4}{\funStarAlt{\varPreTx}, \funGen{\varSecKeyCarol}} \< \\
+        \{\cdots \funStarAlt{\varCoinShared}\} \opFunResult \funStarAlt{\varPreTx}.\varOutputs \< \< \< \< \\
         \pcif \funStarAlt{\varCoinShared} \opNotEq \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \< \< \< \< \\
         \t \pcreturn \cnstFalsum \< \< \< \< \\
         \varProofBobCarol \opFunResult \procDRProofL{\funStarAlt{\varCoinShared}}{\varFundValue}{\varSecKeyBob} \< \< \< \< \varProofBobCarol \opFunResult \procDRProofL{\funStarAlt{\varCoinShared}}{\varFundValue}{\varSecKeyCarol} \\
@@ -198,8 +199,8 @@ Finally they create the updated pre-transaction $\varPreTx$ which can be sent ba
         (\varSigBobCarol, \varPubKeyBobCarol) \opFunResult \procDSignL{\varMsg}{\varSecKeyBob}{\varNonceBob} \< \< \< \< (\varSigBobCarol, \varPubKeyBobCarol) \opFunResult \procDSignR{\varMsg}{\varSecKeyCarol}{\varNonceCarol} \\
         (\cdot, \cdot, \funStar{\varSigContext}) \opFunResult \varSigBobCarol \< \< \< \< (\cdot, \cdot, \funStar{\varSigContext}) \opFunResult \varSigBobCarol \\
         \funStarAlt{\varSigContext} \opFunResult \procSetupCtx{\varSigContext}{\funStar{\varSigContext}.\varPubKey}{\funStar{\varSigContext}.\varRand} \< \< \< \< \funStarAlt{\varSigContext} \opFunResult \procSetupCtx{\varSigContext}{\funStar{\varSigContext}.\varPubKey}{\funStar{\varSigContext}.\varRand} \\
-        \< \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \funStarAlt{\varCoinShared}}{\varProofs \opConc \varProofBobCarol}{\funStarAlt{\varSigContext}}{\varCommits \opConc \varPubKeyBobCarol}{\varSigBobCarol}{\varTime} \< \\
-        \pcreturn (\varPreTx, \funStar{\varPtSpendableCoinBob}) \< \< \< \< \pcreturn (\varPreTx, \funStar{\varPtSpendableCoinCarol})
+        \< \funStar{\varPreTx} \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \funStarAlt{\varCoinShared}}{\varProofs \opConc \varProofBobCarol}{\funStarAlt{\varSigContext}}{\varCommits \opConc \varPubKeyBobCarol}{\varSigBobCarol}{\varTime} \< \\
+        \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinBob}) \< \< \< \< \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinCarol})
         }
         }
         \caption{Extended Mimblewimble Transaction Scheme - $\procDRecvCoinsId$ \label{fig:ext-mim-tx-recv}}
