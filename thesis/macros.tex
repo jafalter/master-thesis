@@ -104,6 +104,7 @@
 \newcommand{\varPubKey}{\styleVariable{pk}}
 \newcommand{\varPubKeyAlice}{\varPubKey_{\varAlice}}
 \newcommand{\varPubKeyBob}{\varPubKey_{\varBob}}
+\newcommand{\varPubKeyAliceBob}{\varPubKey_{\varAlice\varBob}}
 \newcommand{\varPubKeyBobCarol}{\varPubKey_{\varBob\varCarol}}
 \newcommand{\varPubKeyComp}{\varPubKey_{\styleVariable{C}}}
 \newcommand{\varPubKeyCompApt}{\varPubKey_{\styleVariable{comp\_apt}}}
@@ -386,7 +387,7 @@
 \newcommand{\procDBuildMwTxId}{\styleFunction{dBuildMWTx}}
 \newcommand{\procDBuildMwTx}[3]{\procDBuildMwTxId \langle(#1,#2,#3), (#2)\rangle}
 \newcommand{\procDSharedOutputMwTxId}{\styleFunction{dsharedOutMWTx}}
-\newcommand{\procDSharedOutputMwTx}[3]{\procDSharedOutputMwTxId \langle(#1,#2,#3), (#2) \rangle}
+\newcommand{\procDSharedOutputMwTx}[3]{\procDSharedOutputMwTxId \langle(#1,#2,#3), () \rangle}
 \newcommand{\procDSharedOutputMwTxL}[3]{\procDSharedOutputMwTxId(#1,#2,#3)}
 \newcommand{\procDSharedOutputMwTxR}[1]{\procDSharedOutputMwTxId(#1)}
 \newcommand{\procDSharedInpMwTxId}{\styleFunction{dsharedInpMWTx}}

@@ -205,7 +205,7 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
     \begin{enumerate}
         \item $\cnstSimulator$ computes one (or multiple) input coins as follows:
         \begin{gather*}
-            \varBlindingFactor, \varValue \sample \cnstIntegersPrimeWithoutZero{*} \\
+            \varBlindingFactor, \varValue \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
             \varSpendableCoin \opFunResult \procCreateCoin{\varBlindingFactor}{\varValue}
         \end{gather*}
         He chooses $\varFundValue$ randomly and sets $\varTime \opEqNoQ \cnstFalsum$.
@@ -350,7 +350,7 @@ As for $\cnstRelation_2$ we again allow to call the protocol with an array of in
     \textbf{Carol is corrupt}: Simulator $\cnstSimulator$ works as follows:
     \begin{enumerate}
         \item $\cnstSimulator$ invokes $\cnstAdversary$ and saves $\funArray{\varPtSpendableCoinCarol}$ when the adversary calls $\procZKfId{\cnstRelation_{3*}}$
-        \item The simulator then chooses $\varBlindingFactorAlice, \funStar{\varBlindingFactorAlice}, \varFundValue \sample \cnstIntegersPrimeWithoutZero{*}$ and computes $\varPtSpendableCoinAlice \opAssign {\varCoin \opAssign \varPtSpendableCoinCarol.\varCoin, \varBlindingFactor \opAssign \varBlindingFactorAlice, \varValue \opAssign \varPtSpendableCoinCarol.\varValue}$.
+        \item The simulator then chooses $\varBlindingFactorAlice, \funStar{\varBlindingFactorAlice}, \varFundValue \sample \cnstIntegersPrimeWithoutZero{\varPrime}$ and computes $\varPtSpendableCoinAlice \opAssign {\varCoin \opAssign \varPtSpendableCoinCarol.\varCoin, \varBlindingFactor \opAssign \varBlindingFactorAlice, \varValue \opAssign \varPtSpendableCoinCarol.\varValue}$.
         He then proceeds by building $\varPreTx$ as given by the protocol definition with the choosen values and $\funArray{\varPtSpendableCoinAlice}$ and sends it to $\cnstAdversary$ as if coming from Alice.
         \item When Carol calls $\procZKfId{\cnstRelation_{1,2,3}}$ as the verifier $\cnstSimulator$ checks the passed values for equality and returns either 0 or 1.
         As soon as Carol calls $\procZkpProve{\cnstRelation_{2}}{\varSpendableCoinCarol}$ $\cnstSimulator$ will extract $\varFundValue \funStar{\varSpendableCoinCarol}.\varValue$ and finally calls the TTP with inputs $(\funArray{\varPtSpendableCoinCarol}, \varFundValue)$ to receive $\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinCarol}, (\varSecKeyCarol, \varNonceCarol)$.
@@ -420,7 +420,7 @@ We extend our model by including the $\procDSignId$ protocol for which security 
 \end{theorem}
 
 \begin{proof}
-    As before we proof security by construction a simulator $\cnstSimulator$ with access to a trusted third party (TTP) computing $\procDRecvCoinsId$ in the ideal setting upon receiving inputs from the two parties.
+    As before we proof security by construction of a simulator $\cnstSimulator$ with access to a trusted third party (TTP) computing $\procDRecvCoinsId$ in the ideal model upon receiving inputs from the two parties.
     The simulators task is to extract the inputs of the adversary $\cnstAdversary$, send the inputs to the TTP and construct a protocol transcript indistinguishable from a real one.
     We first look at the case in which Bob is corrupted and then when Carol is corrupted.
 
@@ -516,7 +516,7 @@ We further require a trusted third party computing $\procDRecvCoinsId$, which we
     \opFunResult \procDRecvCoinsL{\varPreTx}{\varFundValue}  \< \< \opFunResult \procDRecvCoinsR \\
     \varTx \opFunResult \procFinTx{\funStarAlt{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \\
     \< \sendmessageright*{\varTx} \\
-    \pcreturn (\varTx, \funStar{\varSpendableCoinAlice}, \funStar{\varPtSpendableCoinAlice}) \< \< \pcreturn (\funStar{\varPtSpendableCoinBob})
+    \pcreturn (\varTx, \funStar{\varSpendableCoinAlice}, \funStar{\varPtSpendableCoinAlice}) \< \< \pcreturn (\varTx, \funStar{\varPtSpendableCoinBob})
     }
 \end{varwidth}
 }
@@ -533,8 +533,8 @@ We further require a trusted third party computing $\procDRecvCoinsId$, which we
     \textbf{Alice is corrupted}: Simulator $\cnstSimulator$ works as follows:
     \begin{enumerate}
         \item $\cnstSimulator$ invokes $\cnstAdversary$ and saves $\funArray{\varSpendableCoin}$, $\varSecKeyAlice$, $\varNonceAlice$ and $\funStar{\varSpendableCoinAlice}$ to its memory.
-        \item $\cnstAdversary$ sends $\varPreTx$ from which $\cnstSimulator$ extracts $\varTime \opAssign \varPreTx \varTime$.
-        He further extracts $\varFundValue \opAssign \sum_{\varI \opAssign 0}^{\varI \opSm n} \varSpendableCoin_i.\varValue \opSub \funStar{\varSpendableCoinAlice}.\varValue$.
+        \item $\cnstAdversary$ sends $\varPreTx$ from which $\cnstSimulator$ extracts $\varTime \opAssign \varPreTx.\varTime$.
+        He further extracts $\varFundValue \opAssign \sum\varSpendableCoin_i.\varValue \opSub \funStar{\varSpendableCoinAlice}.\varValue$.
         $\cnstSimulator$ verifies that the values $\varPreTx.\varInputs$, $\varPreTx.\varOutputs$, $\varPreTx.\varProof$ and $\varPreTx.\varSigContext$ correspond to what he has saved to its memory.
         In case this verification failes he sends $\cnstAbort$ to the TTP and outputs $\cnstFalsum$.
         \item $\cnstSimulator$ sends ($\funArray{\varSpendableCoin}$, $\varFundValue$, $\varTime$) to the TTP and receives ($\varTx$, $\funStar{\varSpendableCoinAlice}$, $\varPtSpendableCoinAlice$).
@@ -559,4 +559,103 @@ We further require a trusted third party computing $\procDRecvCoinsId$, which we
     This is achieved by the calculation we have layed out to construct $\varSigAliceBob$ from $\varTx.\varSignature$ and $\varSigAlice$ (which $\cnstSimulator$ can compute by himself knowing $\varSecKeyAlice$ and $\varNonceAlice$).
     Knowing $\varSigAliceBob$ $\cnstSimulator$ also knows what $\funStarAlt{\varPreTx}$ must be in a real execution, making the transcript identical.
     Also if the adversary cheats (sending an invalid $\varPreTx$) this is noticed by the simulator who then outputs $\cnstFalsum$ which is identical to a real execution.
+
+    \textbf{Bob is corrupted}: Simulator works as follows:
+    \begin{enumerate}
+        \item $\cnstSimulator$ invokes $\cnstAdversary$ and sends $()$ to the TTP to receive the outputs ($\varTx$, $\funStar{\varPtSpendableCoinBob}$)
+        \item $\cnstSimulator$ now has the following challenge: $\cnstAdversary$ first expects the first pre-transaction $\varPreTx$ coming from Alice, which should not have any signature, only one output (Alice change output) and only a partially setup signature context $\varSigContext$.
+        To achieve this $\cnstSimulator$ clones $\varTx$ into $\varPreTx$, removes the last output coin (and proof), and sets the signature field to $\cnstEmptySet$.
+        The simulator can now construct the partially setup signature context as follows:
+        \begin{gather*}
+            \varSecKeyAlice, \varNonceAlice \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \funStarAlt{\varSigContext} \opAssign \{ \varPubKey \opAssign \funGen{\varSecKeyAlice}, \funGen{\varNonceAlice} \}
+        \end{gather*}
+        He then sets $\varPreTx.\varSigContext \opAssign \funStarAlt{\varSigContext}$ and sends $\varPreTx$ to $\cnstAdversary$ as if coming from Alice.
+        \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_{1,2,3}}$ as the verifier $\cnstSimulator$ compares the values with what he sent in step 1 in $\varPreTx$ and returns either 0 or 1.
+        \item Now the next challenge for $\cnstSimulator$ is that $\cnstAdversary$ expects a $\funStarAlt{\varPreTx}$ which is partially signed (i.e. has the partial signature from Alice + Bob shared output), but not yet the signature from Alice.
+        The simulator can construct the updated pre-transaction as follows:
+        $\cnstAdversary$ expects Alice to provide a partial signature under $\funGen{\varSecKeyAlice}$ with nonce commitment $\funGen{\varNonceAlice}$, as this is how $\cnstSimulator$ setup the signature context in step 2.
+        Consequently the partial signature expected in $\funStarAlt{\varPreTx}$ has to be valid under $\varPubKeyAliceBob \opEqNoQ \varPubKey \opAddPoint {\funGen{\varSecKeyAlice}}^{-1}$ with nonce commitment $\varRandAliceBob \opEqNoQ \varRand \opAddPoint {\funGen{\varNonceAlice}}^{-1}$ with $(\varPubKey, \varRand)$ being the final composite values from $\varTx.\varSigContext$.
+        The simulator can construct such a signature like follows:
+        \begin{gather*}
+            \{ \varS, \varRand \} \opFunResult \varTx.\varSignature \\
+            \varSigAlice \opFunResult \procSignPrt{\varTx.\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varTx.\varSigContext} \\
+            \{ \varSAlice, \varRandAlice, \varSigContext \} \opFunResult \varSigAlice \\
+            \varSAliceBob \opAssign \varS \opSub \varSAlice \\
+            \varSigAliceBob \opAssign \{ \varSAliceBob, \varRand \opAddPoint \varRandAlice^{-1}, \varSigContext \}
+        \end{gather*}
+        Now $\cnstSimulator$ constructs $\funStarAlt{\varPreTx}$ simply by cloning $\varTx$ and replacing $\funStarAlt{\varPreTx}.\varSignature$ with $\varSigAliceBob$.
+        Knowing $\funStar{\varPtSpendableCoinBob}$ from the TTP output the simulator now simply sends ($\funStarAlt{\varPreTx}$, $\funStar{\varPtSpendableCoinBob}$) as output when $\cnstAdversary$ calls $\procDRecvCoinsId$.
+        \item Finally $\cnstSimulator$ sends $\varTx$ as if coming from Alice and outputs whatever $\cnstAdversary$ outputs.
+    \end{enumerate}
+
+    We can easily claim that $\varTx$ sent by $\cnstSimulator$ in the last step is identical to the value from a real execution.
+    Also when $\cnstAdversary$ tries to cheat by sending invalid values to $\procZKfId{\cnstRelation_{1,2,3}}$ will he receive 0, as would be the case in a real execution.
+    Therefore the only thing that remains to show is that $\varPreTx$ and $\funStarAlt{\varPreTx}$ are indistinguishable from values exchanged in a real transcript.
+    We note that $\varSecKeyAlice$ and $\varNonceAlice$ are uniformly distributed values in $\cnstIntegersPrimeWithoutZero{\varPrime}$.
+    Consequently $\funGen{\varSecKeyAlice}$ and $\funGen{\varNonceAlice}$ are uniformly distributed in $\cnstGroup$.
+    It is trivial to see that this must also hold for the values sampled by the simulator.
+    Therefore the signature context constructed in step 2 for $\varPreTx$ must be indistinguishable from a real one, which also means that the $\varPreTx$ is indistinguishable.
+    For $\funStarAlt{\varPreTx}$ to be indistinguishable it must hold that it completes into $\varSignature$ from the final transaction by adding the partial signature under $\varPubKeyAlice$ with nonce commitment $\varRandAlice$.
+    It is easy to see that by the construction of $\varSigAliceBob$ in step 4 this must hold and therefore $\funStarAlt{\varPreTx}$ is indeed indistinguishable from a $\funStarAlt{\varPreTx}$ which would be sent in a real execution.
+
+    We have shown that the simulator $\cnstSimulator$ is able to produce an indistinguishable transcrip both in the case that Alice and that Bob is corrupted and can thereby conclude that $\procDSharedOutputMwTxId$ is secure in the $\procZKfId{\cnstRelation_1}$,$\procZKfId{\cnstRelation_2}$,$\procZKfId{\cnstRelation_3}$,$\procDRecvCoinsId$-model and consequently theorem~\ref{teo:atom:sec-sharedout-tx} holds.
+\end{proof}
+
+Next we proof security for $\procDSharedInpMwTxId$.
+
+\textbf{Hybrid functionalities}: For this proof is enough to give the parties access to a trusted third party computing the $\procDSendCoinsId$ and the $\procDFinTxId$ protocol.
+Further calls to a zero-knowledge proof of knowledge functionality are not needed.
+This means that do not have to extend to original protocol instantiation.
+
+\begin{theorem} \label{teo:atom:sec-dshared-inp}
+    Let $\varCommitScheme$ be a correct and secure pedersen commitment scheme, $\varProofSystem$ a correct and secure range proof system and $\varSigSchemeMP$ be a secure and correct two-party signature scheme, then $\procDRecvCoinsId$ securely computes a mimewimble transaction spending an input coin $\varCoinShared$ shared between Alice and Bob in the hybrid $\procDSendCoinsId,\procDFinTxId$-model
+\end{theorem}
+
+\begin{proof}
+    We proof security by construction of simulator $\cnstSimulator$ with access to a trusted third party (TTP) computing $\procDSharedInpMwTxId$ in the ideal model upon receiving inputs from the two parties.
+    The simulators taks is to extract the adversaries inputs, send them to the TTp and construct a protocol transcript indistinguishable from a real one.
+    We again look separately at the case in in which Alice, and in which Bob is corrupted.
+
+    \textbf{Alice is corrupted}: Simulator $\cnstSimulator$ works as follows:
+    \begin{enumerate}
+        \item $\cnstSimulator$ invokes $\cnstAdversary$ and saves $\funArray{\varPtSpendableCoinAlice}$, $\varFundValue$ and $\varTime$ when $\cnstAdversary$ calls $\procDSendCoinsId$.
+        \item $\cnstSimulator$ externally sends the inputs ($\funArray{\varPtSpendableCoinAlice}$, $\varFundValue$, $\varTime$) to the TTP and receives ($\varTx$, $\funStar{\varSpendableCoinAlice}$).
+        He further calculates $\varPreTx$ by cloning $\varTx$ and removing the last output coin (and proof) from $\varPreTx$ and setting $\varPreTx.\varSignature \opAssign \cnstEmptySet$.
+        As in the previous proof we need to replace $\varPreTx.\varSigContext$ with a partially setup $\funStarAlt{\varSigContext}$.
+        The simulator can achieve this by choosing ($\varSecKeyAlice$, ${\varSecKeyBob}_2$), ($\varNonceAlice$, ${\varNonceBob}_2$) such that:
+        \begin{gather*}
+        {\varPubKeyBob}_1 \opEqNoQ \varTx.\varSigContext.\varPubKey \opAddPoint {\funGen{\varSecKeyAlice + {\varSecKeyBob}_2}}^{-1} \\
+        {\varRandBob}_1 \opEqNoQ \varTx.\varSigContext.\varRand \opAddPoint {\funGen{\varNonceAlice + {\varNonceBob}_2}}^{-1}
+        \end{gather*}
+        and then setting
+        \[ \funStarAlt{\varSigContext} \opAssign \{ \varPubKey \opAssign \funGen{\varSecKeyAlice} \opAddPoint {\varPubKeyBob}_1, \varRand \opAssign \funGen{\varNonceAlice} \opAddPoint {\varRandBob}_1 \} \]
+        \item Now finally $\cnstSimulator$ returns the outputs ($\varPreTx$, $\funStar{\varSpendableCoinAlice}$, ($\varSecKeyAlice$, $\varNonceAlice$)) to $\cnstAdversary$ (calling $\procDSendCoinsId$).
+        \item The simulator now needs to construct a partially signed $\funStarAlt{\varPreTx}$, that is the partial signature must be valid under $\funGen{{\varSecKeyBob}_2}$ and nonce commitment $\funGen{\varNonceBob_2}$ and complete into $\varTx.\varSignature$ by adding the second partial signature valid under the combination of the remaing two keys.
+        $\cnstSimulator$ can achieve this by running $\varSigBob \opFunResult \procSignPrt{\varTx.\varMsg}{\varSecKeyBob}{\varNonceBob}{\varTx.\varSigContext}$.
+        He then clones $\varTx$ into $\funStarAlt{\varPreTx}$ and sets $\funStarAlt{\varPreTx}.\varSignature \opAssign \varSigBob$.
+        Eventually $\cnstSimulator$ sends $\funStarAlt{\varPreTx}$ as if coming from Bob.
+        \item When $\cnstAdversary$ calls $\procDFinTxId$ $\cnstSimulator$ checks if the $\funStar{\varSecKeyAlice}, \funStar{\varNonceAlice}$ passed as input parameters matches with $\varSecKeyAlice, \varNonceAlice$ that he returned in step 3 and returns $\varTx$ as well as sending $\cnstContinue$ to the TTP.
+        If they don't match he sends $\cnstAbort$ to the TTP and outputs $\cnstFalsum$.
+    \end{enumerate}
+
+    The argument that the transcript produced by $\cnstSimulator$ is indistinguishable from a real one in the case that Alice is corrupted can be made as follows:
+    If $\cnstAdversary$ tries to cheat and send invalid values to $\procDFinTxId$ the simulation will halt with $\cnstSimulator$ outputting $\cnstFalsum$, which is identical to what would happen in a real execution.
+    The argument why $\varPreTx$ and $\funStarAlt{\varPreTx}$ are indistinguishable from real ones is similar to the argument we have already made in the last proof.
+    $\varSecKeyAlice, {\varSecKeyBob}_2$ (as well as the nonce values) are uniformly distributed in $\cnstIntegersPrimeWithoutZero{\varPrime}$, which is the same during a real execution and therefore does not give $\cnstAdversary$ any chance to know that he is in a simulation.
+    Furthermore by the way $\varSecKeyAlice$ and $\varPubKeyBob_1$ are constructed, the signature valid under $\funGen{\varSecKeyBob}_2$ must complete to $\varTx.\varSignature$ when the second part is added, which also makes $\funStarAlt{\varPreTx}$ indistinguishable from a real one.
+
+    \textbf{Bob is corrupted}: Simulator $\cnstSimulator$ works as follows:
+    \begin{enumerate}
+        \item $\cnstSimulator$ invokes $\cnstAdversary$ and save $\funArray{\varPtSpendableCoinBob}$, $\varFundValue$ and $\varTime$ upon $\cnstAdversary$ calling $\procDSendCoinsId$.
+        \item The simulator externally sends the inputs ($\funArray{\varPtSpendableCoinBob}$, $\varFundValue$, $\varTime$) to the TTP and receives the outputs ($\varTx$, $\funStar{\varSpendableCoinBob}$).
+        Similar to the case that Alice was corrupted $\cnstSimulator$ chooses values ${\varSecKeyBob}_1, {\varNonceBob}_1$ as follows
+        \begin{gather}
+            \varPubKeyBob_2 \opEqNoQ \varTx.\varSigContext.\varPubKey \opAddPoint {\funGen{\varSecKeyAlice, {\varSecKeyBob}_1}}^{-1} \\
+            \varRandBob_2 \opEqNoQ \varTx.\varSigContext.\varRand \opAddPoint {\funGen{\varNonceAlice, {\varNonceBob}}_1}^{-1}
+        \end{gather}
+        He then constructs $\varPreTx$ by cloning $\varTx$ removing the last output coin and proof, setting the signature field to $\cnstEmptySet$ and replacing the signature context with \[ \funStarAlt{\varSigContext} \opAssign \{ \varPubKey \opAssign \funGen{\varSecKeyAlice \opAddScalar {\varSecKeyBob}_1}, \varRand \opAssign \funGen{\varNonceAlice \opAddScalar {\varNonceBob}_1} \} \]
+        Finally he returns ($\varPreTx$, ($\varSecKeyBob, \varNonceBob$)) to $\cnstAdversary$ (calling $\procDRecvCoinsId$).
+        \item $\cnstAdversary$ now sends $\funStarAlt{\varPreTx}$ which $\cnstSimulator$
+    \end{enumerate}
 \end{proof}
