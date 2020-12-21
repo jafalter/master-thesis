@@ -36,13 +36,13 @@ We construct the following theorem:
     From the instantiation of $\procSendCoinsId$ we can see that Alice's share will be $\varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \cnstSumZeroToN \funArray{\varBlindingFactorAlice}$, where $\funStar{\varBlindingFactorAlice}$ is the blinding factor to her output and $\funArray{\varBlindingFactorAlice}$ are the blinding factors to her input coins.
     Bobs secret key is constructed like $\varSecKeyBob \opAssign \funStar{\varBlindingFactorBob}$, so it corresponds to the blinding factor of his output.
     From the construction of the two-party signature scheme in~\ref{def:sig:two-party-sig} we know that therefore the final signature will be valid under the following public key:
-    \[ \funStar{\varPubKey} \opAssign \funGen{\varSecKeyAlice} \opAddPoint \funGen{\varSecKeyBob} \]
+    \[ \funStarAlt{\varExcess} \opAssign \funGen{\varSecKeyAlice} \opAddPoint \funGen{\varSecKeyBob} \]
     Given how the secret keys are constructed we arrive at:
-    \[ \funStar{\varPubKey} \opAssign \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \cnstSumZeroToN \funArray{\funGen{- \varBlindingFactorAlice}} \opAddPoint \funGen{\varBlindingFactorBob} \]
-    If we can show that the public key $\varPubKey$ computed in $\procVerfTxId$ is the same as above, $\procVerf{\varMsg}{\varSignature}{\varPubKey} \opEqNoQ 1$ must hold and therefore condition 3 would be proven.
-    We show this by a stepwise conversion of the initial equation computing $\varPubKey$ until we arrive at the equation for $\funStar{\varPubKey}$:
+    \[ \funStarAlt{\varExcess} \opAssign \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \cnstSumZeroToN \funArray{\funGen{- \varBlindingFactorAlice}} \opAddPoint \funGen{\varBlindingFactorBob} \]
+    If we can show that the excess value $\varExcess$ computed in $\procVerfTxId$ is the same as above, $\procVerf{\varMsg}{\varSignature}{\varPubKey} \opEqNoQ 1$ must hold and therefore condition 3 would be proven.
+    We show this by a stepwise conversion of the initial equation computing $\varExcess$ until we arrive at the equation for $\funStarAlt{\varExcess}$:
     \begin{gather}
-        \varPubKey \opEqNoQ \funStar{\varPubKey} \\
+        \varExcess \opEqNoQ \funStarAlt{\varExcess} \\
         \cnstSumZeroToN \varOutputs \opSub \cnstSumZeroToN \varInputs \opEqNoQ \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \cnstSumZeroToN \funArray{\funGen{- \varBlindingFactorAlice}} \opAddPoint \funGen{\varBlindingFactorBob} \\
         \varCoinOutAlice \opAddPoint \varCoinOutBob \opAddPoint \cnstSumZeroToN \funArray{(\varCoinInp)^{-1}}  \opEqNoQ\\
         (\funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \funGenH{\varValue \opSub \varFundValue}) \opAddPoint
@@ -53,8 +53,8 @@ We construct the following theorem:
     \end{gather}
     From step 5.3 to 5.4 we replace every coin $\varCoin$ by its instantiation for a pedersen commitment $\varCoin \opEqNoQ \funGen{\varValue} \opAddPoint \funGenH{\varValue}$.
 
-    From step 5.4 to 5.4 we rely on the fact that if Alice is honest $\varValue \opEqNoQ \cnstSumZeroToN \varValue_i$, therefore also $(\varValue \opSub \varFundValue) \opAddScalar\varFundValue \opEqNoQ \cnstSumZeroToN \varValue_i$ must hold.
-    From that we can infer that $\funGenH{\varValue \opSub \varFundValue} \opAddPoint \funGenH{\varFundValue} \opAddPoint \cnstSumZeroToN \funGenH{- \varValue_i}$ must cancel out, otherwise the transaction would either create or burn value, which is not allowed and in which case $\procVerfTxId$ should again return 0.
+    From step 5.4 to 5.4 we rely on the fact that if Alice is honest $\varValue \opEqNoQ \sum \varValue_i$, therefore also $(\varValue \opSub \varFundValue) \opAddScalar\varFundValue \opEqNoQ \sum \varValue_i$ must hold.
+    From that we can infer that $\funGenH{\varValue \opSub \varFundValue} \opAddPoint \funGenH{\varFundValue} \opAddPoint \sum \funGenH{- \varValue_i}$ must cancel out, otherwise the transaction would either create or burn value, which is not allowed and in which case $\procVerfTxId$ should again return 0.
 
     We have managed to show that condition 1-4 must hold for a valid transaction and can conclude that \emph{Transaction Scheme Correctness} holds for $\varMWSchemeParams{\varCommitScheme}{\varProofSystem}{\varSigSchemeMP}$.
 
@@ -76,7 +76,7 @@ We construct the following theorem:
     We can split $\varSecKeyAlice$ into arbitrarily chosen shares $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ with $\varSecKeyAlice \opEqNoQ (\varSecKeyAlice)_1 + (\varSecKeyAlice)_2$.
     By the definition of Two-Party Signatures~\ref{def:sig:two-party-sig} the combined signature from $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ will be valid under $\funGen{\varSecKeyAlice}$.
     Thereby we can treat $\varSecKeyAlice$ and $\varSecKeyCarol$ from $\procSendCoinsId$ as arbitrary shares of a combined $\varSecKeyAliceCarol$.
-    It follows from the addtive homomorphic property of the elliptic curve that a signature valid under $\funGen{\varSecKeyAliceCarol}$ must also be valid under $\funGen{\varSecKeyAlice} \opAddPoint \funGen{\varSecKeyCarol}$.
+    It follows from the additive homomorphic property of the elliptic curve that a signature valid under $\funGen{\varSecKeyAliceCarol}$ must also be valid under $\funGen{\varSecKeyAlice} \opAddPoint \funGen{\varSecKeyCarol}$.
     The case of two receivers calling $\procDRecvCoinsId$ is symmetric.
     From this we can conclude that condition 4 must also hold for the \emph{Extended Transaction Scheme}. \\
     Now for the \emph{Adapted Extended Transaction Scheme} the same argument holds.
@@ -89,7 +89,7 @@ We construct the following theorem:
 \subsection{Security}\label{subsec:atom:security}
 
 We now want to prove security in the malicious setting as defined in~\ref{subsec:pre:security} for the protocols defined in~\ref{sec:atom:protocols}.
-Again we show that the distributed protocols are secure in the hybrid $\procZKfId{\cnstRelation}$-model as already explained in~\ref{subsec:sig:secureaptscheme}.
+Again we show that the distributed protocols are secure in the hybrid $\procZKfId{\cnstRelation}$-model as already explained in section~\ref{subsec:sig:secureaptscheme}.
 We start by proving security of the simple transaction protocol $\procDBuildMwTxId$.
 
 \textbf{Hybrid functionalities}: The parties have access to a trusted third party computing the zero-knowledge proof of knowledge functionalities $\procZKfId{\cnstRelation_1}$, $\procZKfId{\cnstRelation_2}$ and $\procZKfId{\cnstRelation_2*}$.
@@ -99,7 +99,7 @@ We shorten the call by the prover to just provide $\varSpendableCoin$ because it
 $\cnstRelation_2*$ is the same as $\cnstRelation_2$ just for a list of secrets inputs $\funArray{(\varBlindingFactor, \varValue)}$ and its list of commitments $\funArray{\varCommitment}$.
 Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnstRelation_2*}{\funArray{\varSpendableCoin}}$.
 
-\textbf{Proof Idea}: We extend the protocol $\procDBuildMwTxId$ instantiated in section~\ref{sec:atom:protocols} with the following calls to the zero-knowledge proof of knowledge functionalities as depicted in~\ref{fig:atom:hybrid-dbuild}.
+\textbf{Proof Idea}: We extend the protocol $\procDBuildMwTxId$ instantiated in section~\ref{sec:atom:protocols} with the following calls to the zero-knowledge proof of knowledge functionalities as depicted in figure~\ref{fig:atom:hybrid-dbuild}.
 
 \begin{figure}
     \fbox{
@@ -136,7 +136,7 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
 
 \begin{theorem}
     \label{theo:atom:sec-tx}
-    Let $\varCommitScheme$ be a correct and secure pedersen commitment scheme, $\varProofSystem$ be a correct and secure rangeproof system and $\varSigSchemeMP$ be a secure and correct two-party signature scheme, then $\procDBuildMwTxId$ securly computes a Mimblewimble transaction transfering the value $\varFundValue$ from a sender (denoted as Alice) to a receiver (denoted as Bob) in the hybrid $\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}$-model.
+    Let $\varCommitScheme$ be a correct and secure pedersen commitment scheme, $\varProofSystem$ be a correct and secure rangeproof system and $\varSigSchemeMP$ be a secure and correct two-party signature scheme, then $\procDBuildMwTxId$ securely computes a Mimblewimble transaction transferring the value $\varFundValue$ from a sender (denoted as Alice) to a receiver (denoted as Bob) in the hybrid $\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}$-model.
 \end{theorem}
 
 \begin{proof}
@@ -356,16 +356,16 @@ As for $\cnstRelation_2$ we again allow to call the protocol with an array of in
     \textbf{Carol is corrupt}: Simulator $\cnstSimulator$ works as follows:
     \begin{enumerate}
         \item $\cnstSimulator$ invokes $\cnstAdversary$ and saves $\funArray{\varPtSpendableCoinCarol}$ when the adversary calls $\procZKfId{\cnstRelation_{3*}}$
-        \item The simulator then chooses $\varBlindingFactorAlice, \funStar{\varBlindingFactorAlice}, \varFundValue \sample \cnstIntegersPrimeWithoutZero{\varPrime}$ and computes $\varPtSpendableCoinAlice \opAssign {\varCoin \opAssign \varPtSpendableCoinCarol.\varCoin, \varBlindingFactor \opAssign \varBlindingFactorAlice, \varValue \opAssign \varPtSpendableCoinCarol.\varValue}$.
-        He then proceeds by building $\varPreTx$ as given by the protocol definition with the choosen values and $\funArray{\varPtSpendableCoinAlice}$ and sends it to $\cnstAdversary$ as if coming from Alice.
+        \item The simulator then chooses $\varBlindingFactorAlice, \funStar{\varBlindingFactorAlice}, \varFundValue \sample \cnstIntegersPrimeWithoutZero{\varPrime}$ and sets \\ $\varPtSpendableCoinAlice \opAssign \{ \varCoin \opAssign \varPtSpendableCoinCarol.\varCoin, \varBlindingFactor \opAssign \varBlindingFactorAlice, \varValue \opAssign \varPtSpendableCoinCarol.\varValue \}$.
+        He then proceeds by building $\varPreTx$ as given by the protocol definition with the chosen values and $\funArray{\varPtSpendableCoinAlice}$ and sends it to $\cnstAdversary$ as if coming from Alice.
         \item When Carol calls $\procZKfId{\cnstRelation_{1,2,3}}$ as the verifier $\cnstSimulator$ checks the passed values for equality and returns either 0 or 1.
-        As soon as Carol calls $\procZkpProve{\cnstRelation_{2}}{\varSpendableCoinCarol}$ $\cnstSimulator$ will extract $\varFundValue \funStar{\varSpendableCoinCarol}.\varValue$ and finally calls the TTP with inputs $(\funArray{\varPtSpendableCoinCarol}, \varFundValue)$ to receive $\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinCarol}, (\varSecKeyCarol, \varNonceCarol)$.
+        As soon as Carol calls $\procZkf{\cnstRelation_{2}}{\varSpendableCoinCarol}$ $\cnstSimulator$ will extract $\varFundValue \funStar{\varSpendableCoinCarol}.\varValue$ and finally call the TTP with inputs $(\funArray{\varPtSpendableCoinCarol}, \varFundValue)$ to receive $\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinCarol}, (\varSecKeyCarol, \varNonceCarol)$.
         \item Now the simulator rewinds to step 1 and constructs the actual $\varPreTx$ from $\funStarAlt{\varPreTx}$ as follows:
         \begin{gather*}
             \{ \varMsg, \varInputs, \varOutputs, \varProofs, \varSigContext, \varCommits, \cnstEmptySet, \varTime \} \opFunResult \funStarAlt{\varPreTx} \\
             \varPubKeyAlice \opAssign \funStarAlt{\varPreTx}.\varSigContext.\varPubKey \opAddPoint {\funGen{\varSecKeyCarol}}^{-1} \\
             \varRandAlice \opAssign \funStarAlt{\varPreTx}.\varSigContext.\varRand \opAddPoint {\funGen{\varNonceCarol}}^{-1} \\
-            \funStar{\varSigContext} \opAssign \{ \varPubKey \opAssign \varPubKeyAlice, \varRand \opAssign \varRandAlice \}
+            \funStar{\varSigContext} \opAssign \{ \varPubKey \opAssign \varPubKeyAlice, \varRand \opAssign \varRandAlice \} \\
             \varPreTx \opAssign \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs[0]}{\varProofs[0]}{\funStar{\varSigContext}}{\varCommits[0]}{\cnstEmptySet}{\varTime}
         \end{gather*}
         he then sends again $\varPreTx$ Carol and continues as before
@@ -636,8 +636,8 @@ This means that we do not have to extend to original protocol instantiation any 
             \end{gather*}
             \item $\cnstSimulator$ now has the correct values for the signatures A and B1 and can therefore recompute the correct value for the partial signature B2 from $\varTx.\varSignature$ with the same calculation as shown in the previous step
         \end{enumerate}
-        \item $\cnstSimulator$ is now able to construct $\funStarAlt{\funStarAlt{\varPreTx}}$ by again cloning $\varTx$ and setting $\funStarAlt{\funStarAlt{\varPreTx}}.\varSignature \opAssign {\varSigBob}_2$.
-        The simulator will rewind the call to the TTP computing $\procDFinTxId$ and send $\funStarAlt{\funStarAlt{\varPreTx}}$ to $\cnstAdversary$ as if coming from Bob.
+        \item $\cnstSimulator$ is now able to construct $\funStarAltDouble{\varPreTx}$ by again cloning $\varTx$ and setting $\funStarAltDouble{\varPreTx}.\varSignature \opAssign {\varSigBob}_2$.
+        The simulator will rewind the call to the TTP computing $\procDFinTxId$ and send $\funStarAltDouble{\varPreTx}$ to $\cnstAdversary$ as if coming from Bob.
         \item When $\cnstAdversary$ calls $\procDFinTxId$ $\cnstSimulator$ will forward the inputs to the TTP party computing $\procDFinTxId$, return the TTP outputs back to $\cnstAdversary$ and finally output whatever $\cnstAdversary$ outputs.
     \end{enumerate}
 

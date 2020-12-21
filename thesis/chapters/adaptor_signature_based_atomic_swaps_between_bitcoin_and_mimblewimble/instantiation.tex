@@ -1,7 +1,7 @@
 \urldef\urlgrinexplained\url{https://medium.com/@brandonarvanaghi/grin-transactions-explained-step-by-step-fdceb905a853}
 
 In this section we will provide an instantiation of the transaction scheme definitions found in~\ref{def:atom:mw-tx-scheme},~\ref{def:atom:ext-mw-tx-scheme} and~\ref{def:atom:apt-ext-mw-tx-scheme}.
-The instantiations can be implemented in a Cryptocurrency based on the Mimblewimble protocol such as Beam and Grin.
+The instantiations can be implemented in a cryptocurrency based on the mimblewimble protocol such as Beam and Grin.
 
 \subsection{Mimblewimble Transaction Scheme}
 
@@ -9,7 +9,7 @@ First we provide an instantiation of the simplest form of a transaction in which
 For the execution of the protocol we assume to have access to a homomorphic commitment scheme such as Pedersen Commitment $\varCommitScheme$ as defined in definition~\ref{def:pre:pedersen}.
 Furthermore we require a Rangeproof system $\varProofSystem$ as defined in~\ref{sec:pre:rangeproof} and a two-party signature scheme $\varSigSchemeMP$ as defined in~\ref{def:sig:two-party-sig}.
 
-The make the pseudocode for the transaction protocol easier to read we first introduce two auxiliary functions $\procCreateCoinId$
+To make the pseudocode for the transaction protocol easier to read we first introduce two auxiliary functions $\procCreateCoinId$
 and $\procCreatePreTxId$.
 The coin creation function will take as input a value $\varValue$ and a blinding factor $\varBlindingFactor$. It will create and output a new spendable coin $\varSpendableCoin$ already containing a range proof $\varProof$ attesting to the statement that the coins value $\varValue$ is within the valid range as defined for the blockchain.
 The transaction creation algorithm $\procCreatePreTxId$ takes as input a message $\varMsg$, a list of input coins $\funArray{\varCoinInp}$, a list of output coins $\funArray{\varCoinOut}$, a list of rangeproofs $\funArray{\varProof}$, a signature context $\varSigContext$, a list of commitments $\varCommitment$, a signature $\varSignature$, and a lock time $\varTime$ and will collect the input data into a transaction object.
@@ -165,7 +165,7 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
 Figure~\ref{fig:ext-mim-tx-recv} shows an instantiation of the $\procRecvCoinsId$ function of the Extended Mimblewimble Transaction Scheme.
 Calling this protocol two receivers Bob and Carol want to create a receiving shared coin $\varCoinShared$ with value $\varFundValue$ and key shares $(\varBlindingFactorAlice, \varBlindingFactorCarol)$.
 The protocol starts by both receivers verifing the senders output(s).
-Bob starts by creating a coin with fund value $\varFundValue$ and his share of the newly create blinding factor and sends it over to Carol.
+Bob starts by creating a coin with fund value $\varFundValue$ and his share of the newly created blinding factor and sends it over to Carol.
 Carol finalizes the shared coin by adding a commitment to her blinding factor to the coin and sends it back, together with the commitment.
 Bob verifies validity of the updated shared coin after which the two parties engage in two two-party protocols to create their partial signature and coin rangeproof.
 Finally they create the updated pre-transaction $\varPreTx$ which can be sent back to the transaction sender.
@@ -258,7 +258,7 @@ The procedure then returns the pre-transaction $\varPreTx$ containing Bobs adapt
 In figure~\ref{fig:inst-apt-mw-tx-fin} we show the updated distributed version of the transaction finalization protocol.
 Again Alice verifies the pre-transaction $\varPreTx$ received by Bob and then cooperates with Bob in the $\procDSignId$ protocol to build the partial signature for their shared coin.
 Note that at this point Alice is not able to finalize the signature (and consequently the transaction) as she only knows Bobs adapted partial signature ($\varSigAptBob$), but not the original one ($\varSigBob$), which is needed for the $\procFinSigId$ function.
-Therefore, Bob completes the transaction and outputs it, while Alice outputs $\varSigAliceBob$ with which see can then retreive $\varX$.
+Therefore, Bob completes the transaction and outputs it, while Alice outputs $\varSigAliceBob$ with which see can then retrieve $\varX$.
 
 \begin{figure}
     \fbox{
