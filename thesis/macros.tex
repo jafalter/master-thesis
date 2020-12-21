@@ -58,6 +58,7 @@
 \newcommand{\funList}[1]{\{#1\}}
 \newcommand{\funStar}[1]{#1^*}
 \newcommand{\funStarAlt}[1]{{#1}'}
+\newcommand{\funStarAltDouble}[1]{{#1}'}
 \newcommand{\funHat}[1]{\hat{#1}}
 \newcommand{\funTilde}[1]{\tilde{#1}}
 \newcommand{\funNegl}[1]{\styleFunction{negl}(#1)}
@@ -104,6 +105,7 @@
 \newcommand{\varPubKey}{\styleVariable{pk}}
 \newcommand{\varPubKeyAlice}{\varPubKey_{\varAlice}}
 \newcommand{\varPubKeyBob}{\varPubKey_{\varBob}}
+\newcommand{\varPubKeyAliceBob}{\varPubKey_{\varAlice\varBob}}
 \newcommand{\varPubKeyBobCarol}{\varPubKey_{\varBob\varCarol}}
 \newcommand{\varPubKeyComp}{\varPubKey_{\styleVariable{C}}}
 \newcommand{\varPubKeyCompApt}{\varPubKey_{\styleVariable{comp\_apt}}}
@@ -179,6 +181,7 @@
 \newcommand{\varSStar}{\funStar{\varS}}
 \newcommand{\varSAlice}{\styleVariable{s}_\varAlice}
 \newcommand{\varSBob}{\styleVariable{s}_\varBob}
+\newcommand{\varSAliceBob}{\varS_{\varAlice\varBob}}
 \newcommand{\varSBobCarol}{\styleVariable{s}_{\varBob\varCarol}}
 \newcommand{\varKey}{\styleVariable{x}}
 \newcommand{\varKeyVerf}{\varKey_{\styleVariable{p1}}}
@@ -187,6 +190,7 @@
 \newcommand{\varRand}{\styleVariable{R}}
 \newcommand{\varRandAlice}{\varRand_{\varAlice}}
 \newcommand{\varRandBob}{\varRand_{\varBob}}
+\newcommand{\varRandAliceBob}{\varRand_{\varAlice\varBob}}
 \newcommand{\varRandAdv}{\varRand_{\cnstAdversary}}
 \newcommand{\varSigPt}{\funTilde{\varSignature}}
 \newcommand{\varSigContext}{\Lambda}
@@ -384,7 +388,7 @@
 \newcommand{\procDBuildMwTxId}{\styleFunction{dBuildMWTx}}
 \newcommand{\procDBuildMwTx}[3]{\procDBuildMwTxId \langle(#1,#2,#3), (#2)\rangle}
 \newcommand{\procDSharedOutputMwTxId}{\styleFunction{dsharedOutMWTx}}
-\newcommand{\procDSharedOutputMwTx}[3]{\procDSharedOutputMwTxId \langle(#1,#2,#3), (#2) \rangle}
+\newcommand{\procDSharedOutputMwTx}[3]{\procDSharedOutputMwTxId \langle(#1,#2,#3), () \rangle}
 \newcommand{\procDSharedOutputMwTxL}[3]{\procDSharedOutputMwTxId(#1,#2,#3)}
 \newcommand{\procDSharedOutputMwTxR}[1]{\procDSharedOutputMwTxId(#1)}
 \newcommand{\procDSharedInpMwTxId}{\styleFunction{dsharedInpMWTx}}
@@ -419,9 +423,9 @@
 \newcommand{\procDSendCoinsL}[3]{\procDSendCoinsId (#1,#2,#3)}
 \newcommand{\procDSendCoinsR}[3]{\procDSendCoinsId (#1,#2,#3)}
 \newcommand{\procDRecvCoinsId}{\styleFunction{dRecvCoins}}
-\newcommand{\procDRecvCoins}[2]{\procDRecvCoinsId \langle(#1,#2), (#1,#2) \rangle}
+\newcommand{\procDRecvCoins}[2]{\procDRecvCoinsId \langle(#1,#2), () \rangle}
 \newcommand{\procDRecvCoinsL}[2]{\procDRecvCoinsId(#1,#2)}
-\newcommand{\procDRecvCoinsR}[2]{\procDRecvCoinsId(#1,#2)}
+\newcommand{\procDRecvCoinsR}{\procDRecvCoinsId()}
 \newcommand{\procDFinTxId}{\styleFunction{dFinTx}}
 \newcommand{\procDFinTx}[5]{\procDFinTxId \langle(#1,#2,#3),(#1,#4,#5)\rangle}
 \newcommand{\procDFinTxL}[3]{\procDFinTxId (#1,#2,#3)}

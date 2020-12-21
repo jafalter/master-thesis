@@ -1,7 +1,7 @@
 \urldef\urlgrinexplained\url{https://medium.com/@brandonarvanaghi/grin-transactions-explained-step-by-step-fdceb905a853}
 
 In this section we will provide an instantiation of the transaction scheme definitions found in~\ref{def:atom:mw-tx-scheme},~\ref{def:atom:ext-mw-tx-scheme} and~\ref{def:atom:apt-ext-mw-tx-scheme}.
-The instantiations can be implemented in a Cryptocurrency based on the Mimblewimble protocol such as Beam and Grin.
+The instantiations can be implemented in a cryptocurrency based on the mimblewimble protocol such as Beam and Grin.
 
 \subsection{Mimblewimble Transaction Scheme}
 
@@ -9,7 +9,7 @@ First we provide an instantiation of the simplest form of a transaction in which
 For the execution of the protocol we assume to have access to a homomorphic commitment scheme such as Pedersen Commitment $\varCommitScheme$ as defined in definition~\ref{def:pre:pedersen}.
 Furthermore we require a Rangeproof system $\varProofSystem$ as defined in~\ref{sec:pre:rangeproof} and a two-party signature scheme $\varSigSchemeMP$ as defined in~\ref{def:sig:two-party-sig}.
 
-The make the pseudocode for the transaction protocol easier to read we first introduce two auxiliary functions $\procCreateCoinId$
+To make the pseudocode for the transaction protocol easier to read we first introduce two auxiliary functions $\procCreateCoinId$
 and $\procCreatePreTxId$.
 The coin creation function will take as input a value $\varValue$ and a blinding factor $\varBlindingFactor$. It will create and output a new spendable coin $\varSpendableCoin$ already containing a range proof $\varProof$ attesting to the statement that the coins value $\varValue$ is within the valid range as defined for the blockchain.
 The transaction creation algorithm $\procCreatePreTxId$ takes as input a message $\varMsg$, a list of input coins $\funArray{\varCoinInp}$, a list of output coins $\funArray{\varCoinOut}$, a list of rangeproofs $\funArray{\varProof}$, a signature context $\varSigContext$, a list of commitments $\varCommitment$, a signature $\varSignature$, and a lock time $\varTime$ and will collect the input data into a transaction object.
@@ -138,7 +138,7 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
         \t \pcreturn \cnstFalsum \< \< \pcreturn \cnstFalsum \\
         \varMsg \opAssign \cnstBinary{*} \\
         (\funStar{\varBlindingFactorAlice}, \varNonceAlice) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< (\funStar{\varBlindingFactorCarol}, \varNonceCarol) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-        \varSpendableCoinAlice \opFunResult \procCreateCoin{\varValueAlice}{\funStar{\varBlindingFactorAlice}} \< \< \varSpendableCoinCarol \opFunResult \procCreateCoin{\varValueCarol}{\funStar{\varBlindingFactorCarol}} \\
+        \funStar{\varSpendableCoinAlice} \opFunResult \procCreateCoin{\varValueAlice}{\funStar{\varBlindingFactorAlice}} \< \< \funStar{\varSpendableCoinCarol} \opFunResult \procCreateCoin{\varValueCarol}{\funStar{\varBlindingFactorCarol}} \\
         \{ \varCoinOutAlice, \funStar{\varBlindingFactorAlice}, \varValueAlice, \varProofAlice \} \opFunResult \funStar{\varSpendableCoinAlice} \< \< \{ \varCoinOutCarol, \funStar{\varBlindingFactorCarol}, \varValueCarol, \varProofCarol \} \opFunResult \funStar{\varSpendableCoinCarol} \\
         \varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \sum \funArray{\varBlindingFactorAlice} \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \opSub \sum \funArray{\varBlindingFactorCarol} \\
         \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
@@ -150,11 +150,11 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
         \< \< \pcif \procVerfProof{\varProofs[0]}{\varOutputs[0]} \opEqNoQ 0 \opOr \varTime \opNotEq \funStar{\varTime} \\
         \< \< \t \pcreturn \cnstFalsum \\
         \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyCarol}}{\funGen{\varNonceCarol}} \\
-        \< \< \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutCarol}{\varProof \opConc \varProofCarol}{\varSigContext}{\varCommits \opConc \funGen{\varNonceCarol}}{\cnstEmptySet}{\varTime} \\
-        \< \sendmessageleft*{\varPreTx} \< \\
-        \pcif \procVerfProof{\varPreTx.\varProofs[1]}{\varPreTx.\varOutputs[1]} \opEqNoQ 0 \< \< \\
+        \< \< \funStarAlt{\varPreTx} \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutCarol}{\varProof \opConc \varProofCarol}{\varSigContext}{\varCommits \opConc \funGen{\varNonceCarol}}{\cnstEmptySet}{\varTime} \\
+        \< \sendmessageleft*{\funStarAlt{\varPreTx}} \< \\
+        \pcif \procVerfProof{\funStarAlt{\varPreTx}.\varProofs[1]}{\funStarAlt{\varPreTx}.\varOutputs[1]} \opEqNoQ 0 \< \< \\
         \t \pcreturn \cnstFalsum \< \< \\
-        \pcreturn (\varPreTx, \varSpendableCoinAlice, (\varSecKeyAlice, \varNonceAlice)) \< \< \pcreturn (\varPreTx, \varSpendableCoinCarol, (\varSecKeyCarol, \varNonceCarol))
+        \pcreturn (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \< \< \pcreturn (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinCarol}, (\varSecKeyCarol, \varNonceCarol))
         }
         }
         \caption{Extended Mimblewimble Transaction Scheme - $\procDSendCoinsId$ \label{fig:ext-mim-tx-spend}}
@@ -165,7 +165,7 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
 Figure~\ref{fig:ext-mim-tx-recv} shows an instantiation of the $\procRecvCoinsId$ function of the Extended Mimblewimble Transaction Scheme.
 Calling this protocol two receivers Bob and Carol want to create a receiving shared coin $\varCoinShared$ with value $\varFundValue$ and key shares $(\varBlindingFactorAlice, \varBlindingFactorCarol)$.
 The protocol starts by both receivers verifing the senders output(s).
-Bob starts by creating a coin with fund value $\varFundValue$ and his share of the newly create blinding factor and sends it over to Carol.
+Bob starts by creating a coin with fund value $\varFundValue$ and his share of the newly created blinding factor and sends it over to Carol.
 Carol finalizes the shared coin by adding a commitment to her blinding factor to the coin and sends it back, together with the commitment.
 Bob verifies validity of the updated shared coin after which the two parties engage in two two-party protocols to create their partial signature and coin rangeproof.
 Finally they create the updated pre-transaction $\varPreTx$ which can be sent back to the transaction sender.
@@ -177,18 +177,21 @@ Finally they create the updated pre-transaction $\varPreTx$ which can be sent ba
         \fbox{
         \procedure[linenumbering,skipfirstln]{$\procDRecvCoins{\varPreTx}{\varFundValue}$} {
         Bob \< \< \< \< Carol \\
-        (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \< \< \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \\
+        (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\cnstEmptySet,\varTime) \opFunResult \varPreTx \\
         \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \< \< \< \< \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \\
         \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut[\varIterator]} \opEqNoQ 0 \< \< \< \< \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut[\varIterator]} \opEqNoQ 0 \\
         \t \pcreturn \cnstFalsum \< \< \< \< \t \pcreturn \cnstFalsum \\
         (\funStar{\varBlindingFactorBob}, \varNonceBob) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \< \< \\
         (\varCoinShared, \cdot, \cdot, \cdot) \opFunResult \procCreateCoin{\varFundValue}{\funStar{\varBlindingFactorBob}} \< \< \< \< \\
         \varSecKeyBob \opAssign \funStar{\varBlindingFactorBob} \< \< \< \< \\
-        \< \sendmessagerightx{4}{\varCoinShared} \< \\
+        \< \sendmessagerightx{4}{\varPreTx, \varCoinShared} \< \\
         \< \< \< \< (\funStar{\varBlindingFactorCarol}, \varNonceCarol) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
         \< \< \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \\
-        \< \< \< \< \funStarAlt{\varCoinShared} \opAssign \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \\
-        \< \sendmessageleftx{4}{\funStarAlt{\varCoinShared}, \funGen{\varSecKeyCarol}} \< \\
+        \< \< \< \< \funStarAlt{\varCoinShared} \opAssign \varCoinShared \opAddPoint \funGen{\varBlindingFactorCarol} \\
+        \< \< \< \< \funStarAlt{\varPreTx} \opAssign \varPreTx \\
+        \< \< \< \< \funStarAlt{\varPreTx}.\varOutputs[] \opAssign \funStarAlt{\varCoinShared} \\
+        \< \sendmessageleftx{4}{\funStarAlt{\varPreTx}, \funGen{\varSecKeyCarol}} \< \\
+        \{\cdots \funStarAlt{\varCoinShared}\} \opFunResult \funStarAlt{\varPreTx}.\varOutputs \< \< \< \< \\
         \pcif \funStarAlt{\varCoinShared} \opNotEq \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \< \< \< \< \\
         \t \pcreturn \cnstFalsum \< \< \< \< \\
         \varProofBobCarol \opFunResult \procDRProofL{\funStarAlt{\varCoinShared}}{\varFundValue}{\varSecKeyBob} \< \< \< \< \varProofBobCarol \opFunResult \procDRProofL{\funStarAlt{\varCoinShared}}{\varFundValue}{\varSecKeyCarol} \\
@@ -196,8 +199,8 @@ Finally they create the updated pre-transaction $\varPreTx$ which can be sent ba
         (\varSigBobCarol, \varPubKeyBobCarol) \opFunResult \procDSignL{\varMsg}{\varSecKeyBob}{\varNonceBob} \< \< \< \< (\varSigBobCarol, \varPubKeyBobCarol) \opFunResult \procDSignR{\varMsg}{\varSecKeyCarol}{\varNonceCarol} \\
         (\cdot, \cdot, \funStar{\varSigContext}) \opFunResult \varSigBobCarol \< \< \< \< (\cdot, \cdot, \funStar{\varSigContext}) \opFunResult \varSigBobCarol \\
         \funStarAlt{\varSigContext} \opFunResult \procSetupCtx{\varSigContext}{\funStar{\varSigContext}.\varPubKey}{\funStar{\varSigContext}.\varRand} \< \< \< \< \funStarAlt{\varSigContext} \opFunResult \procSetupCtx{\varSigContext}{\funStar{\varSigContext}.\varPubKey}{\funStar{\varSigContext}.\varRand} \\
-        \< \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \funStarAlt{\varCoinShared}}{\varProofs \opConc \varProofBobCarol}{\funStarAlt{\varSigContext}}{\varCommits \opConc \varPubKeyBobCarol}{\varSigBobCarol}{\varTime} \< \\
-        \pcreturn (\varPreTx, \funStar{\varPtSpendableCoinBob}) \< \< \< \< \pcreturn (\varPreTx, \funStar{\varPtSpendableCoinCarol})
+        \< \funStar{\varPreTx} \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \funStarAlt{\varCoinShared}}{\varProofs \opConc \varProofBobCarol}{\funStarAlt{\varSigContext}}{\varCommits \opConc \varPubKeyBobCarol}{\varSigBobCarol}{\varTime} \< \\
+        \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinBob}) \< \< \< \< \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinCarol})
         }
         }
         \caption{Extended Mimblewimble Transaction Scheme - $\procDRecvCoinsId$ \label{fig:ext-mim-tx-recv}}
@@ -255,7 +258,7 @@ The procedure then returns the pre-transaction $\varPreTx$ containing Bobs adapt
 In figure~\ref{fig:inst-apt-mw-tx-fin} we show the updated distributed version of the transaction finalization protocol.
 Again Alice verifies the pre-transaction $\varPreTx$ received by Bob and then cooperates with Bob in the $\procDSignId$ protocol to build the partial signature for their shared coin.
 Note that at this point Alice is not able to finalize the signature (and consequently the transaction) as she only knows Bobs adapted partial signature ($\varSigAptBob$), but not the original one ($\varSigBob$), which is needed for the $\procFinSigId$ function.
-Therefore, Bob completes the transaction and outputs it, while Alice outputs $\varSigAliceBob$ with which see can then retreive $\varX$.
+Therefore, Bob completes the transaction and outputs it, while Alice outputs $\varSigAliceBob$ with which see can then retrieve $\varX$.
 
 \begin{figure}
     \fbox{
