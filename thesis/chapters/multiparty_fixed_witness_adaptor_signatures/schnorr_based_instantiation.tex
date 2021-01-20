@@ -1,8 +1,8 @@
 We start by providing a general instantiation of a signature scheme (see definition~\ref{def:pre:signature-scheme}):
-We assume we have a group $\cnstGroup$ with prime $\varPrime$, $\cnstHash$ is a secure hash function as defined in definition~\ref{def:pre:hash-function} and $\varMsg \opIn \cnstBinary{*}$ is a message.
+We assume we have a group $\cnstGroup$ with prime $\varPrime$ \todo{missing info about generator}, $\cnstHash$ is a secure hash function as defined in definition~\ref{def:pre:hash-function} and $\varMsg \opIn \cnstBinary{*}$ is a message.
 
 
-A concrete implementation can be seen in figure~\ref{fig:schnorr}. The signature scheme is called schnorr signature scheme, first defined in~\cite{schnorr1989efficient} and is widely employed in many cryptography systems.
+A concrete implementation can be seen in figure~\ref{fig:schnorr}. The signature scheme is called schnorr \todo{Please write Schnorr with the first S always in capitals} signature scheme, first defined in~\cite{schnorr1989efficient} and is widely employed in many cryptography systems\todo[inline]{You could name here some examples of those systems. You can also mention that the reasons why it has been used in practice is its simplicity, formal analysis available, etc. }.
 \begin{figure}
     \begin{center}
         \fbox{
@@ -29,12 +29,14 @@ A concrete implementation can be seen in figure~\ref{fig:schnorr}. The signature
     \caption{Schnorr Signature Scheme as first defined in~\cite{schnorr1989efficient}}
     \label{fig:schnorr}
 \end{figure}
-Correctness of the scheme is easy to derive. As $\varS$ is calculated as $\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey$, when generator $\varG$ is raised to $\varS$, we get
+Correctness of the scheme is easy to derive. 
+\todo[inline]{Introduce here what you are about to show. For instance, as shown in Figure X, verf, step 3, we need to show that....}
+As $\varS$ is calculated as $\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey$, when generator $\varG$ is raised to $\varS$, we get
 $\funGen{\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey}$ which we can transform into $\funGen{\varNonce} \opAddPoint \funGen{\varSecKey \opTimesScalar \varSchnorrChallenge}$, and finally
 into $\varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge}$ which is the same as the right side of the equation.
 
 From the regular schnorr signature we now provide an instantiation for the two-party case defined in definition~\ref{def:sig:two-party-sig}. Note that this two-party variant of the scheme is what is
-currently implemented in the mimblewimble-based cryptocurrencies and will provide a basis from which we will build our adapted scheme.
+currently implemented in the mimblewimble-based cryptocurrencies and will provide a basis from which we will build our adapted scheme.\todo[inline]{What is adapted scheme here? you mean the scheme for 2-party adaptor signatures?}
 
 First we define a auxiliary function $\procSetupCtxId$ to use for the instantion:
 
@@ -56,6 +58,8 @@ is essential for the scheme to achieve EUF-CMA as described by Lindell et al. ~\
 
 In $\procKeyGenPtId$ Alice will initially setup the signature context and send it to Bob, together with her public and zk-proof.
 Bob verifies the proof (and exits if it is invalid). He will proceed by adding his parameters to the signature context and send it back to Alice, together with his public key and zk-proof, which Alice will verify.
+
+\todo[inline]{In your $\procKeyGenPtId$, you generate both the combined public key and the combined randomness. Imagine a scenario where Alice and Bob want to have a shared public key and re-use it to sign multiple messages (and for each, they would need to generate new fresh shared randomness). How would that be handled? Would you need a modified version of $\procKeyGenPtId$ where only randomness is created? I am mentioning this because this could be a question that you might get. You might want to add a note here about that so that you don't forget}
 
 $\procSignPrtId$ and $\procVerfPtSigId$ are generally similiar to the instantiation of the normal schnorr signature scheme. Note however that for computing the schnorr challenge $\varSchnorrChallenge$ the input into
 the hash function will be the combined public key $\varPubKey$ and combined nonce commitment $\varRand$, which the participants can read from the context object $\varSigContext$. This has the effect that the partial
@@ -117,8 +121,10 @@ to introduce the slightly adjusted $\procVerfPtSigId$ to be able to verify speci
 We further formalize a protocol $\procDSignId$ which is a protocol between two parties running the partial signature creation outlined before.
 Note that we assume that the secret keys as well as nonces used in the signatures have already been generated, for example by running the $\procKeyGenPtId$ protocol.
 Both parties input the shared message $\varM$ as well as their secret keys and secret nonces.
-The protocol outputs a signature $\varSigFin$ to the message $\varSigFin$, valid under the composite public key $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
+The protocol outputs a signature $\varSigFin$ to the message $\varSigFin$\todo{typo?}, valid under the composite public key $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
 Additionally to the final signature the protocol also outputs the composite public key $\varPubKey$.
+
+\todo[inline]{If they run $\procKeyGenPtId$, don't they have already the nonces in the context? And if so, are you adding them again here in $\procDSignId$?}
 
 \begin{center}
     \fbox{
@@ -154,9 +160,9 @@ For a proof of its correctness and a more extensive explanation we refer the rea
 In figure~\ref{fig:aptSchnorr} we further provide a schnorr-based instantiation for the fixed witness adapted signature scheme as defined in definition~\ref{def:sig:two-party-fixed-wit-apt-sig}.
 
 $\procAptSigId$ will add the secret witness $\varWit$ to the $\varS$ value of the signature, this means we will not be able to verify the adapted signature using $\procVerfPtSigId$ anymore. Therefore we
-introduce $\procVerifyAptSigId$ which takes as additional parameter the statement $\varStatement$ which will be included in the verifiers equation. Now the function verifies not only validity of the portial
+introduce $\procVerifyAptSigId$ which takes as additional parameter the statement $\varStatement$ which will be included in the verifiers equation. Now the function verifies not only validity of the partial
 signature, but also that it indeed has been adapted with the witness value $\varWit$, being the discrete logarithm of $\varStatement$. After obtaining $\varSigFin$, we can then cleverly unpack the secret $\varWit$,
-which is shown in the $\procExpExtId$ function.
+which is shown in the $\procExpExtId$\todo{typo? The name of the function here is not the same as in the figure} function.
 
 \begin{figure}
     \begin{center}
@@ -191,7 +197,7 @@ which is shown in the $\procExpExtId$ function.
 We now define a protocol $\procDAptSignId$ between Alice and Bob creating a signature $\varSigFin$ for the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$
 Now Bob will hide his secret $\varWit$ which Alice can extract after the signing process has completed.
 One thing to note is that in this protocol only Bob is able to call $\procFinSigId$ to create the final signature, which is different to the previous protocol.
-This is because the function requires Bobs unadapted partial signature $\varSigBob$ as input, which Alice does not know. (She only knows Bobs adapted variant).
+This is because the function requires Bob's unadapted partial signature $\varSigBob$ as input, which Alice does not know. (She only knows Bobs adapted variant).
 Therefore, one further interaction is needed to send the final signature to Alice.
 The protocol outputs $(\varWit, (\varSigFin, \varPubKey))$ for Alice as she manages to learn $\varWit$ and $(\varSigFin, \varPubKey)$ for Bob.
 
