@@ -36,6 +36,7 @@ The transaction creation algorithm $\procCreatePreTxId$ takes as input a message
         }
     \end{varwidth}
     }
+    \todo[inline]{Editorial: it is weird that each line in createTx is numbered as in principle it should be one line only, right?}
 \end{center}
 
 In figure~\ref{fig:inst-mw-tx} we provide an instantiation of the Mimblewimble Transction Scheme using the auxiliary functions provided before.
@@ -50,6 +51,12 @@ The sender and receiver both will create their signatures which will then be agg
 However, we find that by using a two-party signature scheme for our formalization we are closer to what is implemented in practice~\footnote{\urlgrinexplained} .
 Furthermore by starting the signing process at the receivers turn we avoid a potential problem:
 If an adversary learns the already signed pre-transaction and transaction value $\varFundValue$ before the intended receiver, the adversary would be able to steal the coins by creating his malicious output coin together with his signature, which he could then aggregate to the senders pre-transaction.
+
+\todo[inline]{Some points here:\\
+ - Minor: The footnote goes over the page limit. You can put the link in a \url{here}, using the url package with the hyphens option. Otherwise, you could use a service like tinyurl, but I do not know how long it will stay active.\\
+ - I really like the points that you write here to use your scheme instead that of Fuchsbauer. It would be nice if you can write a summary of them in the previous section, when you say: ``making small adjustments to the original definition to fit with our requirements.'' Instead, I would say: we adapt Fuchsbauer's definition because (i) reason 1, (ii) reason 2, (iii) reason 3, etc... each reason in a line or two and then mention, we give a more detailed comparison in Section X (refering to this one).\\
+ - I think you should write the problem in a clearer way (if you have not done it already in a previous section). I think that showing the attack in a clear and understandable manner is important for the reader and a clear reason why you need to change this. Actually, a question I have is: is the attack also possible in the paper of Fuchsbauer? If so, we should clearly write it and say that what you propose is a fix.
+}
 
 In $\procRecvCoinsId$ the receiver of a pre-transaction will verify the senders proof $\varProofBob$, create his output coin $\varCoinOutBob$, add his parameters to the signature context and then create his partial signature $\varSigBob$.
 The function returns an updated version of the pre-transaction $\varPreTx$ which can be sent back to the sender, as well as the newly created spendable output $\varSpendableCoinBob$.
@@ -157,18 +164,22 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
         \pcreturn (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \< \< \pcreturn (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinCarol}, (\varSecKeyCarol, \varNonceCarol))
         }
         }
+        \todo[inline]{$v_A$ in line 8 of Alice is not defined before. Same with $v_C$.}
         \caption{Extended Mimblewimble Transaction Scheme - $\procDSendCoinsId$ \label{fig:ext-mim-tx-spend}}
     \end{figure}
 \end{landscape}
 \restoregeometry
 
-Figure~\ref{fig:ext-mim-tx-recv} shows an instantiation of the $\procRecvCoinsId$ function of the Extended Mimblewimble Transaction Scheme.
+Figure~\ref{fig:ext-mim-tx-recv} shows an instantiation of the $\procRecvCoinsId$ \todo{typo? should be the distributed version of that?} function of the Extended Mimblewimble Transaction Scheme.
 Calling this protocol two receivers Bob and Carol want to create a receiving shared coin $\varCoinShared$ with value $\varFundValue$ and key shares $(\varBlindingFactorAlice, \varBlindingFactorCarol)$.
 The protocol starts by both receivers verifing the senders output(s).
 Bob starts by creating a coin with fund value $\varFundValue$ and his share of the newly created blinding factor and sends it over to Carol.
 Carol finalizes the shared coin by adding a commitment to her blinding factor to the coin and sends it back, together with the commitment.
 Bob verifies validity of the updated shared coin after which the two parties engage in two two-party protocols to create their partial signature and coin rangeproof.
 Finally they create the updated pre-transaction $\varPreTx$ which can be sent back to the transaction sender.
+
+
+\todo[inline]{I think you have not mentioned earlier that you need a distributed version of range proof for your distributed protocols. Also, I think Figure 5.4 is not described in the text? }
 
 \newgeometry{margin=2cm}
 \begin{landscape}
@@ -258,7 +269,7 @@ The procedure then returns the pre-transaction $\varPreTx$ containing Bobs adapt
 In figure~\ref{fig:inst-apt-mw-tx-fin} we show the updated distributed version of the transaction finalization protocol.
 Again Alice verifies the pre-transaction $\varPreTx$ received by Bob and then cooperates with Bob in the $\procDSignId$ protocol to build the partial signature for their shared coin.
 Note that at this point Alice is not able to finalize the signature (and consequently the transaction) as she only knows Bobs adapted partial signature ($\varSigAptBob$), but not the original one ($\varSigBob$), which is needed for the $\procFinSigId$ function.
-Therefore, Bob completes the transaction and outputs it, while Alice outputs $\varSigAliceBob$ with which see can then retrieve $\varX$.
+Therefore, Bob completes the transaction and outputs it, while Alice outputs $\varSigAliceBob$ with which she can then retrieve $\varX$.
 
 \begin{figure}
     \fbox{

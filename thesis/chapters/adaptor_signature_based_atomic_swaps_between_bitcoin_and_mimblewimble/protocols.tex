@@ -6,7 +6,7 @@ Later in section~\ref{sec:atom:security} we will prove the security of these pro
 $\procDBuildMwTxId$ is a protocol between a sender and receiver which builds a mimblewimble transaction transferring a value $\varFundValue$ from the sender to a receiver for a Mimblewimble Transaction scheme as defined in~\ref{def:atom:mw-tx-scheme}.
 It takes as input a list of spendable coins $\funArray{\varSpendableCoin}$, a transaction value $\varFundValue$, and an optional timelock $\varTime$ from the sender, the same transaction value $\varFundValue$ from the receiver and uses the functions defined earlier to output a valid transaction $\varTx$ as well as the newly spendable coins to both parties.
 \[ \langle (\varTx, \funStar{\varSpendableCoinAlice}), (\varTx, \funStar{\varSpendableCoinBob}) \rangle \opFunResult \procDBuildMwTx{\funStar{\varSpendableCoin}}{\varFundValue}{\varTime} \]
-Figure~\ref{fig:d-build-mw-tx} show the implementation of the $\procDBuildMwTxId$.
+Figure~\ref{fig:d-build-mw-tx} shows the implementation of the $\procDBuildMwTxId$.
 
 \begin{figure}
     \fbox{
