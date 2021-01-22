@@ -136,12 +136,13 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
         }
     \end{varwidth}
     }
+    \todo[inline]{We need to decide what version of the protocols you want to put finally in the thesis. So far you are writing 2 versions: (i) the version as it is in Grin; and (ii) the version that you are able to prove secure (i.e., adding the calls to the zkp system). So, one question that you might get is: what is the "good" version, that is, if I create another implementation of Mimblewimble, which one should I take? And another question could be: the fact that you have 2 versions means that the current implementation is broken? Think about the answers and we should discuss them. Regarding the 2 versions, I see 2 possibilities: (a) keep both and clearly say their difference; or (b) keep only the one that you prove secure and say that it is slightly different from that of Mimblewimble. }
     \caption{$\procDBuildMwTxId$ in the hybrid Model} \label{fig:atom:hybrid-dbuild}
 \end{figure}
 
 \begin{theorem}
     \label{theo:atom:sec-tx}
-    Let $\varCommitScheme$ be a correct and secure pedersen commitment scheme, $\varProofSystem$ be a correct and secure rangeproof system and $\varSigSchemeMP$ be a secure and correct two-party signature scheme, then $\procDBuildMwTxId$ securely computes a Mimblewimble transaction transferring the value $\varFundValue$ from a sender (denoted as Alice) to a receiver (denoted as Bob) in the hybrid $\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}$-model.
+    Let $\varCommitScheme$ be a correct and secure pedersen commitment scheme, $\varProofSystem$ \todo[inline]{I would write $\varProofSystem$ as $\varProofSystem_{\textit{RP}}$ instead to clearly show that it is not a generic zk proof but a range proof. } be a correct and secure rangeproof system and $\varSigSchemeMP$ be a secure and correct two-party signature scheme, then $\procDBuildMwTxId$ securely computes a Mimblewimble transaction transferring the value $\varFundValue$ from a sender (denoted as Alice) to a receiver (denoted as Bob) in the hybrid $\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}$-model.\todo{one ideal functionality missing here?}
 \end{theorem}
 
 \begin{proof}
@@ -204,8 +205,9 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
         From those two values he can then compute the value that $\varSigBob$ must have such that it will complete to $\varSigFin$ when added to Alice's part of the signature.
         All further values $\cnstSimulator$ needs to build $\funStarAlt{\varPreTx}$ he can simply read from the final transaction $\varTx$.
         Therefore $\funStarAlt{\varPreTx}$ is identical to the one sent in the real execution.
-        \item \textit{Phase 3}: When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_2}$ as the verifier, $\cnstSimulator$ can simply check equality with the correct value and return 0 or 1, which is identical to the real execution.
+        \item \textit{Phase 3}: When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_2}$ as the verifier, $\cnstSimulator$ can simply check equality with the correct value and return 0 or 1, which is identical to the real execution. \todo{Same comment about using "identical" as in the security of previous chapter}
     \end{itemize}
+    
 
     We have managed to show that in the case that Alice is corrupted the simulation is perfect, because the transcript is in fact identical to the transcript of the real execution.
 
@@ -220,7 +222,7 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
         Now he can call $\procSendCoinsId$ and get:
         \[ (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime} \]
         \item The simulator invokes $\cnstAdversary$ and sends $\varPreTx$ as if coming from Alice.
-        \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_1},\procZKfId{\cnstRelation_2}$ as the verifier $\cnstSimulator$ simply checks equality we the values he sent and returns either 0 or 1.
+        \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation_1},\procZKfId{\cnstRelation_2}$ \todo{one ideal functionality missing?} as the verifier $\cnstSimulator$ simply checks equality we the values he sent and returns either 0 or 1.
         The adversary proceeds by calling $\procZkf{\cnstRelation_2}{\funStar{\varSpendableCoinBob}}$, $\cnstSimulator$ saves $\funStar{\varSpendableCoinBob}$ and extracts $\varFundValue \opEqNoQ \funStar{\varSpendableCoinBob}.\varValue$
         He then calls the TTP computing $\procDBuildMwTxId$ with the input $\varFundValue$ and receives $(\varTx, \funStar{\varSpendableCoinBob})$.
         \item Next $\cnstAdversary$ sends an updated pre-transaction $\funStarAlt{\varPreTx}$.
@@ -272,7 +274,7 @@ We start with the proof for $\procDSendCoinsId$ which is called inside $\procDSh
 
 \textbf{Hybrid functionalities}: For this proof we need to extend our hybrid model.
 As previously the parties have access to a trusted third party computing the zero-knowledge proof of knowledge functionalities $\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}$ and $\procZKfId{\cnstRelation_2*}$.
-Additionally we introduce $\procZKfId{\cnstRelation_3}$, whereas $\cnstRelation_3$ is the relation between a value $\varValue$, two secrets $\varBlindingFactorAlice, \varBlindingFactorCarol$ and the commitment $\varCoin \opEqNoQ \funGenH{\varValue} \opAddPoint \funGen{\varBlindingFactorAlice} \opAddPoint \funGen{\varBlindingFactorCarol}$.
+Additionally we introduce $\procZKfId{\cnstRelation_3}$, whereas $\cnstRelation_3$ is the relation between a value $\varValue$, two secrets $\varBlindingFactorAlice, \varBlindingFactorCarol$ and the commitment $\varCoin \opEqNoQ \funGenH{\varValue} \opAddPoint \funGen{\varBlindingFactorAlice} \opAddPoint \funGen{\varBlindingFactorCarol}$. \todo[inline]{In general, one cannot add an ideal functionality for a zkp of an arbitrary relation. I mention this because I see here you introduce a new relation $\cnstRelation_3$. In theory, when one introduces such ideal functionality, there should be a protocol that is secure for such functionality. However, in this case is fine as one can foresee that R3 can be done securely with a Sigma Protocol (as the one we saw in the lecture) or in the worst case with a more powerful zkp such as SNARKS.}
 This means that for $\cnstRelation_3$ we have two provers, one of them having to provide $\varBlindingFactorAlice$, the other $\varBlindingFactorCarol$.
 Both will have to provide the commitment $\varCoin$ and the value $\varValue$.
 Both parties can then call the protocol again as the verifier providing the commitment $\funStar{\varCoin}$ and receiving 1 if $\funStar{\varCoin} \opEqNoQ \varCoin_\varAlice \opEqNoQ \varCoin_\varCarol$ (whereas $\varCoin_\varAlice$ is the commitment received from Bob as the prover, resp. for Carol) $\varValue_\varAlice \opEqNoQ \varValue_\varCarol$ and $\funStar{\varCoin} \opEqNoQ \funGenH{\varValue_{\cdot}} \opAddPoint \funGen{\varBlindingFactorAlice} \opAddPoint \funGen{\varBlindingFactorCarol}$.
@@ -329,7 +331,7 @@ As for $\cnstRelation_2$ we again allow to call the protocol with an array of in
 \begin{proof}
     Again we proof security by constructing a simulator $\cnstSimulator$ with access to a trusted third party (TTP) computing $\procDSendCoinsId$ in the ideal setting upon receiving inputs from the two parties.
     The simulators task is to extract the inputs of the adversary $\cnstAdversary$, send the inputs to the TTP and construct a protocol transcript indistinguishable from a real one.
-    We separately look at the case in which Alice is corrupted, and the case the Carol is corrupted.
+    We separately look at the case in which Alice is corrupted, and the case the Carol is corrupted. \todo[inline]{Editorial: I see that you have mentioned the proof strategy several times throughout the thesis. This is good, just that, if you find it repetitive, you can mention it once the first time you need it and refer to it in the rest.}
 
     \textbf{Alice is corrupted}: Simulator $\cnstSimulator$ works as follows:
     \begin{enumerate}
@@ -364,7 +366,7 @@ As for $\cnstRelation_2$ we again allow to call the protocol with an array of in
         \item The simulator then chooses $\varBlindingFactorAlice, \funStar{\varBlindingFactorAlice}, \varFundValue \sample \cnstIntegersPrimeWithoutZero{\varPrime}$ and sets \\ $\varPtSpendableCoinAlice \opAssign \{ \varCoin \opAssign \varPtSpendableCoinCarol.\varCoin, \varBlindingFactor \opAssign \varBlindingFactorAlice, \varValue \opAssign \varPtSpendableCoinCarol.\varValue \}$.
         He then proceeds by building $\varPreTx$ as given by the protocol definition with the chosen values and $\funArray{\varPtSpendableCoinAlice}$ and sends it to $\cnstAdversary$ as if coming from Alice.
         \item When Carol calls $\procZKfId{\cnstRelation_{1,2,3}}$ as the verifier $\cnstSimulator$ checks the passed values for equality and returns either 0 or 1.
-        As soon as Carol calls $\procZkf{\cnstRelation_{2}}{\varSpendableCoinCarol}$ $\cnstSimulator$ will extract $\varFundValue \funStar{\varSpendableCoinCarol}.\varValue$ and finally call the TTP with inputs $(\funArray{\varPtSpendableCoinCarol}, \varFundValue)$ to receive $\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinCarol}, (\varSecKeyCarol, \varNonceCarol)$.
+        As soon as Carol calls $\procZkf{\cnstRelation_{2}}{\varSpendableCoinCarol}$ $\cnstSimulator$ will extract $\varFundValue \funStar{\varSpendableCoinCarol}.\varValue$ and finally call the TTP with inputs $(\funArray{\varPtSpendableCoinCarol}, \varFundValue)$ \todo{you also need $t$ here?} to receive $\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinCarol}, (\varSecKeyCarol, \varNonceCarol)$.
         \item Now the simulator rewinds to step 1 and constructs the actual $\varPreTx$ from $\funStarAlt{\varPreTx}$ as follows:
         \begin{gather*}
             \{ \varMsg, \varInputs, \varOutputs, \varProofs, \varSigContext, \varCommits, \cnstEmptySet, \varTime \} \opFunResult \funStarAlt{\varPreTx} \\
