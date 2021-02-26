@@ -1,8 +1,9 @@
 With the outlined Adapted Mimblewimble Transaction Scheme from definition~\ref{def:atom:apt-ext-mw-tx-scheme} and protocols from \ref{sec:atom:protocols} we can now construct an Atomic Swap protocol with another cryptocurrency.
-In this thesis we will explain a swap with Bitcoin, as at present Bitcoin and Bitcoin-like cryptocurrencies are the most widely adopted.
+In this thesis we will explain a swap with Bitcoin, as at present Bitcoin and Bitcoin-like cryptocurrencies \todo{not sure I would claim that Bitcoin-like cryptocurrencies are also widely adopted} are the most widely adopted.
 We will generally refer to the ``Bitcoin side`` and the ``Mimblewimble side`` of the swap to be most generic.
 Upon implementation one has to decide for a specific implementation, for example BTC on the Bitcoin side and Grin on
 the Mimblewimble side.
+\todo[inline]{Here, I would write sth like: To abstract away from the details of the different Bitcoin implementations, we define here the minimal DPT functions that we require for our atomic swap. These functionalities are inherent to the Bitcoin functionality and thus supported in all implementations.}
 On the Bitcoin side we define three DPT functions $(\procLockAddrId, \procVerifyLockId, \procSpendBtcId)$.
 \begin{itemize}
     \item $(\varScriptPubKey) \opFunResult \procLockAddr{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varTime}$:
@@ -10,7 +11,7 @@ On the Bitcoin side we define three DPT functions $(\procLockAddrId, \procVerify
     Additionally, the function requires Bobs public key $\varPubKeyBob$ and a timelock $\varTime$ (given as a block number) as input which allows Bob to reclaim his funds after some time if the atomic swap was not completed successfully.
     The function will create and return a Bitcon script $\varScriptPubKey$ to which Bob can send funds using a P2SH transaction.
     To spend this output Alice will have to provide a signature under her public key $\varPubKeyAlice$ and $\varStatement$, which she is able to provide, once acquired $\varWit$.
-    This construction is similar although simpler to the locking mechanism described by Malavolta et al.
+    This construction is similar although simpler to the locking mechanism described by Malavolta et al. \todo[inline]{Question that arises here: Why a simpler locking mechanism suffices here? What is the extra functionality in Malavolta et al. that you do not require here?}
     For a in-depth security analysis of this concept we refer the interested reader to their paper ~\cite{malavolta2019anonymous}.
     For a concrete Bitcoin Script realizing this functionality see section~\ref{ch:implementation}.
     \item $\{ 1,0 \} \opFunResult \procVerifyLock{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varValue}{\varTime}{\varUTXO_{lock}}$:
@@ -23,9 +24,11 @@ On the Bitcoin side we define three DPT functions $(\procLockAddrId, \procVerify
     It returns a signed transaction which then can be broadcast.
 \end{itemize}
 
+\todo[inline]{I assume that the phases required in atomic swap will be explained earlier in the thesis?}
+
 \subsection{Setup phase}\label{subsec:atom:setup}
 
-We assume Alice owns Mimblewimble coins $\funArray{\varSpendableCoin}$ with the total value $\varValueMw$ and Bob
+We assume Alice owns Mimblewimble coins $\funArray{\varSpendableCoin}$ with the total value $\varValueMw$ and Bob owns 
 Bitcoin locked in some UTXO $\varUTXO$ with a value of $\varValueBtc$ and secret spending key $\varSecKey_{btc}$.
 Before the protocol can start the two parties must agree on the value they want to swap, the exchange rate of the currencies and a time after which the swap should be canceled.
 After coming to an agreement the following variables are defined and known by both Alice and Bob:
@@ -36,6 +39,7 @@ After coming to an agreement the following variables are defined and known by bo
     \item $\varTimeBTC$ The locktime as a blockheight for the Bitcoin side.
     \item $\varTimeMW$ The locktime as a blockheight for the Mimblewimble side.
 \end{itemize}
+\todo[inline]{the symbol for $varSwpState$ is overloaded. You have used this symbol already many times before for other purpose (e.g., the adversary?)}
 We collect this shared variables in an initial swap state $\varSwpState$:
 \[ \varSwpState \opAssign \{ \varSecParam, \varAmountBtc, \varAmountMW, \varTimeBTC, \varTimeMW \} \]
 
@@ -93,6 +97,8 @@ For Bob it furthermore outputs his part $\funStar{\varPtSpendableCoinBob}$ of th
         \pcreturn (\varSwpState, \funStar{\varPtSpendableCoinAlice}, \funStar{\varSpendableCoinAlice}, \varSecKeyAlice, \funStarAlt{\varSpendableCoinAlice}) \< \< \< \< \pcreturn (\varSwpState, \funStar{\varPtSpendableCoinBob}, \varUTXO_{B}, \varWit)
         }
         }
+        \todo[inline]{You need to add at some point that Alice (and Bob) parse the state in $\mathcal{A}$ to extract parameters they need later.\\
+        I think we need a way to differentiate better between local operations and 2-party protocols (e.g., dsharedInMWTx).}
         \caption{Atomic Swap - $\procSetupSwapId$.}\label{fig:setup-swap}
     \end{figure}
 \end{landscape}
@@ -103,7 +109,7 @@ For Bob it furthermore outputs his part $\funStar{\varPtSpendableCoinBob}$ of th
 First we need to define an additional auxiliary function $\procVerifyTimeId$ with the following interface:
 \[ \{0,1\} \opFunResult \procVerifyTime{\varChain}{\varTime} \]
 This function will verify that there is sufficient time to execute the atomic swap protcol.
-As input it takes a chain paramter $\varChain$ (in our case this could be either BTC or MW) and a block height $\varTime$.
+As input it takes a chain parameter $\varChain$ (in our case this could be either BTC or MW) and a block height $\varTime$.
 The routine will verify that the current height of the blockchain is marginally below $\varTime$.
 If this is the case it will return 1, or 0 otherwise.
 How much time exactly should be left for the function to return 1 is implementation specific, and could be set to for instance one day.
@@ -138,6 +144,7 @@ The protocol outputs their newly created output/coin to each party.
         \pcreturn (\varUTXO_{A}) \< \< \< \< \pcreturn (\funStar{\varSpendableCoinBob})
         }
         }
+        \todo[inline]{Here both publish the mimblewimble tx?}
         \caption{Atomic Swap - $\procSetupSwapId$. \label{fig:exec-swap}}
     \end{figure}
 \end{landscape}

@@ -1,16 +1,21 @@
 As we have already discussed in section~\ref{sec:pre:mimblewimble} for the creation of a transaction in Mimblewimble, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
-To construct the transaction protocol we assume that we have access to a two-party signature scheme $\varSigSchemeMP$ as defined in definition~\ref{def:sig:two-party-sig}, a zero-knowledge Rangeproofs system $\varProofSystem$
+To construct the transaction protocol we assume that we have access to a two-party signature scheme $\varSigSchemeMP$ as defined in definition~\ref{def:sig:two-party-sig}, a zero-knowledge Rangeproofs system $\varProofSystem$ 
+\todo[inline]{zero-knowlege proof rangeproof is not a standard term. What about: zero knowledge proof to prove that a value fits in a certain range. These specific type of zero-knowledge proofs are called rangeproofs and implemented in Bulletproofs. If you have defined range proof before, you can simply say that you require a range proof system instead.}
 such as Bulletproofs, as described in section~\ref{sec:pre:rangeproof} and a homomorphic commitment scheme $\varCommitScheme$ as defined in definition~\ref{def:pre:homo-com} such as Pedersen Commitments~\ref{def:pre:pedersen}.
 
 Fuchsbauer et al. have defined three procedures $\styleFunction{Send}$, $\styleFunction{Rcv}$ and $\styleFunction{Ldgr}$ with regards to the creation of a transaction.
 $\styleFunction{Send}$ called by the sender will create a pre-transaction, $\styleFunction{Rcv}$ takes the pre-transaction and adds the receivers output and $\styleFunction{Ldgr}$ (again called by the sender) verifies and publishes the final transaction to the blockchain ledger.
 As we have already pointed out in this thesis we won't discuss the transaction publishing phase therefore we will not cover the publishing functionality of the $\styleFunction{Ldgr}$ procedure, however we will use the verification capabilities of the algorithm.
-That means the transactions created by our protocol must be compatible with the $\styleFunction{MW.Ver(\varSecParam, \varTx)}$ functionality formalized by Fuchsbauer et at.
+That means the transactions created by our protocol must be compatible with the $\styleFunction{MW.Ver(\varSecParam, \varTx)}$ functionality formalized by Fuchsbauer et at. 
+\todo[inline]{You could add here that if a transaction correctly verifies, then we assume that it is the case that can be added to the ledger controlled by the Ldr function.}
 We redefine the $\styleFunction{Send}$ and $\styleFunction{Rcv}$ functionality in our paper, making small adjustments to the original definitions to fit with our requirements.
 
-To improve the readability of our formalizations we introduce a wrapper $\varSpendableCoin$ which represents a spendable coin and contains a reference to the coin commitment and rangeproof as defined in~\ref{def:pre:coin} as well as its (secret) spending information which consist of the coins value and blinding factor.
+To improve the readability of our formalizations we introduce a wrapper $\varSpendableCoin$ which represents a spendable coin and contains a reference to the coin commitment and rangeproof as defined in~\ref{def:pre:coin} as well as its (secret) spending information which consist of the coins value and blinding factor. 
+\todo[inline]{In the description above include the symbols for each element. For instance, coins value (v), blinding factor (r)}
 \[ \varSpendableCoin \opAssign \{ \varCommitment, \varValue, \varBlindingFactor, \varProof \} \]
 If we want to indicate that a spendable coin is a output coin of a transaction we write $\funStar{\varSpendableCoin}$.
+
+\todo[inline]{Add introduction text for the next definition. We next define .... that intuitively allows to....}
 
 \begin{definition}[Mimblewimble Transaction Scheme]
     \label{def:atom:mw-tx-scheme}
@@ -24,7 +29,9 @@ If we want to indicate that a spendable coin is a output coin of a transaction w
         \item $(\funStar{\varPreTx}, \funStar{\varSpendableCoinBob}) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue}$: The receiveCoins algorithm is a DPT routine called by the receiver and takes as input a pre-transaction $\varPreTx$ and a fund value
         $\varFundValue$.
         It will output a modified pre-transaction $\funStar{\varPreTx}$ together with Bobs new spendable output coin $\funStar{\varSpendableCoinBob}$ which has been added to the transaction.
-        At this stage the transaction already has to be partially signed. (by the receiver)
+        At this stage the transaction already has to be partially signed by the receiver. 
+        
+        \todo[inline]{Throughout the thesis, you are using Alice as the sender and Bob as the receiver, right? If so, make sure that this is clearly specified somewhere.}
         \item $\varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}$: The finalize algorithm is a DPT routine again called by the transaction sender that takes as input a pre-transaction $\varPreTx$ and the senders signing key $\varSecKeyAlice$ and nonce $\varNonceAlice$.
         The function will output a finalized signed transaction $\varTx$.
         \item $\{1,0\} \opFunResult \procVerfTx{\varTx}$: The verification algorithm is taken from the Fuchsbauer et al. paper \cite{fuchsbauer2019aggregate} (there it is named $\styleFunction{MW.Ver}$) and can be used to verify mimblewimble transactions.
@@ -37,6 +44,7 @@ If we want to indicate that a spendable coin is a output coin of a transaction w
             \item Condition 4: For every output coin the range proof verifies.
         \end{enumerate}
     \end{itemize}
+    \todo[inline]{The vrfTx is taken as it is from Fuchsbauer paper? If so, mention that explicitely: the function is exactly the same and we add it here for completeness. Also, it conveys the point that we want that our protocol outputs transactions that are valid for the current Mimblewimble for compatibility.}
 \end{definition}
 
 We say a Mimblewimble Transaction Scheme is correct if the verification algorithm $\procVerfTxId$ returns 1 if and only if the added transaction is well balanced and its signature is valid.
@@ -60,22 +68,24 @@ More formally:
     \]
 \end{definition}
 
+\todo[inline]{Add text to introduce the definition below}
+
 \begin{definition}[Extended Mimblewimble Transaction Scheme]
     \label{def:atom:ext-mw-tx-scheme}
-    An extended Mimblewimble transaction scheme $\varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ is an extension to $\varMWScheme$ with the following two procedures:
+    An extended Mimblewimble transaction scheme $\varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ is an extension to $\varMWScheme$ with the following two \todo{three?} procedures:
     \[ \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opConc (\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId) \]
     \begin{itemize}
         \item $\langle (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice,\varNonceAlice)), (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyCarol,\varNonceCarol)) \rangle$ \\
         $\opFunResult \procDSendCoins{\funArray{\varSpendableCoinAlice}}{\funArray{\varSpendableCoinCarol}}{\varFundValue}{\varTime}$:
         The distributed coin spending algorithm takes as input a list of spendable input coins which ownership is shared between Alice and Carol.
-        Note that for each provided input coin Alice and Carol have only a share to the blinding factor.
+        Note that for each provided input coin Alice and Carol have only a share to the blinding factor. \todo{this statement is unclear here}
         A coins full blinding factor can then be calculated as:
-        $\varBlindingFactor \opAssign \varBlindingFactorAlice \opAddScalar \varBlindingFactorCarol$.
+        $\varBlindingFactor \opAssign \varBlindingFactorAlice \opAddScalar \varBlindingFactorCarol$. \todo{$\varBlindingFactorAlice$ and $\varBlindingFactorCarol$ not introduced before}
         Again optionally a block height $\varTime$ can be given to time lock the transaction.
         Similar to the single party version of the function its outputs are a pre-transaction $\varPreTx$ and change coin for each party, as well as their signing information.
         \item $\langle (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinBob}), (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinCarol}) \rangle \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue}$: The distributed coin receive procedure takes as input a pre-transaction $\varPreTx$ and a value $\varFundValue$ which should be transferred with the transaction.
-        The distributed algorithm will generate a output coin owned by both Alice and Carol. (each owning a share of the key).
-        The output will be an updated pre-transaction $\funStar{\varPreTx}$, the shared output coin $\varCoinShared$ with the respective shares of the blinding factor added as $\funStar{\varSpendableCoinBob}$, $\funStar{\varSpendableCoinCarol}$.
+        The distributed algorithm will generate a output coin owned by both Alice \todo{You mention Alice but using B as subscript} and Carol. (each owning a share of the key).
+        The output will be an updated pre-transaction $\funStar{\varPreTx}$, the shared output coin $\varCoinShared$ \todo{not defined before} with the respective shares of the blinding factor added as $\funStar{\varSpendableCoinBob}$, $\funStar{\varSpendableCoinCarol}$.
         Note that $\varCoinShared$ will only be spendable if both owners cooperate running the $\procDSendCoinsId$ protocol.
         \item $\langle \varTx, \varTx \rangle \opFunResult \procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}$: The distributed finalized transaction protocol has to be used if we are creating a transaction spending a shared coin (i.e. the transaction was created with the $\procDSendCoinsId$ algorithm).
         In this case we require signing information from both Alice and Carol.
@@ -104,6 +114,9 @@ Correctness is given very similar to the standard scheme:
     \]
 \end{definition}
 
+
+\todo[inline]{Add text to introduce the following definition}
+
 \begin{definition}[Contract Mimblewimble Transaction Scheme]
     \label{def:atom:apt-ext-mw-tx-scheme}
     The contract version of the extended Mimblewimble Transaction Scheme updates the Extended Mimblewimble Transaction Schme by providing a modified version of the single party receive routine and the distributed finalize transaction protocol.
@@ -114,6 +127,9 @@ Correctness is given very similar to the standard scheme:
         Note that the routine also returns Bob's unadapted partial signature.
         The reason for this is that we later still need the unadapted version to complete the signature und thereby finalize the transaction.
         By not sharing this unadapted signature with Alice, Bob is the one who gets to finalize the transaction which is different from the simpler protocol and is an important feature necessary for our atomic swap protocol.
+        
+        \todo[inline]{The reader here will be waiting for the distributed version of $\procAptRecvCoins$. I would add a note saying that we could define the distributed version (and maybe even define it and we put it in the appendix), but omit it here for clarity as we do not need it for the protocol afterwards. }
+        
         \item $\langle \varSigAliceBob, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$: The contract variant of the finalize transaction algorithm is a distributed protocol between the sender(s) and receiver.
         Additionally to the pre-transaction $\funStar{\varPreTx}$ the senders need to input their signing information, Bob needs to input the unadapted version of his partial signature as it is needed for transaction completion.
         This protocol could also be implemented as a three party protocol, two senders controlling a shared coin and a third receiver.
@@ -145,3 +161,6 @@ Similar as before we define correctness for the adapted scheme:
         \right]=1.
     \]
 \end{definition}
+
+
+\todo[inline]{I see why you have defined the schemes the way you did, but I know that because I have talked to you several times before :) I think it is hard to parse for a person that reads this for the first time (and not knowing yet what you have in mind for the cross-chain swap protocol that only comes later in the thesis). I propose that before introducing these definitions, at the beginning of the section, you have a paragraph or two of "overview" ( and possibly a figure/graphic to accompany it) where you say: In Fuchsbauer paper, they define these operations that allows a single sender to pay to a single receiver. Now, we first change Send and Rcv to follow our schemes in section X. Next, we would need that sender's coins are not controlled by a single user, but by two, so we extend Send to support the case where blind factor is shared between two (as shown in Fig...). And so on.... Basically, write a little the story behind these design decisions that you have made throughout your thesis. Makes sense?}

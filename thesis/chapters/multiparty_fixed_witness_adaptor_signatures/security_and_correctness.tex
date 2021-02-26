@@ -3,11 +3,11 @@ We now prove that the outlined schnorr-based instantiation is correct, i.e. Adap
 \subsection{Adaptor Signature Correctness}\label{subsec:sig:aptsig-correctness}
 
 To prove that Adaptor Signature Correctness holds we have 3 statements to prove, first we prove that $\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPubKey} \opEqNoQ 1$ holds in our
-schnorr-based instantiation of the signature scheme, whereas $\varSigContext$ is setup such that $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
+schnorr-based instantiation of the signature scheme, where $\varSigContext$ is setup such that $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
 
 \begin{proof}
     \label{prf:apt-schnorr-pre-sig-corr}
-    For this prove we assume the setup already specified in definition~\ref{def:sig:apt-sig-correctness}.
+    For this proof we assume the setup already specified in definition~\ref{def:sig:apt-sig-correctness}.
     The proof is by showing equality of the equation checked by the verifier of the final signature by continuous substitutions in the left side of equation:
     \begin{align}
         \funGen{\varS} &\opEqNoQ \varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge} \\
@@ -20,7 +20,7 @@ schnorr-based instantiation of the signature scheme, whereas $\varSigContext$ is
     \end{align}
 
     It remains to prove that with the same setup $\procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEqNoQ 1$ and
-    $(\varStatement \opSeperate \varWit) \opIn \cnstRelation$ (whereas $\varWit$ is the output for the $\procExtWitId$ function) hold.
+    $(\varStatement \opSeperate \varWit) \opIn \cnstRelation$ (whereas \todo{whereas does not mean what you want to see here. I think you may use where here instead. Same problem appeared already several times in the text} $\varWit$ is the output for the $\procExtWitId$ function) hold.
 
     \[
         \procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEqNoQ 1
@@ -39,7 +39,7 @@ schnorr-based instantiation of the signature scheme, whereas $\varSigContext$ is
         (\varStatement \opSeperate \varWit) \opIn \cnstRelation
     \]
     We do this by showing that $\varWit$ is calculated correctly in $\procExtWitId$:
-    $\varSAptBob$ is the $\varS$ value in Bobs adapted partial signature
+    $\varSAptBob$ is the $\varS$ value in Bob's adapted partial signature
     \begin{align}
         \varWit \opEqNoQ & \varSApt \opSub (\varS \opSub \varSAlice) \\
         & \varSAptBob \opSub ((\varSAlice \opAddScalar \varSBob ) \opSub \varSAlice ) \\
@@ -48,6 +48,7 @@ schnorr-based instantiation of the signature scheme, whereas $\varSigContext$ is
         1 \opEqNoQ & 1
     \end{align}
 \end{proof}
+\todo[inline]{In the proof above, I think that $\varSApt$ in 4.14 should be $\varSAptBob$? }
 
 \subsection{Security}\label{subsec:sig:secureaptscheme}
 
@@ -57,7 +58,7 @@ For achieving this we will prove security for both the $\procDSignId$ and $\proc
 In particular, we will use the $\procZKfId{\cnstRelation}$-model in which we assume that we have access to a constant-round protocol $\procZKfId{\cnstRelation}$ that computes the zero-knowledge proof of knowledge functionality for any $\cnstNP$ relation $\cnstRelation$.
 The function is parameterized with a relation $\cnstRelation$ between a witness value $\varWit$ (or potentially multiple)  and a statement $\varStatement$.
 One party provides the witness statment pair $(\varWit, \varStatement)$, the second the statement $\funStar{\varStatement}$.
-If $\varStatement \opEqNoQ \funStar{\varStatement}$ and $\cnstRelation (\varWit, \varStatement)$ the functionality returns 1, otherwise 0.
+If $\varStatement \opEqNoQ \funStar{\varStatement}$ and $\cnstRelation (\varWit, \varStatement)$\todo{Have you introduced the notation $\cnstRelation (\varWit, \varStatement)$ before? This is not standard I think} the functionality returns 1, otherwise 0.
 More formally:
 \[
     \procZkf{\cnstRelation}{((\varWit, \varStatement), \funStar{\varStatement})} \opEqNoQ
@@ -67,7 +68,7 @@ More formally:
     \end{cases}
 \]
 That a constant-round zero-knowledge proof of knowledge exists was proven in~\cite{lindell2013note}.
-We recall from~\ref{sec:pre:privacy:zeroknowlegde} that a secure zero-knowledge proof must fulfill Completeness, Soundness and Zero-Knowledge.
+We recall from~\ref{sec:pre:privacy:zeroknowlegde} that a secure zero-knowledge proof must fulfill Completeness, Soundness and Zero-Knowledge. \todo{Where are these three properties defined? Give a reference to where you present them in the thesis or the corresponding paper}
 
 \paragraph{Hybrid functionalities:} The parties have access to a trusted third party that computes the zero-knowledge proof of knowledge functionality $\procZKfId{\cnstRelation}$. $\cnstRelation$ is the relation between a secret key $\varSecKey$ and its public key $\varPubKey \opEqNoQ \funGen{\varSecKey}$, for the elliptic curve generator point $\varG$.
 The participants have to call the functionality in the same order.
@@ -100,6 +101,8 @@ That means if the prover first sends the pair $(\varWit_1, \varStatement_1)$ and
     }
 \end{center}
 
+\todo[inline]{I think here only you know what operations are hidden behind the dots. A reader would need to find the corresponding figure of dSign and compare line by line. I think it would be more readable if you put the complete dSign and highlight in a certain color what instructions you have added and deleted here.}
+
 That means both Alice and Bob will verify the validity of the public key and nonce commitments of the other party and will stop protocol execution in case an invalid value has been sent.
 We assume parties have access to a trusted third party computing $\procZKfId{\cnstRelation}$ which will return 1 iff $\varPubKeyAlice \opEqNoQ \funStar{\varPubKeyAlice}$ (where $\funStar{\varPubKeyAlice}$ is the public key that Bob received from Alice) and $\varPubKeyAlice \opEqNoQ \funGen{\varSecKeyAlice}$. (The same holds for the reversed case)
 
@@ -108,6 +111,9 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
     Then $\procDSignId$ securely computes a signature $\varSigFin$ under the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ in the $\procZKfId{\cnstRelation}$-model.
 \end{theorem}
 
+\todo[inline]{I think that the theorem is missing the assumption that the hash function is modeled in the random 
+oracle model, which you use in the case where Bob is corrupted.}
+
 \begin{proof}
     We proof security of the protocol by constructing a simulator $\cnstSimulator$ who is given output $(\varSigFin, \varPubKey)$ from a TTP (trusted third party) that securely computes the protocol in the ideal world upon receiving the inputs from Alice and Bob.
     The task of the simulator will be to extract the inputs used by $\cnstAdversary$ such that he is able to call the TTP and receive the outputs.
@@ -115,7 +121,7 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
     The simulator uses the calls to $\procZKfId{\cnstRelation}$ in order to do this.
     Furthermore we assume that the message $\varMsg$ is known to both Alice and Bob.
     All other inputs (including public keys) are only known to the respective party at the start of the protocol.
-    We have to proof two cases, one in which Alice and one in which Bob is the corrupted party.
+    We have to proof\todo{I think you need to write prove instead of proof here?} two cases, one in which Alice is the corrupted party and one in which Bob is the corrupted party.
     
     \textbf{Alice is corrupted: } Simulator $\cnstSimulator$ works as follows:
     \begin{enumerate}
@@ -155,6 +161,11 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
     \end{itemize}
 
     We have shown that the distributions in each phase are indeed identical, which proves the indistinguishability of the two transcripts in the case Alice is corrupted.
+    
+    \todo[inline]{Minor points in the formality:\\
+    1. You are missing the point that the output of the simulator is also indistinguishable from the output of the attacker. In fact, your simulator is setting as output the same as the adversary.
+    2. You often write ``have to be identical to the real execution''. This is not formally correct: By real execution, the reader would understand an execution where the attacker contacts the real Bob and not your simulator. Therefore, the values that you create in the simulator are not identical to that real execution. What you are doing is creating an execution that is computationally indistinguishable to that of a real execution (i.e., imagine that A is given the transcript of two executions, one transcript is the messages exchanged with the real Bob and a second transcript is the messages that you create with the simulator. Then, A cannot tell what transcript is the real one and what transcript is the simulated one). An statement that is correct is that your simulator is creating messages that are identical to that expected by the adversary in the current execution. 
+    3. In this case, it is trivial to see that the two transcripts (the one that you create with the simulator and the one that would be created with the real Bob) are indistinguishable, so what you have done so far is fine. However, to be fully formal you would need to do the following: (i) assume that there is an adversary that is able to differentiate between the two transcripts, then you can build an adversary that breaks a certain assumption (e.g., the zero-knowledge of the zkps or the discrete logarithm assumption).  }
 
     \textbf{Bob is corrupted: } Simulator $\cnstSimulator$ works as follows:
     \begin{enumerate}
@@ -172,6 +183,9 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
             \varSigFin \opEqNoQ \varNonceAlice \opAddScalar \varSecKeyAlice \opTimesScalar \funStar{\varSchnorrChallenge} \opAddScalar \varNonceBob \opAddScalar \varSecKeyBob \opTimesScalar \funStar{\varSchnorrChallenge} \\
             \funStar{\varSchnorrChallenge} \opEqNoQ \frac{\varSigFin \opSub \varNonceAlice \opSub \varNonceBob}{\varSecKeyAlice \opAddScalar \varSecKeyBob}
         \end{gather*}
+        
+        \todo[inline]{Following-up from a previous message, in the description of the protocol in previous page, it does not appear when Bob does this hash computation. This is the reason why I think you should show the complete protocol in the figure above.}
+        
         \item $\cnstSimulator$ receives $(\varSigBob, \varSigContext, \varPubKeyBob)$ from $\cnstAdversary$.
         (In case he does not $\cnstSimulator$ sends $\cnstAbort$ to the TTP and outputs $\cnstFalsum$).
         He verifies the values sent to him by comparing them with $\varPubKeyBob$ and $\varRandBob$ from its memory, if they are found to be invalid $\cnstSimulator$ sends $\cnstAbort$ to the TTP, otherwise it sends $\cnstContinue$.
@@ -182,7 +196,7 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
         \item \textit{Phase 1: } The values $(\varPubKeyAlice, \varRandAlice)$ sent by $\cnstSimulator$ to $\cnstAdversary$ only depend on Alice's input parameters (and to some extend on the public elliptic curve parameters).
         As $\cnstAdversary$ does not know $\varPubKeyAlice$ or $\varRandAlice$ yet, he has no way of determining for two public keys $\varPubKeyAlice, \funStar{\varPubKeyAlice}$ which of the two is the correct one (other than guessing).
         \item \textit{Phase 2: } When $\cnstAdversary$ calls $\procZKfId{\cnstRelation}$ with the parameters sent to him he will still receive 1 back, and 0 otherwise, which is again exactly the same as in the real execution.
-        The hash function $\funHash{\cdot}$ is expected to output a random value for the schnorr challenge as defined by the hiding property of the hash function.
+        The hash function $\funHash{\cdot}$ is expected to output a random value for the schnorr challenge as defined by the hiding property of the hash function. \todo{This is not because of the hiding property, but the random oracle model. If you assume that the the hash function is hiding (but not in the random oracle), it might be that you cannot guess the input from the output, but the output is not random.}
         In the simulated case $\cnstSimulator$ calculates the output value from the final signature and depends on the input values of Alice and Bob of which at least Alice input is chosen randomly by $\cnstSimulator$.
         As dependent on randomly chosen inputs the calculation output will as well be distributed uniformly across the possible values and is therefore indistinguishable from a real hash function output.
         The remaining messages sent by $\cnstAdversary$ are identical to those of the real execution due to the deterministic nature of $\cnstAdversary$.
@@ -194,6 +208,7 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
 
     We have managed to show that in the case that Bob is corrupted the transcript is indistinguishable to a real transcript and even identical for the most part.
     We can therefore conclude that the transcript output will be indistinguishable from a real one in all cases and have thereby proven that the protocol $\procDSignId$ is secure.
+\todo[inline]{As before, you are missing the output of the simulator.}
 \end{proof}
 
 We now do the same for $\procDAptSignId$:
@@ -226,13 +241,16 @@ The relation $\cnstRelation$ is equally defined as in the previous proof.
         }
     \end{varwidth}
     }
+    \todo[inline]{Same as before, I would show the whole protocol, highlighting the changes.}
 \end{center}
 
 \begin{theorem}
-    Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were setup securly as for instance with the distributed keygen protocol $\procKeyGenPtId$.
+    Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were setup securely as for instance with the distributed keygen protocol $\procKeyGenPtId$.
     Additionally we have a pair $(\varWit, \varStatement)$ in the relation $\varStatement \opEqNoQ \funGen{\varWit}$ for which $\varWit$ was chosen randomly.
     Then $\procDAptSignId$ securely computes a signature $\varSigFin$ under the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ after which $\varWit$ is revealed to Alice, in the $\procZKfId{\cnstRelation}$-model.
 \end{theorem}
+
+\todo[inline]{Do you use the random oracle model as well?}
 
 \begin{proof}
     We proof the security of $\procDAptSignId$ by constructing a simulator $\cnstSimulator$ who is given the output $(\varSigFin, \varPubKey)$ (resp. ($\varWit, (\varSigFin, \varPubKey)$)) from a TTP that securly computes the protocol in the ideal world after receiving the inputs from Alice and Bob.
@@ -252,6 +270,9 @@ The relation $\cnstRelation$ is equally defined as in the previous proof.
         If any of those checks fail $\cnstSimulator$ sends $\cnstAbort$ to the TTP and outputs $\cnstFalsum$.
         Otherwise he sends $(\varMsg, \varSecKeyAlice, \varNonceAlice)$ to the TTP and receives $(\varWit, (\varSigFin, \varPubKey))$
         \item Again $\cnstSimulator$ calculates $\varSigBob, \varPubKeyBob, \varRandBob$ and finalizes the context $\varSigContext$ as layed out in the proof beforehand in step 3.
+        
+        \todo[inline]{I would copy the steps here to make the proof self-complete.}
+        
         \item $\cnstSimulator$ calculates $\funStar{\varSBob} \opAssign \varSBob \opAddScalar \varWit$ (extracted from the TTP output) from which he sets $\varSigAptBob \opAssign (\funStar{\varSBob}, \varRandBob, \varSigContext)$.
         \item $\cnstSimulator$ sends $(\varSigAptBob, \varSigContext, \varPubKeyBob, \varStatement \opAssign \funGen{\varWit})$ as if coming from Bob.
         \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation}$ we compare the parameters send by $\cnstAdversary$ to the real one, in case he sent a invalid value $\cnstSimulator$ returns 0, otherwise 1.
@@ -264,16 +285,21 @@ The relation $\cnstRelation$ is equally defined as in the previous proof.
         \item In \textit{Phase 2} Bob additionally sends $\varStatement$ to Alice
         \item We introduce \textit{Phase 4} in which Bob sends $\varSigFin$ to Alice
     \end{itemize}
+    
+    \todo[inline]{Here, I would write what you have done: ``The next steps are similar to those in proof x, with the differences a, b''. Then, I would say, ``yet for completeness, we write the full proof in the following'' and write the whole proof. We can see if we want to put in the appendix later if we find it repetitive.}
+    
 
     We now again argue why each phase in the simulation is indistinguishable from a real execution
     \begin{itemize}
-        \item \textit{Phase 1:} This phase is identical to phase 1 the previous proof, thereby the argument is the same.
+        \item \textit{Phase 1:} This phase is identical to phase 1 the previous proof, thereby the argument is the same. \todo{Same. Say that is the same but write it for completeness.}
         \item \textit{Phase 2:} In this phase $\cnstSimulator$ sends $\varStatement \opAssign \funGen{\varWit}$ to $\cnstAdversary$ for which $\varWit$ was received from the TTP, therefore it will be the same $\varWit$ sent in the real execution by the honest party which makes the simulation perfect in this phase.
         \item \textit{Phase 3:} Again the messages send in this phase are produced by the deterministic $\cnstAdversary$ which will be indistinguishable to the real execution.
         In contrast to the $\procDSignId$ protocol now the adversary does not yet finish the protocol.
         \item \textit{Phase 4:} Now the $\cnstAdversary$ expects to receive $\varSigFin$, from which he is able to extract the witness $\varWit$.
         Indeed he will receive a $\varSigFin$ which is identical to the one sent in a real execution by honest Bob, furthermore he will be able to extract $\varWit$ such that $\varStatement \opEqNoQ \funGen{\varWit}$, which again makes this phase identical to the real execution.
     \end{itemize}
+
+\todo[inline]{There are 4 phases here, while in the previous proof you had only three phases. I would recall the phases here as well (and maybe even mark them in the protocol so that it is clearer what you mean)}
 
     We have shown that in the case Alice is corrupt the simulated transcript produced by $\cnstSimulator$ is indeed distributed equally to a real execution and is thereby computationally indistinguishable.
 
