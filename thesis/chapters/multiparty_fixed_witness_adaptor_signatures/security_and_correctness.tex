@@ -1,9 +1,9 @@
-We now prove that the outlined schnorr-based instantiation is correct, i.e. Adaptor Signature Correctness holds, and is secure with regards to the definition~\ref{subsec:pre:security}.
+We now prove that the outlined Schnorr-based instantiation is correct, i.e. Adaptor Signature Correctness holds, and is secure with regards to the definition~\ref{subsec:pre:security}.
 
 \subsection{Adaptor Signature Correctness}\label{subsec:sig:aptsig-correctness}
 
 To prove that Adaptor Signature Correctness holds we have 3 statements to prove, first we prove that $\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPubKey} \opEqNoQ 1$ holds in our
-schnorr-based instantiation of the signature scheme, where $\varSigContext$ is setup such that $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
+Schnorr-based instantiation of the signature scheme, where $\varSigContext$ is setup such that $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
 
 \begin{proof}
     \label{prf:apt-schnorr-pre-sig-corr}
@@ -196,14 +196,14 @@ oracle model, which you use in the case where Bob is corrupted.}
         \item \textit{Phase 1: } The values $(\varPubKeyAlice, \varRandAlice)$ sent by $\cnstSimulator$ to $\cnstAdversary$ only depend on Alice's input parameters (and to some extend on the public elliptic curve parameters).
         As $\cnstAdversary$ does not know $\varPubKeyAlice$ or $\varRandAlice$ yet, he has no way of determining for two public keys $\varPubKeyAlice, \funStar{\varPubKeyAlice}$ which of the two is the correct one (other than guessing).
         \item \textit{Phase 2: } When $\cnstAdversary$ calls $\procZKfId{\cnstRelation}$ with the parameters sent to him he will still receive 1 back, and 0 otherwise, which is again exactly the same as in the real execution.
-        The hash function $\funHash{\cdot}$ is expected to output a random value for the schnorr challenge as defined by the hiding property of the hash function. \todo{This is not because of the hiding property, but the random oracle model. If you assume that the the hash function is hiding (but not in the random oracle), it might be that you cannot guess the input from the output, but the output is not random.}
+        The hash function $\funHash{\cdot}$ is expected to output a random value for the Schnorr challenge as defined by the hiding property of the hash function. \todo{This is not because of the hiding property, but the random oracle model. If you assume that the the hash function is hiding (but not in the random oracle), it might be that you cannot guess the input from the output, but the output is not random.}
         In the simulated case $\cnstSimulator$ calculates the output value from the final signature and depends on the input values of Alice and Bob of which at least Alice input is chosen randomly by $\cnstSimulator$.
         As dependent on randomly chosen inputs the calculation output will as well be distributed uniformly across the possible values and is therefore indistinguishable from a real hash function output.
         The remaining messages sent by $\cnstAdversary$ are identical to those of the real execution due to the deterministic nature of $\cnstAdversary$.
         \item \textit{Phase 3: } The simulator will now verify the values sent to him by $\cnstAdversary$ and will halt and output $\cnstFalsum$ in the case that he sends something invalid which is identical to the real execution.
         In this case $\cnstAdversary$ must not receive ($\varSigFin, \varPubKey$) in the ideal setting which is modelled by $\cnstSimulator$ sending $\cnstAbort$ to the TTP.
         Otherwise $\cnstSimulator$ will calculate his part of the partial signature as defined by the protocol.
-        It will therefore found to be valid by $\cnstAdversary$ and will complete to $\varSigFin$ with $\procFinSigId$, because of the fixed, calculated schnorr challenge $\cnstSimulator$ calculated in Phase 2.
+        It will therefore found to be valid by $\cnstAdversary$ and will complete to $\varSigFin$ with $\procFinSigId$, because of the fixed, calculated Schnorr challenge $\cnstSimulator$ calculated in Phase 2.
     \end{itemize}
 
     We have managed to show that in the case that Bob is corrupted the transcript is indistinguishable to a real transcript and even identical for the most part.
