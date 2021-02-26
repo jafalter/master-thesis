@@ -1,30 +1,17 @@
-In this chapter, we will define a variant of the adaptor signature scheme as explained in section ~\ref{sec:pre:aptsignatures}.
-The main difference in the protocol outlined in this thesis is that one of the two parties does know the fixed secret witness before the start of the protocol. The aim of the protocol will then be that the other person is able to extract the witness from the final signature.
-This feature can then be leveraged to build an Atomic Swap protocol as we will show in ~\ref{ch:atomicswap}.
+In this chapter, we will define a variant of the adaptor signature scheme as explained in ~\cref{sec:pre:aptsignatures}.
+This new variant is tailored specifically to meet the requirements of being applicable in the scenario of two-party signature protocols, constructable for aggregateable signature schemes such as schnorr~\cite{maxwell2019simple}.
+In a two-party signature protocol each party holds only a share of a private key (to a composite public key) for which they want to cooperatively create a signature.
+The advantage of our adapted signature scheme in comparison to the original definition is that in the two-party scenario mentioned above we do not need to introduce an additional pre-signature step.
+Instead one of the partial signatures created and exchanged by the two parties will serve as the pre-signature allowing for a simpler protocol.
+In particular our protocol will allow one of the two parties, to hide a witness value $\varWit \opIn (\varWit, \varStatement)$ inside his partial signature.
+The second party (knowing $\varStatement$, but not $\varWit$) can verify that $\varWit$ is indeed contained in the partial signature received by the peer, and will furthermore be able to extract $\varWit$ from the final signature and the previously received partial signature.
+This feature can then be leveraged to build an Atomic Swap protocol as we will show in ~\cref{ch:atomicswap}.
 
-\todo[inline]{Points to clarify here:\\
-- Why a new protocol for adaptor signatures is required?\\
-- What are the advantages in practice of your protocol? }
-
-
-
-The rest of the chapter is organized as follows. First we will define the general two-party signature creation protocol as it is currently implemented in Mimblewimble-based Cryptocurrencies.
-We reduce the generated signatures to the general case~\cite{schnorr1989efficient} and prove its correctness. 
-\todo[inline]{What is the general case? Explain}
-From this two-party protocol, we then derive the adapted variant, which allows hiding a fixed witness value in the signature, which can be revealed only by the other party after attaining the final signature.
-\todo[inline]{The witness value is revealed by the other party to whom? there are only two parties and the generator of the signature with the witness inside already knows the witness, right?}
-
-We start by defining our extended signature scheme in section~\ref{sec:sig:definitions}, proceed by providing a schnorr-based instantiation of the protocol in section~\ref{sec:sig:schnorr-inst} and finally prove its security in section~\ref{sec:sig:two-party-apt-security}.
-
-\todo[inline]{I would organize the content above in two paragraphs:\\
-(a) one paragraph that contains the info about the fixed witness adaptor signature and the extensions\\
-(b) A paragraph with the organization of the rest of the chapter.\\
-I think you somehow have this content already but mixed with each other. 
-}
-
-\todo[inline]{Editorial:\\
-If you use ref{sth} for your citations, it only includes the number and you need to add Section, Figure, etc on your own. You can use cref{sth} instead and automatically adds the corresponding word (e.g., Section 5). You need to add the package cleveref for that.
-}
+The rest of the chapter is organized as follows:
+First we will define the general two-party schnorr signature protocol, as it is currently implemented in mimblewimble-based cryptocurrencies.
+We will then show that the final signatures output by the protocol fulfill the same properties as regular schnorr signatures seen in ~\cite{schnorr1989efficient} and prove correctness of the protocol.
+From this two-party protocol, we then derive the adapted variant already mentioned before.
+We start by defining our extended signature scheme in ~\cref{sec:sig:definitions}, proceed by providing a schnorr-based instantiation of the protocol in ~\cref{sec:sig:schnorr-inst} and finally prove its security in ~\cref{sec:sig:two-party-apt-security}.
 
 \section{Definitions} \label{sec:sig:definitions}
 \input{chapters/multiparty_fixed_witness_adaptor_signatures/definitions}
