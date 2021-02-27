@@ -1,13 +1,12 @@
-We now prove that the outlined Schnorr-based instantiation is correct, i.e. Adaptor Signature Correctness holds, and is secure with regards to the definition~\ref{subsec:pre:security}.
+We now prove that the outlined Schnorr-based instantiation is correct, i.e. Adaptor Signature Correctness holds, and is secure with regards to the~\cref{subsec:pre:security} .
 
 \subsection{Adaptor Signature Correctness}\label{subsec:sig:aptsig-correctness}
 
-To prove that Adaptor Signature Correctness holds we have 3 statements to prove, first we prove that $\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPubKey} \opEqNoQ 1$ holds in our
-Schnorr-based instantiation of the signature scheme, where $\varSigContext$ is setup such that $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
+To prove that Adaptor Signature Correctness holds we have 3 statements to prove as given by \cref{def:sig:apt-sig-correctness}, first we prove that $\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPubKey} \opEqNoQ 1$ holds in our Schnorr-based instantiation of the signature scheme, where $\varSigContext$ is setup such that $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
 
 \begin{proof}
     \label{prf:apt-schnorr-pre-sig-corr}
-    For this proof we assume the setup already specified in definition~\ref{def:sig:apt-sig-correctness}.
+    For this proof we assume the setup already specified in~\cref{def:sig:apt-sig-correctness} .
     The proof is by showing equality of the equation checked by the verifier of the final signature by continuous substitutions in the left side of equation:
     \begin{align}
         \funGen{\varS} &\opEqNoQ \varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge} \\
@@ -20,7 +19,7 @@ Schnorr-based instantiation of the signature scheme, where $\varSigContext$ is s
     \end{align}
 
     It remains to prove that with the same setup $\procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEqNoQ 1$ and
-    $(\varStatement \opSeperate \varWit) \opIn \cnstRelation$ (whereas \todo{whereas does not mean what you want to see here. I think you may use where here instead. Same problem appeared already several times in the text} $\varWit$ is the output for the $\procExtWitId$ function) hold.
+    $(\varStatement \opSeperate \varWit) \opIn \cnstRelation$ for $\varWit \opFunResult \procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob}$:
 
     \[
         \procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEqNoQ 1
@@ -41,24 +40,23 @@ Schnorr-based instantiation of the signature scheme, where $\varSigContext$ is s
     We do this by showing that $\varWit$ is calculated correctly in $\procExtWitId$:
     $\varSAptBob$ is the $\varS$ value in Bob's adapted partial signature
     \begin{align}
-        \varWit \opEqNoQ & \varSApt \opSub (\varS \opSub \varSAlice) \\
+        \varWit \opEqNoQ & \varSAptBob \opSub (\varS \opSub \varSAlice) \\
         & \varSAptBob \opSub ((\varSAlice \opAddScalar \varSBob ) \opSub \varSAlice ) \\
         & \varSBob \opAddScalar \varWit \opSub (\varSBob) \\
         \varWit \opEqNoQ & \varWit \\
         1 \opEqNoQ & 1
     \end{align}
 \end{proof}
-\todo[inline]{In the proof above, I think that $\varSApt$ in 4.14 should be $\varSAptBob$? }
 
 \subsection{Security}\label{subsec:sig:secureaptscheme}
 
 We have shown that the outlined signature scheme is correct, next we have to prove its security.
-Our goal is to proof security in the malicious setting (as defined in~\ref{subsec:pre:security}) that means the adversary might or might not behave as specified by the protocol.
+Our goal is to proof security in the malicious setting (as defined in~\cref{subsec:pre:security}) that means the adversary might or might not behave as specified by the protocol.
 For achieving this we will prove security for both the $\procDSignId$ and $\procDAptSignId$ protocols in the hybrid model which was layed out by Yehuda Lindell in~\cite{lindell2017simulate}.
 In particular, we will use the $\procZKfId{\cnstRelation}$-model in which we assume that we have access to a constant-round protocol $\procZKfId{\cnstRelation}$ that computes the zero-knowledge proof of knowledge functionality for any $\cnstNP$ relation $\cnstRelation$.
 The function is parameterized with a relation $\cnstRelation$ between a witness value $\varWit$ (or potentially multiple)  and a statement $\varStatement$.
 One party provides the witness statment pair $(\varWit, \varStatement)$, the second the statement $\funStar{\varStatement}$.
-If $\varStatement \opEqNoQ \funStar{\varStatement}$ and $\cnstRelation (\varWit, \varStatement)$\todo{Have you introduced the notation $\cnstRelation (\varWit, \varStatement)$ before? This is not standard I think} the functionality returns 1, otherwise 0.
+If $\varStatement \opEqNoQ \funStar{\varStatement}$ and $(\varWit, \varStatement) \opIn \cnstRelation$ the functionality returns 1, otherwise 0.
 More formally:
 \[
     \procZkf{\cnstRelation}{((\varWit, \varStatement), \funStar{\varStatement})} \opEqNoQ
@@ -68,60 +66,63 @@ More formally:
     \end{cases}
 \]
 That a constant-round zero-knowledge proof of knowledge exists was proven in~\cite{lindell2013note}.
-We recall from~\ref{sec:pre:privacy:zeroknowlegde} that a secure zero-knowledge proof must fulfill Completeness, Soundness and Zero-Knowledge. \todo{Where are these three properties defined? Give a reference to where you present them in the thesis or the corresponding paper}
+A secure zero-knowledge proof must fulfill Completeness, Soundness and Zero-Knowledge properties which are defined for instance in~\cite{groth2010short}.
 
 \paragraph{Hybrid functionalities:} The parties have access to a trusted third party that computes the zero-knowledge proof of knowledge functionality $\procZKfId{\cnstRelation}$. $\cnstRelation$ is the relation between a secret key $\varSecKey$ and its public key $\varPubKey \opEqNoQ \funGen{\varSecKey}$, for the elliptic curve generator point $\varG$.
 The participants have to call the functionality in the same order.
 That means if the prover first sends the pair $(\varWit_1, \varStatement_1)$ and then $(\varWit_2, \varStatement_2)$ the verifier needs to first send $\varStatement_1$ and then $\varStatement_2$.
 
-\paragraph{Proof idea:} In order to construct our simulation proof in the hybrid-model we make some adjustments to the $\procDSignId$ protocol utilizing the capabilities of the $\procZKfId{\cnstRelation}$ functionality:
+\paragraph{Proof idea:} In order to construct our simulation proof in the hybrid-model we make some adjustments to the $\procDSignId$ protocol utilizing the capabilities of the $\procZKfId{\cnstRelation}$ functionality: (The added statements are marked in blue)
 \begin{center}
     \fbox{
     \begin{varwidth}{\textwidth}
         \procedure[linenumbering,skipfirstln]{$\procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}$} {
         Alice \< \< Bob \\
-        \cdots \< \< \\
-        \procZkf{\cnstRelation}{(\varSecKeyAlice, \varPubKeyAlice)} \\
-        \procZkf{\cnstRelation}{(\varNonceAlice, \varRandAlice)} \\
+        \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
+        \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
+        \color{blue} \procZkf{\cnstRelation}{(\varSecKeyAlice, \varPubKeyAlice)} \\
+        \color{blue} \procZkf{\cnstRelation}{(\varNonceAlice, \varRandAlice)} \\
         \< \sendmessageright*{\varSigContext, \varPubKeyAlice, \varRandAlice} \< \\
-        \< \< \cdots \\
-        \< \< \pcif \procZkf{\cnstRelation}{\varPubKeyAlice} \opEqNoQ 0 \opOr \procZkf{\cnstRelation}{\varSigContext.\varRand} \opEqNoQ 0 \\
-        \< \< \t \pcreturn \cnstFalsum \\
-        \< \< \procZkf{\cnstRelation}{(\varSecKeyBob, \varPubKeyBob)} \\
-        \< \< \procZkf{\cnstRelation}{(\varNonceBob, \varRandBob)} \\
+        \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyBob}}{\funGen{\varNonceBob}} \< \< \\
+        \< \< \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
+        \< \< \color{blue} \pcif \procZkf{\cnstRelation}{\varPubKeyAlice} \opEqNoQ 0 \opOr \procZkf{\cnstRelation}{\varSigContext.\varRand} \opEqNoQ 0 \\
+        \< \< \color{blue} \t \pcreturn \cnstFalsum \\
+        \< \< \color{blue} \procZkf{\cnstRelation}{(\varSecKeyBob, \varPubKeyBob)} \\
+        \< \< \color{blue} \procZkf{\cnstRelation}{(\varNonceBob, \varRandBob)} \\
         \< \sendmessageleft*{\varSigBob, \varSigContext, \varPubKeyBob} \< \\
-        \cdots \< \< \\
-        \pcif \procZkf{\cnstRelation}{\varPubKeyBob} \opEqNoQ 0 \opOr \pcskipln \\
-        \t \procZkf{\cnstRelation}{\varSigContext.\varRand \opAddPoint \varRandAlice^{-1}} \opEqNoQ 0 \\
-        \t \pcreturn \cnstFalsum \\
-        \< \cdots \< \\
+        \color{blue} \pcif \procZkf{\cnstRelation}{\varPubKeyBob} \opEqNoQ 0 \opOr \pcskipln \\
+        \t \color{blue} \procZkf{\cnstRelation}{\varSigContext.\varRand \opAddPoint \varRandAlice^{-1}} \opEqNoQ 0 \\
+        \t \color{blue} \pcreturn \cnstFalsum \\
+        \pcif \procVerfPtSig{\varSigBob}{\varMsg}{\varPubKeyBob} \opEqNoQ 0 \< \< \\
+        \t \pcreturn \cnstFalsum \< \< \\
+        \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \< \< \\
+        \< \sendmessageright*{\varSigAlice} \< \\
+        \< \< \pcif \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice} \opEqNoQ 0 \\
+        \< \< \t \pcreturn \cnstFalsum \\
+        \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
+        \varPubKey \opFunResult \varSigContext.\varPubKey \< \< \varPubKey \opFunResult \varSigContext.\varPubKey \\
         \pcreturn (\varSigFin, \varPubKey) \< \< \pcreturn (\varSigFin, \varPubKey)
         }
     \end{varwidth}
     }
 \end{center}
 
-\todo[inline]{I think here only you know what operations are hidden behind the dots. A reader would need to find the corresponding figure of dSign and compare line by line. I think it would be more readable if you put the complete dSign and highlight in a certain color what instructions you have added and deleted here.}
-
 That means both Alice and Bob will verify the validity of the public key and nonce commitments of the other party and will stop protocol execution in case an invalid value has been sent.
-We assume parties have access to a trusted third party computing $\procZKfId{\cnstRelation}$ which will return 1 iff $\varPubKeyAlice \opEqNoQ \funStar{\varPubKeyAlice}$ (where $\funStar{\varPubKeyAlice}$ is the public key that Bob received from Alice) and $\varPubKeyAlice \opEqNoQ \funGen{\varSecKeyAlice}$. (The same holds for the reversed case)
+We assume parties have access to a trusted third party computing $\procZKfId{\cnstRelation}$ which will return 1 if $\varPubKeyAlice \opEqNoQ \funStar{\varPubKeyAlice}$ (where $\funStar{\varPubKeyAlice}$ is the public key that Bob received from Alice) and $\varPubKeyAlice \opEqNoQ \funGen{\varSecKeyAlice}$. (The same holds for the reversed case)
 
 \begin{theorem}\label{lem:sig:security}
-Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were setup securly as for instance with the distributed keygen protocol $\procKeyGenPtId$.
+Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were setup securely as for instance with the distributed keygen protocol $\procKeyGenPtId$ and a hash function $\funHash{\cdot}$ modeled in the random oracle model.
     Then $\procDSignId$ securely computes a signature $\varSigFin$ under the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ in the $\procZKfId{\cnstRelation}$-model.
 \end{theorem}
-
-\todo[inline]{I think that the theorem is missing the assumption that the hash function is modeled in the random 
-oracle model, which you use in the case where Bob is corrupted.}
 
 \begin{proof}
     We proof security of the protocol by constructing a simulator $\cnstSimulator$ who is given output $(\varSigFin, \varPubKey)$ from a TTP (trusted third party) that securely computes the protocol in the ideal world upon receiving the inputs from Alice and Bob.
     The task of the simulator will be to extract the inputs used by $\cnstAdversary$ such that he is able to call the TTP and receive the outputs.
     From this output the simulator $\cnstSimulator$ will have to construct a transcript which is indistinguishable from the protocol transcript in the real world in which the corrupted party is controlled by a deterministic polynomial adversary $\cnstAdversary$.
     The simulator uses the calls to $\procZKfId{\cnstRelation}$ in order to do this.
-    Furthermore we assume that the message $\varMsg$ is known to both Alice and Bob.
+    Furthermore, we assume that the message $\varMsg$ is known to both Alice and Bob.
     All other inputs (including public keys) are only known to the respective party at the start of the protocol.
-    We have to proof\todo{I think you need to write prove instead of proof here?} two cases, one in which Alice is the corrupted party and one in which Bob is the corrupted party.
+    We have to prove two cases, one in which Alice is the corrupted party and one in which Bob is the corrupted party.
     
     \textbf{Alice is corrupted: } Simulator $\cnstSimulator$ works as follows:
     \begin{enumerate}
@@ -140,8 +141,8 @@ oracle model, which you use in the case where Bob is corrupted.}
             \varSigBob \opAssign (\varSBob, \varRandBob, \varSigContext)
         \end{gather*}
         \item After having done the calculations $\cnstSimulator$ is able to send $\varSigContext, \varSigBob, \varPubKeyBob$ to $\cnstAdversary$ as if coming from Bob.
-        \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation}$ and $\procZKfId{\cnstRelation}$ (as the verifier) $\cnstSimulator$ checks equality with $\varPubKeyBob$ (respective $\varRandBob$) and thereafter send back either 0 or 1.
-        \item Eventually $\cnstSimulator$ will receive $\funStar{\varSigAlice}$ from $\cnstAdversary$ and checks if $\varSigAlice \opEqNoQ \funStar{\varSigAlice}$.
+        \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation}$ and $\procZKfId{\cnstRelation}$ (as the verifier) $\cnstSimulator$ checks equality with $\varPubKeyBob$ (respective $\varRandBob$) and thereafter sends back either 0 or 1.
+        \item Eventually $\cnstSimulator$ will receive $\funStar{\varSigAlice}$ from $\cnstAdversary$ and checks if $\varSigAlice \opEqNoQ \funStar{\varSigAlice}$ (as calculated in step 3).
         If they are indeed the same the simulator will send $\cnstContinue$ to the TTP and output whatever $\cnstAdversary$ outputs, otherwise he will send $\cnstAbort$ and output $\cnstFalsum$.
     \end{enumerate}
 

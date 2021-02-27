@@ -26,7 +26,8 @@ The definition below was constructed with the goal in mind of formalizing exactl
 \end{definition}
 
 We require the two party signature scheme to be correct as well as secure as of~\cref{subsec:pre:security}.
-For the correctness of the distributed key-generation protocol $\procKeyGenPtId$, special care needs to be taken to gurantee a uniformly random distribution of generated keys as pointed out by Lindell Yehuda in~\cite{lindell2017fast}.
+For the security of the distributed key-generation protocol $\procKeyGenPtId$, special care needs to be taken not to be vulnerable to rogue-key attacks.
+In such an attack one of the public keys is computed as a function of the other parties public key, allowing the corrupted signer to produce forged signatures under the honest users public key without knowing its secret key~\cite{maxwell2019simple}.
 
 
 From the ~\cref{def:sig:two-party-sig}, we now derive an adapted signature scheme $\varSigSchemeApt$, which allows one of the participants to hide a secret witness value inside his partial signature.
