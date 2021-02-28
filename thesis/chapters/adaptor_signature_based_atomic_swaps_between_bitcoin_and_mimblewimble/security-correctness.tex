@@ -325,7 +325,7 @@ As for $\cnstRelation_2$ we again allow to call the protocol with an array of in
 
 \begin{theorem}
     \label{teo:atom:sec-dspend}
-    Let $\varCommitScheme$ be a correct and secure pedersen commitment scheme, $\varProofSystem$ be a correct and secure range proof system and $\varSigSchemeMP$ be a secure and correct two-party signature scheme, then $\procDSendCoinsId$ securely computes a mimblewimble pre-transaction $\funStarAlt{\varPreTx}$ spending a coin $\varCoinShared$ owned by the two parties in the hybrid $\procZKfId{\cnstRelation_1}$,$\procZKfId{\cnstRelation_2}$,$\procZKfId{\cnstRelation_3}$-model.
+    Let $\varCommitScheme$ be a correct and secure pedersen commitment scheme, $\varProofSystem$ be a correct and secure range proof system and $\varSigSchemeMP$ be a secure and correct two-party signature scheme, then $\procDSendCoinsId$ securely computes a Mimblewimble pre-transaction $\funStarAlt{\varPreTx}$ spending a coin $\varCoinShared$ owned by the two parties in the hybrid $\procZKfId{\cnstRelation_1}$,$\procZKfId{\cnstRelation_2}$,$\procZKfId{\cnstRelation_3}$-model.
 \end{theorem}
 
 \begin{proof}
@@ -541,7 +541,7 @@ We further require a trusted third party computing $\procDRecvCoinsId$, which we
 \end{figure}
 
 \begin{theorem}\label{teo:atom:sec-sharedout-tx}
-    Let $\varCommitScheme$ be a correct and secure pedersen commitment scheme, $\varProofSystem$ be a correct and secure range proof system and $\varSigSchemeMP$ be a secure and correct two-party signature scheme, then $\procDSharedOutputMwTxId$ securely computes a mimblewimble transaction with a output coin $\funStarAlt{\varCoinShared}$ which spending secret is shared between Alice and Bob.
+    Let $\varCommitScheme$ be a correct and secure pedersen commitment scheme, $\varProofSystem$ be a correct and secure range proof system and $\varSigSchemeMP$ be a secure and correct two-party signature scheme, then $\procDSharedOutputMwTxId$ securely computes a Mimblewimble transaction with a output coin $\funStarAlt{\varCoinShared}$ which spending secret is shared between Alice and Bob.
 \end{theorem}
 
 \begin{proof}

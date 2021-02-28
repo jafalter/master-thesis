@@ -34,7 +34,7 @@ If we want to indicate that a spendable coin is a output coin of a transaction w
         \todo[inline]{Throughout the thesis, you are using Alice as the sender and Bob as the receiver, right? If so, make sure that this is clearly specified somewhere.}
         \item $\varTx \opFunResult \procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}$: The finalize algorithm is a DPT routine again called by the transaction sender that takes as input a pre-transaction $\varPreTx$ and the senders signing key $\varSecKeyAlice$ and nonce $\varNonceAlice$.
         The function will output a finalized signed transaction $\varTx$.
-        \item $\{1,0\} \opFunResult \procVerfTx{\varTx}$: The verification algorithm is taken from the Fuchsbauer et al. paper \cite{fuchsbauer2019aggregate} (there it is named $\styleFunction{MW.Ver}$) and can be used to verify mimblewimble transactions.
+        \item $\{1,0\} \opFunResult \procVerfTx{\varTx}$: The verification algorithm is taken from the Fuchsbauer et al. paper \cite{fuchsbauer2019aggregate} (there it is named $\styleFunction{MW.Ver}$) and can be used to verify Mimblewimble transactions.
         If an invalid transaction is passed it will output 0, otherwise 1.
         The routine verifies four conditions:
         \begin{enumerate}

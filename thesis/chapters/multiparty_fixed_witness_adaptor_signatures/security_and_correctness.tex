@@ -1,12 +1,12 @@
-We now prove that the outlined Schnorr-based instantiation is correct, i.e. Adaptor Signature Correctness holds, and is secure with regards to the~\cref{subsec:pre:security} .
+We now prove that the outlined Schnorr-based instantiation is correct, i.e. Adaptor Signature Correctness holds, and is secure with regards to the~\cref{subsec:pre:security}.
 
 \subsection{Adaptor Signature Correctness}\label{subsec:sig:aptsig-correctness}
 
-To prove that Adaptor Signature Correctness holds we have 3 statements to prove as given by \cref{def:sig:apt-sig-correctness}, first we prove that $\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPubKey} \opEqNoQ 1$ holds in our Schnorr-based instantiation of the signature scheme, where $\varSigContext$ is setup such that $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
+To prove that Adaptor Signature Correctness holds we have three statements to prove as given by \cref{def:sig:apt-sig-correctness}, first we prove that $\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPubKey} \opEqNoQ 1$ holds in our Schnorr-based instantiation of the signature scheme, where $\varSigContext$ is setup such that $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
 
 \begin{proof}
     \label{prf:apt-schnorr-pre-sig-corr}
-    For this proof we assume the setup already specified in~\cref{def:sig:apt-sig-correctness} .
+    For this proof we assume the setup already specified in~\cref{def:sig:apt-sig-correctness}.
     The proof is by showing equality of the equation checked by the verifier of the final signature by continuous substitutions in the left side of equation:
     \begin{align}
         \funGen{\varS} &\opEqNoQ \varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge} \\
@@ -214,7 +214,7 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
 We now do the same for $\procDAptSignId$:
 Again we adjust the protocol with calls to $\procZKfId{\cnstRelation}$, note that we now have one additional call $\procZKfId{\cnstRelation}$, for the pair $(\varWit, \varStatement)$.
 The relation $\cnstRelation$ is equally defined as in the previous proof.
-The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj} .
+The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj}.
 \begin{figure}
     \begin{center}
         \fbox{
