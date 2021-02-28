@@ -1,0 +1,84 @@
+We now formalize two protocols $\procDSignId$ and $\procDAptSignId$ which will later be used when constructing Mimblewimble transactions.
+$\procDSignId$ is a two-party protocol creating a signature under a composite public key $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$ using the algorithms outlined in \cref{fig:twoparty-schnorr} .
+$\procDAptSignId$ additionally, uses the functionality of \cref{fig:aptSchnorr} to allow one party to adapt his partial signature with a secret witness value $\varWit$, which is then revealed to the other party by the final signature.
+
+Note that for these protocols we assume that the secret keys as well as nonce values used in the signatures have already been generated beforehand, for example by running a secure setup protocol similar to $\procKeyGenPtId$.
+However, in this case we furthermore assume that the signature context $\varSigContext$ has not yet been setup between the parties, the reason for this is that we are faced with exactly this scenario in the Mimblewimble transaction protocols, which we shall see later in \cref{sec:atom:inst} .
+Both parties input the shared message $\varM$ as well as their secret keys and secret nonces.
+The instantiation of the protocol can be seen in \cref{fig:sig:dsign} .
+The protocol outputs a signature $\varSigFin$ to the message $\varMsg$, valid under the composite public key $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
+Additionally, to the final signature the protocol also outputs the composite public key $\varPubKey$.
+
+\begin{figure}
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering,skipfirstln]{$\procDSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}$} {
+            Alice \< \< Bob \\
+            \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
+            \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
+            \< \sendmessageright*{\varSigContext, \varPubKeyAlice \opAssign \funGen{\varSecKeyAlice}} \< \\
+            \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyBob}}{\funGen{\varNonceBob}} \< \< \\
+            \< \< \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
+            \< \sendmessageleft*{\varSigBob, \varSigContext, \varPubKeyBob \opAssign \funGen{\varSecKeyBob}} \< \\
+            \pcif \procVerfPtSig{\varSigBob}{\varMsg}{\varPubKeyBob} \opEqNoQ 0 \< \< \\
+            \t \pcreturn \cnstFalsum \< \< \\
+            \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \< \< \\
+            \< \sendmessageright*{\varSigAlice} \< \\
+            \< \< \pcif \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice} \opEqNoQ 0 \\
+            \< \< \t \pcreturn \cnstFalsum \\
+            \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
+            \varPubKey \opFunResult \varSigContext.\varPubKey \< \< \varPubKey \opFunResult \varSigContext.\varPubKey \\
+            \pcreturn (\varSigFin, \varPubKey) \< \< \pcreturn (\varSigFin, \varPubKey)
+            }
+        \end{varwidth}
+        }
+    \end{center}
+    \caption{Instantiation of the $\procDSignId$ protocol.} \label{fig:sig:dsign}
+\end{figure}
+
+The final signature is a valid signature to the message $\varMsg$ under the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$.
+A verifier knowing the signed message $\varMsg$, the final signature $\varSigFin$ and the composite public key $\varPubKey$ can now verify the signature using the regular $\procVerfId$ procedure as shown in \cref{fig:schnorr} .
+
+We now define the $\procDAptSignId$ protocol between Alice and Bob again creating a signature $\varSigFin$ under the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$.
+Now Bob will hide his secret $\varWit$ which Alice can extract after the signing process has completed.
+The concrete instantiation can be seen in \cref{fig:sig:daptsign} .
+One thing to note is that in this protocol only Bob is able to call the signature finalization algorithm $\procFinSigId$ for computing the final signature, which is different from the previous protocol, in which both had the ability to do so.
+The reason for this is that the function requires Bob's unadapted partial signature $\varSigBob$ as input, which Alice does not know. (She only knows Bobs adapted partial signature).
+Therefore, one further interaction is needed to send the final signature to Alice.
+The protocol outputs $(\varWit, (\varSigFin, \varPubKey))$ for Alice as she manages to learn $\varWit$ and $(\varSigFin, \varPubKey)$ for Bob.
+
+\begin{figure}
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
+            \procedure[linenumbering,skipfirstln]{$\procDAptSign{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyBob}{\varNonceBob}{\varWit}$} {
+            Alice \< \< Bob \\
+            \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
+            \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
+            \< \sendmessageright*{\varSigContext, \varPubKeyAlice \opAssign \funGen{\varSecKeyAlice}} \< \\
+            \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyBob}}{\funGen{\varNonceBob}} \< \< \\
+            \< \< \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
+            \< \< \varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit} \\
+            \< \< \varPubKeyBob \opAssign \funGen{\varSecKeyBob} \\
+            \< \< \varStatement \opAssign \funGen{\varWit} \\
+            \< \sendmessageleft*{\varSigAptBob, \varSigContext, \varPubKeyBob, \varStatement} \< \\
+            \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEqNoQ 0 \< \< \\
+            \t \pcreturn \cnstFalsum \< \< \\
+            \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \< \< \\
+            \< \sendmessageright*{\varSigAlice} \< \\
+            \< \< \pcif \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice} \opEqNoQ 0 \\
+            \< \< \t \pcreturn \cnstFalsum \\
+            \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
+            \< \sendmessageleft*{\varSigFin} \< \\
+            \varPubKey \opFunResult \varSigContext.\varPubKey \< \< \varPubKey \opFunResult \varSigContext.\varPubKey \\
+            \pcif \procVerf{\varMsg}{\varSigFin}{\varPubKey} \opEqNoQ 0 \\
+            \t \pcreturn \cnstFalsum \\
+            \varWit \opFunResult \procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob} \\
+            \pcreturn (\varWit, (\varSigFin, \varPubKey)) \< \< \pcreturn (\varSigFin, \varPubKey)
+            }
+        \end{varwidth}
+        }
+    \end{center}
+    \caption{Instantiation of the $\procDAptSignId$ protocol.} \label{fig:sig:daptsign}
+\end{figure}
