@@ -1,16 +1,16 @@
 In this section we will outline the fundamental properties of the protocols employed in Mimblewimble which are relevant for the thesis and particularly the construction of the Atomic Swap protocol constructed in chapter~\ref{ch:atomicswap}.
 \subsubsection{Transaction Structure} \label{subsec:pre:mimblwimble-tx}
 
-First we will define the notion of a coin in Mimblewimble which has similarity to an unspent transction output (UTXO) in Bitcoin.
+First we will define the notion of a coin in Mimblewimble which has similarity to an unspent transaction output (UTXO) in Bitcoin.
 \begin{definition}[Mimblewimble Coin]\label{def:pre:coin}
     For two adjacent elliptic curve generators $\varG$ and $\varH$ a coin in Mimblewimble is a tuple of the form ($\varCoin$, $\varProof$), where $\varCoin \opAssign \funGen{\varValue} \opAddPoint \funGenH{\varNonce}$ is a Pedersen Commitment~\cite{pedersen1991non}
     to the value $\varValue$ with blinding factor $\varNonce$. $\varProof$ is a range proof attesting to the statement that $\varValue$ is in a valid range in zero-knowledge.
     The valid range is defined by the specific implementation, in pratice $\langle 0, 2^{64} -1 \rangle$ is used in the most prominant implementations.
 \end{definition}
 
-A Mimblewimble transaction consists of $\varCoinInp \opAssign (\varCoin_1 \opSeperate \dots \opSeperate \varCoin_n)$ input coins and $\varCoinOut \opAssign (\varCoin'_1 \opSeperate \dots \opSeperate \varCoin'_n)$ output coins.
+A Mimblewimble transaction consists of $\varCoinInp \opAssign (\varCoin_1 , \dots , \varCoin_n)$ input coins, $\varCoinOut \opAssign (\varCoin'_1 , \dots , \varCoin'_n)$ output coins and kernel $\varKernel$, which we will define throughout this section.
 \begin{definition}[Transaction well-balancedness]  \label{def:pre:tx-well-balancedness}
-    A transaction is considered \emph{well-balanced} iff $\sum{\varValue'_i} \opSub \sum{\varValue_i} \opEqNoQ 0$ so the sum of all output values subtracted from the sum of input values has to be 0. (Not taking transaction fees into account)
+    A transaction is considered \emph{well-balanced} if $\sum{\varValue'_i} \opSub \sum{\varValue_i} \opEqNoQ 0$ so the sum of all output values subtracted from the sum of input values has to be 0. (Not taking transaction fees into account)
 \end{definition}
 
 \begin{definition}[Transaction validity] \label{def:pre:tx-mw-validity}
@@ -26,11 +26,12 @@ From the definition of \emph{Transaction validity} we can derive the following e
 So if we assume that a transaction is valid then we are left with the following so called excess value:
 \[ \varExcess \opEqNoQ \funGen{\varExcessExp} \opEqNoQ \funGen{(\sum{\varNonce'_i} \opSub \sum{\varNonce_i})} \]
 Knowledge of the opening of all coins, and the well-balancedness of the transaction implies knowledge of the discrete logarithm $\varExcessExp$ of $\varExcess$.
-Directly revealing $\varExcessExp$ would leak too much information, an adversary knowing the openings for input coins and all but one output coin, could easily calculate the unknown opening given $\varExcess$.
+Directly revealing $\varExcessExp$ would leak too much information, an adversary knowing the openings for input coins and all but one output coin, could easily calculate the unknown opening given $\varExcessExp$.
 Therefore instead knowledge of the discrete logarithm to $\varExcess$ is proven by providing a valid signature for $\varExcess$ as public key.
 Finally we would like to add that coinbase transactions (transactions creating new money as part of mining reward) additionally include the newly minted money as supply $\varSupply$ in the excess equation as follows:
 \[ \varExcess \opAssign \funGen{(\sum{\varNonce'_i} \opSub \sum{\varNonce_i})} \opSub \funGenH{\varSupply} \]
-Finally a Mimblewimble transaction is of form:
+For non coinbase transactions, $\varSupply$ will simply be set to 0.
+Finally, a Mimblewimble transaction is of form:
 \[ \varTx \opAssign (\varSupply \opSeperate \varCoinInp \opSeperate \varCoinOut \opSeperate \varKernel)\:\text{with}\:\varKernel \opAssign (\funList{\varProof} \opSeperate \funList{\varExcess} \opSeperate \funList{\varSignature}) \]
 where $\varSupply$ is the transaction supply amount, $\varCoinInp$ is the list of input coins, $\varCoinOut$ is the list of output coins and $\varKernel$ is the transaction Kernel.
 The Kernel consists of $\funList{\varProof}$ which is a set of all output coin range proofs, $\funList{\varExcess}$ a set of excess values and finally $\funList{\varSignature}$ a set of signatures ~\cite{fuchsbauer2019aggregate}.
@@ -94,7 +95,8 @@ This property is employed in the Mimblewimble protocol to reduce the space requi
 As already pointed out, building transactions in Mimblewimble is an interactive process between the sender and receiver of funds.
 Jedusor, Tom Elvis originally envisioned the following two-step process to build a transaction:~\cite{jedusor2016mimblewimble}
 
-Assume Alice wants to transfer coins of value $\varFundValue$ to Bob.
+Throughout the thesis whenever we are concerned with Mimblewimble transactions we generally refer to the sending party (owning the input coins) as Alice and the receiving party (owning the newly created output coin) as Bob.
+Assume for the following that Alice wants to transfer coins of value $\varFundValue$ to Bob:
 \begin{enumerate}
     \item Alice first selects an input coin $\varCoinInp$ (or potentially multiple) in her control with total stored value $\varValue$ with $\varValue \geq \varFundValue$.
     She then creates change coin outputs $\varCoinOutAlice$ (could again be multiple) with the remainder of her input value substracted by the value send to Bob.
@@ -176,3 +178,4 @@ A figure showing the protocol flow is depicted in Figure~\ref{fig:txSalvaged}.
     }
     \caption{Salvaged transaction protocol by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} \label{fig:txSalvaged}}
 \end{figure}
+

@@ -47,8 +47,7 @@ The pre-transaction can then be sent to a receiver.
 Note that this instantiation differs from the one described by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} in that the sender does not yet sign the transaction during $\procSendCoinsId$.
 This has the reason that in our definition of the Two-Party Signature Scheme~\ref{def:sig:two-party-sig} the signature context $\varSigContext$ requires to be fully setup before a partial signature can be created, therefore signing can only start at the receivers turn, after the signature context has been completed.
 In the referenced paper it is possible to start the signing earlier, because instead of using the notion of a two-party signing protocol, they instead rely on an aggregateable signature scheme.
-The sender and receiver both will create their signatures which will then be aggregated into the final one.
-However, we find that by using a two-party signature scheme for our formalization we are closer to what is implemented in practice~\footnote{\urlgrinexplained}.
+The sender and receiver both will create their signatures which will then be aggregated into the final one. .
 Furthermore by starting the signing process at the receivers turn we avoid a potential problem:
 If an adversary learns the already signed pre-transaction and transaction value $\varFundValue$ before the intended receiver, the adversary would be able to steal the coins by creating his malicious output coin together with his signature, which he could then aggregate to the senders pre-transaction.
 
