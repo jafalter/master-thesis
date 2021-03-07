@@ -1,12 +1,12 @@
-In this section we specify three protocols to build Mimblewimble transactions from the definitions found in~\ref{sec:atom:definitions}.
-Later in section~\ref{sec:atom:security} we will prove the security of these protocols and finally in section~\ref{sec:atom:atomic-swap} we will utilize them to build our Atomic Swap.
+In this section we specify three protocols to build Mimblewimble transactions from the definitions found in~\cref{sec:atom:definitions}.
+Later in section~\cref{sec:atom:security} we will prove the security of these protocols and finally in section~\cref{sec:atom:atomic-swap} we will utilize them to build our Atomic Swap.
 
 \subsection{Simple Mimblewimble Transaction - $\procDBuildMwTxId$} \label{subsec:atom:simple-mw-tx}
 
-$\procDBuildMwTxId$ is a protocol between a sender and receiver which builds a Mimblewimble transaction transferring a value $\varFundValue$ from the sender to a receiver for a Mimblewimble Transaction scheme as defined in~\ref{def:atom:mw-tx-scheme}.
+$\procDBuildMwTxId$ is a protocol between a sender and receiver which builds a Mimblewimble transaction transferring a value $\varFundValue$ from the sender to a receiver for a Mimblewimble Transaction scheme as defined in~\cref{def:atom:mw-tx-scheme}.
 It takes as input a list of spendable coins $\funArray{\varSpendableCoin}$, a transaction value $\varFundValue$, and an optional timelock $\varTime$ from the sender, the same transaction value $\varFundValue$ from the receiver and uses the functions defined earlier to output a valid transaction $\varTx$ as well as the newly spendable coins to both parties.
 \[ \langle (\varTx, \funStar{\varSpendableCoinAlice}), (\varTx, \funStar{\varSpendableCoinBob}) \rangle \opFunResult \procDBuildMwTx{\funStar{\varSpendableCoin}}{\varFundValue}{\varTime} \]
-Figure~\ref{fig:d-build-mw-tx} shows the implementation of the $\procDBuildMwTxId$.
+Figure~\cref{fig:d-build-mw-tx} shows the implementation of the $\procDBuildMwTxId$.
 
 \begin{figure}
     \fbox{
@@ -30,7 +30,7 @@ Figure~\ref{fig:d-build-mw-tx} shows the implementation of the $\procDBuildMwTxI
 \subsection{Shared Output Mimblewimble Transaction - $\procDSharedOutputMwTxId$} \label{subsec:atom:shared-out-mw-tx}
 
 $\procDSharedOutputMwTxId$ is a protocol between a sender and a receiver.
-It builds a Mimblewimble transaction transferring value from a sender for the Extendend Mimblewimble Transaction Scheme in ~\ref{def:atom:ext-mw-tx-scheme}.
+It builds a Mimblewimble transaction transferring value from a sender for the Extendend Mimblewimble Transaction Scheme in ~\cref{def:atom:ext-mw-tx-scheme}.
 However, instead of simply sending value to a receiver it sends it to a shared coin, for which both the sender and receiver know one part of the opening.
 As input it again takes a list of spendable coins $\funArray{\varSpendableCoin}$, a transaction value $\varFundValue$ and an optional timelock $\varTime$ from the sender and the same transaction value $\varFundValue$ from the receiver.
 It outputs the final transaction $\varTx$ to both parties, Alice will receive her spendable change output $\funStar{\varSpendableCoinAlice}$ and both parties will receive their part of the shared spendable coin $\funStar{\varPtSpendableCoinAlice}$, $\funStar{\varPtSpendableCoinBob}$.
@@ -39,7 +39,7 @@ It outputs the final transaction $\varTx$ to both parties, Alice will receive he
 
 One use case of this transaction protocol is to lock funds between two users, which can then be redeemed by both parties cooperating.
 
-Figure~\ref{fig:d-shared-out-mw-tx} shows the implementation of the protocol.
+Figure~\cref{fig:d-shared-out-mw-tx} shows the implementation of the protocol.
 
 \begin{figure}
     \fbox{
@@ -63,7 +63,7 @@ Figure~\ref{fig:d-shared-out-mw-tx} shows the implementation of the protocol.
 \subsection{Shared Input Mimblewimble Transaction $\procDSharedInpMwTxId$} \label{subsec:atom:shared-inp-mw-tx}
 
 $\procDSharedInpMwTxId$ is a protocol between a sender and a receiver.
-It builds a Mimblewimble transaction transferring value from a coin shared between the sender and receiver to a receiver again for the Extended Mimblewimble Transaction Scheme outlined in~\ref{def:atom:ext-mw-tx-scheme}
+It builds a Mimblewimble transaction transferring value from a coin shared between the sender and receiver to a receiver again for the Extended Mimblewimble Transaction Scheme outlined in~\cref{def:atom:ext-mw-tx-scheme}
 As input it takes a list of partial spendable coins $\funArray{\varPtSpendableCoinAlice}$, a transaction value $\varFundValue$ and an optional timelock $\varTime$ from the sender, and the other part of the shared spendable coins $\varPtSpendableCoinBob$ as well as the same transaction value $\varFundValue$ from the receiver.
 It outputs a final transaction $\varTx$ to both parties, as well as the new outputs $\funStar{\varSpendableCoinAlice}, \funStar{\varSpendableCoinBob}$ to the respective owner.
 
@@ -71,7 +71,7 @@ It outputs a final transaction $\varTx$ to both parties, as well as the new outp
 
 The protocol can be used to redeem funds which are locked created with the $\procDSharedInpMwTxId$ protocol.
 
-Figure~\ref{fig:d-shared-inp-mw-tx} shows the implementation of the protocol.
+Figure~\cref{fig:d-shared-inp-mw-tx} shows the implementation of the protocol.
 
 \begin{figure}
     \fbox{
@@ -92,13 +92,13 @@ Figure~\ref{fig:d-shared-inp-mw-tx} shows the implementation of the protocol.
 
 \subsection{Contract Mimblewimble Transaction - $\procDScriptMwTxId$} \label{subsec:atom:script-mw-tx}
 
-$\procDScriptMwTxId$ is a protocol between a sender and a receiver for the Contract Mimblewimble Transaction Scheme defined in~\ref{def:atom:apt-ext-mw-tx-scheme}.
+$\procDScriptMwTxId$ is a protocol between a sender and a receiver for the Contract Mimblewimble Transaction Scheme defined in~\cref{def:atom:apt-ext-mw-tx-scheme}.
 Similar to the $\procDSharedInpMwTxId$ it spends an input coin which is shared between the sender and receiver.
-Additionally, we utilize the adapted signature protocol from~\ref{def:sig:two-party-fixed-wit-apt-sig} to let the receiver hide a secret witness value $\varWit$ in the transaction signature which the sender can extract from the final transaction, thereby allowing the construction of primitive contracts.
+Additionally, we utilize the adapted signature protocol from~\cref{def:sig:two-party-fixed-wit-apt-sig} to let the receiver hide a secret witness value $\varWit$ in the transaction signature which the sender can extract from the final transaction, thereby allowing the construction of primitive contracts.
 
 \[ \langle (\varTx, \funStar{\varSpendableCoinAlice}, \varWit), (\varTx, \funStar{\varSpendableCoinBob}) \rangle \opFunResult \procDScriptMwTx{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime}{\varStatement}{\funArray{\varPtSpendableCoinBob}}{\varWit} \]
 
-Figure~\ref{fig:d-script-tx} shows the implementation of the protocol.
+Figure~\cref{fig:d-script-tx} shows the implementation of the protocol.
 
 \begin{figure}
     \fbox{
@@ -124,9 +124,17 @@ Figure~\ref{fig:d-script-tx} shows the implementation of the protocol.
     \caption{$\procDScriptMwTxId$ two-party protocol to build a primitive contract transaction} \label{fig:d-script-tx}
 \end{figure}
 
-
-
-
-
+\paragraph{A note on rogue-key attacks:} In~\cref{sec:sig:definitions} we mentioned that in a Two-Party Signature Scheme we need to take special care in the key generation phase not to be vulnerable against rogue-key attacks in which one of the parties public key is computed as a function of the other.
+We see that in all of the protocols layed out in this section we do not take this special care, as the transaction receiver will always generate his private key after having seen the one by the sender.
+This would in theory allow for the following rogue-key attack:
+Imagine we have an attacker $\cnstAdversary$ who knows the value $\varValue$ of some coin $\varCoin \opEqNoQ \funGen{\varBlindingFactor} \opAddPoint \funGenH{\varValue}$. He would then compute $\varPubKeyAlice \opEqNoQ \varCoin \opAddPoint {(\funGenH{\varValue}})^{-1}$.
+For the rogue-key attack to succeed $\cnstAdversary$ would now try to choose his pubkey as $\varPubKeyBob \opEqNoQ \varPubKeyAlice^{-1}$ such that it would cancel out Alice's key, however remembering the structure of Mimblewimble transactions we actually sign the Excess value $\varExcess \opEqNoQ \varInputs \opSub \varOutputs$, where $\varInputs$ and $\varOutputs$ is the list of input and output coins.
+So in order to make the public keys cancel out $\cnstAdversary$ would have to choose his key as $\varPubKeyBob \opAssign \varPubKeyAlice$.
+So then $\cnstAdversary$ would have to create a transaction spending Alice's coin to a pedersen commitment of the form $\varCoin \opEqNoQ \varPubKeyBob \opAddPoint \funGenH{\varValue}$.
+In this case the Excess value would calculate like $\varPubKeyAlice \opAddPoint {\varPubKeyBob}^{-1}$ which by the definition of $\varPubKeyBob$ is $\varPubKeyAlice \opAddPoint {\varPubKeyAlice}^{-1}$ which would allow $\cnstAdversary$ to forge a signature.
+However, since we chose $\varPubKeyBob$ as simply $\varPubKeyAlice$ and $\varPubKeyAlice \opEqNoQ \funGen{\varBlindingFactor}$ (from the original petersen commitment) the new output coin would in fact be identical to the input coin and the transaction would therefore simply spend a coin to itself.
+In practice this kind of transaction is not allowed on the Grin or Bean network, therefore making this attack vector non-viable which is why our formalization is still secure.
+Imagining it would not be disallowed for a moment, the only thing that $\cnstAdversary$ could achieve is to steal a fee from Alice.
+As soon as he would try to add his own output coin the calculation of $\varExcess$ changes and the public keys would no longer cancel out.
 
 

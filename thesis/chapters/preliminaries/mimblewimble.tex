@@ -179,3 +179,13 @@ A figure showing the protocol flow is depicted in Figure~\ref{fig:txSalvaged}.
     \caption{Salvaged transaction protocol by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} \label{fig:txSalvaged}}
 \end{figure}
 
+\subsubsection{Mimblewimble Ledger} \label{subsec:pre:mimblewimble:ledger}
+
+In Mimblewimble the ledger itself is a transaction of the form defined in~\cref{subsec:pre:mimblwimble-tx} with a set of input and outputs which initially start out empty~\cite{fuchsbauer2019aggregate}.
+The list of outputs as given in the ledger is the list of spendable coins, similar to the list of UTXOs (unspent transaction outputs) in Bitcoin.
+Upon publishing a new transaction to the ledger it will be merged with the ledger itself as seen in~\cref{sec:pre:mimblewimble:merge}, after which a cut through as seen in~\cref{par:pre:mimblewimble:cut} is executed.
+By running the cut through all coins that now appear in both the output and input list are discarded.
+It is easy to see that the input list of the ledger must therefore always be empty as whenever an output coin is spent it will be discarded immediately after.
+We can further see that with this setup the ledger only every grows in size of the unspent output list, which is very helpful given that each output coin must also attach a range proof that usually has high space requirements.
+In Grin and Beam updates to the ledger are made in the form of blocks requiring proof of work which is the same as it is in Bitcoin~\cite{antonopoulos2014mastering}.
+A miner that found a new block by having solved the proof of work is allowed to include one coinbase transaction creating a fixed amount of new supply which he can send to himself as a reward.
