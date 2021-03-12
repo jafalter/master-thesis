@@ -167,9 +167,6 @@ Carol finalizes the shared coin by adding a commitment to her blinding factor to
 Bob verifies validity of the updated shared coin after which the two parties engage in two two-party protocols to create their partial signature and coin rangeproof.
 Finally they create the updated pre-transaction $\varPreTx$ which can be sent back to the transaction sender.
 
-
-\todo[inline]{I think you have not mentioned earlier that you need a distributed version of range proof for your distributed protocols. Also, I think Figure 5.4 is not described in the text? }
-
 \newgeometry{margin=2cm}
 \begin{landscape}
     \thispagestyle{plain}
@@ -207,6 +204,9 @@ Finally they create the updated pre-transaction $\varPreTx$ which can be sent ba
     \end{figure}
 \end{landscape}
 \restoregeometry
+
+Finally, \cref{fig:ext-mim-tx-fin} shows the implementation of the $\procDFinTxId$ protocol.
+Running this protocol the two transaction senders, each owning a share of the input coins keys, will cooperate to produce a signature share valid under their input coins and change outputs, after which they can combine the partial signatures into the final one and finalize the transaction.
 
 \begin{figure}
     \fbox{
