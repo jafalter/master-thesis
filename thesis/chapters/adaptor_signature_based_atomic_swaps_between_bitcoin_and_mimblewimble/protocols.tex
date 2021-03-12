@@ -125,16 +125,23 @@ Figure~\cref{fig:d-script-tx} shows the implementation of the protocol.
 \end{figure}
 
 \paragraph{A note on rogue-key attacks:} In~\cref{sec:sig:definitions} we mentioned that in a Two-Party Signature Scheme we need to take special care in the key generation phase not to be vulnerable against rogue-key attacks in which one of the parties public key is computed as a function of the other.
-We see that in all of the protocols layed out in this section we do not take this special care, as the transaction receiver will always generate his private key after having seen the one by the sender.
-This would in theory allow for the following rogue-key attack:
-Imagine we have an attacker $\cnstAdversary$ who knows the value $\varValue$ of some coin $\varCoin \opEqNoQ \funGen{\varBlindingFactor} \opAddPoint \funGenH{\varValue}$. He would then compute $\varPubKeyAlice \opEqNoQ \varCoin \opAddPoint {(\funGenH{\varValue}})^{-1}$.
-For the rogue-key attack to succeed $\cnstAdversary$ would now try to choose his pubkey as $\varPubKeyBob \opEqNoQ \varPubKeyAlice^{-1}$ such that it would cancel out Alice's key, however remembering the structure of Mimblewimble transactions we actually sign the Excess value $\varExcess \opEqNoQ \varInputs \opSub \varOutputs$, where $\varInputs$ and $\varOutputs$ is the list of input and output coins.
-So in order to make the public keys cancel out $\cnstAdversary$ would have to choose his key as $\varPubKeyBob \opAssign \varPubKeyAlice$.
-So then $\cnstAdversary$ would have to create a transaction spending Alice's coin to a pedersen commitment of the form $\varCoin \opEqNoQ \varPubKeyBob \opAddPoint \funGenH{\varValue}$.
-In this case the Excess value would calculate like $\varPubKeyAlice \opAddPoint {\varPubKeyBob}^{-1}$ which by the definition of $\varPubKeyBob$ is $\varPubKeyAlice \opAddPoint {\varPubKeyAlice}^{-1}$ which would allow $\cnstAdversary$ to forge a signature.
-However, since we chose $\varPubKeyBob$ as simply $\varPubKeyAlice$ and $\varPubKeyAlice \opEqNoQ \funGen{\varBlindingFactor}$ (from the original petersen commitment) the new output coin would in fact be identical to the input coin and the transaction would therefore simply spend a coin to itself.
-In practice this kind of transaction is not allowed on the Grin or Bean network, therefore making this attack vector non-viable which is why our formalization is still secure.
-Imagining it would not be disallowed for a moment, the only thing that $\cnstAdversary$ could achieve is to steal a fee from Alice.
-As soon as he would try to add his own output coin the calculation of $\varExcess$ changes and the public keys would no longer cancel out.
+We see that in all of the protocols layed out in this section we do not take this into account, as for the receiving party it will always be possible to generate his keypair as a function of the senders public key.
+We now show how attempting a rogue-key attack in Mimblewimble would play out and why it would not threaten the security of our scheme:\\
+Imagine we have an attacker $\cnstAdversary$ who knows the value $\varValue$ of some coin $\varCoin \opEqNoQ \funGen{\varBlindingFactor} \opAddPoint \funGenH{\varValue}$ that is present in the unspent output list of the blockchain.
+He could then compute $\varPubKeyAlice \opEqNoQ \varCoin \opAddPoint {(\funGenH{\varValue}})^{-1}$.
+For the rogue-key attack to succeed $\cnstAdversary$ would now create a transaction spending $\varCoin$ and choose his output coin pubkey as $\varPubKeyBob \opEqNoQ \varPubKeyAlice^{-1}$ with the attempt of cancelling out Alice's key.
+However, recalling the structure of Mimblewimble transactions the participants sign the Excess value $\varExcess \opEqNoQ \varInputs \opSub \varOutputs$, where $\varInputs$ and $\varOutputs$ is the list of input and output coins.
+Therefore to make the public keys cancel out $\cnstAdversary$ would instead have to choose his key as $\varPubKeyBob \opAssign \varPubKeyAlice$.
+Given this setup (a transaction which spends the coin $\varCoin \opEqNoQ \varPubKeyAlice \opAddPoint \funGenH{\varValue}$ to $\funStar{\varCoin} \opEqNoQ \varPubKeyBob \opAddPoint\funGenH{\varValue}$), the Excess value $\varExcess$ would calculate like $\varPubKeyAlice \opAddPoint {\varPubKeyBob}^{-1}$ which by the definition of $\varPubKeyBob$ is $\varPubKeyAlice \opAddPoint {\varPubKeyAlice}^{-1}$ which would cancel out and allow the adversary to forge a signature.
+However, since we chose $\varPubKeyBob$ as simply $\varPubKeyAlice$ and $\varPubKeyAlice \opEqNoQ \funGen{\varBlindingFactor}$ (from the original petersen commitment) the new output coin $\funStar{\varCoin}$ would in fact be identical to the input coin $\varCoin$ and the transaction would therefore simply spend a coin to itself.
+Recalling the instantiation of the transaction verification algorithm $\procVerfTxId$ defined by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} which we layed out in~\cref{fig:inst-mw-tx} we see that the union between input and output coin list must be empty, otherwise the transaction will not verify.
+Therefore, even though the attacker could create a forged signature for this transaction, it would still be invalid as by the definition of the transaction verification algorithm.
+We further consider the case in which the attacker would try to add a fee $\varFee$ to the transaction, to effectivly steal value from a coin.
+In this case the newly created output coin would be $\varPubKeyBob \opAddPoint \funGenH{\varValue - \varFee}$.
+Now the output coin is no longer identical to the input coin, yet the input and output values still cancel out due to the fee and by the definition of $\varPubKeyBob$ the two public keys must as well still cancel out allowing for a forged signature.
+In this scenario $\cnstAdversary$ is however faced with the problem that he does not have a valid range proof for this new output coin.
+To compute such a proof he would need to know the original $\varBlindingFactor$ of $\varPubKeyAlice \opEqNoQ \funGen{\varBlindingFactor}$, which he doesn't, therefore it is again impossible for him the create a valid transaction, even though he would be able to forge the transaction signature.
+We conclude that all possible rogue-key attacks on Mimblewimble are prevented by means of transaction verification and we therefore do not have to take further special care to prevent them.
+
 
 

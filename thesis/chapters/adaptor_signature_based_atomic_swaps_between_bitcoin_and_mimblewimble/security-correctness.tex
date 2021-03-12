@@ -10,10 +10,8 @@ We construct the following theorem:
 
 \begin{theorem}
     \label{lem:atom:correctness}
-    \emph{Transaction Scheme Correctness}, \emph{Extended Transaction Scheme Correctness} or \emph{Adapted Transaction Scheme Correctness} for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$, $\varextMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ or $\varaptMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ holds if and only if the underlying Commitment Scheme $\varCommitScheme,$ Two-Party Signature Scheme $\varSigSchemeMP$ and Rangeproof system $\varProofSystem$ are correct.
+    \emph{Transaction Scheme Correctness}, \emph{Extended Transaction Scheme Correctness} or \emph{Adapted Transaction Scheme Correctness} for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$, $\varextMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ or $\varaptMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varProofSystem}$ holds if the underlying Commitment Scheme $\varCommitScheme,$ Two-Party Signature Scheme $\varSigSchemeMP$ and Rangeproof system $\varProofSystem$ are correct.
 \end{theorem}
-
-\todo[inline]{I think this theorem states more than what you actually prove. If and only if means that you prove both directions but I think you prove only one direction, that is, assume that COM, two-party signature and rangeproof are correct then your transactions schemes are correct. For the if and only if, you should additionally prove the following: Assume that your transactions schemes are correct then show that COM, two-party signature and range proof are correct. }
 
 \begin{proof}
     We assume there are two honest participants Alice and Bob, there exists a list of input coins $\funArray{\varCoinInp}$ with blinding factors $\funArray{\varBlindingFactor_i}$ and values $\funArray{\varValue_i}$ wrapped inside a list $\funArray{\varSpendableCoin}$ known to Alice, and some amount $\varFundValue$ which Alice wants to transfer to Bob.
@@ -25,16 +23,14 @@ We construct the following theorem:
     \end{enumerate}
     We recall the conditions for $\procVerfTx{\varTx}$ to return 1 found in~\ref{def:atom:mw-tx-scheme} and show that each of them must hold:
 
-    Condition 1 and 2 both must hold if the participants are honest.
-    In the case that the sending party provides duplicate inputs the check at the beginning of the $\procSendCoinsId$ procedure will fail and consequently $\procVerfTx{\varTx}$ will return 0.
-    The blinding factors to the ouput coins created in $\procSendCoinsId$ and $\procRecvCoinsId$ are generated randomly, which means a duplication can only appear with negligible probability.
+    Condition 1 and 2 both must hold if the participants are honest that is compute their coins as given by protocol definition and provide input parameters that are valid.
+    In the case that the sending party provides duplicate inputs the check at the beginning of the $\procSendCoinsId$ procedure will fail and return $\cnstFalsum$ and thereby halting the protocol.
+    The blinding factors to the output coins created in $\procSendCoinsId$ and $\procRecvCoinsId$ are generated randomly, which means a duplication can only appear with negligible probability.
 
     Condition 3 follows from the implementation of the $\procCreateCoinId$ function called in $\procSendCoinsId$ as well as $\procRecvCoinsId$.
-    In the function a rangeproof is computed for the new coin $\varCoin$ with value $\varValue$ and blinding factor $\varBlindingFactor$ as $\varProof \opFunResult \procProof{\varCoin}{\varValue}{\varBlindingFactor}$.
-    Given that our Rangeproof system $\varProof$ system has to be correct $\procVerfProof{\varProof}{\varCoin} \opEqNoQ 1$ must hold for all coins created with the $\procCreateCoinId$ routine.
-    Therefore Condition 2\todo{typo?} must hold if the transaction is computed honestly.
-
-\todo[inline]{I think you have mixed condition 3 and condition 4? In your description of verfTX (Definition 5.1), Condition 4 checks the validity of range proofs and condition 3 checks the validity of the transaction signature.}
+    In the function a range proof is computed for the new coin $\varCoin$ with value $\varValue$ and blinding factor $\varBlindingFactor$ as $\varProof \opFunResult \procProof{\varCoin}{\varValue}{\varBlindingFactor}$.
+    Given that our Rangeproof system $\varProofSystem$ system has to be correct $\procVerfProof{\varProof}{\varCoin} \opEqNoQ 1$ must hold for all coins created with the $\procCreateCoinId$ routine.
+    Therefore Condition 3 must hold if the transaction is computed honestly.
 
     For condition 4 we must look at how the secret keys $\varSecKeyAlice$ and $\varSecKeyBob$ are constructed.
     From the instantiation of $\procSendCoinsId$ we can see that Alice's share will be $\varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \cnstSumZeroToN \funArray{\varBlindingFactorAlice}$, where $\funStar{\varBlindingFactorAlice}$ is the blinding factor to her output and $\funArray{\varBlindingFactorAlice}$ are the blinding factors to her input coins.
@@ -47,18 +43,18 @@ We construct the following theorem:
     We show this by a stepwise conversion of the initial equation computing $\varExcess$ until we arrive at the equation for $\funStarAlt{\varExcess}$:
     \begin{gather}
         \varExcess \opEqNoQ \funStarAlt{\varExcess} \\
-        \cnstSumZeroToN \varOutputs \opSub \cnstSumZeroToN \varInputs \opEqNoQ \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \cnstSumZeroToN \funArray{\funGen{- \varBlindingFactorAlice}} \opAddPoint \funGen{\varBlindingFactorBob} \\
-        \varCoinOutAlice \opAddPoint \varCoinOutBob \opAddPoint \cnstSumZeroToN \funArray{(\varCoinInp)^{-1}}  \opEqNoQ\\
+        \cnstSumZeroToN \varOutputs \opSub \cnstSumZeroToN \varInputs \opSub \funGenH{\varFee}  \opEqNoQ \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \cnstSumZeroToN \funArray{\funGen{- \varBlindingFactorAlice}} \opAddPoint \funGen{\varBlindingFactorBob} \opSub \funGenH{\varFee} \\
+        \varCoinOutAlice \opAddPoint \varCoinOutBob \opAddPoint \cnstSumZeroToN \funArray{(\varCoinInp)^{-1}} \opAddPoint \funGenH{- \varFee}  \opEqNoQ\\
         (\funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \funGenH{\varValue \opSub \varFundValue}) \opAddPoint
         (\funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \funGenH{\varFundValue}) \opAddPoint
-        \cnstSumZeroToN \funArray{(\funGen{- \varBlindingFactorAlice}, \funGenH{- \varValue_i})} \opEqNoQ \\
+        \cnstSumZeroToN \funArray{(\funGen{- \varBlindingFactorAlice}, \funGenH{- \varValue_i})} \opAddPoint \funGenH{- \varFee} \opEqNoQ \\
         \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \cnstSumZeroToN \funGen{- \varBlindingFactorAlice} \opEqNoQ \funGen{\funStar{\varBlindingFactorAlice}} \opAddPoint \funGen{\funStar{\varBlindingFactorBob}} \opAddPoint \cnstSumZeroToN \funGen{- \varBlindingFactorAlice} \\
         1 \opEqNoQ 1
     \end{gather}
-    From step 5.3 to 5.4 we replace every coin $\varCoin$ by its instantiation for a pedersen commitment $\varCoin \opEqNoQ \funGen{\varValue} \opAddPoint \funGenH{\varValue}$.\todo{typo? should be $g^r$ instead?}
+    From step 5.3 to 5.4 we replace every coin $\varCoin$ by its instantiation for a pedersen commitment $\varCoin \opEqNoQ \funGen{\varBlindingFactor} \opAddPoint \funGenH{\varValue}$.
 
-    From step 5.4 to 5.4 \todo{typo?} we rely on the fact that if Alice is honest $\varValue \opEqNoQ \sum \varValue_i$, therefore also $(\varValue \opSub \varFundValue) \opAddScalar\varFundValue \opEqNoQ \sum \varValue_i$ must hold.
-    From that we can infer that $\funGenH{\varValue \opSub \varFundValue} \opAddPoint \funGenH{\varFundValue} \opAddPoint \sum \funGenH{- \varValue_i}$ must cancel out, otherwise the transaction would either create or burn value, which is not allowed and in which case $\procVerfTxId$ should again return 0.
+    From step 5.4 to 5.5 we rely on the fact that if Alice is honest $\varValue \opEqNoQ \sum \varValue_i \opAddScalar \varFee$, therefore also $(\varValue \opSub \varFundValue) \opAddScalar \varFundValue \opEqNoQ \sum \varValue_i$ must hold.
+    From that we can infer that $\funGenH{\varValue \opSub \varFundValue} \opAddPoint \funGenH{\varFundValue} \opAddPoint \sum \funGenH{- \varValue_i} \opAddPoint \funGenH{\varFee}$ must cancel out, otherwise the transaction would either create or burn value, which is not allowed and in which case $\procVerfTxId$ should again return 0.
 
     We have managed to show that condition 1-4 must hold for a valid transaction and can conclude that \emph{Transaction Scheme Correctness} holds for $\varMWSchemeParams{\varCommitScheme}{\varProofSystem}{\varSigSchemeMP}$.
 
@@ -66,7 +62,7 @@ We construct the following theorem:
 
     Condition 1-2 again follow trivially from the construction of $\procDSendCoinsId$ and $\procDRecvCoinsId$ for the same reasons we have already layed out in the previous proof.
 
-    $\procDSendCoinsId$, $\procDRecvCoinsId$, $\procAptRecvCoinsId$ all rely on the same $\procCreateCoinId$ routine to create output coins, thereby condition 3 \todo{same comment as before with mixed conditions} also holds for valid transactions with the same argument as for the previous proof.
+    $\procDSendCoinsId$, $\procDRecvCoinsId$, $\procAptRecvCoinsId$ all rely on the same $\procCreateCoinId$ routine to create output coins, thereby condition 3 also holds for valid transactions with the same argument as for the previous proof.
 
     In the case of \emph{Extended Transaction Scheme Correctness} the blinding factors for the input coins $\funArray{\varCoinInp}$ are shared.
     However, we can easily reduce this case to the proof for the regular case:
@@ -76,7 +72,7 @@ We construct the following theorem:
         \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \opSub \cnstSumZeroToN \varBlindingFactorCarol
     \end{gather}
     $\varSecKeyAlice$ and $\varSecKeyCarol$ are then inputs to $\procDFinTxId$ in which a partial signature $\varSigAliceCarol$ is calculated, by both Alice and Carol signing with their secret key.
-    Assume the general key from before\todo{what is exactly before? not clear here for the reader}, in which we have a single secret key $\varSecKeyAlice$.
+    Recall the case we have proven above, in which we have a single secret key $\varSecKeyAlice$:
     We can split $\varSecKeyAlice$ into arbitrarily chosen shares $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ with $\varSecKeyAlice \opEqNoQ (\varSecKeyAlice)_1 + (\varSecKeyAlice)_2$.
     By the definition of Two-Party Signatures~\ref{def:sig:two-party-sig} the combined signature from $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ will be valid under $\funGen{\varSecKeyAlice}$.
     Thereby we can treat $\varSecKeyAlice$ and $\varSecKeyCarol$ from $\procSendCoinsId$ as arbitrary shares of a combined $\varSecKeyAliceCarol$.
@@ -89,7 +85,6 @@ We construct the following theorem:
 
     We have thereby proven that if $\varCommitScheme, \varProofSystem, \varSigSchemeMP$ are correct and the participants behave honestly (that is by providing valid inputs and calling the respective routines in the given order) $\procVerfTx{\varTx}$ will return 1 for the resulting transaction $\varTx$ and therefore theorem~\ref{lem:atom:correctness} holds.
 \end{proof}
-\todo[inline]{Right. As I mentioned before, you have proven only one direction (what is what you were supposed/expected to do). Just update the theorem.}
 
 \subsection{Security}\label{subsec:atom:security}
 

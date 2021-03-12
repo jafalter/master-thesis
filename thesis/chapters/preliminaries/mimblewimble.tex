@@ -10,7 +10,7 @@ First we will define the notion of a coin in Mimblewimble which has similarity t
 
 A Mimblewimble transaction consists of $\varCoinInp \opAssign (\varCoin_1 , \dots , \varCoin_n)$ input coins, $\varCoinOut \opAssign (\varCoin'_1 , \dots , \varCoin'_n)$ output coins and kernel $\varKernel$, which we will define throughout this section.
 \begin{definition}[Transaction well-balancedness]  \label{def:pre:tx-well-balancedness}
-    A transaction is considered \emph{well-balanced} if $\sum{\varValue'_i} \opSub \sum{\varValue_i} \opEqNoQ 0$ so the sum of all output values subtracted from the sum of input values has to be 0. (Not taking transaction fees into account)
+    A transaction is considered \emph{well-balanced} if for a list of input coins with values $\funArray{\varValue}$, a list of output coins with values $\funArray{\funStar{\varValue}}$, and a fee $\varFee$ $\sum{\funArray{\varValue}} \opSub \sum{\funArray{\funStar{\varValue}}} \opSub \varFee \opEqNoQ 0$ so the sum of all output values and the fee subtracted from the sum of input values has to be 0.
 \end{definition}
 
 \begin{definition}[Transaction validity] \label{def:pre:tx-mw-validity}
@@ -22,7 +22,7 @@ A Mimblewimble transaction consists of $\varCoinInp \opAssign (\varCoin_1 , \dot
 \end{definition}
 
 From the definition of \emph{Transaction validity} we can derive the following equation:
-\[ \sum{\varCoinOut} \opSub \sum{\varCoinInp} \opEqNoQ \sum{(\funGenH{\varValue'_i} \opAddPoint \funGen{\varNonce'_i})} \opSub \sum{(\funGenH{\varValue_i} \opAddPoint \funGen{\varNonce_i})} \]
+\[ \sum{\varCoinOut} \opSub \sum{\varCoinInp} \opEqNoQ \sum{(\funGenH{\varValue'_i} \opAddPoint \funGen{\varNonce'_i})} \opSub \sum{(\funGenH{\varValue_i} \opAddPoint \funGen{\varNonce_i})} \opSub \funGenH{\varFee} \]
 So if we assume that a transaction is valid then we are left with the following so called excess value:
 \[ \varExcess \opEqNoQ \funGen{\varExcessExp} \opEqNoQ \funGen{(\sum{\varNonce'_i} \opSub \sum{\varNonce_i})} \]
 Knowledge of the opening of all coins, and the well-balancedness of the transaction implies knowledge of the discrete logarithm $\varExcessExp$ of $\varExcess$.
