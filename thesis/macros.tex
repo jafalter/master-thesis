@@ -131,8 +131,9 @@
 \newcommand{\varProofCarol}{\pi_\varCarol}
 \newcommand{\varProofBobCarol}{\varProof_{\varBob\varCarol}}
 \newcommand{\varProofSystem}{\Pi}
-\newcommand{\varRProofSystemParam}[1]{\varProofSystem[#1]}
-\newcommand{\varMPRProofSystem}{\varProofSystem_{mp}}
+\newcommand{\varRProofSystem}{\Pi_{RP}}
+\newcommand{\varRProofSystemParam}[1]{\varRProofSystem[#1]}
+\newcommand{\varMPRProofSystem}{\varProofSystem_{RP-MP}}
 \newcommand{\varMPRProofSystemParam}[1]{\varMPRProofSystem[#1]}
 \newcommand{\varSignature}{\sigma}
 \newcommand{\varInput}{\styleVariable{I}}
@@ -422,9 +423,9 @@
 \newcommand{\procDRProofR}[3]{\procDRProofId (#1,#2,#3)}
 
 \newcommand{\procDSendCoinsId}{\styleProtocol{dSpendCoins}}
-\newcommand{\procDSendCoins}[4]{\procDSendCoinsId \langle (#1,#3,#4), (#2,#3,#4) \rangle}
+\newcommand{\procDSendCoins}[4]{\procDSendCoinsId \langle (#1,#3,#4), (#2,#3) \rangle}
 \newcommand{\procDSendCoinsL}[3]{\procDSendCoinsId (#1,#2,#3)}
-\newcommand{\procDSendCoinsR}[3]{\procDSendCoinsId (#1,#2,#3)}
+\newcommand{\procDSendCoinsR}[2]{\procDSendCoinsId (#1,#2)}
 \newcommand{\procDRecvCoinsId}{\styleProtocol{dRecvCoins}}
 \newcommand{\procDRecvCoins}[2]{\procDRecvCoinsId \langle(#1,#2), () \rangle}
 \newcommand{\procDRecvCoinsL}[2]{\procDRecvCoinsId(#1,#2)}

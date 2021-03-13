@@ -62,8 +62,8 @@ If we want to indicate that a spendable coin is used as an output coin in a tran
 
 \begin{definition}[Mimblewimble Transaction Scheme]
     \label{def:atom:mw-tx-scheme}
-    A Mimblewimble Transaction Scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem}$ with commitment scheme $\varCommitScheme$, two-party signature scheme $\varSigSchemeMP$, and rangeproof system $\varProofSystem$ consists of the following tupel of procedures:
-    \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varProofSystem} \opAssign ( \procSendCoinsId,\procRecvCoinsId,\procFinTxId,\procVerfTxId ) \]
+    A Mimblewimble Transaction Scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varRProofSystem}$ with commitment scheme $\varCommitScheme$, two-party signature scheme $\varSigSchemeMP$, and range proof system $\varRProofSystem$ consists of the following tuple of procedures:
+    \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varRProofSystem} \opAssign ( \procSendCoinsId,\procRecvCoinsId,\procFinTxId,\procVerfTxId ) \]
     \begin{itemize}
         \item $(\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$: The spendCoins algorithm is a DPT function called by the sending party to initiate the spending of some input coins.
         As input, it takes a list of spendable coins $\funArray{\varSpendableCoin}$ and a value $\varFundValue$ which should be transferred to the receiver.

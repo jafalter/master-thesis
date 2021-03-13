@@ -7,7 +7,7 @@ The instantiations can be implemented in a Cryptocurrency based on the Mimblewim
 
 First we provide an instantiation of the simplest form of a transaction in which a sender wants to transfer some value $\varFundValue$ to a receiver.
 For the execution of the protocol we assume to have access to a homomorphic commitment scheme such as Pedersen Commitment $\varCommitScheme$ as defined in definition~\cref{def:pre:pedersen}.
-Furthermore we require a Rangeproof system $\varProofSystem$ as defined in~\cref{sec:pre:rangeproof} and a two-party signature scheme $\varSigSchemeMP$ as defined in~\cref{def:sig:two-party-sig}.
+Furthermore we require a range proof system $\varRProofSystem$ as defined in~\cref{sec:pre:rangeproof} and a two-party signature scheme $\varSigSchemeMP$ as defined in~\cref{def:sig:two-party-sig}.
 
 To make the pseudocode for the transaction protocol easier to read we first introduce two auxiliary functions $\procCreateCoinId$
 and $\procCreatePreTxId$.
@@ -109,7 +109,7 @@ If he finds it as valid, he will only now create his partial signature and final
 
 \subsection{Extended Mimblewimble Transaction Scheme}\label{subsec:atom:ext-tx-scheme}
 
-Figure~\cref{fig:ext-mim-tx-spend} shows an instantiation of the $\procDSendCoinsId$ function of the Extended Mimblewimble Transaction Scheme.
+Figure~\cref{fig:atom:dsendcoins} shows an instantiation of the $\procDSendCoinsId$ function of the Extended Mimblewimble Transaction Scheme.
 We have an array of spendable input coins which keys are shared between two parties Alice and Carol.
 We use Carol here to not confuse this party with the receiver, which we previously called Bob.
 Although Carol and Bob could be the same person, they not necessarily have to be.
@@ -143,8 +143,8 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
         \varPreTx \opFunResult \pcskipln \\
         \procCreatePreTx{\varMsg}{\funArray{\varCoinInp}}{\funArray{\varCoinOutAlice}}{\funArray{\varProofAlice}}{\varSigContext}{\funArray{\funGen{\varNonceAlice}}}{\cnstEmptySet}{\varTime} \< \< \\
         \< \sendmessageright*{\varPreTx} \< \\
-        \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\funStar{\varTime}) \opFunResult \varPreTx \\
-        \< \< \pcif \procVerfProof{\varProofs[0]}{\varOutputs[0]} \opEqNoQ 0 \opOr \varTime \opNotEq \funStar{\varTime} \\
+        \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varTime) \opFunResult \varPreTx \\
+        \< \< \pcif \procVerfProof{\varProofs[0]}{\varOutputs[0]} \opEqNoQ 0 \\
         \< \< \t \pcreturn \cnstFalsum \\
         \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyCarol}}{\funGen{\varNonceCarol}} \\
         \< \< \funStarAlt{\varPreTx} \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutCarol}{\varProof \opConc \varProofCarol}{\varSigContext}{\varCommits \opConc \funGen{\varNonceCarol}}{\cnstEmptySet}{\varTime} \\
@@ -154,7 +154,7 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
         \pcreturn (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \< \< \pcreturn (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinCarol}, (\varSecKeyCarol, \varNonceCarol))
         }
         }
-        \caption{Extended Mimblewimble Transaction Scheme - $\procDSendCoinsId$ \label{fig:ext-mim-tx-spend}}
+        \caption{Extended Mimblewimble Transaction Scheme - $\procDSendCoinsId$ \label{fig:atom:dsendcoins}}
     \end{figure}
 \end{landscape}
 \restoregeometry
