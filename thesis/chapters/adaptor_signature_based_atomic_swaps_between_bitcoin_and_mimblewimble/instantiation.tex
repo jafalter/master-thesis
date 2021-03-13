@@ -159,7 +159,7 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
 \end{landscape}
 \restoregeometry
 
-Figure~\cref{fig:ext-mim-tx-recv} shows an instantiation of the $\procDSendCoinsId$ function of the Extended Mimblewimble Transaction Scheme.
+Figure~\cref{fig:atom:drecv} shows an instantiation of the $\procDRecvCoinsId$ function of the Extended Mimblewimble Transaction Scheme.
 Calling this protocol, two receivers Bob and Carol want to create a receiving shared coin $\varCoinShared$ with value $\varFundValue$ and key shares $(\varBlindingFactorAlice, \varBlindingFactorCarol)$.
 The protocol starts by both receivers verifing the senders output(s).
 Bob starts by creating a coin with fund value $\varFundValue$ and his share of the newly created blinding factor and sends it over to Carol.
@@ -200,7 +200,7 @@ Finally they create the updated pre-transaction $\varPreTx$ which can be sent ba
         \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinBob}) \< \< \< \< \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinCarol})
         }
         }
-        \caption{Extended Mimblewimble Transaction Scheme - $\procDRecvCoinsId$ \label{fig:ext-mim-tx-recv}}
+        \caption{Extended Mimblewimble Transaction Scheme - $\procDRecvCoinsId$ \label{fig:atom:drecv}}
     \end{figure}
 \end{landscape}
 \restoregeometry
