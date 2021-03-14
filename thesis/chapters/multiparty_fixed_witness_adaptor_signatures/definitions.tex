@@ -1,6 +1,6 @@
 A two-party signature scheme is an extension of a signature scheme as defined in ~\cref{def:pre:signature-scheme}, which allows us to distribute signature generation for a composite public key shared between two parties Alice and Bob.
 Alice and Bob want to collaborate to generate a signature valid under the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ without having to reveal their secret keys to each other.
-The definition below was constructed with the goal in mind of formalizing exactly what is currently implemented and used in mimblewimble-based cryptocurrencies.
+The definition below was constructed with the goal in mind of formalizing exactly what is currently implemented and used in Mimblewimble-based cryptocurrencies.
 
 \begin{definition}[Two Party Signature Scheme]
     \label{def:sig:two-party-sig}
@@ -12,6 +12,8 @@ The definition below was constructed with the goal in mind of formalizing exactl
         \item $((\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext), (\varSecKeyBob, \varPubKeyBob, \varNonceBob, \varSigContext)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam}$: The distributed key generation protocol takes as input the security parameter from both Alice and Bob and returns
         the tuple $(\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext)$ to Alice (similar to Bob) where $(\varSecKeyAlice, \varPubKeyAlice)$ is a pair of private and corresponding public keys, $\varNonceAlice$ a secret nonce and $\varSigContext$ is the signature context containing parameters shared between Alice and Bob.
         We introduce $\varSigContext$ for the participants to share as well as update parameters with each other during the protocol execution.
+        Note that this context always has to be consistent between the two parties.
+        That means if Alice were to update $\varSigContext$, she has to sent the updated version to Bob to continue protocol.
 
         \item $(\varSigAlice) \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}$: The partial signing algorithm is a DPT function that takes as input the message $\varMsg$, the share of the secret key $\varSecKeyAlice$ and nonce $\varNonceAlice$ (similiar for Bob) as well
         as the shared signature context $\varSigContext$. The procedure outputs $(\varSigAlice)$, that is, a share of the signature to a participant.
@@ -26,49 +28,48 @@ The definition below was constructed with the goal in mind of formalizing exactl
 \end{definition}
 
 We require the two party signature scheme to be correct as well as secure as of~\cref{subsec:pre:security}.
-For the security of the distributed key-generation protocol $\procKeyGenPtId$, special care needs to be taken not to be vulnerable to rogue-key attacks.
+For the security of the distributed key-generation protocol $\procKeyGenPtId$, special care needs to be taken to protect the scheme against rogue-key attacks.
 In such an attack one of the public keys is computed as a function of the other parties public key, allowing the corrupted signer to produce forged signatures under the honest users public key without knowing its secret key~\cite{maxwell2019simple}.
 
 
 From the ~\cref{def:sig:two-party-sig}, we now derive an adapted signature scheme $\varSigSchemeApt$, which allows one of the participants to hide a secret witness value inside his partial signature.
 \begin{definition}[Two Party Fixed Witness Adaptor Signature Scheme]
     \label{def:sig:two-party-fixed-wit-apt-sig}
-    Given a pair $(\varWit, \varStatement) \opIn \cnstRelation$ where $\cnstRelation$ is a hard relation as of \cref{def:pre:hard-relation}) a Two Party Fixed Witness Adaptor Signature Scheme $\varSigSchemeApt$ is an extension to $\varSigSchemeMP$ with the following algorithms.
+    Given a pair $(\varWit, \varStatement) \opIn \cnstRelation$ (where $\cnstRelation$ is a hard relation as of \cref{def:pre:hard-relation}) a Two Party Fixed Witness Adaptor Signature Scheme $\varSigSchemeApt$ is an extension to $\varSigSchemeMP$ with the following algorithms.
 
     \[ \varSigSchemeApt \opAssign (\varSigSchemeMP \opConc \procAptSigId \opConc \procVerifyAptSigId \opConc \procExtWitId) \]
 
     \begin{itemize}
-        \item $\varSigAptAlice \opFunResult \procAptSig{\varSigAlice}{\varWit}$: The adapt signature algorithm is a DPT function that takes as input a partial signature $\varSigPt$ and a secret witness value $\varWit$.
-        The procedure will output a adapted partial signature $\varSigApt$ which can be verified to contain $\varWit$ using the $\procVerifyAptSigId$ function, without having to reveal $\varWit$.
-        \item $\cnstTrueorFalse \opFunResult \procVerifyAptSig{\varSigAptAlice}{\varMsg}{\varPubKeyAlice}{\varStatement}$: The verification algorithm is a DPT function that takes as input an adapted partial signature $\varSigApt$,
-        the other participants public keys and a statement $\varStatement$. The function will verify the partial signature's validity as well that it contains the secret witness $\varWit$.
-        \item $\varWit \opFunResult \procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob}$: The witness extraction algorithm is a DPT function that lets Alice extract the secret witness $\varWit$ from the final composite
-        signature. Note that to extract the witness $\varWit$ the partial signatures shared between the participants beforehand and the statement $\varStatement$ needs to be provided as inputs. This means that for
-        executing this function one needs to first learn the partial signatures exchanged between the parties.
+        \item $\varSigAptAlice \opFunResult \procAptSig{\varSigAlice}{\varWit}$: The adapt signature algorithm is a DPT function that takes as input a partial signature $\varSigAlice$ and a secret witness value $\varWit$.
+        The procedure will output an adapted partial signature $\varSigAptAlice$ which can be verified to contain $\varWit$ using the $\procVerifyAptSigId$ function, without having to reveal $\varWit$.
+
+        \item $\cnstTrueorFalse \opFunResult \procVerifyAptSig{\varSigAptAlice}{\varMsg}{\varPubKeyAlice}{\varStatement}$: The verification algorithm is a DPT function that takes as input an adapted partial signature $\varSigAptAlice$, the other participants public key $\varPubKeyAlice$ and a statement $\varStatement$.
+        The function will verify the partial signature's validity as well that it contains the secret witness $\varWit$.
+
+        \item $\varWit \opFunResult \procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob}$: The witness extraction algorithm is a DPT function that lets Alice extract the secret witness $\varWit$ after having learned the final composite signature $\varSigFin$.
+        As input it expects the partial signatures $\varSigAlice$ and $\varSigAptBob$ shared between the participants during protocol execution, as well as the final composite signature $\varSigFin$.
+        Consequently, only protocol participants knowing the partial signatures will be able to run this algorithm.
     \end{itemize}
 \end{definition}
 
-Similar to how it is defined in~\cite{aumayr2020bitcoinchannels} additionally to regular Correctness as defined in~\cref{def:pre:signature-scheme} we require our signature scheme to satisfy Adaptor Signature Correctness.
-This property is given when every adapted partial signature generated by $\procAptSigId$ can be completed into a final signature for all pairs $(\varWit \opSeperate \varStatement) \opIn \cnstRelation$, from which it will
-be possible to extract the witness computing $\procExtWitId$ with the required parameters.
+Similar to how it is defined in~\cite{aumayr2020bitcoinchannels} additionally to regular Correctness, as defined in~\cref{def:pre:signature-scheme}, we require our signature scheme to satisfy Adaptor Signature Correctness.
+This property is given when every adapted partial signature generated by $\procAptSigId$ can be completed into a final signature for all pairs $(\varWit \opSeperate \varStatement) \opIn \cnstRelation$, from which it will then be possible to extract the witness computing $\procExtWitId$ with the required parameters.
 
 \begin{definition}[Adaptor Signature Correctness]
     \label{def:sig:apt-sig-correctness}
-    More formally \emph{Adaptor Signature Correctness} is given if for every security parameter $\varN \in \cnstNatural$, message $\varMsg \in \cnstBinary{*}$, \\ keypairs
-    $((\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext), (\varSecKeyBob, \varPubKeyBob, \varNonceBob, \varSigContext)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam}$
-    with their composite public key $\varSigContext.\varPubKey$
-    and every statement/witness pair $(\varStatement \opSeperate \varWit) \opFunResult \procGenR{\varSecParam}$ it must hold that:
+    More formally \emph{Adaptor Signature Correctness} is given if for every security parameter $\varN \in \cnstNatural$, message $\varMsg \in \cnstBinary{*}$, \\ keypairs $\langle (\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext), (\varSecKeyBob, \varPubKeyBob, \varNonceBob, \varSigContext) \rangle \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam}$ with their composite public key $\varSigContext.\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$ and every statement/witness pair $(\varStatement \opSeperate \varWit) \opFunResult \procGenR{\varSecParam}$ it must hold that:
     \[
         \Pr\left[
         \begin{array}{c}
             \:\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPubKey} \opEqNoQ 1                                         \\
             \opAnd                                                                                              \\
-            \: \procVerifyAptSig{\varSigAptBob}{\varMsg}{}{\varPubKeyBob}{\varStatement} \opEqNoQ 1             \\
+            \: \procVerifyAptSig{\varSigAptBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEqNoQ 1             \\
             \opAnd                                                                                              \\
-            \:(\varStatement \opSeperate \funStar{\varWit}) \opIn \cnstRelation
+            \:(\funStar{\varWit}, \varStatement) \opIn \cnstRelation
         \end{array}
         \middle\vert
         \begin{array}{l}
+            (\varWit, \varStatement) \opFunResult \procGenR{\varSecParam} \\
             \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}        \\
             \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext}              \\
             \varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit}                                             \\

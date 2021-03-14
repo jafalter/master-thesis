@@ -1,12 +1,12 @@
-We now prove that the outlined Schnorr-based instantiation is correct, i.e. Adaptor Signature Correctness holds, and is secure with regards to the~\cref{subsec:pre:security} .
+We now prove that the outlined Schnorr-based instantiation is correct, i.e. Adaptor Signature Correctness holds, and is secure with regards to the~\cref{subsec:pre:security}.
 
 \subsection{Adaptor Signature Correctness}\label{subsec:sig:aptsig-correctness}
 
-To prove that Adaptor Signature Correctness holds we have 3 statements to prove as given by \cref{def:sig:apt-sig-correctness}, first we prove that $\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPubKey} \opEqNoQ 1$ holds in our Schnorr-based instantiation of the signature scheme, where $\varSigContext$ is setup such that $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
+To prove that Adaptor Signature Correctness holds we have three statements to prove as given by \cref{def:sig:apt-sig-correctness}, first we prove that $\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPubKey} \opEqNoQ 1$ holds in our Schnorr-based instantiation of the signature scheme, where $\varSigContext$ is setup such that $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
 
 \begin{proof}
     \label{prf:apt-schnorr-pre-sig-corr}
-    For this proof we assume the setup already specified in~\cref{def:sig:apt-sig-correctness} .
+    For this proof we assume the setup already specified in~\cref{def:sig:apt-sig-correctness}.
     The proof is by showing equality of the equation checked by the verifier of the final signature by continuous substitutions in the left side of equation:
     \begin{align}
         \funGen{\varS} &\opEqNoQ \varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge} \\
@@ -133,7 +133,7 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
     \begin{enumerate}
         \item $\cnstSimulator$ invokes $\cnstAdversary$ receives and saves $(\varSecKeyAlice, \varPubKeyAlice)$, as well as $(\varNonceAlice, \varRandAlice)$ that $\cnstAdversary$ sends to $\procZKfId{\cnstRelation}$.
         \item Next $\cnstSimulator$ receives the message $(\varSigContext, \funStar{\varPubKeyAlice}, \funStar{\varRandAlice})$ as sent to Bob by $\cnstAdversary$.
-        If $\funStar{\varPubKeyAlice} \opNotEq \varPubKeyAlice$ or $\funStar{\varRandAlice} \opNotEq \varRandAlice$ $\cnstSimulator$ externally sends $\cnstAbort$ to the TTP computing $\procDSignId$ and outputs $\cnstFalsum$, otherwise he will send the inputs $(\varMsg, \varSecKeyAlice, \varNonceAlice)$ and receive back $(\varSigFin, \varPubKey)$.
+        If $\funStar{\varPubKeyAlice} \opNotEq \varPubKeyAlice$ or $\funStar{\varRandAlice} \opNotEq \varRandAlice$ $\cnstSimulator$ externally sends $\cnstAbort$ to the TTP computing $\procDSignId$ and outputs whatever $\cnstAdversary$ outputs, otherwise he will send the inputs $(\varMsg, \varSecKeyAlice, \varNonceAlice)$ and receive back $(\varSigFin, \varPubKey)$.
         \item $\cnstSimulator$ now calculates $\varPubKeyBob, \varRandBob$ and $\varSigBob$ as follows:
         \begin{gather*}
             (\varS, \varRand) \opFunResult \varSigFin \\
@@ -147,8 +147,7 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
         \end{gather*}
         \item After having done the calculations $\cnstSimulator$ is able to send $\varSigContext, \varSigBob, \varPubKeyBob$ to $\cnstAdversary$ as if coming from Bob.
         \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation}$ and $\procZKfId{\cnstRelation}$ (as the verifier) $\cnstSimulator$ checks equality with $\varPubKeyBob$ (respective $\varRandBob$) and thereafter sends back either 0 or 1.
-        \item Eventually $\cnstSimulator$ will receive $\funStar{\varSigAlice}$ from $\cnstAdversary$ and checks if $\varSigAlice \opEqNoQ \funStar{\varSigAlice}$ (as calculated in step 3).
-        If they are indeed the same the simulator will finish execution and output whatever $\cnstAdversary$ outputs, otherwise $\cnstSimulator$ will output $\cnstFalsum$.
+        \item Eventually $\cnstSimulator$ will receive $\funStar{\varSigAlice}$ from $\cnstAdversary$ and finally output whatever $\cnstAdversary$ outputs.
     \end{enumerate}
 
     We now show that the joint output distribution in the ideal model with $\cnstSimulator$ is identically distributed to the joint distribution in a real execution in the $\procZKfId{\cnstRelation}$-hybrid model with $\cnstAdversary$.
@@ -156,22 +155,23 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
     \textbf{(1)} Alice sends $(\varSecKeyAlice, \varPubKeyAlice)$ as well as $(\varNonceAlice, \varRandAlice)$ to $\procZKfId{\cnstRelation}$ and $(\varSigContext, \varPubKeyAlice, \varRandAlice)$ to Bob.
     \textbf{(2)} Bob sends $\varPubKeyAlice$ and $\varSigContext.\varRand$ to $\procZKfId{\cnstRelation}$ as the verifier, and  $(\varSecKeyBob, \varPubKeyBob)$, $(\varNonceBob, \varRandBob)$ to $\procZKfId{\cnstRelation}$ as the prover.
     Afterward he sends $(\varSigBob, \varSigContext, \varPubKeyBob)$ to Alice.
-    \textbf{(3)} Alice sends $\varPubKeyBob$ and $\varRandBob$ to $\procZKfId{\cnstRelation}$ as the verifier and $\varSigAlice$ to Bob and returns an output.
+    \textbf{(3)} Alice sends $\varPubKeyBob$ and $\varRandBob$ to $\procZKfId{\cnstRelation}$ as the verifier and $\varSigAlice$ to Bob.
+    Finally, we will have to show that the simulators output is indistinguishable from that of $\cnstAdversary$.
 
     \begin{itemize}
-        \item \textit{Phase 1} Since $\cnstAdversary$ is required to be deterministic, the distribution is identical to a real execution.
-        Also in the case the Alice does not send a message, or sends invalid values which will lead Bob to output $\cnstFalsum$ we also output $\cnstFalsum$ in the simulation, which again is indistinguishable.
-        \item \textit{Phase 2} As $\cnstSimulator$ managed to calculate Bobs $\varSigBob, \varPubKeyBob, \varRandBob$, as if they would be expected in a real execution, from the final $(\varSigFin, \varPubKey)$ and we can conclude that the transcript of this phase must be computationally indistinguishable from a real transcript.
-        As Bob in this case is the honest party, we don't have to consider any deviation from the protocol specification.
+        \item \textit{Phase 1} Since $\cnstAdversary$ is required to be deterministic, the distribution in this phase is identical to what is expected in a real execution.
+        \item \textit{Phase 2} As $\cnstSimulator$ managed to calculate Bobs $\varSigBob, \varPubKeyBob, \varRandBob$, as if they would be expected in a real execution, from the final $(\varSigFin, \varPubKey)$, we can conclude that the transcript of this phase must be computationally indistinguishable from a real transcript.
         \item \textit{Phase 3} The messages sent by the deterministic $\cnstAdversary$ again have to be identically distributed to a real execution, therefore the transcript produced by this phase again has to be indistinguishable.
-        Finally, the output by $\cnstSimulator$ is what was received by the TTP, therefore by definition has to be identically distributed to what is expected in a real execution. \todo[inline]{output?}
+        \item Regarding the protocol output we note that if the adversary deviates from the protocol specification at any time the simulator will note this, halt and output whatever $\cnstAdversary$ outputs.
+        In the case that $\cnstAdversary$ behaves correctly $\cnstSimulator$ will play the protocol until the end and finally again output whatever $\cnstAdversary$ outputs.
+        So both in the case that $\cnstAdversary$ acts honestly and in the case that he does not the outputs of $\cnstAdversary$ and $\cnstSimulator$ will be indistinguishable.
     \end{itemize}
 
-    We have shown that the distributions in each phase are indeed identical, which proves the indistinguishability of the two transcripts in the case Alice is corrupted.
+    We have shown that the distributions of transcript messages are indistinguishable in every phase of the protocol in the case that Alice is corrupted.
 
     \textbf{Bob is corrupted: } Simulator $\cnstSimulator$ works as follows:
     \begin{enumerate}
-        \item $\cnstSimulator$ starts by sampling $\varSecKeyAlice, \varNonceAlice \sample \cnstIntegersPrimeWithoutZero{*}$ and proceeds by setting up the initial signature context as defined in the protocol:
+        \item $\cnstSimulator$ starts by sampling $\varSecKeyAlice, \varNonceAlice \sample \cnstIntegersPrimeWithoutZero{*}$ and proceeds by setting up the initial signature context as defined by the protocol:
         \begin{gather*}
             \varSigContext \opAssign \{ \varPubKey \opAssign 1, \varRand \opAssign 1 \} \\
             \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \\
@@ -186,9 +186,9 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
             \funStar{\varSchnorrChallenge} \opEqNoQ \frac{\varSigFin \opSub \varNonceAlice \opSub \varNonceBob}{\varSecKeyAlice \opAddScalar \varSecKeyBob}
         \end{gather*}
         \item $\cnstSimulator$ receives $(\varSigBob, \varSigContext, \varPubKeyBob)$ from $\cnstAdversary$.
-        (In case he does not $\cnstSimulator$ sends $\cnstAbort$ to the TTP and outputs $\cnstFalsum$).
-        He verifies the values sent to him by comparing them with $\varPubKeyBob$ and $\varRandBob$ from its memory, if they are found to be invalid $\cnstSimulator$ sends $\cnstAbort$ to the TTP, otherwise he sends $\cnstContinue$.
-        \item $\cnstSimulator$ calculates as defined in the protocol as $\varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}$ and then sends it to $\cnstAdversary$ as if coming from Alice and finally outputs whatever $\cnstAdversary$ outputs. \todo[inline]{output}
+        He verifies the values sent to him by comparing them with $\varPubKeyBob$ and $\varRandBob$ from its memory.
+        If the simulator finds the values to be invalid, or if he doesn't receive any values at all, he will send $\cnstAbort$ to the TTP and output whatever $\cnstAdversary$ outputs.
+        \item $\cnstSimulator$ calculates as defined in the protocol as $\varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}$ and then sends it to $\cnstAdversary$ as if coming from Alice and finally outputs whatever $\cnstAdversary$ outputs.
     \end{enumerate}
     Again we argue why the transcript is indistinguishable from the real one for each of the three phases layed out before:
     \begin{itemize}
@@ -204,7 +204,10 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
         \item \textit{Phase 3: } The simulator will now verify the values sent to him by $\cnstAdversary$ and will halt and output $\cnstFalsum$ in the case that he sends something invalid which is again identical to what is expected in a real execution.
         In this case $\cnstAdversary$ must not receive ($\varSigFin, \varPubKey$) in the ideal setting which is modelled by $\cnstSimulator$ sending $\cnstAbort$ to the TTP.
         Otherwise $\cnstSimulator$ will calculate his part of the partial signature as defined by the protocol.
-        It will therefore found to be valid by $\cnstAdversary$ and will complete to $\varSigFin$ with $\procFinSigId$, because of the fixed, calculated Schnorr challenge $\cnstSimulator$ calculated in Phase 2. \todo[inline]{output}
+        It will therefore found to be valid by $\cnstAdversary$ and will complete to $\varSigFin$ with $\procFinSigId$, because of the fixed, calculated Schnorr challenge $\cnstSimulator$ calculated in Phase 2.
+        \item If $\cnstAdversary$ behaves dishonestly at any point of the protocol then the simulator will notice, sent $\cnstAbort$ to the TTP and output whatever $\cnstAdversary$ outputs.
+        If the adversary instead behaves as defined in the protocol specification, the protocol will be played until the end after which $\cnstSimulator$ again outputs whatever $\cnstAdversary$ outputs.
+        Therefore in any case the outputs must be indistinguishable from the adversaries output in a real execution.
     \end{itemize}
 
     We have managed to show that in the case that Bob is corrupted the transcript is indistinguishable from a real transcript.
@@ -214,7 +217,7 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$ which were 
 We now do the same for $\procDAptSignId$:
 Again we adjust the protocol with calls to $\procZKfId{\cnstRelation}$, note that we now have one additional call $\procZKfId{\cnstRelation}$, for the pair $(\varWit, \varStatement)$.
 The relation $\cnstRelation$ is equally defined as in the previous proof.
-The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj} .
+The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj}.
 \begin{figure}
     \begin{center}
         \fbox{
@@ -283,7 +286,7 @@ The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj} .
         When $\cnstAdversary$ internally calls $\procZKfId{\cnstRelation}$ and $\procZKfId{\cnstRelation}$ $\cnstSimulator$ saves $(\varSecKeyAlice, \varPubKeyAlice)$ and $(\varNonceAlice, \varRandBob)$ to its memory.
         \item $\cnstSimulator$ receives $(\varSigContext, \funStar{\varPubKeyAlice}, \funStar{\varPubKeyBob})$ from $\cnstAdversary$.
         $\cnstSimulator$ checks the equalities $\funStar{\varPubKeyAlice} \opEqNoQ \varPubKeyAlice$ and $\funStar{\varRandAlice} \opEqNoQ \varRandAlice$ as well as checking $\varPubKeyAlice \opEqNoQ \funGen{\varSecKeyAlice}$ and $\varRandAlice \opEqNoQ \funGen{\varNonceAlice}$.
-        If any of those checks fail $\cnstSimulator$ sends $\cnstAbort$ to the TTP and outputs $\cnstFalsum$.
+        If any of those checks fail, or he doesn't receive some of the values at all $\cnstSimulator$ sends $\cnstAbort$ to the TTP and outputs whatever $\cnstAdversary$ outputs.
         Otherwise he sends $(\varMsg, \varSecKeyAlice, \varNonceAlice)$ to the TTP and receives $(\varWit, (\varSigFin, \varPubKey))$
         \item Again $\cnstSimulator$ calculates $\varSigBob, \varPubKeyBob, \varRandBob$ and finalizes the context $\varSigContext$ as follows:
         \begin{gather*}
@@ -299,8 +302,7 @@ The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj} .
         \item $\cnstSimulator$ calculates $\funStar{\varSBob} \opAssign \varSBob \opAddScalar \varWit$ (extracted from the TTP output) from which he sets $\varSigAptBob \opAssign (\funStar{\varSBob}, \varRandBob, \varSigContext)$.
         \item $\cnstSimulator$ sends $(\varSigAptBob, \varSigContext, \varPubKeyBob, \varStatement \opAssign \funGen{\varWit})$ as if coming from Bob.
         \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation}$ we compare the parameters send by $\cnstAdversary$ to the real one, in case he sent a invalid value $\cnstSimulator$ returns 0, otherwise 1.
-        \item $\cnstSimulator$ receives $\funStar{\varSigAlice}$ from $\cnstAdversary$ and checks $\varSigAlice \opEqNoQ \funStar{\varSigAlice}$.
-        If the equality holds $\cnstAdversary$ sends $\cnstContinue$ to the TTP and finally sends $\varSigFin$ to $\cnstAdversary$ as if coming from Bob and outputs whatever $\cnstAdversary$ outputs.
+        \item $\cnstSimulator$ receives $\funStar{\varSigAlice}$ from $\cnstAdversary$ and in any case outputs whatever $\cnstAdversary$ outputs.
     \end{enumerate}
 
     The phases are similar to the ones defined in \cref{prf:sig:two-party-security} with the only two adjustments being that a) in Phase 2 Bob additionally sends $\varStatement$ to Alice and b) we introduce a new Phase 4 in which Bob sends $\varSigFin$ to Alice.
@@ -311,18 +313,22 @@ The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj} .
     \textbf{(3)} Alice sends $\varPubKeyBob$ and $\varRandBob$ to $\procZKfId{\cnstRelation}$ as the verifier and $\varSigAlice$ to Bob.
     \textbf{(4)} Bob sends the final signature $\varSigFin$ to Alice.
     They both output $(\varSigFin, \varPubKey)$ and Alice additionally outputs $\varWit$.
+    Finally, again we have to show that the simulators protocol output is equivalent to what is expected of $\cnstAdversary$ in a real execution.
 
-    We now again argue why each phase in the simulation is indistinguishable from a real execution
+    We now again argue why the transcript of each phase has to be indistinguishable from a real transcript:
     \begin{itemize}
         \item \textit{Phase 1:} As $\cnstAdversary$ is required to be deterministic, we can conclude that the transcript in this phase must be indistinguishable from a real transcript.
         \item \textit{Phase 2:} In this phase $\cnstSimulator$ sends $\varStatement \opAssign \funGen{\varWit}$ to $\cnstAdversary$ for which $\varWit$ was received from the TTP, therefore it will resamble the value that would have been expected in a real execution.
         \item \textit{Phase 3:} The transcript in this phase must be indistinguishable for the same reasons already layed out in Phase 1.
         \item \textit{Phase 4:} Now the $\cnstAdversary$ expects to receive $\varSigFin$, from which he is able to extract the witness $\varWit$.
         Indeed he will receive $\varSigFin$ as $\cnstSimulator$ has received from the TTP, which is exactly what would have been expected in a real execution.
-        It must furthermore hold that $\cnstAdversary$ will be able to extract correct $\varWit$ using the $\procExtWitId$ procedure, as the simulator calculated $\varStatement \opEqNoQ \funGen{\varWit}$ in step 5.
+        It must furthermore hold that $\cnstAdversary$ will be able to extract the correct $\varWit$ using the $\procExtWitId$ procedure, as the simulator calculated $\varStatement \opEqNoQ \funGen{\varWit}$ in step 5.
+        \item In that case that $\cnstAdversary$ behaves dishonestly and at any time of the protocol by sending invalid (or no) values to the simulator, he will detect this, abort the further protocol execution and output whatever $\cnstAdversary$ outputs.
+        Similarily in the case that $\cnstAdversary$ behaves honestly the protocol is played until the end after which $\cnstSimulator$ outputs whatever $\cnstAdversary$ outputs.
+        So in both cases the outputs will be equivalent to what is expected in a real execution.
     \end{itemize}
 
-    We have shown that in the case Alice is corrupt the simulated transcript produced by $\cnstSimulator$ is indeed distributed equally to a real execution and is thereby computationally indistinguishable.
+    We have shown that in the case that Alice is corrupt the simulated transcript produced by $\cnstSimulator$ is indeed distributed equally to a real execution and is thereby computationally indistinguishable.
 
     \textbf{Bob is corrupted: } Simulator $\cnstSimulator$ works as follows:
     \begin{enumerate}
@@ -335,34 +341,32 @@ The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj} .
         \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation}$ (as the verifier) $\cnstSimulator$ checks for equality with the values sent by him and returns either 0 or 1.
         Once $\cnstAdversary$ sends $(\varSecKeyBob, \varPubKeyBob)$, $(\varNonceBob, \varRandBob)$, $(\varWit, \varStatement)$ internally to $\procZKfId{\cnstRelation}$ as the prover, $\cnstSimulator$ saves them to his memory.
         \item $\cnstSimulator$ sends $(\varMsg, \varSecKeyAlice, \varNonceAlice, \varWit)$ to the TTP and receives $(\varSigFin, \varPubKey)$.
-        \item When $\cnstAdversary$ queries $\funHash{\cdot}$ the simulator again sets the output to $\funStar{\varSchnorrChallenge}$ calculated with the following steps, already seen in the previous proof:
+        \item When $\cnstAdversary$ queries $\funHash{\cdot}$ the simulator again sets the output to $\funStar{\varSchnorrChallenge}$ calculated with the following steps already seen in the previous proof:
         \begin{gather*}
             \varSigFin \opEqNoQ \varNonceAlice \opAddScalar \varSecKeyAlice \opTimesScalar \funStar{\varSchnorrChallenge} \opAddScalar \varNonceBob \opAddScalar \varSecKeyBob \opTimesScalar \funStar{\varSchnorrChallenge} \\
             \funStar{\varSchnorrChallenge} \opEqNoQ \frac{\varSigFin \opSub \varNonceAlice \opSub \varNonceBob}{\varSecKeyAlice \opAddScalar \varSecKeyBob}
         \end{gather*}
         \item $\cnstSimulator$ receives $(\funStar{\varSigAptBob}, \funStar{\varPubKeyBob}, \varSigContext, \funStar{\varStatement})$ from $\cnstAdversary$ and verifies those values checking equality with the ones stored in its memory.
-        If the equality checks succeed $\cnstSimulator$ sends $\cnstContinue$ to the TTP, otherwise sends $\cnstAbort$ and outputs $\cnstFalsum$.
+        If the equality checks succeed $\cnstSimulator$ sends $\cnstContinue$ to the TTP, otherwise sends $\cnstAbort$ and outputs whatever $\cnstAdversary$ outputs.
         \item The simulator now calculates $\varSigAlice$ as defined by the protocol using the $\procSignPrtId$ procedure and sends the result to $\cnstAdversary$ as if coming from Alice.
-        \item Finally $\cnstSimulator$ will receive $\funStar{\varSigFin}$ from $\cnstAdversary$ (if not he outputs $\cnstFalsum$) and will verify that $\funStar{\varSigFin} \opEqNoQ \varSigFin$.
-        If the equality holds he will output whatever $\cnstAdversary$ outputs, otherwise $\cnstFalsum$. \todo[inline]{output?}
+        \item Finally $\cnstSimulator$ will receive $\funStar{\varSigFin}$ from $\cnstAdversary$ and in any case output whatever $\cnstAdversary$ outputs.
     \end{enumerate}
     
-    Again we argue why the transcript is indistinguishable in phases 1--4.
+    Again we argue why the transcript is indistinguishable in phases 1--4:
     \begin{itemize}
         \item \textit{Phase 1:} As argued in \cref{prf:sig:two-party-security} in this phase the adversary will just receive some public, nonce commitment and signature context.
         As he does not know Alice real inputs he has no way of knowing if the values received are the correct ones fitting with Alice inputs, other than by guessing.
         \item \textit{Phase 2:} As argued before due to the hash function being modeled in the random oracle its output is expected to be randomly distributed.
-        As the calculation done by $\cnstSimulator$ to create the hash output relies itself on randomly chosen values, we can conclude that the output is distributed indistinguishably from a real hash output.
-        $\cnstAdversary$ can further not know the original input value from the hash output he receives as he then would also be able to break the Pre-image Resistance property of the hash function.
-        \item \textit{Phase 3:} In this section $\cnstSimulator$ will verify equality of the values sent by $\cnstAdversary$ with the variables saved prior to its memory and halts with output $\cnstFalsum$ if any of the values are unequal.
+        As the calculation done by $\cnstSimulator$ to create the hash output relies itself on randomly chosen values ($\varSecKeyAlice, \varNonceAlice$), we can conclude that the output is distributed indistinguishably from a real hash output.
+        Further $\cnstAdversary$ must not know the original input value by seeing the hash output he receives as he then would also be able to break the Pre-image Resistance property of the hash function.
+        \item \textit{Phase 3:} In this section $\cnstSimulator$ will verify equality of the values sent by $\cnstAdversary$ with the variables saved prior to its memory and if any of the values are unequal or invalid.
         In this case $\cnstAdversary$ should not receive the final outputs $(\varSigFin, \varPubKey)$ which is modelled by sending $\cnstAbort$ to the TTP.
         The same behaviour is expected in a real execution when Alice calls $\procZKfId{\cnstRelation}$ and receives a 0 bit.
         $\varSigAlice$ must be indistinguishable from a real execution because it was calculated by $\cnstSimulator$ exactly as of protocol definition.
-        \item \textit{Phase 4:} In this phase $\cnstSimulator$ is expected to receive $\funStar{\varSigFin}$ from $\cnstAdversary$ which needs to be equal to $\varSigFin$ received earlier by the TTP.
-        $\cnstSimulator$ will do this simple equality check and if successful output whatever $\cnstAdversary$ outputs. \todo[inline]{output?}
-        In the other case we would simply output $\cnstFalsum$ which is identical to the case in which a Bob sends a $\varSigFin$ that does not verify.
+        \item \textit{Phase 4:} In this phase $\cnstSimulator$ is expected to receive $\funStar{\varSigFin}$ from $\cnstAdversary$ after which $\cnstSimulator$ will simply output whatever $\cnstAdversary$, which must be indistinguishable from a real execution because of the deterministic adversary.
+        \item Again in both the case that $\cnstAdversary$ deviates from protocol specification and in the case that he follows it $\cnstSimulator$ will output whatever $\cnstAdversary$ outputs, therefore being equal to what would be the expected output from $\cnstAdversary$ in a real execution.
     \end{itemize}
 
     We have shown that the transcript produced by $\cnstSimulator$ in an ideal world with access to a TTP computing $\procDAptSignId$ is indistinguishable from a transcript produced during a real execution both in the case that Alice and that Bob is corrupted.
-    By managing to show this we have proven that the protocol is secure in $\procZKfId{\cnstRelation}$-model and theorem \cref{lem:sig:daptsign} therefore holds.
+    By managing to show this we have proven that the protocol is secure in $\procZKfId{\cnstRelation}$-model and theorem~\cref{lem:sig:daptsign} therefore holds.
 \end{proof}
