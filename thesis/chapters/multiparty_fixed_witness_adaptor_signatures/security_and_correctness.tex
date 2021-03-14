@@ -55,7 +55,7 @@ Our goal is to proof security in the malicious setting (as defined in~\cref{subs
 For achieving this we will prove security for both the $\procDSignId$ and $\procDAptSignId$ protocols in the hybrid model which was layed out by Yehuda Lindell in~\cite{lindell2017simulate}.
 In particular, we will use the $\procZKfId{\cnstRelation}$-model in which we assume that we have access to a constant-round protocol $\procZKfId{\cnstRelation}$ that computes the zero-knowledge proof of knowledge functionality for any $\cnstNP$ relation $\cnstRelation$.
 The function is parameterized with a relation $\cnstRelation$ between a witness value $\varWit$ (or potentially multiple)  and a statement $\varStatement$.
-One party provides the witness statment pair $(\varWit, \varStatement)$, the second the statement $\funStar{\varStatement}$.
+One party provides the witness statement pair $(\varWit, \varStatement)$, the second the statement $\funStar{\varStatement}$.
 If $\varStatement \opEqNoQ \funStar{\varStatement}$ and $(\varWit, \varStatement) \opIn \cnstRelation$ the functionality returns 1, otherwise 0.
 More formally:
 \[
@@ -68,12 +68,16 @@ More formally:
 That a constant-round zero-knowledge proof of knowledge exists was proven in~\cite{lindell2013note}.
 A secure zero-knowledge proof must fulfill Completeness, Soundness and Zero-Knowledge properties which are defined for instance in~\cite{groth2010short}.
 
-\paragraph{Hybrid functionalities:} The parties have access to a trusted third party that computes the zero-knowledge proof of knowledge functionality $\procZKfId{\cnstRelation}$. $\cnstRelation$ is the relation between a secret key $\varSecKey$ and its public key $\varPubKey \opEqNoQ \funGen{\varSecKey}$, for the elliptic curve generator point $\varG$.
+\paragraph{Hybrid functionalities:} The parties have access to a trusted third party that computes the zero-knowledge proof of knowledge functionality $\procZKfId{\cnstRelation}$.
+$\cnstRelation$ is the relation between a secret key $\varSecKey$ and its public key $\varPubKey \opEqNoQ \funGen{\varSecKey}$, for the elliptic curve generator point $\varG$.
 The participants have to call the functionality in the same order.
 That means if the prover first sends the pair $(\varWit_1, \varStatement_1)$ and then $(\varWit_2, \varStatement_2)$ the verifier needs to first send $\varStatement_1$ and then $\varStatement_2$.
 
 \paragraph{Proof idea:} In order to construct our simulation proof in the hybrid-model we make some adjustments to the $\procDSignId$ protocol utilizing the capabilities of the $\procZKfId{\cnstRelation}$ functionality.
 The adjusted protocol can be seen in figure \cref{fig:sig:dsign-adj} with the newly added lines marked in blue.
+We note here that by making those adjustments to the original protocol we now no longer prove the security of the original but rather the adjusted one.
+This does not mean that original protocol is insecure, but if one wants to implement a version of the protocol that is proven to be secure, than it should include the calls added in the adjusted protocol.
+The same argument holds for all of the adjusted protocols from this section.
 \begin{figure}
     \begin{center}
         \fbox{
@@ -111,7 +115,9 @@ The adjusted protocol can be seen in figure \cref{fig:sig:dsign-adj} with the ne
     \end{center}
     \caption{Adjustment to the $\procDSignId$ protocol seen in \cref{fig:sig:dsign}} \label{fig:sig:dsign-adj}
 \end{figure}
-That means both Alice and Bob will verify the validity of the public key and nonce commitments of the other party and will stop protocol execution in case an invalid value has been sent.
+
+
+In the adjusted protocol both Alice and Bob will verify the validity of the public key and nonce commitments of the other party and will stop protocol execution in case an invalid value has been sent.
 We assume parties have access to a trusted third party computing $\procZKfId{\cnstRelation}$ which will return 1 if $\varPubKeyAlice \opEqNoQ \funStar{\varPubKeyAlice}$ (where $\funStar{\varPubKeyAlice}$ is the public key that Bob received from Alice) and $\varPubKeyAlice \opEqNoQ \funGen{\varSecKeyAlice}$. (The same holds for the reversed case)
 
 \begin{theorem}\label{lem:sig:dsign}

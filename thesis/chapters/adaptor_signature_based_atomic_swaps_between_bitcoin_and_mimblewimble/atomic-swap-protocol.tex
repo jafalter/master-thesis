@@ -125,6 +125,7 @@ The routine will verify that the current height of the blockchain is marginally 
 If this is the case it will return 1, or 0 otherwise.
 How much time exactly should be left for the function to return 1 is implementation specific, and could be set to for instance one day.
 We now define a protocol $\procExcSwapId$ to execute the Atomic Swap between some amount $\varAmountBtc$ on the Bitcoin side and some amount on the Mimblewimble side $\varAmountMW$.
+An instantiation of the protocol can be found in~\cref{fig:exec-swap}.
 We assume the participants have successfully run the $\procSetupSwapId$ protocol and both know the updated swap state $\varSwpState$ as returned by the setup protocol.
 Both parties need to provide their part of the locked Mimblewimble coins as input to the protocol.
 Additionally, Alice needs to provide her secret key for the Bitcoin side $\varSecKeyAlice$ and Bob the secret witness value $\varWit$.
@@ -158,7 +159,7 @@ Therefore it is important to pick long enough timeouts, and also check how much 
         \pcreturn (\varUTXO_{A}) \< \< \< \< \pcreturn (\funStar{\varSpendableCoinBob})
         }
         }
-        \caption{Atomic Swap - $\procSetupSwapId$. \label{fig:exec-swap}}
+        \caption{Atomic Swap - $\procExcSwapId$. \label{fig:exec-swap}}
     \end{figure}
 \end{landscape}
 \restoregeometry
