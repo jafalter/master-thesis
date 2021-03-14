@@ -1,34 +1,44 @@
-With the outlined Adapted Mimblewimble Transaction Scheme from definition~\ref{def:atom:apt-ext-mw-tx-scheme} and protocols from \ref{sec:atom:protocols} we can now construct an Atomic Swap protocol with another Cryptocurrency.
-In this thesis we will explain a swap with Bitcoin, as at present Bitcoin and Bitcoin-like cryptocurrencies \todo{not sure I would claim that Bitcoin-like cryptocurrencies are also widely adopted} are the most widely adopted.
-We will generally refer to the ``Bitcoin side`` and the ``Mimblewimble side`` of the swap to be most generic.
-Upon implementation one has to decide for a specific implementation, for example BTC on the Bitcoin side and Grin on
-the Mimblewimble side.
-\todo[inline]{Here, I would write sth like: To abstract away from the details of the different Bitcoin implementations, we define here the minimal DPT functions that we require for our atomic swap. These functionalities are inherent to the Bitcoin functionality and thus supported in all implementations.}
-On the Bitcoin side we define three DPT functions $(\procLockAddrId, \procVerifyLockId, \procSpendBtcId)$.
+With the outlined Adapted Mimblewimble Transaction Scheme from~\cref{def:atom:apt-ext-mw-tx-scheme} and protocols from~\cref{sec:atom:protocols} we can now construct an Atomic Swap protocol with another Cryptocurrency.
+In this thesis we will explain a swap with Bitcoin, as at present Bitcoin is the most widely adopted Cryptocurrency.
+To abstract away from the details of different Bitcoin implementations, we define here the minimal DPT functions that we require for our Atomic Swap.
+These functionalities are inherent to the Bitcoin functionality and thus supported in all implementations.
+We define the following three DPT functions $(\procLockAddrId, \procVerifyLockId, \procSpendBtcId)$.
 \begin{itemize}
     \item $(\varScriptPubKey) \opFunResult \procLockAddr{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varTime}$:
     The locking script function lets Bob construct a Bitcoin script only spendable by Alice if she receives the discrete logarithm $\varWit$ of $\varStatement$ with $\varStatement \opEqNoQ \funGen{\varWit}$.
-    Additionally, the function requires Bobs public key $\varPubKeyBob$ and a timelock $\varTime$ (given as a block number) as input which allows Bob to reclaim his funds after some time if the atomic swap was not completed successfully.
+    Additionally, the function requires Bobs public key $\varPubKeyBob$ and a timelock $\varTime$ (given as a block number) as input which allows Bob to reclaim his funds after some time if the Atomic Swap was not completed successfully.
     The function will create and return a Bitcon script $\varScriptPubKey$ to which Bob can send funds using a P2SH transaction.
-    To spend this output Alice will have to provide a signature under her public key $\varPubKeyAlice$ and $\varStatement$, which she is able to provide, once acquired $\varWit$.
-    This construction is similar although simpler to the locking mechanism described by Malavolta et al. \todo[inline]{Question that arises here: Why a simpler locking mechanism suffices here? What is the extra functionality in Malavolta et al. that you do not require here?}
-    For a in-depth security analysis of this concept we refer the interested reader to their paper ~\cite{malavolta2019anonymous}.
-    For a concrete Bitcoin Script realizing this functionality see section~\ref{ch:implementation}.
+    To spend this output Alice will have to provide a multi-signature under her public key $\varPubKeyAlice$ and $\varStatement$, which she is able to provide, once acquired $\varWit$.
+    An alternative way of constructing a locking mechanism on Bitcoin was shown to be secure by Malavolta et al. in~\cite{malavolta2019anonymous}.
+    In their construction the two parties cooperate to construct an initial signature for the spending transaction which is however, not yet valid as it is missing some witness value $\varWit$, only known to one of the two parties.
+    Once the second party gets hold of the witness value he or she can complete the signature and finalize the transaction.
+    Comparing their solution to the more primitive multi-signature script, it achieves greater privacy (from the outside the lock output just looks like a regular P2PKH output), and needs only a single signature, therefore less space, for the unlocking transaction.
+    However, the construction is slightly more complex in the case of ECDSA signatures, which are at present the only signature scheme available on Bitcoin.
+    Even though the construction by Malavolta et al. would also be applicable in our case, because of the additional complexity involved and since the focus of this thesis is the Mimblewimble side of the swap we decided to implement the simpler script-based locking mechanism in our proof of concept implementation.
     \item $\{ 1,0 \} \opFunResult \procVerifyLock{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varValue}{\varTime}{\varUTXO_{lock}}$:
-    The lock verification algorithm takes as input Alices, Bobs public keys and the statement $\varStatement$ and the UTXO $\varUTXO_{lock}$.
+    The lock verification algorithm takes as input Alice and Bob public keys and the statement $\varStatement$ and the UTXO $\varUTXO_{lock}$.
     The function will compute the Bitcoin lock script $\varScriptPubKey$ as created by $\procLockAddrId$ check equality with $\varUTXO_{lock}$ and if the value locked under the UTXO equals $\varValue$.
     Upon successful verification the function returns 1, otherwise 0.
     \item $\varTx \opFunResult \procSpendBtc{\varInputs}{\varOutputs}{\varSecKey}$:
-    The spend Bitcoin functionality is a wrapper around the $\procBuildTransactionId, \procSignTransactionId$ defined in~\ref{subsec:pre:bitcointx}.
+    The spend Bitcoin functionality is a wrapper around the $\procBuildTransactionId, \procSignTransactionId$ defined in~\cref{subsec:pre:bitcointx}.
     It constructs and signs a transaction spending the UTXOs given in $\varInputs$ and creates the fresh UTXOs in $\varOutputs$.
     It returns a signed transaction which then can be broadcast.
 \end{itemize}
 
-\todo[inline]{I assume that the phases required in atomic swap will be explained earlier in the thesis?}
+In the following we describe the phases of an Atomic Swap protocol executed between two parties.
+In the setup phase~\cref{subsec:atom:setup}, the two parties agree on the parameters of the swap, that is the exchange rates, the amount being swapped and the timeout for the refunding.
+In the locking phase~\cref{subsec:atom:locking}, the goal is to lock up the funds on both chains, such that they can either be redeemable by the other party in case the swap was successful, or be refunded to the original owners in case the swap has failed.
+The precondition for running the locking phase is that the parties have first completed the setup phase.
+In the execution phase~\cref{subsec:atom:exec}, the two parties cooperate to redeem the funds locked by the other parties.
+This phase can only be entered after successfully completing the locking phase.
+When the funds are redeemed on both sides the swap is considered successfully completed.
+In case the execution phase fails, for instance if one party stops cooperating, the swap is considered failed and we enter the refunding phase.~\cref{subsec:atom:refund}
+A special security requirement here is that in case of failure the funds are refunded to their original owners on both sides.
+If the swap completes on one side, but then can't be completed on the other side, one party would lose all of their value, therefore we must make sure that this case is an impossibility.
 
-\subsection{Setup phase}\label{subsec:atom:setup}
+\subsubsection{Setup Phase}\label{subsec:atom:setup}
 
-We assume Alice owns Mimblewimble coins $\funArray{\varSpendableCoin}$ with the total value $\varValueMw$ and Bob owns 
+We assume Alice owns Mimblewimble coins $\funArray{\varSpendableCoin}$ with the total value $\varValueMw$ and Bob owns
 Bitcoin locked in some UTXO $\varUTXO$ with a value of $\varValueBtc$ and secret spending key $\varSecKey_{btc}$.
 Before the protocol can start the two parties must agree on the value they want to swap, the exchange rate of the currencies and a time after which the swap should be canceled.
 After coming to an agreement the following variables are defined and known by both Alice and Bob:
@@ -36,21 +46,23 @@ After coming to an agreement the following variables are defined and known by bo
     \item $\varSecParam$ A security parameter.
     \item $\varAmountBtc$ The amount of Bitcoin Bob will swap to Alice.
     \item $\varAmountMW$ The amount of the Mimblewimble coin Alice will swap to Bob.
-    \item $\varTimeBTC$ The locktime as a blockheight for the Bitcoin side.
-    \item $\varTimeMW$ The locktime as a blockheight for the Mimblewimble side.
+    \item $\varTimeBTC$ The locktime as a block height for the Bitcoin side.
+    \item $\varTimeMW$ The locktime as a block height for the Mimblewimble side.
 \end{itemize}
-\todo[inline]{the symbol for $varSwpState$ is overloaded. You have used this symbol already many times before for other purpose (e.g., the adversary?)}
 We collect this shared variables in an initial swap state $\varSwpState$:
 \[ \varSwpState \opAssign \{ \varSecParam, \varAmountBtc, \varAmountMW, \varTimeBTC, \varTimeMW \} \]
 
 In practice, we need to consider that exchange rates might fluctuate, furthermore timeouts have to be calculated separately for each chain.
 The problems with cross chain payments are discussed by Tairi et al. in~\cite{tairi2019a2l}, they propose to use a fixed exchange rate for each day and to use a real world timeout like one day and then calculate the specific block numbers by taking the average block time of the blockchain into account.
+Alternatively, if the chains allow it, we could use a real world unix timestamp as a timeout, instead of a block height.
 In our setup we can also fix the exchange rate at the beginning of the protocol, which stays unchanged during protocol execution.
 If the exchange rate fluctuates and one party is negatively impacted he or she could still decide to stop being cooperative which means the coins would be returned to the original owners after the timeout.
 
 There is furthermore the problem of transaction fees, which we do not consider for this formalization.
 Depending on the current network load the participants need to agree on a fee that they are willing to pay for each network.
-It needs to be considered that if fees are picked to low, it might take time for transactions to be confirmed, and the swap will take longer, if they are picked high the participants will lose funds.
+It needs to be considered that if fees are picked to low, it might take time for transactions to be confirmed, and the swap will take longer, if they are picked high the participants will lose value.
+
+\subsection{Locking phase}\label{subsec:atom:locking}
 
 We formalize the protocol $\procSetupSwapId$ in figure~\ref{fig:setup-swap}.
 The protocol takes as input the shared swap state $\varSwpState$ from both parties.
@@ -64,8 +76,8 @@ Alice can now verify that the funds on Bitcoin side are indeed correctly locked.
 After that she will collaborate with Bob to spend her Mimblewimble coins into an output shared by both parties.
 Immediately after, both parties collaborate again to spend this shared coin back to Alice with a timelock of $\varTimeMW$.
 It is immanent that Alice does not publish the first transaction (A -> AB) before the timelocked refund transaction (AB -> A) was signed, otherwise her funds are locked in the shared output without the possibility of refund if Bob refuses to cooperate.
-The setup protocol concludes with the funds locked up in both chains and ready to be swapped and outputs the updated swap state $\varSwpState$ to both parties.
-Additionally, it outputs Alice's part $\funStar{\varPtSpendableCoinAlice}$ of the locked Mimblewimble coin, her change output on the Mimblewimble side $\funStar{\varSpendableCoinAlice}$, her secret key $\varSecKeyAlice$ for the Bitcoin side and $\funStarAlt{\varSpendableCoinAlice}$, which is refund coin, only valid after $\varTimeMW$.
+The locking protocol concludes with the funds locked up in both chains and ready to be swapped and outputs the updated swap state $\varSwpState$ to both parties.
+Additionally, it outputs Alice's part $\funStar{\varPtSpendableCoinAlice}$ of the locked Mimblewimble coin, her change output on the Mimblewimble side $\funStar{\varSpendableCoinAlice}$, her secret key $\varSecKeyAlice$ for the Bitcoin side and $\funStarAlt{\varSpendableCoinAlice}$, which is a refund coin, only valid after $\varTimeMW$.
 For Bob it furthermore outputs his part $\funStar{\varPtSpendableCoinBob}$ of the locked Mimblewimble coin, his change output on the Bitcoin side $\varUTXO_{B}$ and the secret witness value $\varWit$, which shall be revealed to Alice in the execution phase.
 
 \newgeometry{margin=2cm}
@@ -75,6 +87,7 @@ For Bob it furthermore outputs his part $\funStar{\varPtSpendableCoinBob}$ of th
         \fbox{
         \procedure[linenumbering,skipfirstln]{$\procSetupSwap{\varSwpState}{\funArray{\varSpendableCoin}}{\varValueMw}{\funArray{\varUTXO}}{\funArray{\varSecKey_{btc}}}{\varValueBtc}$} {
         Alice \< \< \< \< Bob \\
+        \{ \varAmountBtc, \varAmountMW, \varTimeBTC, \varTimeMW \} \opFunResult \varSwpState \< \< \< \< \{ \varAmountBtc, \varAmountMW, \varTimeBTC, \varTimeMW \} \opFunResult \varSwpState \\
         \varKeyPairAlice \opFunResult \procSetup{\varSecParam} \< \< \< \< \varKeyPairBob \opFunResult \procSetup{\varSecParam} \\
         \< \< \< \< (\varWit, \varStatement) \opFunResult \procSetup{\varSecParam} \\
         \< \sendmessagerightx{4}{\varPubKeyAlice} \< \\
@@ -97,8 +110,6 @@ For Bob it furthermore outputs his part $\funStar{\varPtSpendableCoinBob}$ of th
         \pcreturn (\varSwpState, \funStar{\varPtSpendableCoinAlice}, \funStar{\varSpendableCoinAlice}, \varSecKeyAlice, \funStarAlt{\varSpendableCoinAlice}) \< \< \< \< \pcreturn (\varSwpState, \funStar{\varPtSpendableCoinBob}, \varUTXO_{B}, \varWit)
         }
         }
-        \todo[inline]{You need to add at some point that Alice (and Bob) parse the state in $\mathcal{A}$ to extract parameters they need later.\\
-        I think we need a way to differentiate better between local operations and 2-party protocols (e.g., dsharedInMWTx).}
         \caption{Atomic Swap - $\procSetupSwapId$.}\label{fig:setup-swap}
     \end{figure}
 \end{landscape}
@@ -108,7 +119,7 @@ For Bob it furthermore outputs his part $\funStar{\varPtSpendableCoinBob}$ of th
 
 First we need to define an additional auxiliary function $\procVerifyTimeId$ with the following interface:
 \[ \{0,1\} \opFunResult \procVerifyTime{\varChain}{\varTime} \]
-This function will verify that there is sufficient time to execute the atomic swap protcol.
+This function will verify that there is sufficient time left to execute the Atomic Swap protocol.
 As input it takes a chain parameter $\varChain$ (in our case this could be either BTC or MW) and a block height $\varTime$.
 The routine will verify that the current height of the blockchain is marginally below $\varTime$.
 If this is the case it will return 1, or 0 otherwise.
@@ -119,10 +130,13 @@ Both parties need to provide their part of the locked Mimblewimble coins as inpu
 Additionally, Alice needs to provide her secret key for the Bitcoin side $\varSecKeyAlice$ and Bob the secret witness value $\varWit$.
 The protocol starts with both parties checking that there is enough time left to complete the protocol.
 After the check they will run the $\procDScriptMwTxId$ protocol in which they spend the locked Mimblewimble output to Bob, while at the same time revealing $\varWit$ to Alice.
-Either one of the parties can now publish the transaction to the Mimblewimble network, which concludes the swap on the mimbewimble side, as Bob is now in full control of the funds.
+Either one of the parties can now publish the transaction to the Mimblewimble network, which concludes the swap on the Mimblewimble side, as Bob is now in full control of the funds.
 Alice, knowing $\varWit$, creates now a new UTXO where she then sends the funds from the Bitcoin lock.
 After publishing this transaction to the Bitcoin network, Alice is in full possession of the swapped funds on the Bitcoin side and the Atomic Swap is completed.
 The protocol outputs their newly created output/coin to each party.
+We note here that after completion of the swap on the Mimblewimble side, Alice is possible to redeem her Bitcoin, however she still has to construct the transaction and get it mined on the network.
+Otherwise, if she would take too long and the timeout block height is reached, Bob could still try to refund his coins, even though he already received the funds on the Mimblewimble side.
+Therefore it is important to pick long enough timeouts, and also check how much time is left again before running the execution protocol.
 
 \newgeometry{margin=2cm}
 \begin{landscape}
@@ -136,7 +150,7 @@ The protocol outputs their newly created output/coin to each party.
         \t \pcreturn \cnstFalsum \< \< \< \< \t \pcreturn \cnstFalsum \\
         (\varMwTx, \cnstEmptySet, \varWit) \< \< \< \< (\varMwTx, \funStar{\varSpendableCoinBob}) \pcskipln \\
         \opFunResult \procDScriptMwTxL{\funStar{\varPtSpendableCoinAlice}}{\varAmountMW}{\cnstFalsum}{\varStatement} \< \< \< \< \opFunResult \procDScriptMwTxR{\funStar{\varPtSpendableCoinBob}}{\varAmountMW}{\varWit} \\
-        \procPublishMW{\varMwTx} \< \< \< \< \procPublishMW{\varMwTx} \\
+        \< \< \< \< \procPublishMW{\varMwTx} \\
         (\funStarAlt{\varSecKeyAlice}, \funStarAlt{\varPubKeyAlice}) \opFunResult \procSetup{\varSecParam} \< \< \< \< \\
         \varUTXO_{A} \opFunResult \procCreateUTXO{\varAmountBtc}{\funStarAlt{\varPubKeyAlice}} \< \< \< \< \\
         \varBtcTx \opFunResult \procSpendBtc{\funArray{\varUTXO_{lock}}}{\funArray{\varUTXO_{A}}}{\funArray{\varSecKeyAlice, \varWit}} \< \< \< \< \\
@@ -144,19 +158,18 @@ The protocol outputs their newly created output/coin to each party.
         \pcreturn (\varUTXO_{A}) \< \< \< \< \pcreturn (\funStar{\varSpendableCoinBob})
         }
         }
-        \todo[inline]{Here both publish the mimblewimble tx?}
         \caption{Atomic Swap - $\procSetupSwapId$. \label{fig:exec-swap}}
     \end{figure}
 \end{landscape}
 \restoregeometry
 
-\subsection{Refunding}\label{subsec:atom:refund}
+\subsection{Refunding phase}\label{subsec:atom:refund}
 
 If one party refused to cooperate or goes offline the coins can be returned to the original owner.
 On the Bitcoin side this is the case as Bob can simply spend the locked output with his private key $\varSecKeyBob$ after the timeout $\varTimeBTC$ has passed.
 He then can simply construct and sign a transaction spending the output to a new UTXO which is in his full possession.
-He even could prepare this transaction upfront and broadcast it, once the the blocknumber hits $\varTimeBTC$ the transaction will become valid and get mined.
-Again we stress the importance of using appropriate timeouts, if a timeout is too short the swap might get cancelled if there are some delays, if the timeout is too long the funds might be locked for an unnessary amount of time.
+He even could prepare this transaction upfront and broadcast it, once the the block number hits $\varTimeBTC$ the transaction will become valid and get mined.
+Again we stress the importance of using appropriate timeouts, if a timeout is too short the swap might get cancelled if there are some delays, if the timeout is too long the funds might be locked for an unnecessary amount of time.
 
 On the Mimblewimble side the second transaction spending the shared output back to Alice guarantees that her funds are returned to her after the timeout $\varTimeMW$ hits.
 For this reason it is so important that Alice publishes both the fund and refund transaction at the same time.
