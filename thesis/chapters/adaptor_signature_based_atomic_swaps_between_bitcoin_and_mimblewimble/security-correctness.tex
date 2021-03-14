@@ -100,6 +100,10 @@ $\cnstRelation_2*$ is the same as $\cnstRelation_2$ just for a list of secrets i
 Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnstRelation_2*}{\funArray{\varSpendableCoin}}$.
 
 \textbf{Proof Idea}: We extend the protocol $\procDBuildMwTxId$ instantiated in ~\cref{sec:atom:protocols} with the following calls to the zero-knowledge proof of knowledge functionalities as depicted in~\cref{fig:atom:hybrid-dbuild}.
+Again as already pointed out in the previous section we must make adjustments to the protocol to be able to prove their security.
+That in turn does not mean that the original protocols are insecure, we simply add calls to make a security proof of this sort possible.
+When one implements these protocols with the goal of security in mind, one should also implement the additional calls added with the adjusted versions.
+The same holds for all adjusted protocols throughout this section.
 
 \begin{figure}
     \fbox{
@@ -131,7 +135,6 @@ Again to shorten the calls by the prover we simplify the call to $\procZkf{\cnst
         }
     \end{varwidth}
     }
-    \todo[inline]{We need to decide what version of the protocols you want to put finally in the thesis. So far you are writing 2 versions: (i) the version as it is in Grin; and (ii) the version that you are able to prove secure (i.e., adding the calls to the zkp system). So, one question that you might get is: what is the "good" version, that is, if I create another implementation of Mimblewimble, which one should I take? And another question could be: the fact that you have 2 versions means that the current implementation is broken? Think about the answers and we should discuss them. Regarding the 2 versions, I see 2 possibilities: (a) keep both and clearly say their difference; or (b) keep only the one that you prove secure and say that it is slightly different from that of Mimblewimble. }
     \caption{Extension of $\procDBuildMwTxId$ (\cref{fig:d-build-mw-tx}) in the hybrid Model} \label{fig:atom:hybrid-dbuild}
 \end{figure}
 
