@@ -1,4 +1,10 @@
+\urldef\urlmwbreak\url{https://github.com/bogatyy/grin-linkability}
+
 In this section we will outline the fundamental properties of the protocols employed in Mimblewimble which are relevant for the thesis and particularly the construction of the Atomic Swap protocol constructed in chapter~\ref{ch:atomicswap}.
+The Mimblewimble protocol is an outline for a Privacy-enhancing Cryptocurrency that achieves Confidential Transactions as of~\cref{def:pre:privacy:conf-tx}.
+If the protocol also achieves Transaction Unlinkability~\cref{def:pre:privacy:tx-unlink} is not fully clear.
+It can be argued that Transaction merging~\cref{sec:pre:mimblewimble:merge} together with Cut-through~\cref{par:pre:mimblewimble:cut} should make transactions unlinkable, however, one author managed in a practical setting to link a large amount of Mimblewimble transactions using well connected network nodes that attempt to sniff original transactions before they were merged\footnote{\urlmwbreak}.
+
 \subsubsection{Transaction Structure} \label{subsec:pre:mimblwimble-tx}
 
 First we will define the notion of a coin in Mimblewimble which has similarity to an unspent transaction output (UTXO) in Bitcoin.
