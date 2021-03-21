@@ -1,0 +1,18 @@
+In 2017 Andrew Poelstra presented a concept called Scriptless Scripts that achieves the execution of primitive contracts only by the use of standard cryptographic tools such as digital signatures.~\cite{poelstra2017scriptless}
+The most prominent Scriptless Script is the Adaptor Signature which has been fully formalized and proven to be secure for Schnorr and ECDSA by Aumayr et al. in~\cite{aumayr2020bitcoinchannels}
+Scriptless Scripts are useful for Cryptocurrencies that lack scripting functionality such is the case for instance in Mimblewimble based systems, but also helps to replace script-based approaches with improvements in privacy as well as efficiency, shown in a paper by Christoph Egger, Pedro Moreno-Sanchez and Matteo Maffei~\cite{egger2019atomic}.
+In~\cref{ch:fixedwitnesssignatures} we will leverage the Adaptor Signature concept together with a Two-Party Signature Scheme to build a scriptless Atomic Swap protocol applicable for Mimblewimble-based Cryptocurrencies.
+The Adaptor Signature Scheme is a two-step process, a signer first computes a pre-signature that can be completed only by a party knowing a certain secret witness value $\varWit$ from a hard relation $(\varWit, \varStatement) \opIn \cnstRelation$.
+After the the pre-signature is completed into the final one, it must then be possible to extract $\varWit$ given the final and the pre-signature.
+
+We here repeat the definition of an Adaptor Signature Scheme found by Aumayr et al. in~\cite{aumayr2020bitcoinchannels}.
+
+\begin{definition}[Adaptor Signature Scheme]
+    An Adaptor Signature Scheme wrt. a hard relation $\cnstRelation$ and a signature scheme $\varSigScheme$ as of~\cref{def:pre:signature-scheme} consists of four algorithms:
+    \begin{itemize}
+        \item $\funTilde{\varSignature} \opFunResult \styleFunction{pSign}(\varSecKey, \varMsg, \varStatement)$ is a PPT algorithm that on input secret key $\varSecKey$, message $\varMsg \opIn \cnstBinary{*}$ and statement $\varStatement$ outputs a pre-signature $\funTilde{\varSignature}$.
+        \item $\cnstTrueorFalse \opFunResult \styleFunction{pVrfy}(\varPubKey, \varMsg, \varStatement, \funTilde{\varSignature})$ is DPT algorithm that on input a public key, message $\varMsg \opIn \cnstBinary{*}$, statement $\varStatement$ and pre-signature $\funTilde{\varSignature}$, outputs either 1 or 0.
+        \item $\varSignature \opFunResult \styleFunction{Adapt}(\funTilde{\varSignature}, \varWit)$ is a DPT algorithm that on input a pre-signature $\funTilde{\varSignature}$ and witness value $\varWit$ outputs a signature $\varSignature$.
+        \item $\varWit \opFunResult \styleFunction{Ext}(\varSignature, \funTilde{\varSignature}, \varStatement)$ is a DPT algorithm that on input a signature $\varSignature$, pre-signature $\funTilde{\varSignature}$ and statement $\varStatement$ outputs a witness $\varWit$ such that $(\varWit, \varStatement) \opIn \cnstRelation$, or $\cnstFalsum$.
+    \end{itemize}
+\end{definition}
