@@ -1,3 +1,48 @@
+\urldef\urlgithub\url{https://github.com/jafalter/mw-btc-swap}
+\urldef\urlgrinwallet\url{https://github.com/mimblewimble/grin-wallet}
+\urldef\urlrustbitcoin\url{https://github.com/rust-bitcoin/rust-bitcoin}
+\urldef\urlprone\url{https://github.com/mimblewimble/grin-wallet/pull/565}
+\urldef\urlprtwo\url{https://github.com/mimblewimble/grin-wallet/pull/557}
+\urldef\urljsonrpc\url{https://www.jsonrpc.org/}
+
+We have developed a prototype implementation\footnote{\urlgithub} of the Atomic Swap protocol outlined in~\cref{sec:atom:atomic-swap} in the Rust programming language between Bitcoin and the Grin Cryptocurrency.
+On the Grin side we have been using the official grin-wallet\footnote{\urlgrinwallet} library and on the Bitcoin side the rust-bitcoin\footnote{\urlrustbitcoin} library for transaction creation, signing etc.
+The choice of programming language was made on the basis that the official libraries available for the Grin Cryptocurrency are also written in Rust.
+During development, we discovered two shortcomings in the grin-wallet library, which is why we used our own local forked version of this library in which we addressed those shortcomings.
+We then submitted both changes to the library as pull requests.\footnote{\urlprone}\footnote{\urlprtwo}
+To query blockchain state, submit and verify transactions our implementation sends JSON-RPC\footnote{\urljsonrpc} to a locally running Bitcoin Core and Grin Core node.
+The developed program is executable via the command line and accepts the following commands:
+\begin{itemize}
+    \item init: The init command is run during the setup phase of the atomic swap.
+    It creates a new swap slate consisting of a public containing to offered currency, exchange rate, connection details and other public parameters and a private file in which secret keys and nonces are stored.
+    The public file can be shared with an interested party to execute a swap.
+    \item import: The import command is run during the setup phase of the atomic swap and allows for the importing of funds both of the Bitcoin and the Grin side.
+    Note that both parties need to import funds with a value of at least what is the desired value to be swapped before the protocol can be run.
+    \item accept: The accept command is executed by an interested party during the setup phase.
+    It imports the public slate file shared by the offering party and creates the respective private slate file, to which funds can be imported.
+    \item listen: The listen command concludes the setup phase on the offerers side and starts a TCP server to which peers can connect to.
+    The precondition for this command to execute is that the offered funds have been successfully imported into the swap slate.
+    \item lock: The lock command starts the locking phase of the Atomic Swap.
+    It is executed by the accepting party, while the offering party must already be listening on a TCP server.
+    Again the command will verify that enough funds have been imported and will otherwise exit with an error.
+    During this phase funds will be locked up on both chains as specified in~\cref{subsec:atom:locking}.
+    Private and public slate files will be updated during this command to allow swap execution to be initiated.
+    \item execute: The execute command runs the execution phase of the Atomic Swap~\cref{subsec:atom:exec} unlocking the funds locked during the locking phase and transferring the coins to their new owners.
+    Again it has to be run by the requesting party while the offering party is still listening on a TCP server.
+    Before the execution starts the program will check on both chains if enough time is left to finish the swap before the timeout would be hit.
+    In the case that not enough time is left in at least of the two blockchains the program will exit with an error.
+    \item cancel: The cancel command returns funds that have been locked during locking phase to the original owners.
+    The command will be executed by the requesting party, while the offering party is listening on a TCP server.
+    Running the cancel protocol is only allowed as soon as the timeout has been hit on both blockchains.
+    Trying to run the command earlier will result in an error.
+\end{itemize}
+
+We successfully managed to run the full protocol between Alice owning Grin and Bob owning Bitcoin on the Bitcoin and Grin testnet.
+In transaction \\10536404873e6ae133afde600b5630d6a00f3be0b9dde01a248c6f13a00b3a4b\footnote{\url{https://tinyurl.com/pend7sdk}}, which was mined in block 1937148\footnote{\url{https://tinyurl.com/7jmryv47}} of the Bitcoin Testnet 0.000016 BTC were locked in the lock address 2NCJDq4YRQ9C83fgvepMqU2D9kE4x7h36Ji\footnote{\url{https://tinyurl.com/2sz8munw}}.
+On the Grin side our lock transaction locking 0.1 GRN was mined in block 718594\footnote{\url{https://floonet.grinscan.net/block/718594}} sending funds to the lock commitment \\08c2e1a98f5fd328cc67b7df5ab9fdee9cf0c1c1f166d5d08a02a578945fdf6076\footnote{\url{https://tinyurl.com/y7ed5za5}}.
+In the execution phase the locked funds on the Grin side where sent to Bob \\(09ef66334dc2e4c74732dafda8af3c32494eed5b23beb483d29d7ef32bf5c3ebb8\footnote{\url{https://tinyurl.com/ychtyf8v}}) in a contract transaction mined in block 718596\footnote{\url{https://floonet.grinscan.net/block/718596}}.
+This allowed Alice to unlock her funds on the Bitcoin side in transaction \\ aa2ab77482841571b6413c68de681830c61527bc6a90ef1781d6208d151fea10\footnote{\url{https://tinyurl.com/45ysh9e4}} which was mined in block 1937150\footnote{\url{https://tinyurl.com/fddeahk8}} on the Bitcoin testnet.
+
 \section{Implementation Bitcoin side}\label{sec:ImplementationBtc}
 \section{Implementation Grin side}\label{sec:ImplementationGrin}
 \section{Performance Evaluation}\label{sec:Performance}
