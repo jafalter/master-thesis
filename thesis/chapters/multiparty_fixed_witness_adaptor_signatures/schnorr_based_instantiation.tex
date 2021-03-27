@@ -138,9 +138,10 @@ For a correctness proof and a generally more extensive explanation of this two-p
 
 In~\cref{fig:aptSchnorr} we further provide a Schnorr-based instantiation for the fixed witness adapted signature scheme as defined in~\cref{def:sig:two-party-fixed-wit-apt-sig}.
 
-$\procAptSigId$ will add the secret witness $\varWit$ to the $\varS$ value of the signature, changing the partial signature it this way means that it can't be verified using $\procVerfId$ any longer.
-Therefore we introduce $\procVerifyAptSigId$ which takes as additional parameter the statement $\varStatement$ which will be included in the verifiers equation.
-Now the function verifies not only validity of the partial signature, but also that it indeed has been adapted with the witness value $\varWit$, being the discrete logarithm of $\varStatement$. After obtaining $\varSigFin$, we can then cleverly unpack the secret $\varWit$, which is shown in the $\procExtWitId$ function.
+$\procAptSigId$ will add the secret witness $\varWit$ to the $\varS$ value of the signature, changing the partial signature this way means that it can't be verified using $\procVerfPtSigId$ any longer.
+Therefore, we introduce $\procVerifyAptSigId$ which takes as additional parameter the statement $\varStatement$ which will be included in the verifier's equation.
+Now the function verifies not only validity of the partial signature, but also that it indeed has been masked with the witness value $\varWit$, being the discrete logarithm of $\varStatement$.
+After obtaining $\varSigFin$, we can then cleverly unpack the secret $\varWit$, which is shown in the $\procExtWitId$ function.
 
 \begin{figure}
     \begin{center}

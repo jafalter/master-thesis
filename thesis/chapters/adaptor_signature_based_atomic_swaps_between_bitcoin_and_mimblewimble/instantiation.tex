@@ -229,8 +229,8 @@ Running this protocol the two transaction senders, each owning a share of the in
 \subsection{Adapted Extended Mimblewimble Transaction Scheme}
 
 Figure~\cref{fig:inst-apt-mw-tx-recv} shows an instantiation of the $\procAptRecvCoinsId$ algorithm.
-Before updating the pre-transaction $\varPreTx$ Bob adapts his partial signature with the witness value $\varWit$.
-The procedure then returns the pre-transaction $\varPreTx$ containing Bob's adapted partial signature, and the statement $\varStatement$ which is a commitment to the witness value $\varWit$.
+Before updating the pre-transaction $\varPreTx$ Bob masks his partial signature with the witness value $\varWit$.
+The procedure then returns the pre-transaction $\varPreTx$ containing Bob's masked partial signature, and the statement $\varStatement$ which is a commitment to the witness value $\varWit$.
 
 \begin{figure}
     \begin{center}
@@ -257,7 +257,7 @@ The procedure then returns the pre-transaction $\varPreTx$ containing Bob's adap
 
 In figure~\cref{fig:inst-apt-mw-tx-fin} we show the updated distributed version of the transaction finalization protocol.
 Again Alice verifies the pre-transaction $\varPreTx$ received by Bob and then cooperates with Bob in the $\procDSignId$ protocol to build the partial signature for their shared coin.
-Note that at this point Alice is not able to finalize the signature (and consequently the transaction) as she only knows Bob's adapted partial signature ($\varSigAptBob$), but not the original one ($\varSigBob$), which is needed for the $\procFinSigId$ function.
+Note that at this point Alice is not able to finalize the signature (and consequently the transaction) as she only knows Bob's masked signature share ($\varSigAptBob$), but not the original one ($\varSigBob$), which is needed for the $\procFinSigId$ function.
 Therefore, Bob completes the transaction and outputs it, while Alice outputs $\varSigAliceBob$ with which she can then retrieve $\varX$.
 
 \begin{figure}
