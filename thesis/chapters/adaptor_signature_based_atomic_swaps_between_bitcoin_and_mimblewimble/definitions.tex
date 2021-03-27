@@ -166,14 +166,14 @@ Now we define the \emph{Contract Mimblewimble Transaction Scheme}, which will ex
     \begin{itemize}
         \item $(\funStar{\varPreTx}, \funStar{\varSpendableCoinBob}, \varSigBob) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$: The contract variant of the receive function takes an additional input a secret witness value
         $\varWit$ which will be hidden in the transaction signature and extractable by the other party after the protocols' completion.
-        Note that the routine also returns Bob's unadapted partial signature.
-        The reason for this is that we later still need the unadapted version to complete the signature und thereby finalize the transaction.
-        By not sharing this unadapted signature with Alice, Bob is the one who gets to finalize the transaction which is different from the simpler protocol and is an important feature necessary for our atomic swap protocol.
+        Note that the routine also returns Bob's unmasked partial signature.
+        The reason for this is that we later still need the unmasked version to complete the signature und thereby finalize the transaction.
+        By not sharing this unmasked signature with Alice, Bob is the one who gets to finalize the transaction which is different from the simpler protocol and is an important feature necessary for our atomic swap protocol.
         We want to stress here that $\procAptRecvCoinsId$ is only a single party algorithm, as such it can only be used in the case that we want to create an output coin owned by a single receiver.
         It would of course be conceivable to also define a distributed version similar to $\procDRecvCoinsId$ of this functionality, allowing two receivers (or one of the two) to hide secret witness values, extractable later by the sender(s).
         However, as for the following protocols such functionality is not needed we omit it here for clarity.
         \item $\langle \varSigAliceBob, \varTx \rangle \opFunResult \procDAptFinTx{\funStar{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$: The contract variant of the finalize transaction algorithm is a distributed protocol between the sender(s) and receiver.
-        Additionally to the pre-transaction $\funStar{\varPreTx}$ the senders need to input their signing information, Bob needs to input the unadapted version of his partial signature as it is needed for transaction completion.
+        Additionally to the pre-transaction $\funStar{\varPreTx}$ the senders need to input their signing information, Bob needs to input the unmasked version of his partial signature as it is needed for transaction completion.
         This protocol could also be implemented as a three party protocol, two senders controlling a shared coin and a third receiver.
         However, as in our case, which we will describe later in~\cref{sec:atom:protocols}, one of the two senders is also the receiver, we allowed ourselves to model this protocol as being between only two parties to simplify the formalization.
         In this version of the protocol only Bob will be able to finalize the transaction, which is different to $\procFinTxId$ and $\procDFinTxId$.

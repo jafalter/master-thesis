@@ -7,7 +7,7 @@ After the the pre-signature is completed into the final one, it must then be pos
 
 We here repeat the definition of an Adaptor Signature Scheme found by Aumayr et al. in~\cite{aumayr2020bitcoinchannels}.
 
-\begin{definition}[Adaptor Signature Scheme]
+\begin{definition}[Adaptor Signature Scheme]\label{def:pre:script:apt}
     An Adaptor Signature Scheme wrt. a hard relation $\cnstRelation$ and a signature scheme $\varSigScheme$ as of~\cref{def:pre:signature-scheme} consists of four algorithms:
     \begin{itemize}
         \item $\funTilde{\varSignature} \opFunResult \styleFunction{pSign}(\varSecKey, \varMsg, \varStatement)$ is a PPT algorithm that on input secret key $\varSecKey$, message $\varMsg \opIn \cnstBinary{*}$ and statement $\varStatement$ outputs a pre-signature $\funTilde{\varSignature}$.
