@@ -10,45 +10,47 @@
 \urldef{\urlethereum}\url{https://ethereum.org/}
 \urldef{\urlgrinfund}\url{https://tinyurl.com/4jkbkccu}
 
-Since the original release of the Bitcoin whitepaper~\cite{nakamoto2019bitcoin} on October 31, 2008, by the anonymous entity Satoshi Nakamoto we have seen an enormous rise interest in Bitcoin as well as other Cryptocurrencies.
-The Bitcoin protocol allows for a P2P (peer to peer) exchange of the Bitcoin currency without the need of trusted intermediaries.
-Achieving this is made possible by the distributed process of proof-of-work in which so called miners compete in adding new transactions to the Bitcoin ledger for which they are rewarded by newly created currency as well as by transaction fees.
+Since the original release of the Bitcoin whitepaper~\cite{nakamoto2019bitcoin} on October 31, 2008, by the anonymous entity Satoshi Nakamoto we have seen an enormous rise in interest in Bitcoin and other Cryptocurrencies.
+The Bitcoin protocol allows for a P2P (peer to peer) exchange of the Bitcoin currency without trusted intermediaries.
+Achieving this is made possible by the distributed process of proof-of-work in which so-called miners compete in adding new transactions to the Bitcoin ledger for which they are rewarded by newly created currency as well as by transaction fees.
 
-\paragraph{Coin Exchanges.} According to CoinMarketCap\footnote{\urlcoinmkt} at the time of writing there are almost 9000 different Cryptocurrencies available with a combined market cap of \$1.8 trillion.
-Most of these currencies try to improve upon different limitations of the Bitcoin protocol, for instance by making it either more expressive, more private, or more efficient.
-Trading between Fiat and Cryptocurrencies as well as between individual Cryptocurrenices is a popular topic among retail investors and has recently started to become attractive for institutions and publicly listed companies such as Microstrategy, Grayscale or Tesla..\footnote{\url{https://bitcointreasuries.org/}}
+\paragraph{Coin Exchanges.} According to CoinMarketCap\footnote{\urlcoinmkt} at the time of writing, there are almost 9000 different Cryptocurrencies available with a combined market cap of \$1.8 trillion.
+Most of these currencies try to improve upon various Bitcoin protocol limitations, for instance, by making it either more expressive, more private, or more efficient.
+Trading between Fiat and Cryptocurrencies and between individual Cryptocurrencies is a popular topic among retail investors.
+It has recently started to become attractive for institutions and publicly listed companies such as Microstrategy, Grayscale, or Tesla..\footnote{\url{https://bitcointreasuries.org/}}
 Most of the trading is currently happening on centralized exchanges such as Binance\footnote{\url{https://www.binance.com/en}} or Coinbase\footnote{https://www.coinbase.com/}.
-On these platforms users can deposit, exchange and withdraw Cryptocurrencies or Fiat currency, while the funds available to its users are controlled by the service provider.
-In the past, many of such platforms have seen hacks in which large quantities of funds were stolen.\footnote{\urlmtgox}\footnote{\urlbitgrail}\footnote{\urlquadriga}
-Exchanges of this sort usually are required by law to collect KYC information which act as a proof of the customers identity to prevent illegal activity on their platforms, which can create a barrier of entry for people that lack identification documents or simply are unwilling to give away this sort of data to the provider.
-As a consequence decentralized exchanges such as Uniswap\footnote{\urluniswp} or Bisq\footnote{\urlbisq} have emerged and are gaining rapidly in popularity.
-A decentralized exchange allows users to exchange Cryptocurrencies directly in a P2P fashion without the need of trusted third parties.
-This is made possible by so called smart contracts that reside on a blockchain such as Ethereum\footnote{\urlethereum} and allow for trustless swaps between currencies.
+Users can deposit, exchange, and withdraw Cryptocurrencies or Fiat currency on these platforms, while the service provider controls the funds available to its users.
+We have seen instances \footnote{\urlmtgox}\footnote{\urlbitgrail}\footnote{\urlquadriga} in which hackers managed to steal large quantities of funds from such platforms.
+Exchanges of this sort are usually required by law to collect KYC information, which acts as proof of the customers' identity to prevent illegal activity on their platforms.
+This requirement can create a barrier of entry for people that lack identification documents or are unwilling to give away this sort of data to the provider.
+Consequently, decentralized exchanges such as Uniswap\footnote{\urluniswp} or Bisq\footnote{\urlbisq} have emerged and are gaining rapidly in popularity.
+A decentralized exchange allows users to exchange Cryptocurrencies directly in a P2P fashion without the need for trusted third parties.
+Smart contracts that reside on a blockchain such as Ethereum\footnote{\urlethereum} and allow for trustless swaps between currencies make decentralized exchange possible.
 Interoperability between Cryptocurrencies is critical to enable such coin swaps.
-A trustless protocol allowing swaps of two individual Cryptocurrencies is called an Atomic Swap protocol~\cite{herlihy2018atomic}.
-In such a protocol funds are locked up on both sides of the trade and settled in a way that each party gains access to the locked funds on the other side after successful protocol execution.
-Usually such a protocol is built utilizing scripting or smart contract capabilities of the individual blockchains.
-However, Cryptocurrencies that focus on improving user privacy, that will be discussed in~\cref{sec:pre:privacy}, usually lack this capabilities, making the construction of a secure Atomic Swap protocol particularly challenging.
+A trustless protocol allowing trades of two individual Cryptocurrencies is called an Atomic Swap protocol~\cite{herlihy2018atomic}.
+In such a protocol, funds are locked up on both sides of the trade and settled so that each party gains access to the locked funds on the other side after successful protocol execution.
+Usually, such a protocol is built utilizing scripting or smart contract capabilities of the individual blockchains.
+However, Cryptocurrencies that focus on improving user privacy that we will discuss in~\cref{sec:pre:privacy} usually lack these capabilities, making the construction of a secure Atomic Swap protocol particularly challenging.
 
-\paragraph{Mimblewimble.} The Mimblewimble protocol was introduced in 2016 by an anonymous entity named Jedusor, Tom Elvis~\cite{jedusor2016mimblewimble} and represents an outline for a new privacy-enhancing Cryptocurrencie with exceptionally low space requirements.
-The author's name, as well as the protocols name, are references to the Harry Potter franchise. \footnote{\urlharrypotter}
-In Harry Potter, Mimblewimble is a tongue-typing curse which reflects the goal of the protocol's design, improving the user's privacy.
-Later, Andrew Poelstra took up the ideas from the original writing and published his understanding of the protocol in his paper~\cite{poelstra2016mimblewimble}.
-The protocol gained popularity in the community and was implemented in the Grin \footnote{\urlgrin} and Beam \footnote{\urlbeam} Cryptocurrencies, which both launched in early 2019.
-In the same year, two papers were published, which successfully defined and proved security properties for Mimblewimble~\cite{fuchsbauer2019aggregate,betarte2019towards}.
-Compared to Bitcoin, there are some differences in Mimblewimble:
+\paragraph{Mimblewimble.} The Mimblewimble protocol was introduced in 2016 by an anonymous author Tom Elvis Jedusor~\cite{jedusor2016mimblewimble} and represents an outline for a new privacy-enhancing Cryptocurrency with shallow space requirements.
+The author’s name and the protocol's name are references to the Harry Potter franchise. \footnote{\urlharrypotter}
+In Harry Potter, Mimblewimble is a tongue-typing curse that reflects the protocol's design goal, improving the user's privacy.
+Later, Andrew Poelstra took up the original writing ideas and published his understanding of the protocol~\cite{poelstra2016mimblewimble}.
+Mimblwimble gained popularity in the community and was implemented in the Grin\footnote{\urlgrin} and Beam\footnote{\urlbeam} Cryptocurrencies that both launched in early 2019.
+In the same year, two papers~\cite{fuchsbauer2019aggregate,betarte2019towards} were published, which successfully defined and proved security properties for Mimblewimble.
+Compared to Bitcoin, there are some differences in the Mimblewimble protocol:
 \begin{itemize}
     \item Transaction values are hidden from a blockchain observer, which is not the case in Bitcoin.
-    \item Coin ownership is given by a single private key of a so called coin commitment, there are no addresses or scripting capabilities that exist in Bitcoin.
-    \item Spent coins are consistently purged from the ledger such that only unspent transaction outputs remain, and the space requirements of the ledger remain low.
-    \item Transactions are merged to enable a degree of transaction undistinguishability, further improving the users privacy.
+    \item Coin ownership is given by a single private key of a so-called coin commitment. There are no addresses or scripting capabilities that exist in Bitcoin.
+    \item The nodes constantly purge spent coins from the ledger such that only unspent transaction outputs remain, and the ledger's space requirements remain low.
+    \item Transactions are merged to achieve a degree of transaction indistinguishability, further improving the user's privacy.
 \end{itemize}
 
-\paragraph{Our contribution.} In this thesis we will first describe a new variant of a two-party signature scheme, which can be used to build primitive contracts on a Mimblewimble-based Cryptocurrency.
+\paragraph{Our contribution.} In this thesis, we will first describe a new variant of a two-party signature scheme, which can be used to build primitive contracts on a Mimblewimble-based Cryptocurrency.
 We will formalize this construction and prove its correctness and security in~\cref{ch:fixedwitnesssignatures}.
-In~\cref{ch:atomicswap} we then formalize four different kinds of transaction protocols that can be conducted between a sender and a receiver in a Mimblewimble-based Cryptocurrency, of which one uses the signature scheme introduced in the previous chapter.
+In~\cref{ch:atomicswap}, we then formalize four different kinds of transaction protocols that can be conducted between a sender and a receiver in a Mimblewimble-based Cryptocurrency, of which one uses the signature scheme introduced in the previous chapter.
 We show that all four transaction types are secure and correct as of the definitions given by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate} and finally construct an Atomic Swap protocol that allows for a trustless exchange between Bitcoin and a Mimblewimble-based Cryptocurrency.
-In~\cref{ch:implementation} we showcase our working proof of concept implementation of the protocol which was tested and evaluated on the Bitcoin and Grin testnets.\\
-With our formalization we contribute to making privacy-enhancing Cryptocurrencies, specifically those built on the Mimblewimble protocol, more interoperable with other Cryptocurrencies, allowing for them to be included to decentralized exchanges.
-As the following request for funding\footnote{\urlgrinfund} shows, there exists interest by developers and the community to implement a production grade version of such a protocol.
-By following our formalization and taking our proof of concept as a reference, developers can build and deploy an Atomic Swap protocol that allows to securly swap Grin and Bitcoin funds without the need of intermediaries.
+In~\cref{ch:implementation}, we showcase our working proof of concept implementation of the protocol, which was tested and evaluated on the Bitcoin and Grin testnets.\\
+Our thesis contributes to making privacy-enhancing Cryptocurrencies, specifically those built on the Mimblewimble protocol, more interoperable, allowing them to be listed on decentralized exchanges.
+The following request for funding\footnote{\urlgrinfund} shows the developers and the community's interest in implementing a production-grade version of such a protocol.
+By implementing our formalization and taking our proof of concept as a reference, developers can build and deploy an Atomic Swap protocol that securely swaps Grin and Bitcoin funds without intermediaries.
