@@ -9,6 +9,7 @@
 \urldef{\urlbisq}\url{https://bisq.network/}
 \urldef{\urlethereum}\url{https://ethereum.org/}
 \urldef{\urlgrinfund}\url{https://tinyurl.com/4jkbkccu}
+\urldef{\urlmonero}\url{https://www.getmonero.org/}
 
 Since the original release of the Bitcoin whitepaper~\cite{nakamoto2019bitcoin} on October 31, 2008, by the anonymous entity Satoshi Nakamoto we have seen an enormous rise in interest in Bitcoin and other Cryptocurrencies.
 The Bitcoin protocol allows for a P2P (peer to peer) exchange of the Bitcoin currency without trusted intermediaries.
@@ -42,7 +43,7 @@ Compared to Bitcoin, there are some differences in the Mimblewimble protocol:
 \begin{itemize}
     \item Transaction values are hidden from a blockchain observer, which is not the case in Bitcoin.
     \item Coin ownership is given by a single private key of a so-called coin commitment. There are no addresses or scripting capabilities that exist in Bitcoin.
-    \item The nodes constantly purge spent coins from the ledger such that only unspent transaction outputs remain, and the ledger's space requirements remain low.
+    \item The nodes constantly purge spent coins from the ledger such that only unspent transaction outputs remain, and the ledger's space requirements remain low, but public verifiability of the blockchain is not lost.
     \item Transactions are merged to achieve a degree of transaction indistinguishability, further improving the user's privacy.
 \end{itemize}
 
@@ -54,3 +55,17 @@ In~\cref{ch:implementation}, we showcase our working proof of concept implementa
 Our thesis contributes to making privacy-enhancing Cryptocurrencies, specifically those built on the Mimblewimble protocol, more interoperable, allowing them to be listed on decentralized exchanges.
 The following request for funding\footnote{\urlgrinfund} shows the developers and the community's interest in implementing a production-grade version of such a protocol.
 By implementing our formalization and taking our proof of concept as a reference, developers can build and deploy an Atomic Swap protocol that securely swaps Grin and Bitcoin funds without intermediaries.
+
+\paragraph{Related work.} Maurice Herlihy~\cite{herlihy2018atomic} describes how hashed timelock contracts can be leveraged to build Atomic Swaps between Cryptocurrencies that have at least some basic scripting capabilities.
+In a hashed timelock contract, the hash pre-image $\varX$ of $\styleVariable{h} \opEqNoQ \funHash{\varX}$, where $\funHash{\cdot}$ is a hash function, serves as the secret contract value that makes the swap possible.
+Fuchsbauer et al. conducted a complete security analysis~\cref{ch:atomicswap} of the Mimblewimble protocol, which will form the basis for.
+Betarte et al.~\cite{betarte2019towards} worked towards making implementations of the Mimblewimble protocol formally verifiable.
+Andrew Poelstra has published his specification of the Mimblewimble protocol in~\cite{poelstra2016mimblewimble} and has managed to expand on the ideas posted in the original writing~\cite{jedusor2016mimblewimble} by Jedusor.
+In the following year, Poelstra further introduced the notion of scriptless script~\cite{poelstra2017scriptless}, showing how one can build primitive scripts just by using cryptography alone.
+Poelstra's ideas were formalized as Adaptor signatures for the first time as a standalone cryptographic primitive by Aumayr et al. in~\cite{aumayr2020bitcoinchannels}.
+Poelstra's insights on scriptless scripts and the formalization by Aumayr et al. together form the basis for our construction of the Two-Party Fixed Witness Adaptor Signature Scheme given in~\cref{ch:fixedwitnesssignatures}.
+Joël Gugger constructed a cross-chain Atomic Swap between Monero and Bitcoin in~\cite{gugger2020bitcoin}.
+Just like Mimblewimble, Monero\footnote{\urlmonero} is a privacy-enhancing Cryptocurrency that lacks scripting capabilities and even lacks timelocking capabilities (which exist in Mimblewimble).
+In Gugger's protocol, the Monero funds are locked in an address shared between the two trading parties.
+On the Bitcoin side, funds are locked so that spending them will reveal the missing key on the Monero side, therefore unlocking the funds on the other side to the second party.
+The author made some special considerations since the two Cryptocurrencies operate on two different elliptic curves.
