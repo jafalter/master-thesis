@@ -1,16 +1,16 @@
 \urldef{\urluniswp}\url{https://uniswap.org/}
 
 This thesis aimed to improve interoperability between Privacy-enhancing Cryptocurrencies and regular Cryptocurrencies, allowing for the listing of more Privacy-enhancing currencies on decentralized exchanges such as Uniswap.\footnote{\urluniswp}
-We achieved this goal by constructing an Atomic Swap protocol between Bitcoin and a Mimblewimble-based Cryptocurrency.
-Similar to Joël Gugger, who construced an Atomic Swap protocol between Bitcoin and the Monero Cryptocurrency in~\cite{gugger2020bitcoin} we leveraged a scriptless scripts approach that was derived from Andrew Poelstra's scriptless scripts~\cite{poelstra2017scriptless} and Adaptor Signatures~\cite{aumayr2020bitcoinchannels} by Auymayr et al.
-We further managed to prove Correctness and Security in the malicious setting for four different types of Mimblewimble transactions which allow for the distribution of Mimblewimble coins between multiple keys as well as for the execution of simple contracts, based on our own secure and correct version of Adaptor Signatures.
-We pointed out a weakness in the security analysis of the Mimblewimble protocol done by Fuchsbauer et al. which we have fixed by introducing the notion of two-party signature schemes into their model.
-While two-party signature are prone to Rogue-key attacks we demonstrate the infeasibility of such an attack in the Mimblewimble protocol.
+We have achieved this goal by constructing an Atomic Swap protocol between Bitcoin and a Mimblewimble-based Cryptocurrency.
+Similar to Joël Gugger, who constructed an Atomic Swap protocol between Bitcoin and the Monero Cryptocurrency in~\cite{gugger2020bitcoin}, we leveraged a scriptless scripts approach that was derived from Andrew Poelstra's scriptless scripts~\cite{poelstra2017scriptless} and the Adaptor Signature formalization~\cite{aumayr2020bitcoinchannels} by Auymayr et al.
+We further managed to prove Correctness and Security in the malicious setting for four different types of Mimblewimble transactions that allow for the distribution of Mimblewimble coins between multiple keys and the execution of simple contracts, based on our own secure and correct two-party version of Adaptor Signatures.
+We pointed out a weakness in the security analysis of the Mimblewimble protocol done by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}, which we have fixed by introducing the notion of two-party signature schemes into their model.
+While two-party signatures are prone to Rogue-key attacks, we demonstrate the infeasibility of such an attack in the Mimblewimble protocol.
 
 \paragraph{Future Research.} Erkan Tairi et al. have demonstrated in~\cite{tairi2019a2l} how to construct Payment channel hubs as a solution to scalability issues of blockchain technologies.
-Relying solely on scripless scripts it would be interesting to explore the feasibility of such a construction on a Mimblewimble-based Cryptocurrency by utilizing the contract transactions outlined in our research.
+With their approach relying solely on scriptless scripts, it would be interesting to explore the feasibility of such a construction on a Mimblewimble-based Cryptocurrency by utilizing the contract transactions outlined in our research.
 A. Faz-Hernandez et al. examine the possibility of hash functions that output an elliptic curve point for multiple elliptic curves, including secp256k1.~\cite{hernandez2020hashing} It would be interesting to see if more elaborate contracts such as hashed timelock contracts are made possible on Mimblewimble with such a hash function.
-Finally, another topic of research could be the attempt of constructing an cross chain Atomic Swap between two Cryptocurrencies both lacking scripting functionality.
-For instance it might be possible to combine our protocol with the construction by Gugger~\cite{gugger2020bitcoin} to build Atomic Swaps between Monero and a Mimblewimble-based Cryptocurrency.
+Finally, another interesting research topic would be the construction of a cross-chain Atomic Swap between two Cryptocurrencies both lacking scripting functionality.
+For instance by combining our protocol with the construction by Gugger~\cite{gugger2020bitcoin} to build Atomic Swaps between Monero and a Mimblewimble-based Cryptocurrency.
 
 
