@@ -56,21 +56,22 @@ The protocol outputs $(\varWit, (\varSigFin, \varPubKey))$ for Alice as she mana
             Alice \< \< Bob \\
             \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
             \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
-            \< \sendmessageright*{\varSigContext, \varPubKeyAlice \opAssign \funGen{\varSecKeyAlice}} \< \\
+            \varPubKeyAlice \opAssign \funGen{\varSecKeyAlice} \\
+            \< \sendmessageright*[3cm]{\varSigContext, \varPubKeyAlice} \< \\
             \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyBob}}{\funGen{\varNonceBob}} \< \< \\
             \< \< \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
             \< \< \varSigAptBob \opFunResult \procAptSig{\varSigBob}{\varWit} \\
             \< \< \varPubKeyBob \opAssign \funGen{\varSecKeyBob} \\
             \< \< \varStatement \opAssign \funGen{\varWit} \\
-            \< \sendmessageleft*{\varSigAptBob, \varSigContext, \varPubKeyBob, \varStatement} \< \\
+            \< \sendmessageleft*[3cm]{\varSigAptBob, \varSigContext, \varPubKeyBob, \varStatement} \< \\
             \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varPubKeyBob}{\varStatement} \opEqNoQ 0 \< \< \\
             \t \pcreturn \cnstFalsum \< \< \\
             \varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext} \< \< \\
-            \< \sendmessageright*{\varSigAlice} \< \\
+            \< \sendmessageright*[3cm]{\varSigAlice} \< \\
             \< \< \pcif \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice} \opEqNoQ 0 \\
             \< \< \t \pcreturn \cnstFalsum \\
             \< \< \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
-            \< \sendmessageleft*{\varSigFin} \< \\
+            \< \sendmessageleft*[3cm]{\varSigFin} \< \\
             \varPubKey \opFunResult \varSigContext.\varPubKey \< \< \varPubKey \opFunResult \varSigContext.\varPubKey \\
             \pcif \procVerf{\varMsg}{\varSigFin}{\varPubKey} \opEqNoQ 0 \\
             \t \pcreturn \cnstFalsum \\

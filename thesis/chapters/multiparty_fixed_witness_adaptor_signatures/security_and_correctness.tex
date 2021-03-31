@@ -2,7 +2,7 @@ We now prove that the outlined Schnorr-based instantiation is correct, i.e. Adap
 
 \subsection{Adaptor Signature Correctness}\label{subsec:sig:aptsig-correctness}
 
-To prove that Adaptor Signature Correctness holds we have three statements to prove as given by \cref{def:sig:apt-sig-correctness}, first we prove that $\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPubKey} \opEqNoQ 1$ holds in our Schnorr-based instantiation of the signature scheme, where $\varSigContext$ is setup such that $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
+To prove that Adaptor Signature Correctness holds we have three statements to prove as given by \cref{def:sig:apt-sig-correctness}, first we prove that $\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPubKey} \opEqNoQ 1$ holds in our Schnorr-based instantiation of the Signature Scheme, where $\varSigContext$ is setup such that $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
 
 \begin{proof}
     \label{prf:apt-schnorr-pre-sig-corr}
@@ -50,7 +50,7 @@ To prove that Adaptor Signature Correctness holds we have three statements to pr
 
 \subsection{Security}\label{subsec:sig:secureaptscheme}
 
-We have shown that the outlined signature scheme is correct, next we have to prove its security.
+We have shown that the outlined Signature Scheme is correct, next we have to prove its security.
 Our goal is to proof security in the malicious setting (as defined in~\cref{subsec:pre:security}) that means the adversary might or might not behave as specified by the protocol.
 For achieving this we will prove security for both the $\procDSignId$ and $\procDAptSignId$ protocols in the hybrid model which was layed out by Yehuda Lindell in~\cite{lindell2017simulate}.
 In particular, we will use the $\procZKfId{\cnstRelation}$-model in which we assume that we have access to a constant-round protocol $\procZKfId{\cnstRelation}$ that computes the zero-knowledge proof of knowledge functionality for any $\cnstNP$ relation $\cnstRelation$.

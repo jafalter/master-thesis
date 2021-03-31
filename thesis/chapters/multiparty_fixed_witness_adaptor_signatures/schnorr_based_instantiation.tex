@@ -1,13 +1,13 @@
 \urldef\urlbiptaproot\url{https://en.bitcoin.it/wiki/BIP_0341}
 
-We start by providing a general instantiation of a signature scheme (see~\cref{def:pre:signature-scheme}):
+We start by providing a general instantiation of a Signature Scheme (see~\cref{def:pre:signature-scheme}):
 We assume we have a group $\cnstGroup$ with prime $\varPrime$ and generator point $\varG$, $\cnstHash$ is a secure hash function in the random oracle model as defined in~\cref{def:pre:hash-function} and $\varMsg \opIn \cnstBinary{*}$ is a message.
 
 
 A concrete implementation can be seen in~\cref{fig:schnorr}.
-The signature scheme is called Schnorr signature scheme, first defined in~\cite{schnorr1989efficient} and valued for its simplicity and extensively analyzed security.
-Due to being patented its practical use originally was limited, however since the patent expired in 2008 the signature scheme sees increasing use in practical applications.
-Cryptocurrencies such as Grin and Beam now use Schnorr as its primary signature scheme, also Bitcoin is planning to add Schnorr signatures as an alternative to the currently used ECDSA signatures. \footnote{\urlbiptaproot}
+The Signature Scheme is called Schnorr Signature Scheme, first defined in~\cite{schnorr1989efficient} and valued for its simplicity and extensively analyzed security.
+Due to being patented its practical use originally was limited, however since the patent expired in 2008 the Signature Scheme sees increasing use in practical applications.
+Cryptocurrencies such as Grin and Beam now use Schnorr as its primary Signature Scheme, also Bitcoin is planning to add Schnorr signatures as an alternative to the currently used ECDSA signatures. \footnote{\urlbiptaproot}
 \begin{figure}
     \begin{center}
         \fbox{
@@ -40,7 +40,7 @@ Correctness of the scheme can be derived as following:
 As shown in~\cref{fig:schnorr}, $\procVerfId$, line 3 we need to show that $\funGen{\varS} \opEqNoQ \varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge}$ returns $1$ for correct signatures.
 As $\varS$ is calculated as $\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey$ ($\procSignId$, line 4), when generator $\varG$ is raised to $\varS$, we get $\funGen{\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey}$ which we can transform into $\funGen{\varNonce} \opAddPoint \funGen{\varSecKey \opTimesScalar \varSchnorrChallenge}$, and finally into $\varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge}$ which is the same as the right side of the equation.
 
-From the regular Schnorr signature scheme we now provide an instantiation for the two-party case defined in~\cref{def:sig:two-party-sig}.
+From the regular Schnorr Signature Scheme we now provide an instantiation for the two-party case defined in~\cref{def:sig:two-party-sig}.
 Note that this two-party variant of the scheme is what is currently implemented in the Mimblewimble-based Cryptocurrencies and will provide a basis from which we can then build an instantiation for the Two Party Fixed Witness Adaptor Signature Scheme.
 
 First we define a auxiliary function $\procSetupCtxId$ to use for the instantion:
@@ -76,7 +76,7 @@ Another scenario, one which we will encounter throughout this thesis, is that bo
 In this case the $\procSetupCtxId$ can be incorporated into the signing protocol as we shall see in~\cref{sec:sig:protocols}.
 Whatever method of key generation is used, it must not be vulnerable to rogue key attacks.
 
-$\procSignPrtId$ and $\procVerfPtSigId$ are generally similar to the instantiation of the normal Schnorr signature scheme.
+$\procSignPrtId$ and $\procVerfPtSigId$ are generally similar to the instantiation of the normal Schnorr Signature Scheme.
 Note however that for computing the Schnorr challenge $\varSchnorrChallenge$ the input into the hash function will be the already combined public key $\varPubKey$ and combined nonce commitment $\varRand$, which the participants can read from the context object $\varSigContext$.
 This has the effect that the signature shares itself are not yet a valid signature (neither under $\varPubKey$ nor under $\varPubKeyAlice$ or $\varPubKeyBob$) and furhter means that signing can only start after the context $\varSigContext$ has been fully setup.
 This is because to be valid under $\varPubKey$ the signature shares are missing the $\varS$ values from the other participants.
@@ -105,7 +105,7 @@ Therefore we have to introduce the slightly adjusted $\procVerfPtSigId$ to be ab
             \pcif \procZkpVerify{\varProofBob} \opEqNoQ 0 \< \< \\
             \t \pcreturn \cnstFalsum \< \< \\
             \pcreturn (\varSecKeyAlice,\varPubKeyAlice,\varNonceAlice,\varSigContext) \< \< \pcreturn (\varSecKeyBob,\varPubKeyBob,\varNonceBob,\varSigContext)
-            } \\
+            } \par
             \procedure[linenumbering]{$\procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}$} {
             (\varRand \opSeperate \varPubKey) \opFunResult \varSigContext \\
             \varRandAlice \opAssign \funGen{\varNonceAlice} \\
@@ -134,9 +134,9 @@ Therefore we have to introduce the slightly adjusted $\procVerfPtSigId$ to be ab
     \label{fig:twoparty-schnorr}
 \end{figure}
 
-For a correctness proof and a generally more extensive explanation of this two-party Schnorr signature scheme we refer the reader to a paper by Maxwell et al.~\cite{maxwell2019simple}.
+For a correctness proof and a generally more extensive explanation of this two-party Schnorr Signature Scheme we refer the reader to a paper by Maxwell et al.~\cite{maxwell2019simple}.
 
-In~\cref{fig:aptSchnorr} we further provide a Schnorr-based instantiation for the fixed witness adapted signature scheme as defined in~\cref{def:sig:two-party-fixed-wit-apt-sig}.
+In~\cref{fig:aptSchnorr} we further provide a Schnorr-based instantiation for the Fixed Witness Two Party Adaptor Signature Scheme as defined in~\cref{def:sig:two-party-fixed-wit-apt-sig}.
 
 $\procAptSigId$ will add the secret witness $\varWit$ to the $\varS$ value of the signature, changing the partial signature this way means that it can't be verified using $\procVerfPtSigId$ any longer.
 Therefore, we introduce $\procVerifyAptSigId$ which takes as additional parameter the statement $\varStatement$ which will be included in the verifier's equation.
@@ -151,7 +151,7 @@ After obtaining $\varSigFin$, we can then cleverly unpack the secret $\varWit$, 
             (\varS \opSeperate \varRandAlice \opSeperate \varSigContext) \opFunResult \varSigPt \\
             \varSStar \opAssign \varS \opAddScalar \varWit \\
             \pcreturn \varSigApt \opAssign (\varSStar \opSeperate \varRandAlice \opSeperate \varSigContext)
-            } \\
+            } \par
             \procedure[linenumbering]{$\procVerifyAptSig{\varSigAptAlice}{\varMsg}{\varPubKeyAlice}{\varStatement}$} {
             (\varSAlice \opSeperate \varRandAlice \opSeperate \varSigContext) \opFunResult \varSigAptAlice \\
             (\varPubKey \opSeperate \varRand) \opFunResult \varSigContext \\

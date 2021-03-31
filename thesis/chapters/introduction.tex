@@ -47,9 +47,9 @@ Compared to Bitcoin, there are some differences in the Mimblewimble protocol:
     \item Transactions are merged to achieve a degree of transaction indistinguishability, further improving the user's privacy.
 \end{itemize}
 
-\paragraph{Our contribution.} In this thesis, we will first describe a new variant of a two-party signature scheme, which can be used to build primitive contracts on a Mimblewimble-based Cryptocurrency.
+\paragraph{Our contribution.} In this thesis, we will first describe a new variant of a Two-Party Signature Scheme, which can be used to build primitive contracts on a Mimblewimble-based Cryptocurrency.
 We will formalize this construction and prove its correctness and security in~\cref{ch:fixedwitnesssignatures}.
-In~\cref{ch:atomicswap}, we then formalize four different kinds of transaction protocols that can be conducted between a sender and a receiver in a Mimblewimble-based Cryptocurrency, of which one uses the signature scheme introduced in the previous chapter.
+In~\cref{ch:atomicswap}, we then formalize four different kinds of transaction protocols that can be conducted between a sender and a receiver in a Mimblewimble-based Cryptocurrency, of which one uses the Signature Scheme introduced in the previous chapter.
 We show that all four transaction types are secure and correct as of the definitions given by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate} and finally construct an Atomic Swap protocol that allows for a trustless exchange between Bitcoin and a Mimblewimble-based Cryptocurrency.
 In~\cref{ch:implementation}, we showcase our working proof of concept implementation of the protocol, which was tested and evaluated on the Bitcoin and Grin testnets.\\
 Our thesis contributes to making privacy-enhancing Cryptocurrencies, specifically those built on the Mimblewimble protocol, more interoperable, allowing them to be listed on decentralized exchanges.
@@ -61,9 +61,9 @@ In a hashed timelock contract, the hash pre-image $\varX$ of $\styleVariable{h} 
 Fuchsbauer et al. conduct a complete security analysis of the Mimblewimble protocol, which will form the basis for~\cref{ch:fixedwitnesssignatures}.
 Betarte et al.~\cite{betarte2019towards} work towards making implementations of the Mimblewimble protocol formally verifiable.
 In 2016 Andrew Poelstra published his specification of the Mimblewimble protocol in~\cite{poelstra2016mimblewimble} and has managed to expand on the ideas posted in the original writing~\cite{jedusor2016mimblewimble} by Jedusor.
-In the following year, Poelstra further introduced the notion of scriptless scripts~\cite{poelstra2017scriptless}, showing how one can build primitive contracts just by using cryptography alone.
+In the following year, Poelstra further introduced the notion of Scriptless Scripts~\cite{poelstra2017scriptless}, showing how one can build primitive contracts just by using cryptography alone.
 Poelstra's ideas are formalized as Adaptor signatures as a standalone cryptographic primitive by Aumayr et al. in~\cite{aumayr2020bitcoinchannels}.
-Poelstra's insights on scriptless scripts and the formalization by Aumayr et al. together form the basis for our construction of the Two-Party Fixed Witness Adaptor Signature Scheme in~\cref{ch:fixedwitnesssignatures}.
+Poelstra's insights on Scriptless Scripts and the formalization by Aumayr et al. together form the basis for our construction of the Two-Party Fixed Witness Adaptor Signature Scheme in~\cref{ch:fixedwitnesssignatures}.
 Joël Gugger constructs a cross-chain Atomic Swap between Monero and Bitcoin in~\cite{gugger2020bitcoin}.
 Just like Mimblewimble, Monero\footnote{\urlmonero} is a privacy-enhancing Cryptocurrency that lacks scripting capabilities and even lacks timelocking capabilities (which do exist in Mimblewimble).
 In Gugger's protocol, the Monero funds are locked in an address shared between the two trading parties.

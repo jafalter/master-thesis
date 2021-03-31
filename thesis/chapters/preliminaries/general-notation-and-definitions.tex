@@ -23,7 +23,7 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
 \end{definition}
 
 \begin{definition}[Signature Scheme]\label{def:pre:signature-scheme}
-    A signature scheme $\varSigScheme$ is a tuple of algorithms $(\procSetupId \opSeperate \procSignId \opSeperate \procVerfId)$ defined as follows:~\cite{goldwasser1988digital}
+    A Signature Scheme $\varSigScheme$ is a tuple of algorithms $(\procSetupId \opSeperate \procSignId \opSeperate \procVerfId)$ defined as follows:~\cite{goldwasser1988digital}
     \[ \varSigScheme = (\procSetupId \opSeperate \procSignId \opSeperate \procVerfId) \]
 
     \begin{itemize}
@@ -34,7 +34,7 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
         validity. \\
     \end{itemize}
 
-    A valid signature scheme has to fulfill two security properties:
+    A valid Signature Scheme has to fulfill two security properties:
     \begin{itemize}
         \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold with overwhelming probability: $\procVerf{\varPubKey}{\procSign{\varSecKey}{\varMsg}}{\varMsg} \opEq 1$
         \item Unforgeability (\cnstEUFCMA): Informally the existential unforgeability under chosen message attacks holds if an attacker $\cnstAdversary$ is unable to forge a valid signature for a chosen message.
