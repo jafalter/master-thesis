@@ -142,7 +142,9 @@
 %\end{danksagung*}
 
 \begin{acknowledgements*}
-\todo{Enter your text here.}
+    I wish to show appreciation to my advisors Dr. Pedro Moreno-Sanchez and Univ. Prof. Dr. Matteo Maffei, for providing me with helpful guidance throughout this thesis.
+    I would also like to thank the Grin Developers and Andrew Poelstra for assisting me during the proof of concept implementation.
+    Special thanks further go to Bernhard Abfalter for proofreading.
 \end{acknowledgements*}
 
 %%begin{kurzfassung}
@@ -150,7 +152,16 @@
 %\end{kurzfassung}
 
 \begin{abstract}
-\todo{Enter your text here.}
+    Since the inception of Bitcoin in 2008, we have witnessed enormous growth in the Bitcoin and blockchain space.
+    As the number of individual Cryptocurrencies rises, interoperability between them becomes a critical topic, for instance, to allow for decentralized coin exchange.
+    By cleverly utilizing smart contracts or script constructs available on most blockchain systems, connecting two Cryptocurrencies is possible.
+    However, for the currencies focusing on privacy enhancements, no such capabilities are available.\\
+    This thesis explores the Mimblewimble protocol, a construction of an exceptionally efficient privacy-enhancing Cryptocurrency.
+    By building on other authors' previous work, we formalize different kinds of Mimblewimble transactions that allow for shared coin ownership and simple contracts and prove their security and correctness.
+    We improve on the protocols security model by identifying and fixing a weakness in prior formalizations.
+    Utilizing our advanced transaction protocols, we manage to design an Atomic Swap protocol for Mimblewimble-based systems based solely on cryptographic primitives.
+    We further formalize an Atomic Swap protocol between Bitcoin and a Grin, a Mimblewimble-based Cryptocurrency.
+    We then implement a proof of concept in the programming language Rust, which we successfully deploy and evaluate on the Bitcoin and Grin testnets.
 \end{abstract}
 
 % Select the language of the thesis, e.g., english or naustrian.
@@ -203,11 +214,11 @@
 
 % Use an optional list of tables.
 \cleardoublepage % Start list of tables on the next empty right hand page.
-\listoftables % Starred version, i.e., \listoftables*, removes the toc entry.
+%\listoftables % Starred version, i.e., \listoftables*, removes the toc entry.
 
 % Use an optional list of alogrithms.
-\listofalgorithms
-\addcontentsline{toc}{chapter}{List of Algorithms}
+%\listofalgorithms
+%\addcontentsline{toc}{chapter}{List of Algorithms}
 
 % Add an index.
 \printindex

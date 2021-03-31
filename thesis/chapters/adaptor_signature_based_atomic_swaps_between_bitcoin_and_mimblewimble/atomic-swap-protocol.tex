@@ -25,7 +25,10 @@ We define the following three DPT functions $(\procLockAddrId, \procVerifyLockId
     It returns a signed transaction which then can be broadcast.
 \end{itemize}
 
-In the following we describe the phases of an Atomic Swap protocol executed between two parties.
+
+In the following we describe the phases of an Atomic Swap protocol executed between two parties one owning funds on a Bitcoin-like Cryptocurrency and the other on a Mimblewimble-based one.
+As both of the currently most prominent implementations of the Mimblewimble protocol operate on the secp256k1 elliptic curve (which is also the curve that Bitcoin operates on) we therefore assume a secp256k1-based implementation of the Mimblewimble protocol.
+For a Mimblewimble-based implementation that operates on different curve, additional considerations would have to be made to gurantee the protocols security.
 In the setup phase~\cref{subsec:atom:setup}, the two parties agree on the parameters of the swap, that is the exchange rates, the amount being swapped and the timeout for the refunding.
 In the locking phase~\cref{subsec:atom:locking}, the goal is to lock up the funds on both chains, such that they can either be redeemable by the other party in case the swap was successful, or be refunded to the original owners in case the swap has failed.
 The precondition for running the locking phase is that the parties have first completed the setup phase.
