@@ -67,7 +67,7 @@ It needs to be considered that if fees are picked to low, it might take time for
 
 \subsection{Locking phase}\label{subsec:atom:locking}
 
-We formalize the protocol $\procSetupSwapId$ in figure~\ref{fig:setup-swap}.
+We formalize the protocol $\procSetupSwapId$ in~\cref{fig:setup-swap}.
 The protocol takes as input the shared swap state $\varSwpState$ from both parties.
 From Alice her Mimblewimble input coins $\funArray{\varSpendableCoin}$ with the summed up value $\varValueMw$ is furthermore required as an input.
 From Bob we require a list of UTXO's $\funArray{\varUTXO}$ he wants to spend, he also needs to provide their spending keys $\funArray{\varSecKey_{btc}}$ and their summed of total value $\varValueBtc$, although this could also be read from the blockchain.

@@ -1,6 +1,6 @@
 \urldef\urlmwbreak\url{https://github.com/bogatyy/grin-linkability}
 
-In this section we will outline the fundamental properties of the protocols employed in Mimblewimble which are relevant for the thesis and particularly the construction of the Atomic Swap protocol constructed in chapter~\ref{ch:atomicswap}.
+In this section we will outline the fundamental properties of the protocols employed in Mimblewimble which are relevant for the thesis and particularly the construction of the Atomic Swap protocol constructed in~\cref{ch:atomicswap}.
 The Mimblewimble protocol is an outline for a Privacy-enhancing Cryptocurrency that achieves Confidential Transactions as of~\cref{def:pre:privacy:conf-tx}.
 If the protocol also achieves Transaction Unlinkability~\cref{def:pre:privacy:tx-unlink} is not fully clear.
 It can be argued that Transaction merging~\cref{sec:pre:mimblewimble:merge} together with Cut-through~\cref{par:pre:mimblewimble:cut} should make transactions unlinkable, however, one author managed in a practical setting to link a large amount of Mimblewimble transactions using well connected network nodes that attempt to sniff original transactions before they were merged\footnote{\urlmwbreak}.
@@ -22,7 +22,7 @@ A Mimblewimble transaction consists of $\varCoinInp \opAssign (\varCoin_1 , \dot
 \begin{definition}[Transaction validity] \label{def:pre:tx-mw-validity}
     A transaction is valid if:
     \begin{itemize}
-        \item The transaction is well-balanced as defined in definition~\ref{def:pre:tx-well-balancedness}
+        \item The transaction is well-balanced as defined in~\cref{def:pre:tx-well-balancedness}
         \item $\opForAll \; (\varCoin_i \varProof_i) \opIn \varCoinOut \; \procVerfProof{\varProof_i}{\varCoin_i} \opEqNoQ 1$
     \end{itemize}
 \end{definition}
@@ -54,7 +54,7 @@ Then we can build a single merged transaction:
 \[ \varTx_m \opAssign (\varSupply_0 \opAddScalar \varSupply_1 \opSeperate \varCoinInp^0 \opConc \varCoinInp^1,\:\varCoinOut^0 \opConc \varCoinOut^1 \opSeperate (\funList{\varProof_0} \opConc \funList{\varProof_1} \opSeperate
 \funList{\varExcess_0} \opConc \funList{\varExcess_1} \opSeperate \funList{\varSignature_0} \opConc \funList{\varSignature_1}) \]
 We can easily deduce that if $\varTx_0$ and $\varTx_1$ are valid, it must follow that $\varTx_m$ is valid:\\
-If $\varTx_0$ and $\varTx_1$ are valid as of definition~\ref{def:pre:tx-mw-validity} that means $\varCoinInp^0 \opSub \varCoinOut^0 \opSub \funGenH{\varSupply_0} \opEqNoQ \varExcess_0 \opSeperate \funList{\varProof_0}$ contains valid range proofs for the outputs
+If $\varTx_0$ and $\varTx_1$ are valid as of~\cref{def:pre:tx-mw-validity} that means $\varCoinInp^0 \opSub \varCoinOut^0 \opSub \funGenH{\varSupply_0} \opEqNoQ \varExcess_0 \opSeperate \funList{\varProof_0}$ contains valid range proofs for the outputs
 $\varCoinOut^0$ and $\funList{\varSignature_0}$ contains a valid signature to $\varExcess_0 \opSub \funGenH{\varSupply_0}$ as public key, the same must hold for $\varTx_1$.
 
 By the rules of arithmetic it then must also hold that
@@ -90,7 +90,7 @@ Let's assume $\varCoin_i$ appears as an output in $\varTx_0$ and as an input in 
     \varTx_1 \opAssign (\varSupply_1 \opSeperate \varCoinInp^i \opSeperate \varCoinOut^1 \opSeperate (\funList{\varProof_1} \opSeperate \funList{\varExcess_1} \opSeperate \funList{\varSignature_1}) )\\
 \end{gather*}
 Essentially this means $\varTx_1$ spends a coin created in $\varTx_0$.
-Now lets recall the equation given for transaction well-balancedness in~\ref{def:pre:tx-well-balancedness}:
+Now lets recall the equation given for transaction well-balancedness in~\cref{def:pre:tx-well-balancedness}:
 \[ \sum{\varCoinOut} \opSub \sum{\varCoinInp} \opEqNoQ \sum{(\funGen{\varNonce'_i})} \opSub \sum{(\funGen{\varNonce_i})} \]
 If we merge $\varTx_0$ with $\varTx_1$ as done previously the coin $\varCoin_i$ will appear both in $\sum{\varCoinInp}$ and $\sum{\varCoinOut}$.
 Therefore we can erase $\varCoin_i$ from both lists, while maintaining transaction balancedness.
@@ -110,7 +110,7 @@ Assume for the following that Alice wants to transfer coins of value $\varFundVa
     \item Bob creates himself additional output coins $\varCoinOut^B$ of total value $\varFundValue$ and similar to Alice creates his share $\funStar{\varKey}$ of the discrete logarithm of $\varExcess$.
     Together with the share received by Alice he can now create a signature to $\varExcess$ and finalize the transaction
 \end{enumerate}
-Figure~\ref{fig:txOriginal} depicts the original transaction flow.\\
+\Cref{fig:txOriginal} depicts the original transaction flow.\\
 \begin{figure}
     \centering
     \pseudocode[codesize=\scriptsize]{
@@ -151,7 +151,7 @@ In essence this means Bob spends the newly created outputs and sends them back t
 An example situation could be if Alice pays Bob for some good which Bob is selling. Alice decides to pay in advance, but then Bob discovers that he is already out of stock of the good that Alice ordered.
 To return the funds to Alice, he reverses the transaction instead of participating in another interactive process to build a new transaction with new outputs.
 If Alice already deleted the keys to her initial coins, the funds are now lost.
-The problem was solved in the Grin and Beam Mimblewimble implementations by making the signing process itself a two-party process which will be explained in more detail in chapter~\ref{ch:fixedwitnesssignatures}.
+The problem was solved in the Grin and Beam Mimblewimble implementations by making the signing process itself a two-party process which will be explained in more detail in~\cref{ch:fixedwitnesssignatures}.
 
 Alternatively Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} proposed another way to build transactions which would not be vulnerable to this problem:
 \begin{enumerate}
@@ -163,8 +163,8 @@ Alternatively Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} proposed another 
     of the transaction and therfore will be discarded.
 \end{enumerate}
 One drawback of this approach is that we have two transaction kernels instead of just one because of the merging step, making the transaction slightly bigger, however there is still only one interaction required between Alice and Bob.
-In the solution employed by the Grin and Beam implementations which we will discuss in chapter~\ref{ch:atomicswap}, at least one additional round of interaction will be required.
-A figure showing the protocol flow is depicted in Figure~\ref{fig:txSalvaged}.
+In the solution employed by the Grin and Beam implementations which we will discuss in~\cref{ch:atomicswap}, at least one additional round of interaction will be required.
+A figure showing the protocol flow is depicted in~\cref{fig:txSalvaged}.
 
 \begin{figure}
     \centering
