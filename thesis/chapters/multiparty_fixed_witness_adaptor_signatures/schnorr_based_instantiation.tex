@@ -1,13 +1,16 @@
 \urldef\urlbiptaproot\url{https://en.bitcoin.it/wiki/BIP_0341}
 
 We start by providing a general instantiation of a Signature Scheme (see~\cref{def:pre:signature-scheme}):
-We assume we have a group $\cnstGroup$ with prime $\varPrime$ and generator point $\varG$, $\cnstHash$ is a secure hash function in the random oracle model as defined in~\cref{def:pre:hash-function} and $\varMsg \opIn \cnstBinary{*}$ is a message.
+We assume we have a group $\cnstGroup$ with prime $\varPrime$ and generator point $\varG$.
+$\cnstHash$ is a secure hash function in the random oracle model as defined in~\cref{def:pre:hash-function}, and $\varMsg \opIn \cnstBinary{*}$ is a message.
 
 
-A concrete implementation can be seen in~\cref{fig:schnorr}.
+The reader can see a concrete implementation in~\cref{fig:schnorr}.
 The Signature Scheme is called Schnorr Signature Scheme, first defined in~\cite{schnorr1989efficient} and valued for its simplicity and extensively analyzed security.
-Due to being patented its practical use originally was limited, however since the patent expired in 2008 the Signature Scheme sees increasing use in practical applications.
-Cryptocurrencies such as Grin and Beam now use Schnorr as its primary Signature Scheme, also Bitcoin is planning to add Schnorr signatures as an alternative to the currently used ECDSA signatures. \footnote{\urlbiptaproot}
+Due to being patented, its practical use originally was limited.
+However, since the patent expired in 2008, the Signature Scheme sees increasing use in practical applications.
+Cryptocurrencies such as Grin and Beam now use Schnorr as their primary Signature Scheme.
+Also, Bitcoin is planning to add Schnorr signatures as an alternative to the currently used ECDSA signatures. \footnote{\urlbiptaproot}
 \begin{figure}
     \begin{center}
         \fbox{
@@ -36,14 +39,14 @@ Cryptocurrencies such as Grin and Beam now use Schnorr as its primary Signature 
 \end{figure}
 
 
-Correctness of the scheme can be derived as following:
-As shown in~\cref{fig:schnorr}, $\procVerfId$, line 3 we need to show that $\funGen{\varS} \opEqNoQ \varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge}$ returns $1$ for correct signatures.
+The correctness of the scheme can be derived as follows:
+As shown in~\cref{fig:schnorr}, $\procVerfId$, line 3, we need to show that $\funGen{\varS} \opEqNoQ \varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge}$ returns $1$ for correct signatures.
 As $\varS$ is calculated as $\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey$ ($\procSignId$, line 4), when generator $\varG$ is raised to $\varS$, we get $\funGen{\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey}$ which we can transform into $\funGen{\varNonce} \opAddPoint \funGen{\varSecKey \opTimesScalar \varSchnorrChallenge}$, and finally into $\varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge}$ which is the same as the right side of the equation.
 
-From the regular Schnorr Signature Scheme we now provide an instantiation for the two-party case defined in~\cref{def:sig:two-party-sig}.
-Note that this two-party variant of the scheme is what is currently implemented in the Mimblewimble-based Cryptocurrencies and will provide a basis from which we can then build an instantiation for the Two Party Fixed Witness Adaptor Signature Scheme.
+From the regular Schnorr Signature Scheme, we now provide an instantiation for the two-party case defined in~\cref{def:sig:two-party-sig}.
+Note that this two-party variant of the scheme is what is currently implemented in the Mimblewimble-based Cryptocurrencies and will provide a basis from which we can then build an instantiation for the Two-Party Fixed Witness Adaptor Signature Scheme.
 
-First we define a auxiliary function $\procSetupCtxId$ to use for the instantion:
+First, we define an auxiliary function $\procSetupCtxId$ to use for the instantiation:
 
 \begin{center}
     \fbox{
@@ -57,29 +60,31 @@ First we define a auxiliary function $\procSetupCtxId$ to use for the instantion
     }
 \end{center}
 
-This function helps the participants to setup and update the signature context shared between them.
-In~\cref{fig:twoparty-schnorr} we show a concrete instantiation of the protocol and functions.
+This function helps the participants to set up and update the signature context shared between them.
+In~\cref{fig:twoparty-schnorr}, we show a concrete instantiation of the protocol and procedures.
 
-In $\procKeyGenPtId$ Alice and Bob will each randomly chose their secret key and nonce.
-They further require to create a zero-knowledge proof attesting to the fact that they have generated their key before any message was exchanged.
-This is essential to avoid the rogue key attacks mentioned earlier.
+In $\procKeyGenPtId$, Alice and Bob will each randomly chose their secret key and nonce.
+They further require to create a zero-knowledge proof attesting that they had generated their key before they exchanged any message.
+These proofs are essential to avoid the rogue key attacks mentioned earlier.
 The idea of achieving this using zero-knowledge proofs of knowledge was introduced by Thomas Ristenpart and Scott Yilek in~\cite{ristenpart2007power}.
 Another secure key generation setup for a Schnorr-based multi-signature protocol was found by Micali et al. in~\cite{micali2001accountable}.
 However, the protocol requires additional impractical steps such as splitting signers into individual subgroups $\cnstSubGroup_1, \cnstSubGroup_{2}, \cdots$ of a group $\cnstGroup$.
-In our instantiation of $\procKeyGenPtId$ Alice will initially setup the signature context and send it to Bob, together with her public key and zk-proof of knowledge.
-Bob verifies the proof and will then proceed by adding his parameters to the shared signature context and send it back to Alice, together with his parameters, which then again Alice will verify.
+In our instantiation of $\procKeyGenPtId$, Alice will initially set up the signature context and send it to Bob, together with her public key and zk-proof of knowledge.
+Bob verifies the proof and then proceeds by adding his parameters to the shared signature context and sending it back to Alice, together with his parameters, which Alice will verify.
 
-We note here that this is only one possible way of securely computing the parties keypairs and nonce values, as well as setting up the shared context.
-Alternative ways of generating these values could be employed, depending on the use case.
-For instance one might envision a scenario in which Alice and Bob would like to reuse their keypairs multiple times and only regenerate the random nonces before each signing process, in this case we could split up $\procKeyGenPtId$ into two separate functions.
-Another scenario, one which we will encounter throughout this thesis, is that both the keypairs and nonce values have been generated by a protocol similar to $\procKeyGenPtId$ beforehards, but the shared context $\varSigContext$ is not yet setup.
-In this case the $\procSetupCtxId$ can be incorporated into the signing protocol as we shall see in~\cref{sec:sig:protocols}.
+We note here that this is only one possible way of securely computing the parties' keypairs and nonce values and setting up the shared context.
+Alternative methods of generating these values could be employed, depending on the use case.
+For instance, one might envision a scenario in which Alice and Bob would like to reuse their keypairs multiple times and only regenerate the random nonces before each signing process.
+In this case, we could split up $\procKeyGenPtId$ into two separate functions.
+Another scenario is that both the keypairs and nonce values were generated by a protocol similar to $\procKeyGenPtId$ beforehard.
+Still, the shared context $\varSigContext$ is not yet set up.
+In this case, the $\procSetupCtxId$ can be incorporated into the signing protocol, as we shall see in~\cref{sec:sig:protocols}.
 Whatever method of key generation is used, it must not be vulnerable to rogue key attacks.
 
-$\procSignPrtId$ and $\procVerfPtSigId$ are generally similar to the instantiation of the normal Schnorr Signature Scheme.
-Note however that for computing the Schnorr challenge $\varSchnorrChallenge$ the input into the hash function will be the already combined public key $\varPubKey$ and combined nonce commitment $\varRand$, which the participants can read from the context object $\varSigContext$.
-This has the effect that the signature shares itself are not yet a valid signature (neither under $\varPubKey$ nor under $\varPubKeyAlice$ or $\varPubKeyBob$) and furhter means that signing can only start after the context $\varSigContext$ has been fully setup.
-This is because to be valid under $\varPubKey$ the signature shares are missing the $\varS$ values from the other participants.
+$\procSignPrtId$ and $\procVerfPtSigId$ are generally similar to the instantiation of the ordinary Schnorr Signature Scheme.
+Note, however, that for computing the Schnorr challenge $\varSchnorrChallenge$, the input into the hash function will be the already combined public key $\varPubKey$ and combined nonce commitment $\varRand$, which the participants can read from the context object $\varSigContext$.
+This adjustment affects that the signature shares themselfes are not yet a valid signature (neither under $\varPubKey$ nor under $\varPubKeyAlice$ or $\varPubKeyBob$), and other means that signing can only start after the context $\varSigContext$ has been fully setup.
+This property is because to be valid under $\varPubKey$, the signature shares are missing the other participant's $\varS$ value.
 They are also not valid under the partial public keys $\varPubKeyAlice$ or $\varPubKeyBob$ because the Schnorr challenge is computed already with the combined values.
 Therefore we have to introduce the slightly adjusted $\procVerfPtSigId$ to be able to verify specifically the partial signatures.
 
@@ -130,18 +135,19 @@ Therefore we have to introduce the slightly adjusted $\procVerfPtSigId$ to be ab
         \end{varwidth}
         }
     \end{center}
-    \caption{Two Party Schnorr Signature Scheme}
+    \caption{Two-Party Schnorr Signature Scheme}
     \label{fig:twoparty-schnorr}
 \end{figure}
 
-For a correctness proof and a generally more extensive explanation of this two-party Schnorr Signature Scheme we refer the reader to a paper by Maxwell et al.~\cite{maxwell2019simple}.
+For a correctness proof and a generally more extensive explanation of this Two-Party Schnorr Signature Scheme, we refer the reader to a paper by Maxwell et al.~\cite{maxwell2019simple}.
 
-In~\cref{fig:aptSchnorr} we further provide a Schnorr-based instantiation for the Fixed Witness Two Party Adaptor Signature Scheme as defined in~\cref{def:sig:two-party-fixed-wit-apt-sig}.
+In~\cref{fig:aptSchnorr}, we further provide a Schnorr-based instantiation for the Fixed Witness Two-Party Adaptor Signature Scheme as defined in~\cref{def:sig:two-party-fixed-wit-apt-sig}.
 
-$\procAptSigId$ will add the secret witness $\varWit$ to the $\varS$ value of the signature, changing the partial signature this way means that it can't be verified using $\procVerfPtSigId$ any longer.
-Therefore, we introduce $\procVerifyAptSigId$ which takes as additional parameter the statement $\varStatement$ which will be included in the verifier's equation.
-Now the function verifies not only validity of the partial signature, but also that it indeed has been masked with the witness value $\varWit$, being the discrete logarithm of $\varStatement$.
-After obtaining $\varSigFin$, we can then cleverly unpack the secret $\varWit$, which is shown in the $\procExtWitId$ function.
+$\procAptSigId$ will add the secret witness $\varWit$ to the $\varS$ value of the signature.
+Changing the partial signature this way means that it can't be verified using $\procVerfPtSigId$ any longer.
+Therefore, we introduce $\procVerifyAptSigId$, which takes as an additional parameter the statement $\varStatement$, which will be included in the verifier's equation.
+Now the function verifies the partial signature's validity and that it indeed has been masked with the witness value $\varWit$, being the discrete logarithm of $\varStatement$.
+After obtaining $\varSigFin$, we can then cleverly unpack the secret $\varWit$, shown in the $\procExtWitId$ function.
 
 \begin{figure}
     \begin{center}

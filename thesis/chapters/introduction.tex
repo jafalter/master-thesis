@@ -17,8 +17,8 @@ Achieving this is made possible by the distributed process of proof-of-work in w
 
 \paragraph{Coin Exchanges.} According to CoinMarketCap\footnote{\urlcoinmkt} at the time of writing, there are almost 9000 different Cryptocurrencies available with a combined market cap of \$1.8 trillion.
 Most of these currencies try to improve upon various Bitcoin protocol limitations, for instance, by making it either more expressive, more private, or more efficient.
-Trading between Fiat (government-issued) and Cryptocurrencies, and between individual Cryptocurrencies is a popular topic among retail investors.
-It has recently started to become attractive for institutions and publicly listed companies such as Microstrategy, Grayscale, or Tesla..\footnote{\url{https://bitcointreasuries.org/}}
+Trading between Fiat (government-issued currency) and Cryptocurrencies, and between individual Cryptocurrencies is a popular topic among retail investors.
+It has recently started to become attractive as well for institutions and publicly listed companies such as Microstrategy, Grayscale, or Tesla..\footnote{\url{https://bitcointreasuries.org/}}
 Most of the trading is currently happening on centralized exchanges such as Binance\footnote{\url{https://www.binance.com/en}} or Coinbase\footnote{https://www.coinbase.com/}.
 Users can deposit, exchange, and withdraw Cryptocurrencies or Fiat currency on these platforms, while the service provider controls the funds available to its users.
 We have seen instances \footnote{\urlmtgox}\footnote{\urlbitgrail}\footnote{\urlquadriga} in which hackers managed to steal large quantities of funds from such platforms.
@@ -33,7 +33,7 @@ In such a protocol, funds are locked up on both sides of the trade and settled s
 Usually, such a protocol is built utilizing scripting or smart contract capabilities of the individual blockchains.
 However, Cryptocurrencies that focus on improving user privacy that we will discuss in~\cref{sec:pre:privacy} usually lack these capabilities, making the construction of a secure Atomic Swap protocol particularly challenging.
 
-\paragraph{Mimblewimble.} The Mimblewimble protocol was introduced in 2016 by an anonymous author Tom Elvis Jedusor~\cite{jedusor2016mimblewimble} and represents an outline for a new privacy-enhancing Cryptocurrency with shallow space requirements.
+\paragraph{Mimblewimble.} The Mimblewimble protocol was introduced in 2016 by an anonymous author Tom Elvis Jedusor~\cite{jedusor2016mimblewimble} and represents an outline for a new Privacy-enhancing Cryptocurrency with shallow space requirements.
 The author’s name and the protocol's name are references to the Harry Potter franchise. \footnote{\urlharrypotter}
 In Harry Potter, Mimblewimble is a tongue-tying curse that reflects the protocol's design goal, improving the user's privacy.
 Later, Andrew Poelstra took up the original writing ideas and published his understanding of the protocol~\cite{poelstra2016mimblewimble}.
@@ -53,7 +53,7 @@ We will formalize this construction and prove its correctness and security in~\c
 In~\cref{ch:atomicswap}, we then formalize four different kinds of transaction protocols that can be conducted between a sender and a receiver in a Mimblewimble-based Cryptocurrency, of which one uses the Signature Scheme introduced in the previous chapter.
 We show that all four transaction types are secure and correct as of the definitions given by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate} and finally construct an Atomic Swap protocol that allows for a trustless exchange between Bitcoin and a Mimblewimble-based Cryptocurrency.
 In~\cref{ch:implementation}, we showcase our working proof of concept implementation of the protocol, which was tested and evaluated on the Bitcoin and Grin testnets.\\
-Our thesis contributes to making privacy-enhancing Cryptocurrencies, specifically those built on the Mimblewimble protocol, more interoperable, allowing them to be listed on decentralized exchanges.
+Our thesis contributes to making Privacy-enhancing Cryptocurrencies, specifically those built on the Mimblewimble protocol, more interoperable, allowing them to be listed on decentralized exchanges.
 The following request for funding\footnote{\urlgrinfund} shows the developers and the community's interest in implementing a production-grade version of such a protocol.
 By implementing our formalization and taking our proof of concept as a reference, developers can build and deploy an Atomic Swap protocol that securely swaps Grin and Bitcoin funds without intermediaries.
 
@@ -66,7 +66,7 @@ In the following year, Poelstra further introduced the notion of Scriptless Scri
 Poelstra's ideas are formalized as Adaptor signatures as a standalone cryptographic primitive by Aumayr et al. in~\cite{aumayr2020bitcoinchannels}.
 Poelstra's insights on Scriptless Scripts and the formalization by Aumayr et al. together form the basis for our construction of the Two-Party Fixed Witness Adaptor Signature Scheme in~\cref{ch:fixedwitnesssignatures}.
 Joël Gugger constructs a cross-chain Atomic Swap between Monero and Bitcoin in~\cite{gugger2020bitcoin}.
-Just like Mimblewimble based crypto coins, Monero\footnote{\urlmonero} is a privacy-enhancing Cryptocurrency that lacks scripting capabilities and even lacks timelocking capabilities (which do exist in Mimblewimble).
+Just like Mimblewimble based crypto coins, Monero\footnote{\urlmonero} is a Privacy-enhancing Cryptocurrency that lacks scripting capabilities and even lacks timelocking capabilities (which do exist in Mimblewimble).
 In Gugger's protocol, the Monero funds are locked in an address shared between the two trading parties.
 On the Bitcoin side, funds are locked so that spending them will reveal the missing key for the Monero side, therefore unlocking the Monero funds for the second party.
 The author made some special considerations since the two Cryptocurrencies operate on two different elliptic curves.
