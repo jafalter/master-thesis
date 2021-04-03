@@ -52,19 +52,21 @@ This makes sure that this part of the script will only be executeable after a ce
 If the $\text{OP\_IF}$ evaluates to false we execute the redemption path of the script in which Alice needs to provide a valid signature under her public key and the statement $\varStatement$.
 
 \begin{figure}
-    \fbox{
-    \pseudocode[linenumbering] {
-    OP\_IF \\
-    \t <refund\_time> \\
-    \t OP\_CHECKLOCKTIMEVERIFY \\
-    \t OP\_DROP \\
-    \t <refund\_pub\_key> \\
-    \t OP\_CHECKSIGVERIFY \\
-    OP\_ELSE \\
-    \t 2\;<recv\_pub\_key>\;<X>\;2\;OP\_CHECKMULTISIGVERIFY \\
-    OP\_ENDIF
-    }
-    }
+    \begin{center}
+        \fbox{
+        \pseudocode[linenumbering] {
+        OP\_IF \\
+        \t <refund\_time> \\
+        \t OP\_CHECKLOCKTIMEVERIFY \\
+        \t OP\_DROP \\
+        \t <refund\_pub\_key> \\
+        \t OP\_CHECKSIGVERIFY \\
+        OP\_ELSE \\
+        \t 2\;<recv\_pub\_key>\;<X>\;2\;OP\_CHECKMULTISIGVERIFY \\
+        OP\_ENDIF
+        }
+        }
+    \end{center}
     \caption{Bitcoin locking script.}\label{fig:bitcoin-script}
 \end{figure}
 

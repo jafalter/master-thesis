@@ -1,18 +1,18 @@
 \urldef\urlgrinexplained\url{https://medium.com/@brandonarvanaghi/grin-transactions-explained-step-by-step-fdceb905a853}
 
-In this section we will provide an instantiation of the transaction scheme definitions found in~\cref{def:atom:mw-tx-scheme},~\cref{def:atom:ext-mw-tx-scheme} and~\cref{def:atom:apt-ext-mw-tx-scheme}.
+In this section we will provide an instantiation of the Transaction Scheme definitions found in~\cref{def:atom:mw-tx-scheme},~\cref{def:atom:ext-mw-tx-scheme} and~\cref{def:atom:apt-ext-mw-tx-scheme}.
 The instantiations can be implemented in a Cryptocurrency based on the Mimblewimble protocol such as Beam and Grin.
 
 \subsection{Mimblewimble Transaction Scheme}\label{subsec:atom:mw-tx-scheme}
 
 First we provide an instantiation of the simplest form of a transaction in which a sender wants to transfer some value $\varFundValue$ to a receiver.
 For the execution of the protocol we assume to have access to a homomorphic commitment scheme such as Pedersen Commitment $\varCommitScheme$ as defined in definition~\cref{def:pre:pedersen}.
-Furthermore we require a range proof system $\varRProofSystem$ as defined in~\cref{sec:pre:rangeproof} and a two-party signature scheme $\varSigSchemeMP$ as defined in~\cref{def:sig:two-party-sig}.
+Furthermore we require a range proof system $\varRProofSystem$ as defined in~\cref{sec:pre:rangeproof} and a Two-Party Signature Scheme $\varSigSchemeMP$ as defined in~\cref{def:sig:two-party-sig}.
 
 To make the pseudocode for the transaction protocol easier to read we first introduce two auxiliary functions $\procCreateCoinId$
 and $\procCreatePreTxId$.
 The coin creation function will take as input a value $\varValue$ and a blinding factor $\varBlindingFactor$. It will create and output a new spendable coin $\varSpendableCoin$ already containing a range proof $\varProof$ attesting to the statement that the coins value $\varValue$ is within the valid range as defined for the blockchain.
-The transaction creation algorithm $\procCreatePreTxId$ takes as input a message $\varMsg$, a list of input coins $\funArray{\varCoinInp}$, a list of output coins $\funArray{\varCoinOut}$, a list of rangeproofs $\funArray{\varProof}$, a signature context $\varSigContext$, a list of commitments $\varCommitment$, a signature $\varSignature$, and a lock time $\varTime$ and will collect the input data into a transaction object.
+The transaction creation algorithm $\procCreatePreTxId$ takes as input a message $\varMsg$, a list of input coins $\funArray{\varCoinInp}$, a list of output coins $\funArray{\varCoinOut}$, a list of range proofs $\funArray{\varProof}$, a signature context $\varSigContext$, a list of commitments $\varCommitment$, a signature $\varSignature$, and a lock time $\varTime$ and will collect the input data into a transaction object.
 
 \begin{center}
     \fbox{
@@ -38,7 +38,7 @@ The transaction creation algorithm $\procCreatePreTxId$ takes as input a message
     }
 \end{center}
 
-In figure~\cref{fig:inst-mw-tx} we provide an instantiation of the Mimblewimble Transction Scheme using the auxiliary functions provided before.
+In~\cref{fig:inst-mw-tx-1} and~\cref{fig:inst-mw-tx-2} we provide an instantiation of the Mimblewimble Transction Scheme using the auxiliary functions provided before.
 
 In the $\procSendCoinsId$ function the sender creates his change output coin, which is the difference between the value stored in his input coins and the value which should be transferred to a receiver.
 He sets up the signature context with his parameters and gets a pre-transaction $\varPreTx$, newly created spendable output coin $\varSpendableCoinAlice$, as well as a signing key $\varSecKeyAlice$ and secret nonce $\varNonceAlice$ as output.
@@ -70,7 +70,7 @@ If he finds it as valid, he will only now create his partial signature and final
             \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \\
             \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varSpendableCoin.\varCommitment}{\funArray{\varCoinOutAlice}}{\funArray{\varProofAlice}}{\varSigContext}{\funArray{\funGen{\varSecKeyAlice}}}{\cnstEmptySet}{\varTime} \\
             \pcreturn (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice))
-            } \\
+            } \par
             \procedure[linenumbering]{$\procRecvCoins{\varPreTx}{\varFundValue}$} {
             (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\cnstEmptySet,\varTime) \opFunResult \varPreTx \\
             \pcif \procVerfProof{\varProofs[0]}{\varOutputs[0]} \opEqNoQ 0 \\
@@ -83,7 +83,16 @@ If he finds it as valid, he will only now create his partial signature and final
             \varSigBob \opFunResult \procSignPrt{\varMsg}{\varSecKeyBob}{\varNonceBob}{\varSigContext} \\
             \varPreTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutBob}{\varProofs \opConc \varProofBob}{\varSigContext}{\varCommits \opConc \funGen{\varSecKeyBob}}{\varSigBob}{\varTime} \\
             \pcreturn (\varPreTx, \funStar{\varSpendableCoinBob})
-            } \\
+            }
+        \end{varwidth}
+        }
+    \end{center}
+    \caption{Instantiation of Mimblewimble Transaction Scheme part 1. \label{fig:inst-mw-tx-1}}
+\end{figure}
+\begin{figure}
+    \begin{center}
+        \fbox{
+        \begin{varwidth}{\textwidth}
             \procedure[linenumbering]{$\procFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}$} {
             (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \\
             \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \\
@@ -94,17 +103,17 @@ If he finds it as valid, he will only now create his partial signature and final
             \varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob} \\
             \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \\
             \pcreturn \varTx
-            } \\
+            } \par
             \procedure[linenumbering]{$\procVerfTx{\varTx}$} {
             (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSignature,\varTime) \opFunResult \varTx \\
             \varExcess \opEqNoQ \sum(\varOutputs) \opSub \sum(\varInputs) \\
             \pcreturn (\opForAll \varI \opNotEq \varJ : \varInputs[\varI] \opNotEq \varInputs[\varJ] \opAnd \varOutputs[\varI] \opNotEq \varOutputs[\varJ]) \text{ and } \pcskipln \\
-                \t \varInputs \opUnion \varOutputs \opEqNoQ \cnstEmptySet \text{ and } (\opForAll \varI : \procVerfProof{\varProofs[\varI]}{\varOutputs[\varI]}) \text{ and } \procVerf{\varMsg}{\varSignature}{\varExcess}
+            \t \varInputs \opUnion \varOutputs \opEqNoQ \cnstEmptySet \text{ and } (\opForAll \varI : \procVerfProof{\varProofs[\varI]}{\varOutputs[\varI]}) \text{ and } \procVerf{\varMsg}{\varSignature}{\varExcess}
             }
         \end{varwidth}
         }
     \end{center}
-    \caption{Instantiation of Mimblewimble Transaction Scheme. \label{fig:inst-mw-tx}}
+    \caption{Instantiation of Mimblewimble Transaction Scheme part 2. \label{fig:inst-mw-tx-2}}
 \end{figure}
 
 \subsection{Extended Mimblewimble Transaction Scheme}\label{subsec:atom:ext-tx-scheme}
@@ -122,38 +131,38 @@ The protocol returns $\varPreTx$ to both parties, which can then be transmitted 
 \begin{landscape}
     \thispagestyle{plain}
     \begin{figure}
-        \fbox{
-        \procedure[linenumbering,skipfirstln]{$\procDSendCoins{\funArray{\varPtSpendableCoinAlice}}{\funArray{\varPtSpendableCoinCarol}}{\varFundValue}{\varTime}$}{
-        Alice \< \< Carol \\
-        \varValue \opFunResult \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_{i}.\varValue) \< \< \varValue \opFunResult \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_{i}.\varValue) \\
-        \pcif \varFundValue \opGreaterThen \varValue \< \< \pcif \varFundValue \opGreaterThen \varValue \\
-        \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
-        \pcif \opExists \varI \opNotEq \varJ : \varPtSpendableCoinAlice[\varI] \opEqNoQ \varPtSpendableCoinAlice[\varJ] \< \< \pcif \opExists \varI \opNotEq \varJ : \varPtSpendableCoinCarol[\varI] \opEqNoQ \varPtSpendableCoinCarol[\varJ] \\
-        \t \pcreturn \cnstFalsum \< \< \pcreturn \cnstFalsum \\
-        \varValue_{rem} \opEqNoQ \varValue \opSub \varFundValue \\
-        \varValueAlice, \varValueCarol \opFunResult \{ 0, \varValue_{rem} \} \text{ s.t. } \varValueAlice \opAddScalar \varValueCarol \opEqNoQ \varValue_{rem}\\
-        \< \sendmessageright*{\varValueCarol} \\
-        \varMsg \opAssign \cnstBinary{*} \\
-        (\funStar{\varBlindingFactorAlice}, \varNonceAlice) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< (\funStar{\varBlindingFactorCarol}, \varNonceCarol) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-        \funStar{\varSpendableCoinAlice} \opFunResult \procCreateCoin{\varValueAlice}{\funStar{\varBlindingFactorAlice}} \< \< \funStar{\varSpendableCoinCarol} \opFunResult \procCreateCoin{\varValueCarol}{\funStar{\varBlindingFactorCarol}} \\
-        \{ \varCoinOutAlice, \funStar{\varBlindingFactorAlice}, \varValueAlice, \varProofAlice \} \opFunResult \funStar{\varSpendableCoinAlice} \< \< \{ \varCoinOutCarol, \funStar{\varBlindingFactorCarol}, \varValueCarol, \varProofCarol \} \opFunResult \funStar{\varSpendableCoinCarol} \\
-        \varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \sum \funArray{\varBlindingFactorAlice} \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \opSub \sum \funArray{\varBlindingFactorCarol} \\
-        \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
-        \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
-        \varPreTx \opFunResult \pcskipln \\
-        \procCreatePreTx{\varMsg}{\funArray{\varCoinInp}}{\funArray{\varCoinOutAlice}}{\funArray{\varProofAlice}}{\varSigContext}{\funArray{\funGen{\varNonceAlice}}}{\cnstEmptySet}{\varTime} \< \< \\
-        \< \sendmessageright*{\varPreTx} \< \\
-        \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varTime) \opFunResult \varPreTx \\
-        \< \< \pcif \procVerfProof{\varProofs[0]}{\varOutputs[0]} \opEqNoQ 0 \\
-        \< \< \t \pcreturn \cnstFalsum \\
-        \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyCarol}}{\funGen{\varNonceCarol}} \\
-        \< \< \funStarAlt{\varPreTx} \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutCarol}{\varProof \opConc \varProofCarol}{\varSigContext}{\varCommits \opConc \funGen{\varNonceCarol}}{\cnstEmptySet}{\varTime} \\
-        \< \sendmessageleft*{\funStarAlt{\varPreTx}} \< \\
-        \pcif \procVerfProof{\funStarAlt{\varPreTx}.\varProofs[1]}{\funStarAlt{\varPreTx}.\varOutputs[1]} \opEqNoQ 0 \< \< \\
-        \t \pcreturn \cnstFalsum \< \< \\
-        \pcreturn (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \< \< \pcreturn (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinCarol}, (\varSecKeyCarol, \varNonceCarol))
-        }
-        }
+        \begin{center}
+            \fbox{
+            \procedure[linenumbering,skipfirstln]{$\procDSendCoins{\funArray{\varPtSpendableCoinAlice}}{\funArray{\varPtSpendableCoinCarol}}{\varFundValue}{\varTime}$}{
+            Alice \< \< Carol \\
+            \varValue \opFunResult \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_{i}.\varValue) \< \< \varValue \opFunResult \sum_{\varI \opAssign 0}^{\varI \opSm \varN}(\varSpendableCoin_{i}.\varValue) \\
+            \pcif \varFundValue \opGreaterThen \varValue \opOr \opExists \varI \opNotEq \varJ : \varPtSpendableCoinAlice[\varI] \opEqNoQ \varPtSpendableCoinAlice[\varJ] \< \< \pcif \varFundValue \opGreaterThen \varValue \opOr \opExists \varI \opNotEq \varJ : \varPtSpendableCoinAlice[\varI] \opEqNoQ \varPtSpendableCoinAlice[\varJ] \\
+            \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
+            \varValue_{rem} \opEqNoQ \varValue \opSub \varFundValue \\
+            \varValueAlice, \varValueCarol \opFunResult \{ 0, \varValue_{rem} \} \text{ s.t. } \varValueAlice \opAddScalar \varValueCarol \opEqNoQ \varValue_{rem}\\
+            \< \sendmessageright*{\varValueCarol} \\
+            \varMsg \opAssign \cnstBinary{*} \\
+            (\funStar{\varBlindingFactorAlice}, \varNonceAlice) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< (\funStar{\varBlindingFactorCarol}, \varNonceCarol) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \funStar{\varSpendableCoinAlice} \opFunResult \procCreateCoin{\varValueAlice}{\funStar{\varBlindingFactorAlice}} \< \< \funStar{\varSpendableCoinCarol} \opFunResult \procCreateCoin{\varValueCarol}{\funStar{\varBlindingFactorCarol}} \\
+            \{ \varCoinOutAlice, \funStar{\varBlindingFactorAlice}, \varValueAlice, \varProofAlice \} \opFunResult \funStar{\varSpendableCoinAlice} \< \< \{ \varCoinOutCarol, \funStar{\varBlindingFactorCarol}, \varValueCarol, \varProofCarol \} \opFunResult \funStar{\varSpendableCoinCarol} \\
+            \varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \sum \funArray{\varBlindingFactorAlice} \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \opSub \sum \funArray{\varBlindingFactorCarol} \\
+            \varSigContext \opAssign \{ \varPubKey \opAssign \cnstIdentityElement, \varRand \opAssign \cnstIdentityElement \} \< \< \\
+            \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyAlice}}{\funGen{\varNonceAlice}} \< \< \\
+            \varPreTx \opFunResult \pcskipln \\
+            \procCreatePreTx{\varMsg}{\funArray{\varCoinInp}}{\funArray{\varCoinOutAlice}}{\funArray{\varProofAlice}}{\varSigContext}{\funArray{\funGen{\varNonceAlice}}}{\cnstEmptySet}{\varTime} \< \< \\
+            \< \sendmessageright*{\varPreTx} \< \\
+            \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varTime) \opFunResult \varPreTx \\
+            \< \< \pcif \procVerfProof{\varProofs[0]}{\varOutputs[0]} \opEqNoQ 0 \\
+            \< \< \t \pcreturn \cnstFalsum \\
+            \< \< \varSigContext \opFunResult \procSetupCtx{\varSigContext}{\funGen{\varSecKeyCarol}}{\funGen{\varNonceCarol}} \\
+            \< \< \funStarAlt{\varPreTx} \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \varCoinOutCarol}{\varProof \opConc \varProofCarol}{\varSigContext}{\varCommits \opConc \funGen{\varNonceCarol}}{\cnstEmptySet}{\varTime} \\
+            \< \sendmessageleft*{\funStarAlt{\varPreTx}} \< \\
+            \pcif \procVerfProof{\funStarAlt{\varPreTx}.\varProofs[1]}{\funStarAlt{\varPreTx}.\varOutputs[1]} \opEqNoQ 0 \< \< \\
+            \t \pcreturn \cnstFalsum \< \< \\
+            \pcreturn (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \< \< \pcreturn (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinCarol}, (\varSecKeyCarol, \varNonceCarol))
+            }
+            }
+        \end{center}
         \caption{Extended Mimblewimble Transaction Scheme - $\procDSendCoinsId$ \label{fig:atom:dsendcoins}}
     \end{figure}
 \end{landscape}
@@ -164,42 +173,44 @@ Calling this protocol, two receivers Bob and Carol want to create a receiving sh
 The protocol starts by both receivers verifing the senders output(s).
 Bob starts by creating a coin with fund value $\varFundValue$ and his share of the newly created blinding factor and sends it over to Carol.
 Carol finalizes the shared coin by adding a commitment to her blinding factor to the coin and sends it back, together with the commitment.
-Bob verifies validity of the updated shared coin after which the two parties engage in two two-party protocols to create their partial signature and coin rangeproof.
+Bob verifies validity of the updated shared coin after which the two parties engage in two two-party protocols to create their partial signature and coin range proof.
 Finally they create the updated pre-transaction $\varPreTx$ which can be sent back to the transaction sender.
 
 \newgeometry{margin=2cm}
 \begin{landscape}
     \thispagestyle{plain}
     \begin{figure}
-        \fbox{
-        \procedure[linenumbering,skipfirstln]{$\procDRecvCoins{\varPreTx}{\varFundValue}$} {
-        Bob \< \< \< \< Carol \\
-        (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\cnstEmptySet,\varTime) \opFunResult \varPreTx \\
-        \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \< \< \< \< \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \\
-        \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut[\varIterator]} \opEqNoQ 0 \< \< \< \< \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut[\varIterator]} \opEqNoQ 0 \\
-        \t \pcreturn \cnstFalsum \< \< \< \< \t \pcreturn \cnstFalsum \\
-        (\funStar{\varBlindingFactorBob}, \varNonceBob) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \< \< \\
-        (\varCoinShared, \cdot, \cdot, \cdot) \opFunResult \procCreateCoin{\varFundValue}{\funStar{\varBlindingFactorBob}} \< \< \< \< \\
-        \varSecKeyBob \opAssign \funStar{\varBlindingFactorBob} \< \< \< \< \\
-        \< \sendmessagerightx{4}{\varPreTx, \varCoinShared} \< \\
-        \< \< \< \< (\funStar{\varBlindingFactorCarol}, \varNonceCarol) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
-        \< \< \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \\
-        \< \< \< \< \funStarAlt{\varCoinShared} \opAssign \varCoinShared \opAddPoint \funGen{\varBlindingFactorCarol} \\
-        \< \< \< \< \funStarAlt{\varPreTx} \opAssign \varPreTx \\
-        \< \< \< \< \funStarAlt{\varPreTx}.\varOutputs[] \opAssign \funStarAlt{\varCoinShared} \\
-        \< \sendmessageleftx{4}{\funStarAlt{\varPreTx}, \funGen{\varSecKeyCarol}} \< \\
-        \{\cdots \funStarAlt{\varCoinShared}\} \opFunResult \funStarAlt{\varPreTx}.\varOutputs \< \< \< \< \\
-        \pcif \funStarAlt{\varCoinShared} \opNotEq \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \< \< \< \< \\
-        \t \pcreturn \cnstFalsum \< \< \< \< \\
-        \varProofBobCarol \opFunResult \procDRProofL{\funStarAlt{\varCoinShared}}{\varFundValue}{\varSecKeyBob} \< \< \< \< \varProofBobCarol \opFunResult \procDRProofL{\funStarAlt{\varCoinShared}}{\varFundValue}{\varSecKeyCarol} \\
-        \funStar{\varPtSpendableCoinBob} \opAssign \{ \varCoinShared, \varFundValue, \funStar{\varBlindingFactorBob}, \varProofBobCarol \} \< \< \< \< \funStar{\varPtSpendableCoinCarol} \opAssign \{ \varCoinShared, \varFundValue, \funStar{\varBlindingFactorCarol}, \varProofBobCarol \} \\
-        (\varSigBobCarol, \varPubKeyBobCarol) \opFunResult \procDSignL{\varMsg}{\varSecKeyBob}{\varNonceBob} \< \< \< \< (\varSigBobCarol, \varPubKeyBobCarol) \opFunResult \procDSignR{\varMsg}{\varSecKeyCarol}{\varNonceCarol} \\
-        (\cdot, \cdot, \funStar{\varSigContext}) \opFunResult \varSigBobCarol \< \< \< \< (\cdot, \cdot, \funStar{\varSigContext}) \opFunResult \varSigBobCarol \\
-        \funStarAlt{\varSigContext} \opFunResult \procSetupCtx{\varSigContext}{\funStar{\varSigContext}.\varPubKey}{\funStar{\varSigContext}.\varRand} \< \< \< \< \funStarAlt{\varSigContext} \opFunResult \procSetupCtx{\varSigContext}{\funStar{\varSigContext}.\varPubKey}{\funStar{\varSigContext}.\varRand} \\
-        \< \funStar{\varPreTx} \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \funStarAlt{\varCoinShared}}{\varProofs \opConc \varProofBobCarol}{\funStarAlt{\varSigContext}}{\varCommits \opConc \varPubKeyBobCarol}{\varSigBobCarol}{\varTime} \< \\
-        \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinBob}) \< \< \< \< \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinCarol})
-        }
-        }
+        \begin{center}
+            \fbox{
+            \procedure[linenumbering,skipfirstln]{$\procDRecvCoins{\varPreTx}{\varFundValue}$} {
+            Bob \< \< \< \< Carol \\
+            (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\cnstEmptySet,\varTime) \opFunResult \varPreTx \\
+            \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \< \< \< \< \pcforeach \varOutputs \textit{ as } (\varIterator => \varCoinOut) \\
+            \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut[\varIterator]} \opEqNoQ 0 \< \< \< \< \t \pcif \procVerfProof{\varProofs[\varIterator]}{\varCoinOut[\varIterator]} \opEqNoQ 0 \\
+            \t \pcreturn \cnstFalsum \< \< \< \< \t \pcreturn \cnstFalsum \\
+            (\funStar{\varBlindingFactorBob}, \varNonceBob) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \< \< \< \< \\
+            (\varCoinShared, \cdot, \cdot, \cdot) \opFunResult \procCreateCoin{\varFundValue}{\funStar{\varBlindingFactorBob}} \< \< \< \< \\
+            \varSecKeyBob \opAssign \funStar{\varBlindingFactorBob} \< \< \< \< \\
+            \< \sendmessagerightx{4}{\varPreTx, \varCoinShared} \< \\
+            \< \< \< \< (\funStar{\varBlindingFactorCarol}, \varNonceCarol) \sample \cnstIntegersPrimeWithoutZero{\varPrime} \\
+            \< \< \< \< \varSecKeyCarol \opAssign \funStar{\varBlindingFactorCarol} \\
+            \< \< \< \< \funStarAlt{\varCoinShared} \opAssign \varCoinShared \opAddPoint \funGen{\varBlindingFactorCarol} \\
+            \< \< \< \< \funStarAlt{\varPreTx} \opAssign \varPreTx \\
+            \< \< \< \< \funStarAlt{\varPreTx}.\varOutputs[] \opAssign \funStarAlt{\varCoinShared} \\
+            \< \sendmessageleftx{4}{\funStarAlt{\varPreTx}, \funGen{\varSecKeyCarol}} \< \\
+            \{\cdots \funStarAlt{\varCoinShared}\} \opFunResult \funStarAlt{\varPreTx}.\varOutputs \< \< \< \< \\
+            \pcif \funStarAlt{\varCoinShared} \opNotEq \varCoinShared \opAddPoint \funGen{\varSecKeyCarol} \< \< \< \< \\
+            \t \pcreturn \cnstFalsum \< \< \< \< \\
+            \varProofBobCarol \opFunResult \procDRProofL{\funStarAlt{\varCoinShared}}{\varFundValue}{\varSecKeyBob} \< \< \< \< \varProofBobCarol \opFunResult \procDRProofL{\funStarAlt{\varCoinShared}}{\varFundValue}{\varSecKeyCarol} \\
+            \funStar{\varPtSpendableCoinBob} \opAssign \{ \varCoinShared, \varFundValue, \funStar{\varBlindingFactorBob}, \varProofBobCarol \} \< \< \< \< \funStar{\varPtSpendableCoinCarol} \opAssign \{ \varCoinShared, \varFundValue, \funStar{\varBlindingFactorCarol}, \varProofBobCarol \} \\
+            (\varSigBobCarol, \varPubKeyBobCarol) \opFunResult \procDSignL{\varMsg}{\varSecKeyBob}{\varNonceBob} \< \< \< \< (\varSigBobCarol, \varPubKeyBobCarol) \opFunResult \procDSignR{\varMsg}{\varSecKeyCarol}{\varNonceCarol} \\
+            (\cdot, \cdot, \funStar{\varSigContext}) \opFunResult \varSigBobCarol \< \< \< \< (\cdot, \cdot, \funStar{\varSigContext}) \opFunResult \varSigBobCarol \\
+            \funStarAlt{\varSigContext} \opFunResult \procSetupCtx{\varSigContext}{\funStar{\varSigContext}.\varPubKey}{\funStar{\varSigContext}.\varRand} \< \< \< \< \funStarAlt{\varSigContext} \opFunResult \procSetupCtx{\varSigContext}{\funStar{\varSigContext}.\varPubKey}{\funStar{\varSigContext}.\varRand} \\
+            \< \funStar{\varPreTx} \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \funStarAlt{\varCoinShared}}{\varProofs \opConc \varProofBobCarol}{\funStarAlt{\varSigContext}}{\varCommits \opConc \varPubKeyBobCarol}{\varSigBobCarol}{\varTime} \< \\
+            \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinBob}) \< \< \< \< \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinCarol})
+            }
+            }
+        \end{center}
         \caption{Extended Mimblewimble Transaction Scheme - $\procDRecvCoinsId$ \label{fig:atom:drecv}}
     \end{figure}
 \end{landscape}
@@ -209,24 +220,26 @@ Finally, \cref{fig:ext-mim-tx-fin} shows the implementation of the $\procDFinTxI
 Running this protocol the two transaction senders, each owning a share of the input coins keys, will cooperate to produce a signature share valid under their input coins and change outputs, after which they can combine the partial signatures into the final one and finalize the transaction.
 
 \begin{figure}
-    \fbox{
-    \procedure[linenumbering,skipfirstln]{$\procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}$} {
-    Alice \< \< Carol \\
-    (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \\
-    \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \< \< \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \\
-    \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
-    \pcif \procVerfPtSig{\varSigBob}{\varMsg}{\varCommits[1]} \opEqNoQ 0 \< \< \pcif \procVerfPtSig{\varSigBob}{\varMsg}{\varCommits[1]} \opEqNoQ 0 \\
-    \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
-    \varSigAliceCarol \opFunResult \procDSignL{\varMsg}{\varSecKeyAlice}{\varNonceAlice} \< \< \varSigAliceCarol \opFunResult \procDSignR{\varMsg}{\varSecKeyCarol}{\varNonceCarol} \\
-    \varSigFin \opFunResult \procFinSig{\varSigBob}{\varSigAliceCarol} \< \< \varSigFin \opFunResult \procFinSig{\varSigBob}{\varSigAliceCarol} \\
-    \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \< \< \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \\
-    \pcreturn \varTx \< \< \pcreturn \varTx
-    }
-    }
+    \begin{center}
+        \fbox{
+        \procedure[linenumbering,skipfirstln]{$\procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}$} {
+        Alice \< \< Carol \\
+        (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigBob,\varTime) \opFunResult \varPreTx \\
+        \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \< \< \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \\
+        \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
+        \pcif \procVerfPtSig{\varSigBob}{\varMsg}{\varCommits[1]} \opEqNoQ 0 \< \< \pcif \procVerfPtSig{\varSigBob}{\varMsg}{\varCommits[1]} \opEqNoQ 0 \\
+        \t \pcreturn \cnstFalsum \< \< \t \pcreturn \cnstFalsum \\
+        \varSigAliceCarol \opFunResult \procDSignL{\varMsg}{\varSecKeyAlice}{\varNonceAlice} \< \< \varSigAliceCarol \opFunResult \procDSignR{\varMsg}{\varSecKeyCarol}{\varNonceCarol} \\
+        \varSigFin \opFunResult \procFinSig{\varSigBob}{\varSigAliceCarol} \< \< \varSigFin \opFunResult \procFinSig{\varSigBob}{\varSigAliceCarol} \\
+        \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \< \< \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \\
+        \pcreturn \varTx \< \< \pcreturn \varTx
+        }
+        }
+    \end{center}
     \caption{Extended Mimblewimble Transaction Scheme - $\procDFinTxId$ \label{fig:ext-mim-tx-fin}}
 \end{figure}
 
-\subsection{Adapted Extended Mimblewimble Transaction Scheme}
+\subsection{Contract Mimblewimble Transaction Scheme}
 
 Figure~\cref{fig:inst-apt-mw-tx-recv} shows an instantiation of the $\procAptRecvCoinsId$ algorithm.
 Before updating the pre-transaction $\varPreTx$ Bob masks his partial signature with the witness value $\varWit$.
@@ -252,7 +265,7 @@ The procedure then returns the pre-transaction $\varPreTx$ containing Bob's mask
         \end{varwidth}
         }
     \end{center}
-    \caption{Adapted Extended Mimblewimble Transaction Scheme - $\procAptRecvCoinsId$. \label{fig:inst-apt-mw-tx-recv}}
+    \caption{Contract Mimblewimble Transaction Scheme - $\procAptRecvCoinsId$. \label{fig:inst-apt-mw-tx-recv}}
 \end{figure}
 
 In figure~\cref{fig:inst-apt-mw-tx-fin} we show the updated distributed version of the transaction finalization protocol.
@@ -261,19 +274,21 @@ Note that at this point Alice is not able to finalize the signature (and consequ
 Therefore, Bob completes the transaction and outputs it, while Alice outputs $\varSigAliceBob$ with which she can then retrieve $\varX$.
 
 \begin{figure}
-    \fbox{
-    \procedure[linenumbering,skipfirstln]{$\procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$} {
-    Alice \< \< Bob \\
-    (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \\
-    \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \< \< \\
-    \t \pcreturn \cnstFalsum \< \< \\
-    \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varCommits[1]}{\varStatement} \opEqNoQ 0 \< \< \\
-    \t \pcreturn \cnstFalsum \< \< \\
-    \varSigAliceBob \opFunResult \procDSignL{\varMsg}{\varSecKeyAlice}{\varNonceAlice} \< \< \varSigAliceBob \opFunResult \procDSignL{\varMsg}{\varSecKeyBob}{\varNonceBob} \\
-    \< \< \varSigFin \opFunResult \procFinSig{\varSigAliceCarol}{\varSigBob} \\
-    \< \< \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \\
-    \pcreturn \varSigAliceBob \< \< \pcreturn \varTx
-    }
-    }
+    \begin{center}
+        \fbox{
+        \procedure[linenumbering,skipfirstln]{$\procDAptFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varStatement}{\varSecKeyBob}{\varNonceBob}{\varSigBob}$} {
+        Alice \< \< Bob \\
+        (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \< \< (\varMsg,\varInputs,\varOutputs,\varProofs,\varSigContext,\varCommits,\varSigAptBob,\varTime) \opFunResult \varPreTx \\
+        \pcif \procVerfProof{\varProofs[1]}{\varOutputs[1]} \opEqNoQ 0 \< \< \\
+        \t \pcreturn \cnstFalsum \< \< \\
+        \pcif \procVerifyAptSig{\varSigBob}{\varMsg}{\varCommits[1]}{\varStatement} \opEqNoQ 0 \< \< \\
+        \t \pcreturn \cnstFalsum \< \< \\
+        \varSigAliceBob \opFunResult \procDSignL{\varMsg}{\varSecKeyAlice}{\varNonceAlice} \< \< \varSigAliceBob \opFunResult \procDSignL{\varMsg}{\varSecKeyBob}{\varNonceBob} \\
+        \< \< \varSigFin \opFunResult \procFinSig{\varSigAliceCarol}{\varSigBob} \\
+        \< \< \varTx \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs}{\varProofs}{\varSigContext}{\varCommits}{\varSigFin}{\varTime} \\
+        \pcreturn \varSigAliceBob \< \< \pcreturn \varTx
+        }
+        }
+    \end{center}
     \caption{Adapted Extended Mimblewimble Transaction Scheme - $\procDAptFinTxId$. \label{fig:inst-apt-mw-tx-fin}}
 \end{figure}

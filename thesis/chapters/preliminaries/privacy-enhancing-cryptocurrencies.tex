@@ -2,67 +2,69 @@
 \urldef\urlzcash\url{https://z.cash/}
 \urldef\urlmonero\url{https://www.getmonero.org/}
 
-As seen in \cref{sec:pre:bitcoin} in Bitcoin funds are stored in UTXOs which can be identified by an address.
-The value being transferred in a transaction is given in plain text therefore by the nature of Bitcoin's public blockchain it is possible for anyone to simply look up the amount stored in a given address.
-So called Block Explorers\footnote{\urlblockexp} make such a lookup straight forward.
-As demonstrated for instance in~\cite{barber2012bitter} or~\cite{reid2013analysis} it is further possible to link multiple addresses by analysing transactions, further weakening the anonymity of the system and allowing for the extraction of sensitive metadata.
+As seen in~\cref{sec:pre:bitcoin} in Bitcoin funds are stored in UTXOs, which an address can identify.
+The value being transferred in a transaction is given in plain text; therefore, by the nature of Bitcoin’s public blockchain, anyone can look up the amount stored in a given address.
+So-called Block Explorers\footnote{\urlblockexp} make such a lookup straightforward.
+As demonstrated, for instance, in~\cite{barber2012bitter} or~\cite{reid2013analysis}, it is further possible to link multiple addresses by analyzing transactions, further weakening the system's anonymity and allowing for the extraction of sensitive metadata.
 Attempts such as CoinJoin~\cite{maxwell2013coinjoin} or its successor CoinShuffle~\cite{ruffing2014coinshuffle} introduced protocols that can mitigate this likability issue in Bitcoin.
 
 The goal of Privacy-enhancing Cryptocurrencies is to improve upon Bitcoin's anonymity by the use of cryptographic techniques such as Zero-Knowledge Proofs~\cref{sec:pre:privacy:zeroknowlegde} and Range Proofs~\cref{sec:pre:rangeproof} to achieve Transaction Unlinkability as well as Confidential Transactions (first mentioned by Adam Back in~\cite{back2013confidentialtx}) in which the transferred values are hidden in homomorphic commitments.
 
 \begin{definition}[Transaction Unlinkability] \label{def:pre:privacy:tx-unlink}
-    Given transactions $\varTx_a$ which sends value from $A \rightarrow B$, $\varTx_b$ sending from $B \rightarrow C$ and $\varTx_c$ sending from $D \rightarrow E$, for an attacker $\cnstAdversary$ that is given $\varTx_a$, $\varTx_b$ and $\varTx_c$, with the task of find the two linking transactions the following must hold:
+    Given transactions $\varTx_a$ which sends a value from $A \rightarrow B$, $\varTx_b$ sending from $B \rightarrow C$ and $\varTx_c$ sending from $D \rightarrow E$, for an attacker $\cnstAdversary$ that is given $\varTx_a$, $\varTx_b$ and $\varTx_c$, with the task of finding the two linking transactions the following must hold:
     \[ \varProbability(\cnstAdversary(\varTx_a, \varTx_b, \varTx_c) \opEqNoQ (\varTx_a, \varTx_b)) \opEqNoQ \frac{1}{3} \opAddScalar \funNegl{\cdot}\]
 \end{definition}
 
 \begin{definition}[Confidential transactions] \label{def:pre:privacy:conf-tx}
-    Given a transaction $\varTx$ that transfers amount $\varAmount$, and a set of possible transaction amounts $\funArray{1,\cdots,\varN}$ for an attacker $\cnstAdversary$ trying to extract the correct transaction amount the following must hold:
+    Given a transaction $\varTx$ that transfers amount $\varAmount$, and a set of possible transaction amounts $\funArray{1,\cdots,\varN}$ for an attacker $\cnstAdversary$ trying to extract the correct transaction amount, the following must hold:
     \[ \varProbability(\cnstAdversary(\varTx) \opEqNoQ \varAmount) \opEqNoQ \frac{1}{\varN} \opAddScalar \funNegl{\cdot} \]
 \end{definition}
 
-Notable examples of such constructions are Zerocoin~\cite{miers2013zerocoin}, its successor Zerocash~\cite{sasson2014zerocash}, Monero~\cite{noether2015ring} and Mimblewimble~\cite{jedusor2016mimblewimble}.
-Zerocoin proposed the use of one-way accumlators~\cite{benaloh1993one} allowing the minting of a of unlinkable Zerocoins from normal Bitcoins.
-However, their proposal had some limitations such as only allowing Zerocoins of a fixed denomination and the construction being inefficient.
-In Zerocash the authors improved upon Zerocoin by utilizing Zero-Knowledge Succinct Non-interactive Arguments of Knowledge (zk-SNARKs)~\cite{bitansky2012extractable} instead of an accumulator and managed to address the limitations, however the protocol requires an initial trusted setup.
-A prominant implementation of the Zerocash protocol is the Zcash Cryptocurrency.\footnote{\urlzcash}
-Monero utilizes Ring Signatures to achieve Transaction Unlinkability and further uses homomorphic commitments~\cref{def:pre:homo-com} together with Range proofs~\cref{sec:pre:rangeproof} to hide transaction amounts as was originally proposed by Adam Back.
+Notable examples of such constructions are Zerocoin~\cite{miers2013zerocoin}, its successor Zerocash~\cite{sasson2014zerocash}, Monero~\cite{noether2015ring}, and Mimblewimble~\cite{jedusor2016mimblewimble}.
+Zerocoin proposed using one-way accumulators~\cite{benaloh1993one}, allowing the minting of of unlinkable Zerocoins from regular Bitcoins.
+However, their proposal had some limitations, such as only allowing Zerocoins of a fixed denomination and the inefficient construction.
+In Zerocash, the authors improved upon Zerocoin by utilizing Zero-Knowledge Succinct Non-interactive Arguments of Knowledge (zk-SNARKs)~\cite{bitansky2012extractable} instead of an accumulator and managed to address the limitations.
+However the protocol requires an initial trusted setup.
+A prominent implementation of the Zerocash protocol is the Zcash Cryptocurrency.\footnote{\urlzcash}
+Monero utilizes Ring Signatures to achieve Transaction Unlinkability and further uses homomorphic commitments~\cref{def:pre:homo-com} together with Range proofs~\cref{sec:pre:rangeproof} to hide transaction amounts as initially proposed by Adam Back.
 The Monero protocol has been implemented in the Monero Cryptocurrency.\footnote{\urlmonero}
 Mimblewimble, being the main topic of this thesis, will be discussed in detail in~\cref{sec:pre:mimblewimble}.
 
 \subsection{Zero-Knowledge Proofs} \label{sec:pre:privacy:zeroknowlegde}
 
-Zero-Knowledge proofs were first defined in 1988 by Fiat, Fiege, and Shamir and are an important tool for building Cryptocurrencies.
-The proofs allow a prover to convince a verifier that he owns a witness value without having to reveal the value itself.
-Originally the protocol was presented as an interactive proof between a prover and verifier, however, by utilizing the Fiat Schamir Heuristic, the proofs can be converted into a non-interactive protocol, which makes the proof publicly verfiable~\cite{feige1988zero}.
+Zero-Knowledge proofs were first defined in 1988 by Fiat, Fiege, and Shamir and are essential for building Cryptocurrencies.
+The proofs allow a prover to convince a verifier that he owns a witness value without revealing the value itself.
+Initially, the protocol was presented as an interactive proof between a prover and verifier.
+However, by utilizing the Fiat Shamir Heuristic, the proofs can be converted into a non-interactive protocol, making the proof publicly verifiable~\cite{feige1988zero}.
 Digital signatures (\cref{def:pre:signature-scheme}) such as Schnorr Signatures are a prominent instantiation of a Zero-Knowledge proof protocol.
-Zero-Knowledge proofs such as Bulletproofs~\cite{bunz2018bulletproofs} or zk-SNARKS~\cite{bitansky2012extractable} have important applications in Privacy-Enhancing Cryptocurrencies.
+Zero-Knowledge proofs such as Bulletproofs~\cite{bunz2018bulletproofs} or zk-SNARKS~\cite{bitansky2012extractable} have essential applications in Privacy-Enhancing Cryptocurrencies.
 
 \subsection{Range Proofs} \label{sec:pre:rangeproof}
 
-A Range proof testifies to the fact that a secret value, that was encrypted or committed to, lies within a certain valid range of values.
+A Range proof testifies that a secret value that was encrypted or committed to lies within a specific valid range of values.
 The proofs are Zero-Knowledge in that they do not leak any information about the secret value other than that it lies in the given interval~\cite{bunz2018bulletproofs}.
-Range proofs can be implemented for instance using ring signatures~\cite{noether2016ring}, which was the original implementation used by Monero, being later replaced by the more efficient Bulletproofs\cite{bunz2018bulletproofs} which are also used in the two most prominent Mimblewimble based Cryptocurrencies Beam and Grin.
+Range proofs can be implemented using ring signatures~\cite{noether2016ring}, which was the original implementation used by Monero, later replaced by the more efficient Bulletproofs\cite{bunz2018bulletproofs}, which are also used in the two most prominent Mimblewimble based Cryptocurrencies, Beam and Grin.
 We define a Range proof system as follows:
 
 \begin{definition}[Range Proof System]\label{def:pre:rangeproof}
-    A range proof system $\varRProofSystemParam{\varCommitScheme}$ in regard to a homomorphic commitment scheme $\varCommitScheme$ consists of a tupel of functions $(\procRProofSetupId, \procProofId, \procVerfProofId)$.
+    A range proof system $\varRProofSystemParam{\varCommitScheme}$ in regard to a homomorphic commitment scheme $\varCommitScheme$ consists of a tuple of functions $(\procRProofSetupId, \procProofId, \procVerfProofId)$.
     \begin{itemize}
-        \item $\varRProofParams \opFunResult \procRProofSetup{\varSecParam}{\varI}{\varJ}$: The rangeproof setup algorithm takes as input a security parameter $\varSecParam$ as well as two numbers $\varI$ and $\varJ$ which are treated as exponents of 2 to define the lower and upper bound of the rangeproof protocol.
-        \item $\varProof \opFunResult \procProof{\varCommitment}{\varValue}{\varBlindingFactor}$: The proof algorithm is a DPT function which takes as input a commitment $\varCommitment$, a value $\varValue$ and a blinding factor $\varBlindingFactor$.
-        It will output a proof $\varProof$ attesting to the statement that the value $\varValue$ of commitment $\varCommitment$ is in between the range $\langle \varLowerBound, \varUpperBound \rangle$ as defined during the $\procRProofSetupId$ function.
-        \item $\{1,0\} \opFunResult \procVerfProof{\varProof}{\varCommitment}$: The proof verification algorithm is a DPT function which verifies the validity of the proof $\varProof$ with regard to the commitment $\varCommitment$.
+        \item $\varRProofParams \opFunResult \procRProofSetup{\varSecParam}{\varI}{\varJ}$: The range proof setup algorithm takes as input a security parameter $\varSecParam$ and two numbers $\varI$ and $\varJ$ which are treated as exponents of 2 to define the lower and upper bound of the range proof protocol.
+        \item $\varProof \opFunResult \procProof{\varCommitment}{\varValue}{\varBlindingFactor}$: The proof algorithm is a DPT function that takes as input a commitment $\varCommitment$, a value $\varValue$ and a blinding factor $\varBlindingFactor$.
+        It will output a proof $\varProof$ attesting that the value $\varValue$ of commitment $\varCommitment$ is in between the range $\langle \varLowerBound, \varUpperBound \rangle$ as defined during the $\procRProofSetupId$ function.
+        \item $\{1,0\} \opFunResult \procVerfProof{\varProof}{\varCommitment}$: The proof verification algorithm is a DPT function that verifies the validity of the proof $\varProof$ concerning the commitment $\varCommitment$.
         It will output 1 upon a successful verification or 0 otherwise.
     \end{itemize}
 \end{definition}
 
-We additionally define a Multiparty Range proof system as an extension to a regular Range proof system in which two parties collaborate to compute a Zero-Knowledge proof attesting that a secret value of a certain commitment or encrypted value is within a given interval.
-A construction of such a protocol was done for instance by Klinec et al. in~\cite{klinec2020privacy}.
+We also define a Multiparty Range proof system as an extension to a regular Range proof system. Two parties collaborate to compute a Zero-Knowledge proof attesting that a secret value of a specific commitment or encrypted value is within a given interval.
+A construction of such a protocol was done, for instance, by Klinec et al. in~\cite{klinec2020privacy}.
 
 \begin{definition}[Multiparty Range Proof System]\label{def:pre:mp-rangeproof}
-    A Multiparty Rangeproof System $\varMPRProofSystemParam{\varCommitScheme}$ with regards to a homomorphic commitment scheme $\varCommitScheme$ is an extension to the regular Range Proof System with the following
+    A Multiparty Range proof System $\varMPRProofSystemParam{\varCommitScheme}$ with regards to a homomorphic commitment scheme $\varCommitScheme$ is an extension to the regular Range Proof System with the following
     distributed protocol $\procDRProofId$.
     \begin{itemize}
         \item $\varProof \opFunResult \procDRProof{\varCommitment}{\varValue}{\varBlindingFactorAlice}{\varBlindingFactorBob}$: The distributed proof protocol allows two parties Alice and Bob, each owning a share of the
-        commitment $\varCommitment$ to cooperate in order to produce a valid range proof $\varProof$ without a party learning the blinding factor share from the other party.
+        commitment $\varCommitment$, to cooperate to produce a valid range proof $\varProof$ without a party learning the blinding factor share from the other party.
     \end{itemize}
 \end{definition}

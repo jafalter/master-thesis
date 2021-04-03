@@ -3,12 +3,13 @@ Later in section~\cref{sec:atom:security} we will prove the security of these pr
 
 \subsection{Simple Mimblewimble Transaction - $\procDBuildMwTxId$} \label{subsec:atom:simple-mw-tx}
 
-$\procDBuildMwTxId$ is a protocol between a sender and receiver which builds a Mimblewimble transaction transferring a value $\varFundValue$ from the sender to a receiver for a Mimblewimble Transaction scheme as defined in~\cref{def:atom:mw-tx-scheme}.
+$\procDBuildMwTxId$ is a protocol between a sender and receiver which builds a Mimblewimble transaction transferring a value $\varFundValue$ from the sender to a receiver for a Mimblewimble Transaction Scheme as defined in~\cref{def:atom:mw-tx-scheme}.
 It takes as input a list of spendable coins $\funArray{\varSpendableCoin}$, a transaction value $\varFundValue$, and an optional timelock $\varTime$ from the sender, the same transaction value $\varFundValue$ from the receiver and uses the functions defined earlier to output a valid transaction $\varTx$ as well as the newly spendable coins to both parties.
 \[ \langle (\varTx, \funStar{\varSpendableCoinAlice}), (\varTx, \funStar{\varSpendableCoinBob}) \rangle \opFunResult \procDBuildMwTx{\funStar{\varSpendableCoin}}{\varFundValue}{\varTime} \]
 Figure~\cref{fig:d-build-mw-tx} shows the implementation of the $\procDBuildMwTxId$.
 
 \begin{figure}
+    \begin{center}
     \fbox{
     \begin{varwidth}{\textwidth}
         \procedure[linenumbering,skipfirstln]{$\procDBuildMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
@@ -24,6 +25,7 @@ Figure~\cref{fig:d-build-mw-tx} shows the implementation of the $\procDBuildMwTx
         }
     \end{varwidth}
     }
+    \end{center}
     \caption{$\procDBuildMwTxId$ two-party protocol to build a new transaction} \label{fig:d-build-mw-tx}
 \end{figure}
 
@@ -42,6 +44,7 @@ One use case of this transaction protocol is to lock funds between two users, wh
 Figure~\cref{fig:d-shared-out-mw-tx} shows the implementation of the protocol.
 
 \begin{figure}
+    \begin{center}
     \fbox{
     \begin{varwidth}{\textwidth}
         \procedure[linenumbering,skipfirstln]{$\procDSharedOutputMwTx{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$}{
@@ -57,6 +60,7 @@ Figure~\cref{fig:d-shared-out-mw-tx} shows the implementation of the protocol.
         }
     \end{varwidth}
     }
+    \end{center}
     \caption{$\procDSharedOutputMwTxId$ two-party protocol to build a new transaction with a shared output} \label{fig:d-shared-out-mw-tx}
 \end{figure}
 
@@ -69,11 +73,12 @@ It outputs a final transaction $\varTx$ to both parties, as well as the new outp
 
 \[ \langle (\varTx, \funStar{\varSpendableCoinAlice}), (\varTx, \funStar{\varSpendableCoinBob}) \rangle \opFunResult \procDSharedInpMwTx{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime}{\funArray{\varPtSpendableCoinBob}} \]
 
-The protocol can be used to redeem funds which are locked created with the $\procDSharedInpMwTxId$ protocol.
+The protocol can be used to redeem funds which are locked created with the \\ $\procDSharedInpMwTxId$ protocol.
 
 Figure~\cref{fig:d-shared-inp-mw-tx} shows the implementation of the protocol.
 
 \begin{figure}
+    \begin{center}
     \fbox{
     \begin{varwidth}{\textwidth}
         \procedure[linenumbering,skipfirstln]{$\procDSharedInpMwTx{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime}{\funArray{\varPtSpendableCoinBob}}$}{
@@ -81,12 +86,13 @@ Figure~\cref{fig:d-shared-inp-mw-tx} shows the implementation of the protocol.
         (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \< \< (\varPreTx, (\varSecKeyBob, \varNonceBob)) \pcskipln \\
         \opFunResult \procDSendCoinsL{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime} \< \< \opFunResult \procDSendCoinsL{\funArray{\varPtSpendableCoinBob}}{\varFundValue}{\varTime} \\
         \< \< (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinBob}) \opFunResult \procRecvCoins{\varPreTx}{\varFundValue} \\
-        \< \sendmessageleft*{\funStarAlt{\varPreTx}} \\
+        \< \sendmessageleft*[2cm]{\funStarAlt{\varPreTx}} \\
         \varTx \opFunResult \procDFinTxL{\funStarAlt{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice} \< \< \varTx \opFunResult \procDFinTxL{\funStarAlt{\varPreTx}}{\varSecKeyBob}{\varNonceBob} \\
         \pcreturn (\varTx, \funStar{\varSpendableCoinAlice}) \< \< \pcreturn (\varTx, \funStar{\varSpendableCoinBob})
         }
     \end{varwidth}
     }
+    \end{center}
     \caption{$\procDSharedOutputMwTxId$ two-party protocol to build a new transaction from a shared output} \label{fig:d-shared-inp-mw-tx}
 \end{figure}
 
@@ -101,6 +107,7 @@ Additionally, we utilize the adapted signature protocol from~\cref{def:sig:two-p
 Figure~\cref{fig:d-script-tx} shows the implementation of the protocol.
 
 \begin{figure}
+    \begin{center}
     \fbox{
     \begin{varwidth}{\textwidth}
         \procedure[linenumbering,skipfirstln]{$\procDScriptMwTx{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime}{\varStatement}{\funArray{\varPtSpendableCoinBob}}{\varWit}$}{
@@ -109,18 +116,19 @@ Figure~\cref{fig:d-script-tx} shows the implementation of the protocol.
         \opFunResult \procDSendCoinsL{\funArray{\varPtSpendableCoinAlice}}{\varFundValue}{\varTime} \< \< \opFunResult \procDSendCoinsL{\funArray{\varPtSpendableCoinBob}}{\varFundValue}{\varTime} \\
         \< \< (\funStarAlt{\varPreTx}, \funStar{\varSpendableCoinBob}, \varSigBob)  \pcskipln \\
         \< \< \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}  \\
-        \< \sendmessageleft*{\funStarAlt{\varPreTx}, \funStarAlt{\varStatement}} \\
+        \< \sendmessageleft*[2cm]{\funStarAlt{\varPreTx}, \funStarAlt{\varStatement}} \\
         \pcif \varStatement \opNotEq \cnstFalsum \opAnd \varStatement \opNotEq \funStarAlt{\varStatement} \\
         \t \pcreturn \cnstFalsum \\
         \varSigAptBob \opFunResult \funStarAlt{\varPreTx}.\varSignature \\
         \varSigAliceBob \< \< \varTx \pcskipln \\
         \opFunResult \procDAptFinTxL{\funStarAlt{\varPreTx}}{\varSecKeyAlice}{\varNonceAlice}{\varStatement} \< \< \opFunResult \procDAptFinTxR{\funStarAlt{\varPreTx}}{\varSecKeyBob}{\varNonceBob}{\varSigBob} \\
-        \< \sendmessageleft*{\varTx} \\
+        \< \sendmessageleft*[2cm]{\varTx} \\
         \varWit \opFunResult \procExtWit{\varTx.\varSignature}{\varSigAliceBob}{\varSigAptBob} \\
         \pcreturn (\varTx, \funStar{\varSpendableCoinAlice}, \varWit) \< \< \pcreturn (\varTx, \funStar{\varSpendableCoinBob})
         }
     \end{varwidth}
     }
+    \end{center}
     \caption{$\procDScriptMwTxId$ two-party protocol to build a primitive contract transaction} \label{fig:d-script-tx}
 \end{figure}
 
