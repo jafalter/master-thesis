@@ -1,17 +1,17 @@
-In this section, we will first define procedures and protocols to construct Mimblewimble transactions and prove their security.
+This section will first define procedures and protocols to construct Mimblewimble transactions and prove their security.
 The formalizations will be similar to those found by Fuchsbauer et al. in their cryptographic investigation of the Mimblewimble protocol~\cite{fuchsbauer2019aggregate}.
-In particular the final transaction output from our protocols should be a valid transaction as by the definitions of Fuchsbauer et al.
-As we will only focus on the transaction building protocol~(\cref{subsec:pre:mimblewimble:txbuild}), the notions of cut through~(\cref{par:pre:mimblewimble:cut}), transaction merging~(\cref{sec:pre:mimblewimble:merge}), coin minting (see coinbase transactions \cref{subsec:pre:mimblwimble-tx}), and publishing transactions to the ledger (\cref{subsec:pre:mimblewimble:ledger}), all formalized by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}, will not be topic of this formalization.
+In particular, the final transaction output from our protocols should be a valid transaction as by the definitions of Fuchsbauer et al.
+As we will only focus on the transaction building protocol~(\cref{subsec:pre:mimblewimble:txbuild}), the notions of cut through~(\cref{par:pre:mimblewimble:cut}), transaction merging~(\cref{sec:pre:mimblewimble:merge}), coin minting (see coinbase transactions \cref{subsec:pre:mimblwimble-tx}), and publishing transactions to the ledger (\cref{subsec:pre:mimblewimble:ledger}), all formalized by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}, will not be the topic of this formalization.
 
 As an extension to the regular transaction protocol \emph{Mimblewimble Transaction Scheme}, which we will define first, we will additionally define two further schemes:
-The first of them titled \emph{Extended Mimblewimble Transaction Scheme} will provide additional functions to create and spend coins owned by two parties instead of just one, thereby enabling coins owned by mutliple parties, which is similar to a mutlisig address in Bitcoin~\cite{antonopoulos2014mastering}.
-The second extended definition is called \emph{Contract Mimblewimble Transaction Scheme} in which we further add algorithms that allow embedding primitive smart contracts to the transaction building protocol.
-Both the \emph{Extended Mimblewimble Transaction Scheme} and \emph{Contract Mimblewimble Transaction Scheme} are constructed with the goal in mind of providing the functionality that is later needed to build the final Atomic Swap protocol which we will introduce in~\cref{sec:atom:atomic-swap}.
+The first of them titled \emph{Extended Mimblewimble Transaction Scheme}, will provide additional functions to create and spend coins owned by two parties instead of just one, thereby enabling coins owned by multiple parties, which is similar to a mutlisig address in Bitcoin~\cite{antonopoulos2014mastering}.
+The second extended definition is called \emph{Contract Mimblewimble Transaction Scheme}, in which we further add algorithms that allow embedding primitive smart contracts to the transaction building protocol.
+Both the \emph{Extended Mimblewimble Transaction Scheme} and \emph{Contract Mimblewimble Transaction Scheme} are constructed to provide the functionality that is later needed to build the final Atomic Swap protocol, which we will introduce in~\cref{sec:atom:atomic-swap}.
 
-We will proceed by providing an instantiation of the three transactions schemes in~\cref{sec:atom:inst} which can be implemented and deployed on a Mimblewimble-based Cryptocurrency such as Beam or Grin.
-In~\cref{sec:atom:protocols} we define two-party protocols from the outlined schemes to construct mimbewimble transactions.
-~\Cref{sec:atom:security} shows the proofs that the schemes are correct and the protocols secure in the malicious setting as defined in~\cref{subsec:pre:security}.
-Finally, in~\cref{sec:atom:atomic-swap}, we define a Atomic Swap protocol from these building blocks, allowing two parties to securely and trustlessly swap funds from a Mimblewimble based blockchain with those on another blockchain, such as Bitcoin.
+We will proceed by providing an instantiation of the three transaction schemes in~\cref{sec:atom:inst}, which can be implemented and deployed on a Mimblewimble-based Cryptocurrency such as Beam or Grin.
+In~\cref{sec:atom:protocols}, we define two-party protocols from the outlined schemes to construct Mimblewimble transactions.
+~\Cref{sec:atom:security} shows the proofs that the formalizations are correct and the protocols secure in the malicious setting as defined in~\cref{subsec:pre:security}.
+Finally, in~\cref{sec:atom:atomic-swap}, we describe an Atomic Swap protocol from these building blocks, allowing two parties to securely and trustlessly swap funds from a Mimblewimble based blockchain with those on another blockchain, such as Bitcoin.
 
 \section{Definitions}\label{sec:atom:definitions}
 \input{chapters/adaptor_signature_based_atomic_swaps_between_bitcoin_and_mimblewimble/definitions}
