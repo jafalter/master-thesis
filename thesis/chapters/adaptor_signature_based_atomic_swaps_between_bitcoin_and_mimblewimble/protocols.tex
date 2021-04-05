@@ -144,7 +144,7 @@ However, recalling the structure of Mimblewimble transactions the participants s
 Therefore, making the public keys cancel out $\cnstAdversary$ would instead have to choose his key as $\varPubKeyBob \opAssign \varPubKeyAlice$.
 Given this setup (a transaction which spends the coin $\varCoin \opEqNoQ \varPubKeyAlice \opAddPoint \funGenH{\varValue}$ to $\funStar{\varCoin} \opEqNoQ \varPubKeyBob \opAddPoint\funGenH{\varValue}$), the Excess value $\varExcess$ would calculate like $\varPubKeyAlice \opAddPoint {\varPubKeyBob}^{-1}$.
 $\varPubKeyBob$ definition is $\varPubKeyAlice \opAddPoint {\varPubKeyAlice}^{-1}$, which would cancel out and allow the adversary to forge a signature.
-However, since we chose $\varPubKeyBob$ as simply $\varPubKeyAlice$ and $\varPubKeyAlice \opEqNoQ \funGen{\varBlindingFactor}$ (from the original Petersen commitment) the new output coin $\funStar{\varCoin}$ would be identical to the input coin $\varCoin$, and the transaction spend a coin to itself.
+However, since we chose $\varPubKeyBob$ as simply $\varPubKeyAlice$ and $\varPubKeyAlice \opEqNoQ \funGen{\varBlindingFactor}$ (from the original Pedersen Commitment) the new output coin $\funStar{\varCoin}$ would be identical to the input coin $\varCoin$, and the transaction spend a coin to itself.
 Recalling the instantiation of the transaction verification algorithm $\procVerfTxId$ defined by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate}, which we laid out in~\cref{fig:inst-mw-tx-2}, we see that the union between input and output coin list must be empty.
 Otherwise, the transaction will not verify.
 Therefore, even though the attacker could create a forged signature for this transaction, it would still be invalid as by definition of the transaction verification algorithm.

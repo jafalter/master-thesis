@@ -1,7 +1,7 @@
 \urldef\urlgrinexplained\url{https://tinyurl.com/y63hc4ua}
 
 As we have already discussed in~\cref{sec:pre:mimblewimble} for creating a transaction in Mimblewimble, it is immanent that both the sender and receiver collaborate and exchange messages via a secure channel.
-To construct the transaction protocol, we assume that we have access to a Two-Party Signature Scheme $\varSigSchemeMP$ as defined in~\cref{def:sig:two-party-sig}, a  range proof system as defined in~\cref{def:pre:rangeproof} such as Bulletproofs, as described in ~\cref{sec:pre:rangeproof} and a homomorphic commitment scheme $\varCommitScheme$ as defined in~\cref{def:pre:homo-com} such as Pedersen Commitments seen in ~\cref{def:pre:pedersen}.
+To construct the transaction protocol, we assume that we have access to a Two-Party Signature Scheme $\varSigSchemeMP$ as defined in~\cref{def:sig:two-party-sig}, a  range proof system as defined in~\cref{def:pre:rangeproof} such as Bulletproofs, as described in ~\cref{sec:pre:rangeproof} and a homomorphic Commitment Scheme $\varCommitScheme$ as defined in~\cref{def:pre:homo-com} such as Pedersen Commitments seen in ~\cref{def:pre:pedersen}.
 
 Fuchsbauer et al. have defined three procedures, $\procFuchsSend$, $\procFuchsRcv$, and $\procFuchsLdgr$, regarding creating a transaction.
 $\procFuchsSend$ called by the sender will create a pre-transaction, $\procFuchsRcv$ takes the pre-transaction and adds the receiver's output and $\procFuchsLdgr$ (again called by the sender) verifies and publishes the final transaction to the blockchain ledger.
@@ -30,14 +30,14 @@ The verifier would then check the validity of $\varSignature_1$ and $\varSignatu
 The reason why we can not simply add up the signatures is the following:
 Recall the structure of a Schnorr signature $(\varS, \varRand)$, imagine we would try to create an aggregated signature like $\varSignature_a \opEqNoQ (\varS_1 \opAddScalar \varS_2, \varRand_1 \opAddPoint \varRand_2)$, then this would not be a valid signature anymore.
 Again recalling the structure of Schnorr, $\varS$ is calculated as $\varS \opEqNoQ \varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey$ where $\varSchnorrChallenge \opEqNoQ \funHash{\varMsg \opConc \varRand \opConc \varPubKey}$.
-As we have changed the nonce commitment $\varRand$ and the public key $\varPubKey$ in our aggregated signature the Schnorr challenge $\varSchnorrChallenge$ will be different from the one used by the individual signers, thereby making the verification algorithm return 0.
+As we have changed the nonce Commitment $\varRand$ and the public key $\varPubKey$ in our aggregated signature the Schnorr challenge $\varSchnorrChallenge$ will be different from the one used by the individual signers, thereby making the verification algorithm return 0.
 We can fix this issue by having the individual signers use the final composite $\varRand$ and $\varPubKey$ for their Schnorr challenge calculation, which is exactly what we are doing in the Schnorr-based instantiation of two Two-Party Signature Scheme in~\cref{fig:twoparty-schnorr}.
 This detail, however, introduces the necessity for an initial setup phase in which the parties exchange messages to compute $\varRand$ and $\varPubKey$ from their shares.
 Using the two-party Schnorr model instead of the aggregated Schnorr, we save space, as we only need to store one single signature instead of multiple.
 Further, we also only need to store the final public key $\varPubKey$ and disregard the public key shares.
 We also note that the two-party version is currently implemented in Grin and Beam in practice.\footnote{\urlgrinexplained}
 Finally, there is another critical advantage that comes with the two-party Schnorr approach.
-For the peers to start the signing process, the final composite $\varPubKey$ and nonce commitment $\varRand$ need to be known.
+For the peers to start the signing process, the final composite $\varPubKey$ and nonce Commitment $\varRand$ need to be known.
 That also entails that the flow pointed out in~\cite{fuchsbauer2019aggregate}, in which the transaction sender starts the signing process, and the receiver completes it is no longer possible.
 Instead, the signing process can only start with the receiver's turn.
 We need to introduce a third round.
@@ -64,13 +64,13 @@ Using the Two-Party Signature Scheme instead of an Aggregatable Signature Scheme
 Even if the attacker were able to sniff one of the pre-transactions sent between the parties, because Alice will only ever add the signature for her input coins at the end of the protocol, the attacker would not be able to compute a valid transaction.
 
 We now define the standard \emph{Mimblewimble Transaction Scheme} that intuitively allows a sender to transfer value stored in a Mimblewimble coin to a receiver.
-To improve the readability of our following formalizations, we introduce a wrapper $\varSpendableCoin$ that represents a spendable coin and contains a reference to the coin commitment $\varCommitment$, range proof $\varProof$, and its (secret) spending information of the coins value $\varValue$ and blinding factor $\varBlindingFactor$.
+To improve the readability of our following formalizations, we introduce a wrapper $\varSpendableCoin$ that represents a spendable coin and contains a reference to the coin Commitment $\varCommitment$, range proof $\varProof$, and its (secret) spending information of the coins value $\varValue$ and blinding factor $\varBlindingFactor$.
 \[ \varSpendableCoin \opAssign \{ \varCommitment, \varValue, \varBlindingFactor, \varProof \} \]
 If we want to indicate that a spendable coin is used as an output coin in a transaction, we write $\funStar{\varSpendableCoin}$.
 
 \begin{definition}[Mimblewimble Transaction Scheme]
     \label{def:atom:mw-tx-scheme}
-    A Mimblewimble Transaction Scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varRProofSystem}$ with commitment scheme $\varCommitScheme$, Two-Party Signature Scheme $\varSigSchemeMP$, and range proof system $\varRProofSystem$ consists of the following tuple of procedures:
+    A Mimblewimble Transaction Scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varRProofSystem}$ with Commitment Scheme $\varCommitScheme$, Two-Party Signature Scheme $\varSigSchemeMP$, and range proof system $\varRProofSystem$ consists of the following tuple of procedures:
     \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varRProofSystem} \opAssign ( \procSendCoinsId,\procRecvCoinsId,\procFinTxId,\procVerfTxId ) \]
     \begin{itemize}
         \item $(\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$: The spendCoins algorithm is a DPT function called by the sending party to initiate the spending of some input coins.
@@ -137,7 +137,7 @@ In the following, we define the \emph{Extended Mimblewimble Transaction Scheme},
         Again optionally a block height $\varTime$ can be given to time lock the transaction.
         Similar to the single party version of the function its outputs are a pre-transaction $\varPreTx$ and change coin for each party $\funStar{\varSpendableCoinAlice}$ (resp. $\funStar{\varSpendableCoinCarol}$), and their signing information.
         \item $\langle (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinBob}), (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinCarol}) \rangle \opFunResult \procDRecvCoins{\varPreTx}{\varFundValue}$: The distributed coin receive procedure takes as input a pre-transaction $\varPreTx$ and a value $\varFundValue$ which should be transferred with the transaction.
-        The distributed algorithm will generate an output coin with value $\varValue$, owned by both Bob and Carol (each knowing only a share of the coin commitment's blinding factor).
+        The distributed algorithm will generate an output coin with value $\varValue$, owned by both Bob and Carol (each knowing only a share of the coin Commitment's blinding factor).
         The output will be an updated pre-transaction $\funStar{\varPreTx}$, and the spendable shared output coins for each party $\funStar{\varPtSpendableCoinBob}$ (resp. $\funStar{\varPtSpendableCoinCarol}$).
         Note that the newly generated output coin can only be spent by both parties cooperating, as each share of the blinding factor is strictly required.
         We note here that creating more complex schemes in which a coin is spendable by knowing N out M keys would be possible by implementing Shamir's Secret Sharing algorithm, which can be found in~\cite{shamir1979share}.
@@ -181,7 +181,7 @@ We define the \emph{Contract Mimblewimble Transaction Scheme}, which will extend
         $\varWit$, hidden in the transaction signature and extracted by the other party after the completion of the protocol.
         Note that the routine also returns Bob's unmasked partial signature.
         The reason for this is that we later still need the unmasked version to complete the signature and thereby finalize the transaction.
-        By not sharing this unmasked signature with Alice, Bob is the one who gets to finalize the transaction, which is different from the simpler protocol and is a crucial feature necessary for our atomic swap protocol.
+        By not sharing this unmasked signature with Alice, Bob is the one who gets to finalize the transaction, which is different from the simpler protocol and is a crucial feature necessary for our Atomic Swap protocol.
         We want to stress here that $\procAptRecvCoinsId$ is only a single-party algorithm.
         We can only use it if we're going to create an output coin owned by a single receiver.
         It would, of course, be conceivable also to define a distributed version similar to $\procDRecvCoinsId$ of this functionality, allowing two receivers (or one of the two) to hide secret witness values, extractable later by the sender(s).
@@ -194,13 +194,13 @@ We define the \emph{Contract Mimblewimble Transaction Scheme}, which will extend
         We allowed ourselves to model this protocol as being between only two parties to simplify the formalization.
         In this version of the protocol, only Bob can finalize the transaction, which is different from $\procFinTxId$ and $\procDFinTxId$.
         The reason for that is that for the Atomic Swap execution, Bob needs to be the one in control of building the final transaction.
-        If Alice were to build the final transaction before Bob, she will extract the witness value before the transaction has been published, which in the atomic swap scenario would mean she could steal the funds stored on the other chain.
+        If Alice were to build the final transaction before Bob, she will extract the witness value before the transaction has been published, which in the Atomic Swap scenario would mean she could steal the funds stored on the other chain.
         That is why the protocol does not return the final transaction $\varTx$ to Alice.
         Instead, the protocol will output the sender's partial signature, which Alice can later use to extract the final transaction's witness value.
     \end{itemize}
 \end{definition}
 
-Similar to before, we define correctness for the adapted scheme:
+Similar to before, we define Correctness for the adapted scheme:
 
 \begin{definition}[Contract Transaction Scheme Correctness]
     \label{def:atom:apt-tx-scheme-correctness}
