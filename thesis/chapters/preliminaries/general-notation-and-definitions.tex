@@ -62,18 +62,18 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
     A cryptographic Commitment Scheme $\varCommitScheme$ is defined by a pair of functions $(\procSetupComId, \procCommitId)$~\cite{bunz2018bulletproofs}.
     \begin{itemize}
         \item $\varCommitParams \opFunResult \procSetupCom{\varSecParam}$: The setup procedure is a DPT function, it takes as input a security parameter $\varSecParam$ and outputs public parameters $\varPublicParam$.
-        Depending on $\varPublicParam$ we define a input space $\varInputSpace_{\varPublicParam}$, a randomness space $\varRandSpace_{\varPublicParam}$ and a commitment space $\varCommitSpace_{\varPublicParam}$.
+        Depending on $\varPublicParam$ we define a input space $\varInputSpace_{\varPublicParam}$, a randomness space $\varRandSpace_{\varPublicParam}$ and a Commitment space $\varCommitSpace_{\varPublicParam}$.
         \item $\varCommitment \opFunResult \procCommit{\varInput}{\varNonce}$ The commit routine is DPT function that takes an arbitrary input $\varInput \opIn \varInputSpace_{\varPublicParam}$, a random value $\varNonce \opIn \varRandSpace_{\varPublicParam}$ and
         generates an output $\varCommitment \opIn \varCommitSpace_{\varPublicParam}$.
     \end{itemize}
 
-    Secure commitments must fulfill the \emph{Binding} and \emph{Hiding} security properties:
+    Secure Commitments must fulfill the \emph{Binding} and \emph{Hiding} security properties:
     \begin{itemize}
         \item \textit{Binding:} If a Commitment Scheme is binding it must hold that for all $\cnstPolyTime$ adversaries $\cnstAdversary$ given a valid input $\varInput \opIn \varInputSpace_{\varPublicParam}$
         and randomness $\varNonce \opIn \varRandSpace_{\varPublicParam}$ the probabilty of finding a $\funStar{\varInput} \opNotEq \varInput$ and a $\funStar{\varNonce}$ with
         $\procCommit{\varInput}{\varNonce} \opEqNoQ \procCommit{\funStar{\varInput}}{\funStar{\varNonce}}$ is negligible.
-        \item \textit{Hiding:} For a $\cnstPolyTime$ adversary $\cnstAdversary$, commitment inputs $\varInput_0, \varInput_1 \opIn \varInputSpace_{\varPublicParam}$ randomness $\varNonce \opIn
-       \varRandSpace_{\varPublicParam}$ and a commitment output $\varCommitment \opAssign \procCommit{\varInput_{\varB}, \varNonce}$ the probabilty of the adversary choosing the correct $\varB$ out of $\{0,1\}$
+        \item \textit{Hiding:} For a $\cnstPolyTime$ adversary $\cnstAdversary$, Commitment inputs $\varInput_0, \varInput_1 \opIn \varInputSpace_{\varPublicParam}$ randomness $\varNonce \opIn
+       \varRandSpace_{\varPublicParam}$ and a Commitment output $\varCommitment \opAssign \procCommit{\varInput_{\varB}, \varNonce}$ the probabilty of the adversary choosing the correct $\varB$ out of $\{0,1\}$
         must not be higher then $\frac{1}{2} + \funNegl{\varProbability}$.
     \end{itemize}
 \end{definition}

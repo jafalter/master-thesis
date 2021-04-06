@@ -39,7 +39,7 @@ Also, Bitcoin is planning to add Schnorr signatures as an alternative to the cur
 \end{figure}
 
 
-The correctness of the scheme can be derived as follows:
+Correctness of the scheme can be derived as follows:
 As shown in~\cref{fig:schnorr}, $\procVerfId$, line 3, we need to show that $\funGen{\varS} \opEqNoQ \varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge}$ returns $1$ for correct signatures.
 As $\varS$ is calculated as $\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey$ ($\procSignId$, line 4), when generator $\varG$ is raised to $\varS$, we get $\funGen{\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey}$ which we can transform into $\funGen{\varNonce} \opAddPoint \funGen{\varSecKey \opTimesScalar \varSchnorrChallenge}$, and finally into $\varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge}$ which is the same as the right side of the equation.
 
@@ -82,7 +82,7 @@ In this case, the $\procSetupCtxId$ can be incorporated into the signing protoco
 Whatever method of key generation is used, it must not be vulnerable to rogue key attacks.
 
 $\procSignPrtId$ and $\procVerfPtSigId$ are generally similar to the instantiation of the ordinary Schnorr Signature Scheme.
-Note, however, that for computing the Schnorr challenge $\varSchnorrChallenge$, the input into the hash function will be the already combined public key $\varPubKey$ and combined nonce commitment $\varRand$, which the participants can read from the context object $\varSigContext$.
+Note, however, that for computing the Schnorr challenge $\varSchnorrChallenge$, the input into the hash function will be the already combined public key $\varPubKey$ and combined nonce Commitment $\varRand$, which the participants can read from the context object $\varSigContext$.
 This adjustment affects that the signature shares themselfes are not yet a valid signature (neither under $\varPubKey$ nor under $\varPubKeyAlice$ or $\varPubKeyBob$), and other means that signing can only start after the context $\varSigContext$ has been fully setup.
 This property is because to be valid under $\varPubKey$, the signature shares are missing the other participant's $\varS$ value.
 They are also not valid under the partial public keys $\varPubKeyAlice$ or $\varPubKeyBob$ because the Schnorr challenge is computed already with the combined values.
@@ -139,7 +139,7 @@ Therefore we have to introduce the slightly adjusted $\procVerfPtSigId$ to be ab
     \label{fig:twoparty-schnorr}
 \end{figure}
 
-For a correctness proof and a generally more extensive explanation of this Two-Party Schnorr Signature Scheme, we refer the reader to a paper by Maxwell et al.~\cite{maxwell2019simple}.
+For a Correctness proof and a generally more extensive explanation of this Two-Party Schnorr Signature Scheme, we refer the reader to a paper by Maxwell et al.~\cite{maxwell2019simple}.
 
 In~\cref{fig:aptSchnorr}, we further provide a Schnorr-based instantiation for the Fixed Witness Two-Party Adaptor Signature Scheme as defined in~\cref{def:sig:two-party-fixed-wit-apt-sig}.
 

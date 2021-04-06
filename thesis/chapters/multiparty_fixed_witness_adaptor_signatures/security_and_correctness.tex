@@ -120,7 +120,7 @@ The same argument holds for all of the modified protocols from this section.
 \end{figure}
 
 
-In the adjusted protocol, both Alice and Bob will verify the validity of the other party's public key and nonce commitments.
+In the adjusted protocol, both Alice and Bob will verify the validity of the other party's public key and nonce Commitments.
 They will stop protocol execution in case the peer sent an invalid value.
 We assume parties have access to a trusted third party computing $\procZKfId{\cnstRelation}$ which will return 1 if $\varPubKeyAlice \opEqNoQ \funStar{\varPubKeyAlice}$ (where $\funStar{\varPubKeyAlice}$ is the public key that Bob received from Alice) and $\varPubKeyAlice \opEqNoQ \funGen{\varSecKeyAlice}$. (The same holds for the reversed case)
 
@@ -365,7 +365,7 @@ The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj}.
     
     Again we argue why the transcript is indistinguishable in phases 1--4:
     \begin{itemize}
-        \item \textit{Phase 1:} As argued in \cref{prf:sig:two-party-security}, in this phase, the adversary will receive some public, nonce commitment, and signature context.
+        \item \textit{Phase 1:} As argued in \cref{prf:sig:two-party-security}, in this phase, the adversary will receive some public, nonce Commitment, and signature context.
         As he does not know Alice's actual inputs, he has no way of knowing if the values received are the correct ones fitting with Alice's inputs, other than by guessing.
         \item \textit{Phase 2:} As argued before, with the hash function modeled in the random oracle, its output is expected to be randomly distributed.
         As $\cnstSimulator$'s computation to create the hash output relies on randomly chosen values ($\varSecKeyAlice, \varNonceAlice$), we can conclude that the output is distributed indistinguishably from a real hash output.
