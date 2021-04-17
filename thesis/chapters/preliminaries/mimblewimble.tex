@@ -3,8 +3,8 @@
 This section will outline the fundamental properties of the protocols employed in Mimblewimble, which are relevant for the thesis and particularly the Atomic Swap protocol constructed in~\cref{ch:atomicswap}.
 The Mimblewimble protocol is an outline for a Privacy-enhancing Cryptocurrency that achieves Confidential Transactions as of~\cref{def:pre:privacy:conf-tx}.
 If the protocol also achieves Transaction Unlinkability~\cref{def:pre:privacy:tx-unlink}, is not fully clear.
-One can be argue that Transaction merging~\cref{sec:pre:mimblewimble:merge} together with Cut-through~\cref{par:pre:mimblewimble:cut} should make transactions unlinkable.
-However, one author managed in a practical setting to link a large amount of Mimblewimble transactions using well-connected network nodes that attempt to sniff original transactions before they were merged\footnote{\urlmwbreak}.
+One can argue that Transaction merging~\cref{sec:pre:mimblewimble:merge} together with Cut-through~\cref{par:pre:mimblewimble:cut} should make transactions unlinkable.
+However, one author managed to link a large amount of Mimblewimble transactions in a practical setting using well-connected network nodes that attempt to sniff original transactions before they are merged\footnote{\urlmwbreak}.
 
 \subsubsection{Transaction Structure} \label{subsec:pre:mimblwimble-tx}
 
@@ -61,7 +61,7 @@ The same must hold for $\varTx_1$.
 
 By the rules of arithmetic, it then must also hold that
 \[ \varCoinInp^0 \opConc \varCoinInp^1 \opSub \varCoinOut^0 \opConc \varCoinOut^1 \opSub \funGenH{\varSupply_0 \opAddScalar \varSupply_1} \opEqNoQ \varExcess_0 \opAddPoint \varExcess_1  \]
-$\funList{\varProof_0} \opConc \funList{\varProof_1}$ must contain valid range proofs for the output coins and $\funList{\varSignature_0} \opConc \funList{\varSignature_1}$ must contain valid signatures to the respective Excess points, which makes $\varTx_m$ a valid transaction.
+$\funList{\varProof_0} \opConc \funList{\varProof_1}$ must contain valid range proofs for the output coins and $\funList{\varSignature_0} \opConc \funList{\varSignature_1}$ must contain valid signatures to the respective excess points, which makes $\varTx_m$ a valid transaction.
 
 \paragraph{Subset Problem} \label{par:pre:mimblewimble:subset}
 A subtle problem arises with the way transactions are merged in Mimblewimble.
@@ -97,17 +97,15 @@ Now let's recall the equation given for transaction well-balancedness in~\cref{d
 If we merge $\varTx_0$ with $\varTx_1$ as done previously, the coin $\varCoin_i$ will appear both in $\sum{\varCoinInp}$ and $\sum{\varCoinOut}$.
 Therefore we can erase $\varCoin_i$ from both lists while maintaining transaction balancedness.
 Informally this means that every time a coin gets spent, it can be erased from the ledger without breaking the rules of the system.
-This property is employed in the Mimblewimble protocol to reduce the space requirements of the protocol as well as provide a notion of unlinkability, as transaction histories can be erased.
+This property is employed in the Mimblewimble protocol to reduce the space requirements of the protocol and provide a notion of unlinkability, as transaction histories are continuously erased.
 
 \subsubsection{Transaction Building} \label{subsec:pre:mimblewimble:txbuild}
+Throughout the thesis, whenever we are concerned with Mimblewimble transactions, we generally refer to the sending party (owning the input coins) as Alice and the receiving party (owning the newly created output coin) as Bob.
 As already pointed out, building transactions in Mimblewimble is an interactive process between the sender and receiver of funds.
 Jedusor Tom Elvis originally envisioned the following two-step process to build a transaction:~\cite{jedusor2016mimblewimble}
-
-Throughout the thesis, whenever we are concerned with Mimblewimble transactions, we generally refer to the sending party (owning the input coins) as Alice and the receiving party (owning the newly created output coin) as Bob.
-Assume for the following that Alice wants to transfer coins of value $\varFundValue$ to Bob:
 \begin{enumerate}
     \item Alice first selects an input coin $\varCoinInp$ (or potentially multiple) in her control with total stored value $\varValue$ with $\varValue \geq \varFundValue$.
-    She then creates change coin outputs $\varCoinOutAlice$ (could again be multiple) with the remainder of her input value substracted by the value send to Bob.
+    She then creates change coin outputs $\varCoinOutAlice$ (could again be multiple) with the remainder of her input value substracted by the value sent to Bob.
     For her newly created output coins and her input coins, she calculates her part of discrete logarithm $\varKey$ (her part of the key) to the final $\varExcess$ and sends all this information to Bob as a pre-transaction.
     \item Bob creates himself additional output coins $\varCoinOut^B$ of total value $\varFundValue$ and similar to Alice creates his share $\funStar{\varKey}$ of the discrete logarithm of $\varExcess$.
     Together with the share received from Alice, he can now create a signature to $\varExcess$ and finalize the transaction

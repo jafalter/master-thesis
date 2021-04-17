@@ -30,7 +30,7 @@ We construct the following theorem:
 
     Condition 3 follows from the implementation of the $\procCreateCoinId$ function called in $\procSendCoinsId$ as well as $\procRecvCoinsId$.
     In the procedure, a range proof is computed for the new coin $\varCoin$ with value $\varValue$ and blinding factor $\varBlindingFactor$ as $\varProof \opFunResult \procProof{\varCoin}{\varValue}{\varBlindingFactor}$.
-    Given that our range proof system $\varRProofSystem$ system has to be correct $\procVerfProof{\varProof}{\varCoin} \opEqNoQ 1$ must hold for all coins created with the $\procCreateCoinId$ routine.
+    Given that our Range Proof System $\varRProofSystem$ system has to be correct $\procVerfProof{\varProof}{\varCoin} \opEqNoQ 1$ must hold for all coins created with the $\procCreateCoinId$ routine.
     Therefore Condition 3 must hold if the transaction is computed honestly.
 
     we must look at how the secret keys $\varSecKeyAlice$, and $\varSecKeyBob$ are constructed, for condition 4.
@@ -459,7 +459,7 @@ We extend our model including the $\procDSignId$ protocol, proven to be secure i
 
 \begin{theorem}
     \label{teo:atom:sec-drecv}
-    Let $\varCommitScheme$ be a correct and secure Pedersen Commitment Scheme, $\varMPRProofSystem$ be a correct and secure multiparty range proof system, and $\varSigSchemeMP$ be a secure and correct Two-Party Signature Scheme, then $\procDRecvCoinsId$ securely updates a Mimblewimble pre-transaction by creating a new output coin $\funStarAlt{\varCoinShared}$ for which the key is shared between two parties Bob and Carol in the $\procZKfId{\cnstRelation_1}$,$\procZKfId{\cnstRelation_2}$,$\procDSignId$,$\procDRProofId$-model.
+    Let $\varCommitScheme$ be a correct and secure Pedersen Commitment Scheme, $\varMPRProofSystem$ be a correct and secure Two-Party Range Proof System, and $\varSigSchemeMP$ be a secure and correct Two-Party Signature Scheme, then $\procDRecvCoinsId$ securely updates a Mimblewimble pre-transaction by creating a new output coin $\funStarAlt{\varCoinShared}$ for which the key is shared between two parties Bob and Carol in the $\procZKfId{\cnstRelation_1}$,$\procZKfId{\cnstRelation_2}$,$\procDSignId$,$\procDRProofId$-model.
 \end{theorem}
 
 \begin{proof}
@@ -578,7 +578,7 @@ We further require a trusted third-party computing $\procDRecvCoinsId$, which we
 
 \begin{theorem}
     \label{teo:atom:sec-sharedout-tx}
-    Let $\varCommitScheme$ be a correct and secure Pedersen Commitment Scheme, $\varRProofSystem$ be a correct and secure range proof system and $\varSigSchemeMP$ be a secure and correct Two-Party Signature Scheme, then $\procDSharedOutputMwTxId$ securely computes a Mimblewimble transaction with a output coin $\funStarAlt{\varCoinShared}$ which spending secret is shared between Alice and Bob.
+    Let $\varCommitScheme$ be a correct and secure Pedersen Commitment Scheme, $\varRProofSystem$ be a correct and secure Range Proof System and $\varSigSchemeMP$ be a secure and correct Two-Party Signature Scheme, then $\procDSharedOutputMwTxId$ securely computes a Mimblewimble transaction with a output coin $\funStarAlt{\varCoinShared}$ which spending secret is shared between Alice and Bob.
 \end{theorem}
 
 \begin{proof}
@@ -643,7 +643,7 @@ That means that we do not have to extend to original protocol instantiation seen
 
 \begin{theorem}
     \label{teo:atom:sec-dshared-inp}
-    Let $\varCommitScheme$ be a correct and secure Pedersen Commitment Scheme, $\varMPRProofSystem$ a correct and secure multiparty range proof system, and $\varSigSchemeMP$ be a secure and correct Two-Party Signature Scheme, then $\procDRecvCoinsId$ securely computes a Mimewimble transaction spending an input coin $\varCoinShared$ shared between Alice and Bob in the hybrid $\procDSendCoinsId,\procDFinTxId$-model
+    Let $\varCommitScheme$ be a correct and secure Pedersen Commitment Scheme, $\varMPRProofSystem$ a correct and secure Two-Party Range Proof system, and $\varSigSchemeMP$ be a secure and correct Two-Party Signature Scheme, then $\procDRecvCoinsId$ securely computes a Mimewimble transaction spending an input coin $\varCoinShared$ shared between Alice and Bob in the hybrid $\procDSendCoinsId,\procDFinTxId$-model
 \end{theorem}
 
 \begin{proof}
@@ -703,7 +703,7 @@ On Alice side, we add the following verification at line 2 of the protocol: $\co
 
 \begin{theorem}
     \label{teo:atom:sec-dcontract-mw}
-    Let $\varCommitScheme$ be a correct and secure Pedersen Commitment Scheme, $\varMPRProofSystem$ be a correct and secure multiparty range proof system, and $\varSigSchemeMP$ be a secure and correct Two-Party Signature Scheme, then $\procDScriptMwTxId$ securely computes a Mimblewimble transaction transferring value from a shared input coin $\varCoinShared$ to Bob, while at the same time revealing a secret witness value $\varWit$ to Alice, for which she knows $\varStatement \opEqNoQ \funGen{\varWit}$.
+    Let $\varCommitScheme$ be a correct and secure Pedersen Commitment Scheme, $\varMPRProofSystem$ be a correct and secure Two-Party Range Proof System, and $\varSigSchemeMP$ be a secure and correct Two-Party Signature Scheme, then $\procDScriptMwTxId$ securely computes a Mimblewimble transaction transferring value from a shared input coin $\varCoinShared$ to Bob, while at the same time revealing a secret witness value $\varWit$ to Alice, for which she knows $\varStatement \opEqNoQ \funGen{\varWit}$.
 \end{theorem}
 
 \begin{proof}

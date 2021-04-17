@@ -126,7 +126,7 @@ In the following, we define the \emph{Extended Mimblewimble Transaction Scheme},
     \begin{gather*}
         \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varMPRProofSystem} \opAssign \\ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varMPRProofSystem} \opConc (\procDSendCoinsId,\procDRecvCoinsId, \procDFinTxId)
     \end{gather*}
-    Note that for this scheme, we require a multiparty range proof system $\varMPRProofSystem$ as defined in~\cref{def:pre:mp-rangeproof}.
+    Note that for this scheme, we require a Twp-Party Range Proof System $\varMPRProofSystem$ as defined in~\cref{def:pre:mp-rangeproof}.
     Specifically, we need the proof system to provide a distributed proof computation protocol $\procDRProofId$.
     \begin{itemize}
         \item $\langle (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice,\varNonceAlice)), (\varPreTx, \funStar{\varSpendableCoinCarol}, (\varSecKeyCarol,\varNonceCarol)) \rangle$ \\
