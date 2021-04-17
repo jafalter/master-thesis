@@ -53,7 +53,7 @@ First we demonstrate that $\procVerf{\varMsg}{\varSigFin}{\varSigContext.\varPub
 
 We have shown that the outlined Signature Scheme is correct.
 Next, we have to prove its security.
-Our goal is to prove security in the malicious setting (as defined in~\cref{subsec:pre:security}) that means the adversary might or might not behave as specified by the protocol.
+Our goal is to prove security in the malicious setting (as shown in~\cref{subsec:pre:security}) that means the adversary might or might not behave as specified by the protocol.
 For achieving this, we will prove security for both the $\procDSignId$ and $\procDAptSignId$ protocols in the hybrid model, which Yehuda Lindell laid out in~\cite{lindell2017simulate}.
 In particular, we will use the $\procZKfId{\cnstRelation}$-model in which we assume that we have access to a constant-round protocol $\procZKfId{\cnstRelation}$ that computes the zero-knowledge proof of knowledge functionality for any $\cnstNP$ relation $\cnstRelation$.
 The function is parameterized with a relation $\cnstRelation$ between a witness value $\varWit$ (or potentially multiple)  and a statement $\varStatement$.
@@ -77,7 +77,7 @@ That means if the prover first sends the pair $(\varWit_1, \varStatement_1)$ and
 
 \paragraph{Proof idea:} To construct our simulation proof in the hybrid model, we make some adjustments to the $\procDSignId$ protocol utilizing the capabilities of the $\procZKfId{\cnstRelation}$ functionality.
 The adjusted protocol can be seen in figure \cref{fig:sig:dsign-adj} with the newly added lines marked in blue.
-We note here that by making those adjustments to the original protocol, we now no longer prove the original's security but rather the adjusted one.
+We note here that by making those adjustments to the original protocol, we now no longer prove security of the original protocol but rather the adjusted one.
 This circumstance does not mean that the original protocol is insecure.
 Still, if one wants to implement a version of the protocol proven to be secure, it should include the calls added in the adjusted protocol.
 The same argument holds for all of the modified protocols from this section.
@@ -170,7 +170,7 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$, which were
 
     \begin{itemize}
         \item \textit{Phase 1} Since $\cnstAdversary$ is required to be deterministic, the distribution is identical to what one would expect in an actual execution.
-        \item \textit{Phase 2} As $\cnstSimulator$ managed to calculate Bobs $\varSigBob, \varPubKeyBob, \varRandBob$, as if they would be expected in a real execution, from the final $(\varSigFin, \varPubKey)$, we can conclude that the transcript of this phase must be computationally indistinguishable from a real transcript.
+        \item \textit{Phase 2} As $\cnstSimulator$ managed to calculate Bobs $\varSigBob, \varPubKeyBob, \varRandBob$, as if they would be expected in a real execution from the final $(\varSigFin, \varPubKey)$, we can conclude that the transcript of this phase must be computationally indistinguishable from a real transcript.
         \item \textit{Phase 3} The messages sent by the deterministic $\cnstAdversary$  have to be identically distributed to a real execution.
         Therefore the transcript produced by this phase again has to be indistinguishable.
         \item Regarding the protocol output, we note that if the adversary deviates from the protocol specification, the simulator will notice it, halt, and output whatever $\cnstAdversary$ outputs.
@@ -207,7 +207,7 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$, which were
         As $\cnstAdversary$ does not know $\varPubKeyAlice$ or $\varRandAlice$ yet, he has no way of determining for two public keys, $\varPubKeyAlice, \funStar{\varPubKeyAlice}$, which is the correct one (other than guessing).
         \item \textit{Phase 2: } When $\cnstAdversary$ calls $\procZKfId{\cnstRelation}$ with the proper parameters sent to him, he will still receive 1 back, or 0 otherwise, which is the same as would be expected in an actual execution.
         The hash function $\funHash{\cdot}$ is expected to output a random value for the Schnorr challenge as it is defined in the random oracle model.
-        In the simulated case, $\cnstSimulator$ calculates the output value from the final signature that depends Alice and Bob's input values. of which at least Alice input is chosen randomly by $\cnstSimulator$.
+        In the simulated case, $\cnstSimulator$ calculates the output value from the final signature that depends on Alice's and Bob's input values of which at least Alice input is chosen randomly by $\cnstSimulator$.
         As dependent on random tape, the calculation output will be distributed uniformly across the possible values and is therefore indistinguishable from a real hash function output.
         Furthermore, $\cnstAdversary$ can not recover the original input from the hash output.
         Imagine that he would be able to do so. He would then be able to guess the correct input from any hash output and thereby break the hash function's Pre-image Resistance property.
@@ -283,9 +283,8 @@ The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj}.
 \end{theorem}
 
 \begin{proof}
-    We proof the security of $\procDAptSignId$ by constructing a simulator $\cnstSimulator$ who is given the output $(\varSigFin, \varPubKey)$ (resp. ($\varWit, (\varSigFin, \varPubKey)$)) from a TTP that securely computes the protocol in the ideal world after receiving the inputs from Alice and Bob.
-    The simulator's task again is to extract the adversary's inputs and send them to the trusted third party to receive the protocol outputs.
-    Tthe simulator $\cnstSimulator$ will construct a transcript that is indistinguishable from the protocol transcript in the real world from this output.
+    We proof the security of $\procDAptSignId$ by constructing a simulator $\cnstSimulator$ which is given the output $(\varSigFin, \varPubKey)$ (resp. ($\varWit, (\varSigFin, \varPubKey)$)) from a TTP that securely computes the protocol in the ideal world after receiving the inputs from Alice and Bob.
+    The simulator's task again is to extract the adversary's inputs and send them to the trusted third party to receive the protocol outputs and construct a transcript that is indistinguishable from the protocol transcript in the real world from this output.
     The simulator uses the calls to $\procZKfId{\cnstRelation}$ to do this.
     As in the proof before, we assume the message $\varMsg$ is known to both participants.
     All other inputs (including public keys) are only known to the respective party at the start of the protocol.
@@ -374,10 +373,10 @@ The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj}.
         In case he sent invalid values $\cnstAdversary$ should not receive the final outputs $(\varSigFin, \varPubKey)$, which is modeled by sending $\cnstAbort$ to the TTP.
         The same behavior is expected in a real execution when Alice calls $\procZKfId{\cnstRelation}$ and receives a 0 bit.
         $\varSigAlice$ must be indistinguishable from a real execution because it was calculated by $\cnstSimulator$ exactly as of protocol definition.
-        \item \textit{Phase 4:} In this phase, $\cnstSimulator$ is expected to receive $\funStar{\varSigFin}$ from $\cnstAdversary$ after which $\cnstSimulator$ will output whatever $\cnstAdversary$, which must be indistinguishable from a real execution because of the deterministic adversary.
+        \item \textit{Phase 4:} In this phase, $\cnstSimulator$ is expected to receive $\funStar{\varSigFin}$ from $\cnstAdversary$ after which $\cnstSimulator$ will output whatever $\cnstAdversary$ outputs, which must be indistinguishable from a real execution because of the deterministic adversary.
         \item Again, in both the case that $\cnstAdversary$ deviates from protocol specification and follows it, $\cnstSimulator$ will output whatever $\cnstAdversary$ outputs, therefore being equal to the expected output from $\cnstAdversary$ in an actual execution.
     \end{itemize}
 
     We have shown that the transcript produced by $\cnstSimulator$ in an ideal world with access to a TTP computing $\procDAptSignId$ is indistinguishable from a transcript produced during a real execution both in the case that Alice and that Bob is corrupted.
-    By managing to show this, we have proven that the protocol is secure in $\procZKfId{\cnstRelation}$-model and theorem~\cref{lem:sig:daptsign} therefore holds.
+    By managing to show this, we have proven that the protocol is secure in $\procZKfId{\cnstRelation}$-model and~\cref{lem:sig:daptsign} therefore holds.
 \end{proof}
