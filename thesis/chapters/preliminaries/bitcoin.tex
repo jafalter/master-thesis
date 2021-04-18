@@ -19,7 +19,7 @@ This type of construction is referred to as a P2PK or P2PKH output, which we wil
 However, more complex conditions, such we shall see in~\cref{sec:pre:bitcoin:p2sh}, are possible.
 
 \begin{definition}[Unspent Transaction Output - UTXO] An unspent transaction output is a data structure consisting of a locking condition $\varScriptPubKey$, a value expressed in Bitcoin $\varValue$ and an unlocking script $\varScriptSig$ which is initially empty and has to be provided by the owner when spending the UTXO in a transaction.
-In this paper, we generally use $\varUTXO$ to refer to a singular UTXO and $\varUTXOSet$ to refer to a set of UTXOs.
+In this thesis, we generally use $\varUTXO$ to refer to a singular UTXO and $\varUTXOSet$ to refer to a set of UTXOs.
     \[ \varUTXO \opAssign \{ \varValue \opSeperate \varScriptPubKey \opSeperate \varScriptSig \} \]
 \end{definition}
 
@@ -34,12 +34,12 @@ However, as we shall see in~\cref{sec:pre:bitcoin:p2sh}, this is not necessarily
         \procedure[linenumbering]{$\procCreateUTXO{\varValue}{\varScriptPubKey}$} {
         \pcreturn \varUTXO \opAssign \{ \varValue \opAssign \varValue, \varScriptPubKey \opAssign \varScriptPubKey,
         \varScriptSig \opAssign \cnstEmptySet \}
-        } \\
+        } \par
         \procedure[linenumbering]{$\procSpendUTXO{\varUTXO}{\varScriptSig}$} {
         \{ \varValue, \varScriptPubKey \} \opFunResult \varUTXO \\
         \pcreturn \varUTXO \opAssign \{ \varValue \opAssign \varValue, \varScriptPubKey \opAssign \varScriptPubKey,
         \varScriptSig \opAssign \varScriptSig \}
-        } \\
+        } \par
         \procedure[linenumbering]{$\procVerfUTXO{\varUTXO}$} {
         \{ \varValue, \varScriptPubKey, \varScriptSig \} \opFunResult \varUTXO \\
         \pcreturn \procVerf{\varScriptPubKey}{\varScriptSig}{\varValue}
@@ -48,7 +48,7 @@ However, as we shall see in~\cref{sec:pre:bitcoin:p2sh}, this is not necessarily
     }
 \end{center}
 
-A complete transaction consists of one or many UTXOs as inputs and one or many UTXOs as output.
+A complete transaction consists of one or many UTXOs as inputs and one or many new UTXOs as output.
 For the transaction to be considered valid, the $\varScriptSig$ fields in the inputs need the be correctly filled, and the value in the newly created output UTXOs must not exceed the value stored in the spending UTXOs.
 An output value lower than the combined input value is allowed.
 Then the miner of the transaction gets to collect the difference as a fee.
@@ -73,7 +73,7 @@ A transaction is valid if the following conditions are fulfilled:
 
 \begin{itemize}
     \item The total value of inputs is greater than or equal to the total value of outputs.
-    \item For all $\varUTXO \opIn \varUTXO$ $\procVerfUTXO{\varUTXO} \opEqNoQ 1$ must hold.
+    \item For all $\varUTXO \opIn \varBtcInputs$ $\procVerfUTXO{\varUTXO} \opEqNoQ 1$ must hold.
     \item All input UTXOs have not been spent before.
     \item If a locktime $\varTime$ is given, the Bitcoin blockchain's current block needs to be higher or equal $\varTime$.
 \end{itemize}
@@ -103,7 +103,7 @@ In this type of output $\varScriptPubKey$ will be constructed such that its valu
 P2PKH is an update to this script in which the $\varScriptPubKey$ contains a hashed version of the public key $\varPubKey$ instead of the public key itself.
 To spend a P2PKH output, one has to provide the unhashed public key in addition to a valid signature.
 This type of output is the most commonly used output in the Bitcoin blockchain to transfer value from one participant to another.
-Delgado et al. found in their paper Analysis of the Bitcoin UTXO set from 2017 that more than 80\% of the UTXO set consisted of P2PKH transactions, whereas about 17\% were P2SH and 0.12\% P2PK outputs~\cite{delgado2018analysis}.
+Delgado et al. found in their paper Analysis of the Bitcoin UTXO set~\cite{delgado2018analysis} from 2017 that more than 80\% of the UTXO set consisted of P2PKH transactions, whereas about 17\% were P2SH and 0.12\% P2PK outputs.
 P2PKH outputs can be encoded into a Bitcoin address using base58 encoding.
 These addresses can be handed out to request a payment from somebody.
 

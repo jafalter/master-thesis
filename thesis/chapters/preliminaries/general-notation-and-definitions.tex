@@ -4,10 +4,11 @@ Let $\cnstGroup$ denote a cyclic group of prime order $\varPrime$ and $\cnstInte
 $\cnstIntegersPrimeWithoutZero{\varPrime}$ is $\cnstIntegersPrime{\varPrime} \opExcluding \funList{0}$.
 $\varG \opSeperate \varH$ are adjacent generators in $\cnstGroup$, where adjacent means the discrete logarithm of $\varH$ regarding $\varG$ is not known.
 Exponentiation stands for repeated application of the group operation.
-We define the group operation between two curve points as $\funGen{\varScA} \opAddPoint \funGen{\funGen{\varScB}} \opEq \funGen{\varScA \opAddScalar \varScB}$.
+We define the group operation between two curve points as $\funGen{\varScA} \opAddPoint \funGen{\varScB} \opEqNoQ \funGen{\varScA \opAddScalar \varScB}$.
+We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed between multiple parties) as $\styleProtocol{protocol(\cdot)}$
 
 \begin{definition}[Hard Relation]\label{def:pre:hard-relation}
-    Given a language $\varLanguage \opAssign \funList{\varBigA \opForWhich \exists\varSmallA \text{ s.t. } (\varBigA, \varSmallA) \opIn \cnstRelation}$ then the relation $\cnstRelation$ is
+    Given a language $\varLanguage \opAssign \funList{\varStatement \opForWhich \exists \varWit \text{ s.t. } (\varWit,\varStatement) \opIn \cnstRelation}$ then the relation $\cnstRelation$ is
     considered hard if the following three properties hold:~\cite{aumayr2020bitcoinchannels}
     \begin{enumerate}
         \item $(\varWit, \varStatement) \opFunResult \procGenR{\varSecParam}$ is a $\cnstPolyTime$ sampling algorithm which outputs a statement/witness of the form $(\varWit, \varStatement) \opIn \cnstRelation$.
@@ -17,8 +18,8 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
 \end{definition}
 
 \begin{definition}[Discrete Logarithm]\label{def:pre:discretelog}
-    We define the discrete logarithm in a group $\cnstGroup$ of a number $\varN$ as the number $\varM$ such that for the groups generator $\varG$ the following holds:
-    \[ \funGen{\varM} \opEqNoQ \varN \]
+    We define the discrete logarithm in a group $\cnstGroup$ of a point $\varH$ as the number $\varN$ such that for the groups generator $\varG$ the following holds:
+    \[ \funGen{\varM} \opEqNoQ \varH \]
     The discrete logarithm is a hard relation as defined in~\cref{def:pre:hard-relation}.
 \end{definition}
 
@@ -30,8 +31,7 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
         \item $\varKeyPair \opFunResult \procSetup{\varSecParam}$: The keygen function creates a keypair $\varKeyPair$, the public key $\varPubKey$ can be distributed to the verifier(s) and the secret key $\varSecKey$ has to be kept private. \\
         \item $\varSignature \opFunResult \procSign{\varMsg}{\varSecKey}$: The signing algoritm creates a signature under the message $\varMsg$, which can be verified with the respective public key $\varPubKey$.
         As an input it takes a message $\varMsg$ and the secret key $\varSecKey$ of the signer.
-        \item $\cnstTrueorFalse \opFunResult \procVerf{\varMsg}{\varSignature}{\varPubKey}$: The verification function allows a verifier knowing the signature $\varSignature$, message $\varMsg$ and the provers public key $\varPubKey$ to verify a signatures
-        validity. \\
+        \item $\cnstTrueorFalse \opFunResult \procVerf{\varMsg}{\varSignature}{\varPubKey}$: The verification function allows a verifier, knowing the signature $\varSignature$, message $\varMsg$, and the provers public key $\varPubKey$ to verify the validity of the signature.
     \end{itemize}
 
     A valid Signature Scheme has to fulfill two security properties:
@@ -39,7 +39,7 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
         \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold with overwhelming probability: $\procVerf{\varPubKey}{\procSign{\varSecKey}{\varMsg}}{\varMsg} \opEqNoQ 1$
         \item Unforgeability (\cnstEUFCMA): Informally the existential unforgeability under chosen message attacks holds if attacker $\cnstAdversary$ cannot forge a valid signature for a chosen message.
         More formally, for a polytime adversary $\cnstAdversary$, message $\varMsg$, and public key $\varPubKey$ the following must hold:
-        \[ \varSignature \opFunResult \cnstAdversary(\varMsg, \varPubKey), \varProbability(\procVerf{\varMsg}{\varSignature}{\varPubKey} \opEqNoQ 1) \opSmEq \funNegl{\cdot} \]
+        \[ \varSignature \opFunResult \cnstAdversary(\varMsg, \varPubKey), \; \varProbability(\procVerf{\varMsg}{\varSignature}{\varPubKey} \opEqNoQ 1) \opSmEq \funNegl{\cdot} \]
     \end{itemize}
 \end{definition}
 
@@ -48,7 +48,7 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
     A secure hashing function has to fulfill the following security properties:
     \begin{itemize}
         \item Collision-Resistance (CR): Collision-Resistance means that it is computationally infeasible to find two inputs $\varInput_1$ and $\varInput_2$ such that
-        $\funHash{\varInput_1} \opAssign \funHash{\varInput_2}$ with $\varInput_1 \opNotEq \varInput_2$.
+        $\funHash{\varInput_1} \opEqNoQ \funHash{\varInput_2}$ with $\varInput_1 \opNotEq \varInput_2$.
         \item Pre-image Resistance (Pre): In a hash function $\cnstHash$ that fulfills Pre-image Resistance it is infeasible to recover the original input $\varInput$ from its hash output $\funHash{\varInput}$.
         If this security property is achieved, the hash function is said to be non-invertible.
         \item 2nd Pre-image Resistance (Sec):  This property is similar to Collision-Resistance and is sometimes referred to as \textit{Weak Collision-Resistance}.
@@ -78,7 +78,7 @@ We define the group operation between two curve points as $\funGen{\varScA} \opA
     \end{itemize}
 \end{definition}
 
-\begin{definition}[Additive Homomorphic Commitment]\label{def:pre:homo-com}
+\begin{definition}[Additive Homomorphic Commitment Scheme]\label{def:pre:homo-com}
     A Commitment Scheme as defined in~\cref{def:pre:commitment} is said to be addtive homomorphic if the following holds~\cite{bunz2018bulletproofs}
     \[ \procCommit{\varInput_1}{\varNonce_1} \opAddPoint \procCommit{\varInput_2}{\varNonce_2} \opEqNoQ \procCommit{\varInput_1 \opAddScalar \varInput_2}{\varNonce_1 \opAddScalar \varNonce_2} \]
 \end{definition}
@@ -95,7 +95,7 @@ This can be achieved as follows:
     \end{gather*}
     An instantiation of the Pedersen Commitment Scheme must pick two adjacent generators $\varG$, $\varH$ for the setup to be secure in terms of hiding and binding.
     Formally adjacent means that there exists a hard relation between $\varG$ and $\varH$ in terms of the discrete logarithm~\cref{def:pre:discretelog}.
-That means no $\varX$ is known such that $\varH \opEqNoQ \funGen{x}$.
+So no $\varX$ is known such that $\varH \opEqNoQ \funGen{x}$.
     In practice, this is often achieved by hashing $\varG$ and using the hash output as $\varH$.
 
 \end{definition}
@@ -138,5 +138,5 @@ Then the real execution of the two-party protocol $\varProtocol$ between $\varPa
     \[
         \{ \cnstIdeal_{\cnstFunction, \cnstSimulator(\varZ), \varI}(\varX, \varZ) \opCompInd \cnstReal_{\cnstFunction, \cnstAdversary(\varZ), \varI}(\varX, \varZ) \}
     \]
-    where $\funAbs{\varX} \opEqNoQ \funAbs{\varY}$ and $\varZ \opEqNoQ \styleFunction{poly(\funAbs{x})}$~\cite{lindell2017simulate}.
+    where $\funAbs{\varX} \opEqNoQ \funAbs{\varY}$ and $\varZ \opEqNoQ \styleFunction{poly(\funAbs{x})}$ and $\opCompInd$ means computationally indistinguishable~\cite{lindell2017simulate}.
 \end{definition}
