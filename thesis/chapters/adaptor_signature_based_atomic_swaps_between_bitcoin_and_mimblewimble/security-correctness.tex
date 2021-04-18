@@ -4,13 +4,13 @@ We then show that all protocols described in~\cref{sec:atom:protocols} are secur
 
 \subsection{Correctness} \label{subsec:atom:correctness}
 
-We will argue \emph{Transaction Scheme Correctness} follows from Correctness of the Commitment Scheme $\varCommitScheme$, Two-Party Signature Scheme $\varSigScheme$ as well as the correctness of the range proof system $\varRProofSystem$ used in the transaction protocol.
+We will argue \emph{Transaction Scheme Correctness} follows from Correctness of the Commitment Scheme $\varCommitScheme$, Two-Party Signature Scheme $\varSigScheme$ as well as the correctness of the Range Proof System $\varRProofSystem$ used in the transaction protocol.
 If the transaction was constructed correctly (that is, by calling the procedures $\procSendCoinsId, \procRecvCoinsId, \procFinTxId$, the distributed variants $\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId$ or the adapted ones $\procAptRecvCoinsId, \procDAptFinTxId$ with valid inputs) it must follow that the final transaction has correct Commitments, range proofs, and a valid signature, and $\procVerfTxId$ will therefore return 1.
 We construct the following theorem:
 
 \begin{theorem}
     \label{lem:atom:correctness}
-    \emph{Transaction Scheme Correctness}, \emph{Extended Transaction Scheme Correctness} or \emph{Adapted Transaction Scheme Correctness} for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varRProofSystem}$, $\varextMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varRProofSystem}$ or $\varaptMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varRProofSystem}$ holds if the underlying Commitment Scheme $\varCommitScheme,$ Two-Party Signature Scheme $\varSigSchemeMP$ and range proof system $\varRProofSystem$ are correct.
+    \emph{Transaction Scheme Correctness}, \emph{Extended Transaction Scheme Correctness} or \emph{Adapted Transaction Scheme Correctness} for a transaction system $\varMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varRProofSystem}$, $\varextMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varRProofSystem}$ or $\varaptMWSchemeParams{\varCommitScheme}{\varSigScheme}{\varRProofSystem}$ holds if the underlying Commitment Scheme $\varCommitScheme,$ Two-Party Signature Scheme $\varSigSchemeMP$ and Range Proof System $\varRProofSystem$ are correct.
 \end{theorem}
 
 \begin{proof}
@@ -146,7 +146,7 @@ The same holds for all modified protocols throughout this section.
 
 \begin{theorem}
     \label{theo:atom:sec-tx}
-    Let $\varCommitScheme$ be a correct and secure Pedersen Commitment Scheme, $\varRProofSystem$ be a correct and secure range proof system, and $\varSigSchemeMP$ be a secure and correct Two-Party Signature Scheme.
+    Let $\varCommitScheme$ be a correct and secure Pedersen Commitment Scheme, $\varRProofSystem$ be a correct and secure Range Proof System, and $\varSigSchemeMP$ be a secure and correct Two-Party Signature Scheme.
     $\procDBuildMwTxId$ securely computes a Mimblewimble transaction transferring the value $\varFundValue$ from a sender (denoted as Alice) to a receiver (denoted as Bob) in the hybrid $\procZKfId{\cnstRelation_1}, \procZKfId{\cnstRelation_2}, \procZKfId{\cnstRelation_2*}$-model.
 \end{theorem}
 
@@ -345,7 +345,7 @@ As for $\cnstRelation_2$, we again allow calling the protocol with an array of i
 
 \begin{theorem}
     \label{teo:atom:sec-dspend}
-    Let $\varCommitScheme$ be a correct and secure Pedersen Commitment Scheme, $\varRProofSystem$ be a correct and secure range proof system and $\varSigSchemeMP$ be a secure and correct Two-Party Signature Scheme, then $\procDSendCoinsId$ securely computes a Mimblewimble pre-transaction $\funStarAlt{\varPreTx}$ spending a coin $\varCoinShared$ owned by the two parties in the hybrid $\procZKfId{\cnstRelation_1}$,$\procZKfId{\cnstRelation_2}$,$\procZKfId{\cnstRelation_3}$-model.
+    Let $\varCommitScheme$ be a correct and secure Pedersen Commitment Scheme, $\varRProofSystem$ be a correct and secure Range Proof System and $\varSigSchemeMP$ be a secure and correct Two-Party Signature Scheme, then $\procDSendCoinsId$ securely computes a Mimblewimble pre-transaction $\funStarAlt{\varPreTx}$ spending a coin $\varCoinShared$ owned by the two parties in the hybrid $\procZKfId{\cnstRelation_1}$,$\procZKfId{\cnstRelation_2}$,$\procZKfId{\cnstRelation_3}$-model.
 \end{theorem}
 
 \begin{proof}

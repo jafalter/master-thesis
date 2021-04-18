@@ -17,7 +17,7 @@ The definition below was constructed with the goal in mind of formalizing exactl
 
         \item $(\varSigAlice) \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}$: The partial signing algorithm is a DPT function that takes as input the message $\varMsg$, the share of the secret key $\varSecKeyAlice$ and nonce $\varNonceAlice$ (similar for Bob), and the shared signature context $\varSigContext$. The procedure outputs $(\varSigAlice)$, that is, a share of the signature to a participant.
 
-        \item $\cnstTrueorFalse \opFunResult \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice}$: The share verification algorithm is a DPT function that takes as input a signature share $\varSigAlice$, a message $m$, and the other participant's public key $\varPubKeyAlice$ (similar $\varPubKeyBob$ for Bob's partial signature).
+        \item $\cnstTrueorFalse \opFunResult \procVerfPtSig{\varSigAlice}{\varMsg}{\varPubKeyAlice}$: The share verification algorithm is a DPT function that takes as input a signature share $\varSigAlice$, a message $m$, and the other participant's public key $\varPubKeyAlice$ ($\varPubKeyBob$ for Bob's partial signature).
         The algorithm returns 1 if the verification was successful or 0 otherwise.
 
         \item $\varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob}$: The finalize signature algorithm is a DPT function that takes as input two shares of the signatures and combines them into a final signature valid under the composite public key $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.

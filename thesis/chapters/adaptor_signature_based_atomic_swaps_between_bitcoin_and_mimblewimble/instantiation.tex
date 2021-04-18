@@ -6,13 +6,13 @@ One can implement the instantiations in a Cryptocurrency based on the Mimblewimb
 \subsection{Mimblewimble Transaction Scheme}\label{subsec:atom:mw-tx-scheme}
 
 First, we provide an instantiation of the simplest form of a transaction in which a sender wants to transfer some value $\varFundValue$ to a receiver.
-For the protocol's execution we assume to have access to a homomorphic Commitment Scheme such as Pedersen Commitment $\varCommitScheme$, defined in~\cref{def:pre:pedersen}.
-Furthermore, we require a Range Proof System $\varRProofSystem$ as defined in~\cref{sec:pre:rangeproof} and a Two-Party Signature Scheme $\varSigSchemeMP$ as defined in~\cref{def:sig:two-party-sig}.
+For the protocol's execution we assume to have access to a homomorphic Commitment Scheme such as Pedersen Commitment $\varCommitScheme$, shown in~\cref{def:pre:pedersen}.
+Furthermore, we require a Range Proof System $\varRProofSystem$ as described in~\cref{def:pre:rangeproof} and a Two-Party Signature Scheme $\varSigSchemeMP$ as of~\cref{def:sig:two-party-sig}.
 
 To make the pseudocode for the transaction protocol easier to read, we first introduce two auxiliary functions $\procCreateCoinId$
 and $\procCreatePreTxId$.
 The coin creation function will take as input a value $\varValue$ and a blinding factor $\varBlindingFactor$. It will create and output a new spendable coin $\varSpendableCoin$ already containing a range proof $\varProof$ attesting to the statement that the coins value $\varValue$ is within the valid range as defined for the blockchain.
-The transaction creation algorithm $\procCreatePreTxId$ takes as input a message $\varMsg$, a list of input coins $\funArray{\varCoinInp}$, a list of output coins $\funArray{\varCoinOut}$, a list of range proofs $\funArray{\varProof}$, a signature context $\varSigContext$, a list of Commitments $\varCommitment$, a signature $\varSignature$, and a lock time $\varTime$ and will collect the input data into a transaction object.
+The transaction creation algorithm $\procCreatePreTxId$ takes as input a message $\varMsg$, a list of input coins $\funArray{\varCoinInp}$, a list of output coins $\funArray{\varCoinOut}$, a list of range proofs $\funArray{\varProof}$, a signature context $\varSigContext$, a list of Commitments $\funArray{\varCommitment}$, a signature $\varSignature$, and a lock time $\varTime$ and will collect the input data into a transaction object.
 
 \begin{center}
     \fbox{
@@ -206,7 +206,8 @@ Finally, they make the updated pre-transaction $\varPreTx$ which can be sent bac
             (\varSigBobCarol, \varPubKeyBobCarol) \opFunResult \procDSignL{\varMsg}{\varSecKeyBob}{\varNonceBob} \< \< \< \< (\varSigBobCarol, \varPubKeyBobCarol) \opFunResult \procDSignR{\varMsg}{\varSecKeyCarol}{\varNonceCarol} \\
             (\cdot, \cdot, \funStar{\varSigContext}) \opFunResult \varSigBobCarol \< \< \< \< (\cdot, \cdot, \funStar{\varSigContext}) \opFunResult \varSigBobCarol \\
             \funStarAlt{\varSigContext} \opFunResult \procSetupCtx{\varSigContext}{\funStar{\varSigContext}.\varPubKey}{\funStar{\varSigContext}.\varRand} \< \< \< \< \funStarAlt{\varSigContext} \opFunResult \procSetupCtx{\varSigContext}{\funStar{\varSigContext}.\varPubKey}{\funStar{\varSigContext}.\varRand} \\
-            \< \funStar{\varPreTx} \opFunResult \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \funStarAlt{\varCoinShared}}{\varProofs \opConc \varProofBobCarol}{\funStarAlt{\varSigContext}}{\varCommits \opConc \varPubKeyBobCarol}{\varSigBobCarol}{\varTime} \< \\
+            \funStar{\varPreTx} \opFunResult \< \< \< \< \funStar{\varPreTx} \opFunResult \\
+            \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \funStarAlt{\varCoinShared}}{\varProofs \opConc \varProofBobCarol}{\funStarAlt{\varSigContext}}{\varCommits \opConc \varPubKeyBobCarol}{\varSigBobCarol}{\varTime} \< \< \< \<  \procCreatePreTx{\varMsg}{\varInputs}{\varOutputs \opConc \funStarAlt{\varCoinShared}}{\varProofs \opConc \varProofBobCarol}{\funStarAlt{\varSigContext}}{\varCommits \opConc \varPubKeyBobCarol}{\varSigBobCarol}{\varTime} \\
             \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinBob}) \< \< \< \< \pcreturn (\funStar{\varPreTx}, \funStar{\varPtSpendableCoinCarol})
             }
             }
