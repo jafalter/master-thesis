@@ -4,8 +4,8 @@ We then show that all protocols described in~\cref{sec:atom:protocols} are secur
 
 \subsection{Correctness} \label{subsec:atom:correctness}
 
-We will argue \emph{Transaction Scheme Correctness} follows from Correctness of the Commitment Scheme $\varCommitScheme$, Two-Party Signature Scheme $\varSigScheme$ as well as the correctness of the Range Proof System $\varRProofSystem$ used in the transaction protocol.
-If the transaction was constructed correctly (that is, by calling the procedures $\procSendCoinsId, \procRecvCoinsId, \procFinTxId$, the distributed variants $\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId$ or the adapted ones $\procAptRecvCoinsId, \procDAptFinTxId$ with valid inputs) it must follow that the final transaction has correct Commitments, range proofs, and a valid signature, and $\procVerfTxId$ will therefore return 1.
+We will argue \emph{Transaction Scheme Correctness} follows from Correctness of the Commitment Scheme $\varCommitScheme$, Two-Party Signature Scheme $\varSigScheme$ and the Correctness of the Range Proof System $\varRProofSystem$ used in the transaction protocol.
+If the transaction was constructed correctly (that is, by calling the procedures $\procSendCoinsId, \procRecvCoinsId, \procFinTxId$, the distributed variants $\procDSendCoinsId, \procDRecvCoinsId, \procDFinTxId$ or the adapted ones $\procAptRecvCoinsId, \procDAptFinTxId$ with valid inputs) it must follow that the final transaction has correct commitments, range proofs, and a valid signature, and $\procVerfTxId$ will therefore return 1.
 We construct the following theorem:
 
 \begin{theorem}
@@ -33,7 +33,7 @@ We construct the following theorem:
     Given that our Range Proof System $\varRProofSystem$ system has to be correct $\procVerfProof{\varProof}{\varCoin} \opEqNoQ 1$ must hold for all coins created with the $\procCreateCoinId$ routine.
     Therefore Condition 3 must hold if the transaction is computed honestly.
 
-    we must look at how the secret keys $\varSecKeyAlice$, and $\varSecKeyBob$ are constructed, for condition 4.
+    For condition 4 we must look at how the secret keys $\varSecKeyAlice$, and $\varSecKeyBob$ are constructed.
     From the instantiation of $\procSendCoinsId$, we can see that Alice's share will be $\varSecKeyAlice \opAssign \funStar{\varBlindingFactorAlice} \opSub \cnstSumZeroToN \funArray{\varBlindingFactorAlice}$, where $\funStar{\varBlindingFactorAlice}$ is the blinding factor to her output and $\funArray{\varBlindingFactorAlice}$ are the blinding factors to her input coins.
     Bob's secret key is constructed like $\varSecKeyBob \opAssign \funStar{\varBlindingFactorBob}$, so it corresponds to his output's blinding factor.
     From the construction of the Two-Party Signature Scheme in~\cref{def:sig:two-party-sig}, we know that, therefore, the final signature will be valid under the following public key:
@@ -77,7 +77,7 @@ We construct the following theorem:
     $\varSecKeyAlice$ and $\varSecKeyCarol$ are then inputs to $\procDFinTxId$ in which a partial signature $\varSigAliceCarol$ is calculated by both Alice and Carol signing with their secret key.
     Recall the case we have proven above, in which we have a single secret key $\varSecKeyAlice$:
     We can split $\varSecKeyAlice$ into arbitrarily chosen shares $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ with $\varSecKeyAlice \opEqNoQ (\varSecKeyAlice)_1 + (\varSecKeyAlice)_2$.
-    By the definition of Two-Party Signatures~\cref{def:sig:two-party-sig}, the combined signature from $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ will be valid under $\funGen{\varSecKeyAlice}$.
+    By the definition of the Two-Party Signature Scheme~\cref{def:sig:two-party-sig}, the combined signature from $(\varSecKeyAlice)_1, (\varSecKeyAlice)_2$ will be valid under $\funGen{\varSecKeyAlice}$.
     Thereby we can treat $\varSecKeyAlice$ and $\varSecKeyCarol$ from $\procSendCoinsId$ as arbitrary shares of a combined $\varSecKeyAliceCarol$.
     It follows from the additive homomorphic property of the elliptic curve that a signature valid under $\funGen{\varSecKeyAliceCarol}$ must also be valid under $\funGen{\varSecKeyAlice} \opAddPoint \funGen{\varSecKeyCarol}$.
     The case of two receivers calling $\procDRecvCoinsId$ is symmetric.
@@ -170,7 +170,7 @@ The same holds for all modified protocols throughout this section.
         He also compares $\varTx.\varSigContext.\varPubKey \opEqNoQ \funGen{\varSecKeyAlice}$, $\varTx.\varSigContext.\varRand \opEqNoQ \funGen{\varNonceAlice}$, $\varTx.\varProof[0] \opEqNoQ \funStar{\varSpendableCoinAlice}.\varProof$ and $\varTx.\varCommits[0] \opEqNoQ \funGen{\varSecKeyAlice}$.
         If any of the equalities are invalid $\cnstSimulator$ sends $\cnstAbort$ to the TTP computing $\procDBuildMwTxId$ and returns whatever $\cnstAdversary$ returns.
         Otherwise, he extracts $\varTime \opEqNoQ \varTx.\varTime$ and sends the inputs $(\funArray{\varSpendableCoin}, \varFundValue, \varTime)$ to the TTP and receives back the outputs $(\varTx, \funStar{\varSpendableCoinAlice})$.
-        \item The simulators task is now to construct $\funStarAlt{\varPreTx}$, which he can achieve in the following steps:
+        \item The simulator's task is now to construct $\funStarAlt{\varPreTx}$, which he can achieve in the following steps:
         \begin{enumerate}
             \item He takes the signature context $\varSigContext$ and final signature $\varSigFin$ from the final transaction $\varSigContext \opEqNoQ \varTx.\varSigContext$ and $\varSigFin \opEqNoQ \varTx.\varSignature$.
             \item He computes the adversaries partial signature as $\varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}$
