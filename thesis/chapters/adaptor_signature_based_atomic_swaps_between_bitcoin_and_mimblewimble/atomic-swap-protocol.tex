@@ -1,4 +1,4 @@
-With the outlined Adapted Mimblewimble Transaction Scheme from~\cref{def:atom:apt-ext-mw-tx-scheme} and protocols from~\cref{sec:atom:protocols}, we can now construct an Atomic Swap protocol with another Cryptocurrency.
+With the outlined Contract Mimblewimble Transaction Scheme from~\cref{def:atom:apt-ext-mw-tx-scheme} and protocols from~\cref{sec:atom:protocols}, we can now construct an Atomic Swap protocol with another Cryptocurrency.
 This thesis will explain a swap with Bitcoin, as at present, Bitcoin is the most widely adopted Cryptocurrency.
 To abstract away from the details of different Bitcoin implementations, we define here the minimal DPT functions that we require for our Atomic Swap.
 These functionalities are inherent to the Bitcoin functionality and thus supported in all implementations.
@@ -31,7 +31,7 @@ As both of the currently most prominent implementations of the Mimblewimble prot
 For a Mimblewimble based implementation that operates on a different curve, additional considerations would have to be made to guarantee the protocol's security.
 In the setup phase~\cref{subsec:atom:setup}, the two parties agree on the swap parameters: the exchange rates, the amount being swapped and the timeout for the refunding.
 In the locking phase~\cref{subsec:atom:locking}, the goal is to lock up the funds on both chains, such that they can either be redeemable by the other party in case the swap was successful or be refunded to the original owners in case the trade has failed.
-The precondition for running the locking phase is that the parties have first completed the setup phase.
+The precondition for running the locking phase is that the parties have completed the setup phase.
 In the execution phase~\cref{subsec:atom:exec}, the two parties cooperate to redeem the funds locked by the other parties.
 The peers can only enter this phase after completing the locking step.
 When the funds are redeemed on both sides, the swap is considered successfully completed.
@@ -78,7 +78,7 @@ From Bob, we require a list of UTXO's $\funArray{\varUTXO}$ he wants to spend.
 He also needs to provide their spending keys $\funArray{\varSecKey_{btc}}$ and their sum of total value $\varValueBtc$, although one could also read this from the blockchain.
 
 The protocol starts with both parties creating and exchanging keys.
-Bob now makes two new Bitcoin outputs $\varUTXO_{lock}$ and $\varUTXO_{B}$, one of these is the locked Bitcoins that Alice might retrieve later (or Bob after time $\varTimeBTC$ has passed), and the other Bobs change output. (Difference between what is stored in the input UTXO and what should be sent to Alice).
+Bob now makes two new Bitcoin outputs $\varUTXO_{lock}$ and $\varUTXO_{B}$, one of these is the locked Bitcoins that Alice might retrieve later (or Bob after time $\varTimeBTC$ has passed), and the other Bob's change output. (Difference between what is stored in the input UTXO and what should be sent to Alice).
 After Bob has published the transaction sending value to the new outputs, he will provide Alice with the statement $\varStatement$ under which the Bitcoins are locked together with Alice's public key.
 Alice can now verify that the funds on the Bitcoin side are indeed correctly locked.
 After that, she will collaborate with Bob to spend her Mimblewimble coins into an output shared by both parties.
@@ -142,7 +142,7 @@ Both parties need to provide their part of the locked Mimblewimble coins as inpu
 Additionally, Alice needs to provide her secret key for the Bitcoin side $\varSecKeyAlice$ and Bob the private witness value $\varWit$.
 The protocol starts with both parties checking that there is enough time left to complete the protocol.
 After the check, they will run the $\procDScriptMwTxId$ protocol in which they spend the locked Mimblewimble output to Bob while at the same time revealing $\varWit$ to Alice.
-One of the parties can now publish the transaction to the Mimblewimble network, concluding the swap on the Mimblewimble side, as Bob is now in complete control of the funds.
+Alice can now publish the transaction to the Mimblewimble network, concluding the swap on the Mimblewimble side, as Bob is now in complete control of the funds.
 Knowing $\varWit$, Alice now creates a new UTXO where she then sends the funds from the Bitcoin lock.
 After publishing this transaction to the Bitcoin network, Alice is in full possession of the Bitcoin side's swapped funds, and the Atomic Swap is completed.
 The protocol outputs their newly created output/coin to each party.

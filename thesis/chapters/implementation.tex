@@ -7,7 +7,7 @@
 
 We have developed a prototype implementation\footnote{\urlgithub} of the Atomic Swap protocol outlined in~\cref{sec:atom:atomic-swap} in the Rust programming language between Bitcoin and the Grin Cryptocurrency.
 On the Grin side, we have been using the official grin-wallet\footnote{\urlgrinwallet} library, on the Bitcoin side, the rust-bitcoin\footnote{\urlrustbitcoin} library for transaction creation, signing, etc.
-We chose the programming language Rust because the official libraries available for the Grin Cryptocurrency are also written in Rust.
+We choose the programming language Rust because the official libraries available for the Grin Cryptocurrency are also written in Rust.
 We discovered two shortcomings in the grin-wallet library during development, so we used our local forked version of this library to address those shortcomings.
 We then submitted both changes to the library as pull requests.\footnote{\urlprone}\footnote{\urlprtwo}
 Our implementation sends JSON-RPC\footnote{\urljsonrpc} requests to a locally running Bitcoin Core and Grin Core node to query blockchain state, submit, and verify transactions.
@@ -49,8 +49,7 @@ To make it evaluate to true, one would have to push any number other than 0 to t
 To make it evaluate to false, one would have to push the number 0 to the stack.
 If \textit{OP\_IF} evaluates to true, we execute the refunding code.
 \textit{OP\_CHECKLOCKTIMEVERIFY} will cause the script to fail unless the nLockTime on the transaction is equal or greater than the value passed in \textit{<refund\_time>}.
-This condition makes sure that this part of the script will only be executable after a specific time, such that refunding is not possible prematurely.
-(Note here that one has to set the nLockTime of the transaction, which guarantees that it can only be mined after a particular time)
+This condition makes sure that this part of the script will only be executable after a specific time, such that refunding is not possible prematurely (Note here that one has to set the nLockTime of the transaction, which guarantees that it can only be mined after a particular time).
 If the $\text{OP\_IF}$ evaluates to false, we execute the script's redemption path in which Alice needs to provide a valid signature under her public key and the statement $\varStatement$.
 
 \begin{figure}
@@ -91,8 +90,9 @@ In transaction \\10536404873e6ae133afde600b5630d6a00f3be0b9dde01a248c6f13a00b3a4
 On the Grin side our lock transaction locking 0.1 GRN was mined in block 718594\footnote{\url{https://floonet.grinscan.net/block/718594}} sending funds to the lock Commitment \\08c2e1a98f5fd328cc67b7df5ab9fdee9cf0c1c1f166d5d08a02a578945fdf6076\footnote{\url{https://tinyurl.com/y7ed5za5}}.
 In the execution phase the locked funds on the Grin side were sent to Bob \\(09ef66334dc2e4c74732dafda8af3c32494eed5b23beb483d29d7ef32bf5c3ebb8\footnote{\url{https://tinyurl.com/ychtyf8v}}) in a contract transaction mined in block 718596\footnote{\url{https://floonet.grinscan.net/block/718596}}.
 Executing the contract allowed Alice to unlock her funds on the Bitcoin side in the transaction \\ aa2ab77482841571b6413c68de681830c61527bc6a90ef1781d6208d151fea10\footnote{\url{https://tinyurl.com/45ysh9e4}}, which was mined in block 1937150\footnote{\url{https://tinyurl.com/fddeahk8}} on the Bitcoin testnet.
-We can reduce the protocol's execution time to the time it takes for the individual transactions to be mined on the networks and depends on the current network load and the miner's fee included with the transaction, as transactions are prioritized according to their fees~\cite{kasahara2016effect}.
-Therefore it is unavoidable to estimate fees according to the current network load and the Atomic Swap timeout in a practical setting.
+We can reduce the protocol's execution time to the time it takes for the individual transactions to be mined on the networks.
+Therefore depends on the current network load and the miner's fee included with the transaction, as transactions are prioritized according to their fees~\cite{kasahara2016effect}.
+It is unavoidable to estimate fees according to the current network load and the Atomic Swap timeout in a practical setting.
 Otherwise, a redeeming transaction may stay unconfirmed until the timeout expires.
 Then the second party could try to refund the locked funds with a higher fee, outspending the redeeming transaction.
 Another time-consuming process of our implementation is the validation of locked funds on the Bitcoin side.
