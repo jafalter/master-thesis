@@ -50,7 +50,7 @@ We define a Range Proof System as follows:
     A Range Proof System $\varRProofSystemParam{\varCommitScheme}$ regarding a homomorphic Commitment Scheme $\varCommitScheme$ consists of a tuple of functions $(\procRProofSetupId, \procProofId, \procVerfProofId)$.
     \begin{itemize}
         \item $\varRProofParams \opFunResult \procRProofSetup{\varSecParam}{\varI}{\varJ}$: The range proof setup algorithm takes as input a security parameter $\varSecParam$ and two numbers $\varI$ and $\varJ$ which are treated as exponents of 2 to define the lower and upper bound of the range proof protocol.
-        \item $\varProof \opFunResult \procProof{\varCommitment}{\varValue}{\varBlindingFactor}$: The proof algorithm is a DPT function that takes as input a Commitment $\varCommitment$, a value $\varValue$ and a blinding factor $\varBlindingFactor$.
+        \item $\varProof \opFunResult \procProof{\varCommitment}{\varValue}{\varBlindingFactor}$: The proof algorithm is a PPT function that takes as input a Commitment $\varCommitment$, a value $\varValue$ and a blinding factor $\varBlindingFactor$.
         It will output a proof $\varProof$ attesting that the value $\varValue$ of Commitment $\varCommitment$ is in between the range $\langle \varLowerBound, \varUpperBound \rangle$ as defined during the $\procRProofSetupId$ function.
         \item $\{1,0\} \opFunResult \procVerfProof{\varProof}{\varCommitment}$: The proof verification algorithm is a DPT function that verifies the validity of the proof $\varProof$ concerning the Commitment $\varCommitment$.
         It will output 1 upon a successful verification or 0 otherwise.
