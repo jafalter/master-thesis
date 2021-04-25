@@ -79,13 +79,12 @@ A transaction is valid if the following conditions are fulfilled:
 \end{itemize}
 
 \begin{definition}[Bitcoin Transaction Scheme]
-    We define a Bitcoin Transaction Scheme as a tuple of three DPT functions $(\procBuildTransactionId,
-    \procSignTransactionId, \procVerfTransactionId)$.
+    We define a Bitcoin Transaction Scheme as a tuple of two DPT functions $(\procBuildTransactionId, \procVerfTransactionId)$ and the PPT function $\procSignTransactionId$.
     \begin{itemize}
         \item $\varBtcTx \opFunResult \procBuildTransaction{\varBtcInputs}{\varBtcOutpus}{\varVersion}{\varTime}$: The transaction building algorithm is a DPT function that takes as input a set of unspent transaction outputs $\varBtcInputs$, a collection of newly created transaction outputs $\varBtcOutpus$ a version number $\varVersion$ and an optional locking time $\varTime$.
         The algorithm will output an unsigned transaction $\varBtcTx$.
         \item $\funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\funArray{\varScriptSig}}$: The transaction
-        signing algorithm is a DPT function that takes as input an unsigned Bitcoin transaction $\varBtcTx$ and an array
+        signing algorithm is a PPT function that takes as input an unsigned Bitcoin transaction $\varBtcTx$ and an array
         of unlocking scripts $\funArray{\varScriptSig}$ for all transaction inputs.
         The algorithm outputs a signed Bitcoin transaction, which the sender can now broadcast to the network.
         \item $\{ 1,0 \} \opFunResult \procVerfTransaction{\varBtcTx}$: The verification algorithm is a DPT function taking as input a transaction $\varBtcTx$ outputting 1 on a successful verification or 0 otherwise.
