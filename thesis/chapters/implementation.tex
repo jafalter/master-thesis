@@ -52,6 +52,8 @@ If \textit{OP\_IF} evaluates to true, we execute the refunding code.
 This condition makes sure that this part of the script will only be executable after a specific time, such that refunding is not possible prematurely (Note here that one has to set the nLockTime of the transaction, which guarantees that it can only be mined after a particular time).
 If the $\text{OP\_IF}$ evaluates to false, we execute the script's redemption path in which Alice needs to provide a valid signature under her public key and the statement $\varStatement$.
 
+\todo[inline]{What is exactly the statement? I have not seen it before.}
+
 \begin{figure}
     \begin{center}
         \fbox{
@@ -98,6 +100,9 @@ Then the second party could try to refund the locked funds with a higher fee, ou
 Another time-consuming process of our implementation is the validation of locked funds on the Bitcoin side.
 The reason for that is that for importing a new address into a Bitcoin Core node, one has to rescan the blockchain, which can take up to an hour.
 To reduce this time, it is possible to import the address without performing a rescan.
-However, if the funding transaction was mined in a block before the import command was executed, the transaction would be missed, and the address would therefore appear empty.
-A faster solution would be, for instance, to use the API of a block explorer such as\footnote{\url{https://blockstream.info/}}.
+However, if the funding transaction was mined in a block before the import command was executed, the transaction would be missed, and the address would therefore appear empty.\todo{I will emphasize that this is sth about how Bitcoin wallet handles the addresses, nothing to do with your protocol/design.}
+A faster solution would be, for instance, to use the API of a block explorer such as \todo{such as?? :P I would write the name apart from the footnote itself :)}\footnote{\url{https://blockstream.info/}}.
 However, this would introduce a trusted third party to the protocol, which is generally to be avoided.
+
+
+\todo[inline]{I think this section is well written. But it is a pity that it does not show all the work that you had to do to make the overall implementation work. Perhaps you want to go in a bit more detail about what was implemented in the libraries itself and what you had to implement yourself. For the latter point, maybe you can explain also what challenges you had and how you overcame them. Additionally, you might want to say that the implementation is open source, that you engaged with the community, etc...}
