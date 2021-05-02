@@ -3,8 +3,10 @@
 This section will outline the fundamental properties of the protocols employed in Mimblewimble, which are relevant for the thesis and particularly the Atomic Swap protocol constructed in~\cref{ch:atomicswap}.
 The Mimblewimble protocol is an outline for a Privacy-enhancing Cryptocurrency that achieves Confidential Transactions as of~\cref{def:pre:privacy:conf-tx}.
 If the protocol also achieves Transaction Unlinkability~\cref{def:pre:privacy:tx-unlink}, is not fully clear.
-One can argue that Transaction merging~\cref{sec:pre:mimblewimble:merge} together with Cut-through~\cref{par:pre:mimblewimble:cut} should make transactions unlinkable.
+One can argue that Transaction merging~(see \cref{sec:pre:mimblewimble:merge})\todo{putting the section without any parenthesis or context breaks the reading flow. What about adding (see section x.y)?} together with Cut-through~\cref{par:pre:mimblewimble:cut} should make transactions unlinkable.
 However, one author managed to link a large amount of Mimblewimble transactions in a practical setting using well-connected network nodes that attempt to sniff original transactions before they are merged\footnote{\urlmwbreak}.
+
+\todo[inline]{Then what? why are you using Mimblewimble? Should we just not care about this as it is not privacy-preserving? (I am just asking this because could be one of the questions of the reviewer :P )}
 
 \subsubsection{Transaction Structure} \label{subsec:pre:mimblwimble-tx}
 
@@ -59,9 +61,11 @@ We can easily deduce that if $\varTx_0$ and $\varTx_1$ are valid, it must follow
 If $\varTx_0$ and $\varTx_1$ are valid as of~\cref{def:pre:tx-mw-validity}, that means $\varCoinInp^0 \opSub \varCoinOut^0 \opSub \funGenH{\varSupply_0} \opEqNoQ \varExcess_0 \opSeperate \funList{\varProof_0}$ contains valid range proofs for the outputs $\varCoinOut^0$ and $\funList{\varSignature_0}$ contains a valid signature to $\varExcess_0 \opSub \funGenH{\varSupply_0}$ as the public key.
 The same must hold for $\varTx_1$.
 
-By the rules of arithmetic, it then must also hold that
+By the rules of arithmetic,\todo{hehe it sounds really fun "by the rules of arithmetic". Perhaps, write: ``then it follows that...''} it then must also hold that
 \[ \varCoinInp^0 \opConc \varCoinInp^1 \opSub \varCoinOut^0 \opConc \varCoinOut^1 \opSub \funGenH{\varSupply_0 \opAddScalar \varSupply_1} \opEqNoQ \varExcess_0 \opAddPoint \varExcess_1  \]
 $\funList{\varProof_0} \opConc \funList{\varProof_1}$ must contain valid range proofs for the output coins and $\funList{\varSignature_0} \opConc \funList{\varSignature_1}$ must contain valid signatures to the respective excess points, which makes $\varTx_m$ a valid transaction.
+
+\todo[inline]{What does the symbol $\opSeperate$ means? You have not defined it before}
 
 \paragraph{Subset Problem} \label{par:pre:mimblewimble:subset}
 A subtle problem arises with the way transactions are merged in Mimblewimble.
@@ -74,7 +78,7 @@ Since the attacker has access to both $\varExcess_0$ and $\varExcess_1$ as well 
 Thereby the attacker was able to reconstruct one of the original transactions from which $\varTx_m$ was constructed.
 Following this method, he might be able to uncover all original transactions from the merged one.
 
-This problem has been mitigated in Cryptocurrencies implementing the protocol by including an additional variable $\varOffset$ in the Kernel, called offset value.
+This problem has been mitigated in Cryptocurrencies implementing the protocol\todo{what protocol?} by including an additional variable $\varOffset$ in the Kernel, called offset value.
 Briefly recall the construction of the excess value $\varExcess$:
 \[ \varExcess \opAssign \funGen{\varExcessExp} \]
 In order to solve the problem we redefine $\varExcess$ as:
@@ -130,7 +134,10 @@ Jedusor Tom Elvis originally envisioned the following two-step process to build 
     }
     \caption{Original transaction building process\label{fig:txOriginal}}
 \end{figure}
+\todo[inline]{In this figure, what is $x$ and where does it come from?}
 
+
+\todo[inline]{The attack that you show below is known before? (if so, please put reference). Or did you come up with it? If so, then write that explicity in the text (maybe even make this a (sub)section on its own to highlight that.  }
 This protocol, however, turned out to be insecure as it is vulnerable to the following attack:
 The receiver could spend Alice's change coins $\varCoinOut^A$ by reverting the transaction.
 Doing this would give the sender his coins back, however as the sender might not have the keys for his spent outputs anymore, the coins could then be lost.

@@ -5,11 +5,12 @@ $\cnstIntegersPrimeWithoutZero{\varPrime}$ is $\cnstIntegersPrime{\varPrime} \op
 $\varG \opSeperate \varH$ are adjacent generators in $\cnstGroup$, where adjacent means the discrete logarithm of $\varH$ regarding $\varG$ is not known.
 Exponentiation stands for repeated application of the group operation.
 We define the group operation between two curve points as $\funGen{\varScA} \opAddPoint \funGen{\varScB} \opEqNoQ \funGen{\varScA \opAddScalar \varScB}$.
-We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed between multiple parties) as $\styleProtocol{protocol(\cdot)}$
+We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed between multiple parties) as $\styleProtocol{protocol(\cdot)}$ \todo[inline]{Visually, the notation for function and protocol are not easy to distinguish. Is it easy to change to make it more different?}
 
-\begin{definition}[Hard Relation]\label{def:pre:hard-relation}
+\todo[inline]{When you want to put a reference to where you get a definition from, I would just put it at the side of the name of the definition }
+\begin{definition}[Hard Relation~\cite{aumayr2020bitcoinchannels}]\label{def:pre:hard-relation}
     Given a language $\varLanguage \opAssign \funList{\varStatement \opForWhich \exists \varWit \text{ s.t. } (\varWit,\varStatement) \opIn \cnstRelation}$ then the relation $\cnstRelation$ is
-    considered hard if the following three properties hold:~\cite{aumayr2020bitcoinchannels}
+    considered hard if the following three properties hold:
     \begin{enumerate}
         \item $(\varWit, \varStatement) \opFunResult \procGenR{\varSecParam}$ is a $\cnstPolyTime$ sampling algorithm which outputs a statement/witness of the form $(\varWit, \varStatement) \opIn \cnstRelation$.
         \item Relation $\cnstRelation$ is poly-time decidable.
@@ -18,10 +19,12 @@ We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed
 \end{definition}
 
 \begin{definition}[Discrete Logarithm]\label{def:pre:discretelog}
-    We define the discrete logarithm in a group $\cnstGroup$ of a point $\varH$ as the number $\varN$ such that for the groups generator $\varG$ the following holds:
-    \[ \funGen{\varM} \opEqNoQ \varH \]
+    We define the discrete logarithm in a group $\cnstGroup$ of a point $\varH$ as the \removepms{number}\newpms{integer} $\varN$ such that for the groups generator $\varG$ the following holds:
+    \[ \funGen{\varM} \opEqNoQ \varH \] \todo{should be $\VarN$ instead of $\VarM$?}
     The discrete logarithm is a hard relation as defined in~\cref{def:pre:hard-relation}.
 \end{definition}
+
+\todo[inline]{The discrete logarithm is not a hard relation. The hard relation is given by the discrete logarithm assumption (also called discrete logarithm problem). That is, an adversary $A$ given the tuple $(g, h)$ such that $h = g^n$ can compute $n$ only with negligible probability.}
 
 \begin{definition}[Signature Scheme]\label{def:pre:signature-scheme}
     A Signature Scheme $\varSigScheme$ is a tuple of algorithms $(\procSetupId \opSeperate \procSignId \opSeperate \procVerfId)$ defined as follows:~\cite{goldwasser1988digital}
@@ -42,6 +45,8 @@ We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed
         \[ \varSignature \opFunResult \cnstAdversary(\varMsg, \varPubKey), \; \varProbability(\procVerf{\varMsg}{\varSignature}{\varPubKey} \opEqNoQ 1) \opSmEq \funNegl{\cdot} \]
     \end{itemize}
 \end{definition}
+
+\todo[inline]{This definition is not complete. The adversary has access to signing oracle as well.}
 
 \begin{definition}[Cryptographic Hash Function]\label{def:pre:hash-function}
     A cryptographic hash function $\cnstHash$ is defined as $\funHash{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$ ~\cite{al2011cryptographic}.
@@ -67,6 +72,8 @@ We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed
         generates an output $\varCommitment \opIn \varCommitSpace_{\varPublicParam}$.
     \end{itemize}
 
+	\todo[inline]{I find confusing that you are using $n$ in $1^n$ as well as input for commit. }
+
     Secure Commitments must fulfill the \emph{Binding} and \emph{Hiding} security properties:
     \begin{itemize}
         \item \textit{Binding:} If a Commitment Scheme is binding it must hold that for all $\cnstPolyTime$ adversaries $\cnstAdversary$ given a valid input $\varInput \opIn \varInputSpace_{\varPublicParam}$
@@ -74,7 +81,7 @@ We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed
         $\procCommit{\varInput}{\varNonce} \opEqNoQ \procCommit{\funStar{\varInput}}{\funStar{\varNonce}}$ is negligible.
         \item \textit{Hiding:} For a $\cnstPolyTime$ adversary $\cnstAdversary$, Commitment inputs $\varInput_0, \varInput_1 \opIn \varInputSpace_{\varPublicParam}$ randomness $\varNonce \opIn
        \varRandSpace_{\varPublicParam}$ and a Commitment output $\varCommitment \opAssign \procCommit{\varInput_{\varB}, \varNonce}$ the probabilty of the adversary choosing the correct $\varB$ out of $\{0,1\}$
-        must not be higher then $\frac{1}{2} + \funNegl{\varProbability}$.
+        must not be higher then $\frac{1}{2} + \funNegl{\varProbability}$. \todo{What is $\varProbability$ here?}
     \end{itemize}
 \end{definition}
 
@@ -83,22 +90,28 @@ We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed
     \[ \procCommit{\varInput_1}{\varNonce_1} \opAddPoint \procCommit{\varInput_2}{\varNonce_2} \opEqNoQ \procCommit{\varInput_1 \opAddScalar \varInput_2}{\varNonce_1 \opAddScalar \varNonce_2} \]
 \end{definition}
 
+
+
 \begin{definition}[Pedersen Commitment Scheme]\label{def:pre:pedersen}
     A \emph{Pedersen Commitment Scheme} is an instance of a Commitment Scheme as defined in~\cref{def:pre:commitment} that has the additive homomorphic property as defined in~\cref{def:pre:homo-com}.
 
 This can be achieved as follows:
     $\varCommitSpace_{\varPublicParam} \opAssign \cnstGroup$ of order $\varPrime \opSeperate \varInputSpace_{\varPublicParam} \opSeperate \varRandSpace_{\varPublicParam} \opAssign \cnstIntegersPrime{\varPrime}$.
-    the procedures $(\procSetupComId, \procCommitId)$ are then instantiated as:
+    The procedures $(\procSetupComId, \procCommitId)$ are then instantiated as:
     \begin{gather*}
-        \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \opAssign \varG, \varH \opFunResult (\varG, \varH)\\
+        \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \opAssign \varG, \varH \opFunResult (\varG, \varH)\\ \todo{what is $(\varG, \varH)$?}
         \varCommitment \opFunResult \procCommit{\varInput}{\varNonce} \opAssign \funGen{\varNonce} \funGenH{\varInput}\\
     \end{gather*}
     An instantiation of the Pedersen Commitment Scheme must pick two adjacent generators $\varG$, $\varH$ for the setup to be secure in terms of hiding and binding.
     Formally adjacent means that there exists a hard relation between $\varG$ and $\varH$ in terms of the discrete logarithm~\cref{def:pre:discretelog}.
 So no $\varX$ is known such that $\varH \opEqNoQ \funGen{x}$.
-    In practice, this is often achieved by hashing $\varG$ and using the hash output as $\varH$.
+    In practice, this is often achieved by hashing $\varG$ and using the hash output as $\varH$. \todo{Mention that this is a special hash function that outputs a group element at random instead of a random value. }
 
 \end{definition}
+
+
+
+\todo[inline]{Here you are switching the topic a little, going from primitives to your security analysis technique. I would introduce this change in text or even create another subsection}
 
 To prove our protocols' security, we define the notion of security in the presence of malicious adversaries, which may deviate from the protocol arbitrarily.
 To construct the definition, we must first explain two terms: $\cnstIdeal$, the execution in the ideal model and $\cnstReal$, and the real model's execution.
