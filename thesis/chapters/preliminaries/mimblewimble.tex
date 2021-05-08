@@ -1,7 +1,7 @@
 \urldef\urlmwbreak\url{https://github.com/bogatyy/grin-linkability}
 
 This section will outline the fundamental properties of the protocols employed in Mimblewimble, which are relevant for the thesis and particularly the Atomic Swap protocol constructed in~\cref{ch:atomicswap}.
-The Mimblewimble protocol is an outline for a Privacy-enhancing Cryptocurrency that achieves Confidential Transactions as of~\cref{def:pre:privacy:conf-tx}.
+The Mimblewimble protocol is an outline for a privacy-enhancing cryptocurrency that achieves Confidential Transactions as of~\cref{def:pre:privacy:conf-tx}.
 If the protocol also achieves Transaction Unlinkability~\cref{def:pre:privacy:tx-unlink}, is not fully clear.
 One can argue that Transaction merging~(see \cref{sec:pre:mimblewimble:merge})\todo{putting the section without any parenthesis or context breaks the reading flow. What about adding (see section x.y)?} together with Cut-through~\cref{par:pre:mimblewimble:cut} should make transactions unlinkable.
 However, one author managed to link a large amount of Mimblewimble transactions in a practical setting using well-connected network nodes that attempt to sniff original transactions before they are merged\footnote{\urlmwbreak}.
@@ -25,10 +25,10 @@ A Mimblewimble transaction consists of $\varCoinInp \opAssign (\varCoin_1 , \dot
 
 \begin{definition}[Transaction validity] \label{def:pre:tx-mw-validity}
     A transaction is valid if:
-    \begin{itemize}
+    \begin{asparaitem}
         \item The transaction is well-balanced as defined in~\cref{def:pre:tx-well-balancedness}
         \item $\opForAll \; (\varCoin_i, \varProof_i) \opIn \varCoinOut \; \procVerfProof{\varProof_i}{\varCoin_i} \opEqNoQ 1$
-    \end{itemize}
+    \end{asparaitem}
 \end{definition}
 
 From the definition of \emph{Transaction validity} we can derive the following equation:
@@ -61,7 +61,7 @@ We can easily deduce that if $\varTx_0$ and $\varTx_1$ are valid, it must follow
 If $\varTx_0$ and $\varTx_1$ are valid as of~\cref{def:pre:tx-mw-validity}, that means $\varCoinInp^0 \opSub \varCoinOut^0 \opSub \funGenH{\varSupply_0} \opEqNoQ \varExcess_0 \opSeperate \funList{\varProof_0}$ contains valid range proofs for the outputs $\varCoinOut^0$ and $\funList{\varSignature_0}$ contains a valid signature to $\varExcess_0 \opSub \funGenH{\varSupply_0}$ as the public key.
 The same must hold for $\varTx_1$.
 
-By the rules of arithmetic,\todo{hehe it sounds really fun "by the rules of arithmetic". Perhaps, write: ``then it follows that...''} it then must also hold that
+Then it follows that
 \[ \varCoinInp^0 \opConc \varCoinInp^1 \opSub \varCoinOut^0 \opConc \varCoinOut^1 \opSub \funGenH{\varSupply_0 \opAddScalar \varSupply_1} \opEqNoQ \varExcess_0 \opAddPoint \varExcess_1  \]
 $\funList{\varProof_0} \opConc \funList{\varProof_1}$ must contain valid range proofs for the output coins and $\funList{\varSignature_0} \opConc \funList{\varSignature_1}$ must contain valid signatures to the respective excess points, which makes $\varTx_m$ a valid transaction.
 
@@ -78,7 +78,7 @@ Since the attacker has access to both $\varExcess_0$ and $\varExcess_1$ as well 
 Thereby the attacker was able to reconstruct one of the original transactions from which $\varTx_m$ was constructed.
 Following this method, he might be able to uncover all original transactions from the merged one.
 
-This problem has been mitigated in Cryptocurrencies implementing the protocol\todo{what protocol?} by including an additional variable $\varOffset$ in the Kernel, called offset value.
+This problem has been mitigated in cryptocurrencies implementing the Mimblewimble protocol by including an additional variable $\varOffset$ in the Kernel, called offset value.
 Briefly recall the construction of the excess value $\varExcess$:
 \[ \varExcess \opAssign \funGen{\varExcessExp} \]
 In order to solve the problem we redefine $\varExcess$ as:
@@ -107,13 +107,13 @@ This property is employed in the Mimblewimble protocol to reduce the space requi
 Throughout the thesis, whenever we are concerned with Mimblewimble transactions, we generally refer to the sending party (owning the input coins) as Alice and the receiving party (owning the newly created output coin) as Bob.
 As already pointed out, building transactions in Mimblewimble is an interactive process between the sender and receiver of funds.
 Jedusor Tom Elvis originally envisioned the following two-step process to build a transaction:~\cite{jedusor2016mimblewimble}
-\begin{enumerate}
+\begin{asparaenum}
     \item Alice first selects an input coin $\varCoinInp$ (or potentially multiple) in her control with total stored value $\varValue$ with $\varValue \geq \varFundValue$.
     She then creates change coin outputs $\varCoinOutAlice$ (could again be multiple) with the remainder of her input value substracted by the value sent to Bob.
     For her newly created output coins and her input coins, she calculates her part of discrete logarithm $\varKey$ (her part of the key) to the final $\varExcess$ and sends all this information to Bob as a pre-transaction.
     \item Bob creates himself additional output coins $\varCoinOut^B$ of total value $\varFundValue$ and similar to Alice creates his share $\funStar{\varKey}$ of the discrete logarithm of $\varExcess$.
     Together with the share received from Alice, he can now create a signature to $\varExcess$ and finalize the transaction
-\end{enumerate}
+\end{asparaenum}
 \Cref{fig:txOriginal} depicts the original transaction flow.\\
 \begin{figure}
     \centering
@@ -163,12 +163,12 @@ If Alice already deleted the keys to her initial coins, the funds are now lost.
 The problem was solved in the Grin and Beam Mimblewimble implementations by making the signing process itself a two-party process which will be explained in more detail in~\cref{ch:fixedwitnesssignatures}.
 
 Alternatively, Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} proposed another way to build transactions that would not be vulnerable to this problem:
-\begin{enumerate}
+\begin{asparaenum}
     \item Alice constructs a full-fledged transaction $\varTx_A$ spending her input coins $\varCoinInp$ and creates her change coins $\varCoinOut^A$, plus a special output coin $\varCoinSpecial \opAssign \funGenH{\varFundValue} \opAddPoint \funGen{\varKey_{sp}}$, where $\varFundValue$ is the desired value which should be transferred to Bob and $\varKey_{sp}$ is a randomly chosen key.
     She proceeds by sending $\varTx_A$ as well as $(\varFundValue \opSeperate \varKey_{sp})$ and the necessary range proofs to Bob.
     \item Bob now creates a second transaction $\varTx_B$, spending the special coin $\varCoinSpecial$ to create an output only he controls $\varCoinOutBob$ and merges $\varTx_A$ with $\varTx_B$ into $\varTx_m$. He then broadcasts $\varTx_m$ to the network.
     Note that when the two transactions are merged, the intermediate special coin $\varCoinSpecial$ will be both in the coin output and input list of the transaction and therefore will be discarded.
-\end{enumerate}
+\end{asparaenum}
 One drawback of this approach is that we have two transaction kernels instead of just one because of the merging step, making the transaction slightly bigger.
 However, there is still only one interaction required between Alice and Bob.
 In the solution employed by the Grin and Beam implementations which we will discuss in~\cref{ch:atomicswap}, at least one additional round of interaction will be required.

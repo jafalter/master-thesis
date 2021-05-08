@@ -72,7 +72,7 @@ If we want to indicate that a spendable coin is used as an output coin in a tran
     \label{def:atom:mw-tx-scheme}
     A Mimblewimble Transaction Scheme $\varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varRProofSystem}$ with Commitment Scheme $\varCommitScheme$, Two-Party Signature Scheme $\varSigSchemeMP$, and Range Proof System $\varRProofSystem$ consists of the following tuple of procedures:
     \[ \varMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varRProofSystem} \opAssign ( \procSendCoinsId,\procRecvCoinsId,\procFinTxId,\procVerfTxId ) \]
-    \begin{itemize}
+    \begin{asparaitem}
         \item $(\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice, \varNonceAlice)) \opFunResult \procSendCoins{\funArray{\varSpendableCoin}}{\varFundValue}{\varTime}$: The spendCoins algorithm is a DPT function called by the sending party to initiate the spending of some input coins.
         As input, it takes a list of spendable coins $\funArray{\varSpendableCoin}$ and a value $\varFundValue$ which should be transferred to the receiver.
         Optionally a sender can pass a block height $\varTime$ to make this transaction only valid after a specific time.
@@ -88,13 +88,13 @@ If we want to indicate that a spendable coin is used as an output coin in a tran
         We rename it here to $\procVerfId$ to fit with our naming scheme.
         If an invalid transaction is passed to the routine, it will output 0, 1 otherwise.
         Informally the algorithm verifies four conditions:
-        \begin{enumerate}
+        \begin{asparaenum}
             \item Condition 1: Every input and output coin only appears once in the transaction.
             \item Condition 2: The union of input and output coins is the empty set.
             \item Condition 3: For every output coin, the range proof verifies.
             \item Condition 4: The transaction signature verifies with the excess value of the transaction as the public key, which is calculated by summing up the output coins and subtracting the input coins. (See~\cref{sec:pre:mimblewimble})
-        \end{enumerate}
-    \end{itemize}
+        \end{asparaenum}
+    \end{asparaitem}
 \end{definition}
 
 We say a Mimblewimble Transaction Scheme is correct if the verification algorithm $\procVerfTxId$ returns 1 upon providing a transaction that is well balanced and contains a valid signature.
@@ -128,7 +128,7 @@ In the following, we define the \emph{Extended Mimblewimble Transaction Scheme},
     \end{gather*}
     Note that for this scheme, we require a Two-Party Range Proof System $\varMPRProofSystem$ as shown in~\cref{def:pre:mp-rangeproof}.
     Specifically, we need the system to provide a distributed proof computation protocol $\procDRProofId$.
-    \begin{itemize}
+    \begin{asparaitem}
         \item $\langle (\varPreTx, \funStar{\varSpendableCoinAlice}, (\varSecKeyAlice,\varNonceAlice)), (\varPreTx, \funStar{\varSpendableCoinCarol}, (\varSecKeyCarol,\varNonceCarol)) \rangle$ \\
         $\opFunResult \procDSendCoins{\funArray{\varSpendableCoinAlice}}{\funArray{\varSpendableCoinCarol}}{\varFundValue}{\varTime}$:
         The distributed coin spending algorithm takes as input a list of spendable input coins for which ownership is shared between Alice and Carol.
@@ -143,7 +143,7 @@ In the following, we define the \emph{Extended Mimblewimble Transaction Scheme},
         We note here that creating more complex schemes in which a coin is spendable by knowing N out M keys would be possible by implementing Shamir's Secret Sharing algorithm, which can be found in~\cite{shamir1979share}.
         \item $\langle \varTx, \varTx \rangle \opFunResult \procDFinTx{\varPreTx}{\varSecKeyAlice}{\varNonceAlice}{\varSecKeyCarol}{\varNonceCarol}$: The distributed finalized transaction protocol has to be used to create a transaction spending a shared coin (i.e., the transaction was created with the $\procDSendCoinsId$ algorithm).
         In this case, we require signing information from both Alice and Carol.
-    \end{itemize}
+    \end{asparaitem}
 \end{definition}
 
 Correctness is given very similarly to the standard scheme:
@@ -176,7 +176,7 @@ We define the \emph{Contract Mimblewimble Transaction Scheme}, which will extend
     \begin{gather*}
         \varaptMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varMPRProofSystem} \opAssign \\ \varextMWSchemeParams{\varCommitScheme}{\varSigSchemeMP}{\varMPRProofSystem} \opConc (\procAptRecvCoinsId, \procDAptFinTxId)
     \end{gather*}
-    \begin{itemize}
+    \begin{asparaitem}
         \item $(\funStar{\varPreTx}, \funStar{\varSpendableCoinBob}, \varSigBob) \opFunResult \procAptRecvCoins{\varPreTx}{\varFundValue}{\varWit}$: The contract variant of the receive function takes an additional input, a secret witness value
         $\varWit$, hidden in the transaction signature and extracted by the other party after the completion of the protocol.
         Note that the routine also returns Bob's unmasked partial signature.
@@ -197,7 +197,7 @@ We define the \emph{Contract Mimblewimble Transaction Scheme}, which will extend
         If Alice were to build the final transaction before Bob, she will extract the witness value before the transaction has been published, which in the Atomic Swap scenario would mean she could steal the funds stored on the other chain.
         That is why the protocol does not return the final transaction $\varTx$ to Alice.
         Instead, the protocol will output the sender's partial signature, which Alice can later use to extract the final transaction's witness value.
-    \end{itemize}
+    \end{asparaitem}
 \end{definition}
 
 Similar to before, we define Correctness for the adapted scheme:

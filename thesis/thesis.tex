@@ -12,7 +12,7 @@
 \usepackage{amssymb}    % Provides a multitude of mathematical symbols.
 \usepackage{mathtools}  % Further extensions of mathematical typesetting.
 \usepackage{microtype}  % Small-scale typographic enhancements.
-\usepackage[inline]{enumitem} % User control over the layout of lists (itemize, enumerate, description).
+% \usepackage[inline]{enumitem} % User control over the layout of lists (itemize, enumerate, description).
 \usepackage{multirow}   % Allows table elements to span several rows.
 \usepackage{booktabs}   % Improves the typesettings of tables.
 \usepackage{subcaption} % Allows the use of subfigures and enables their referencing.
@@ -42,6 +42,7 @@
 ]{cryptocode}
 \usepackage{rotating}
 \usepackage{subfiles}
+\usepackage{paralist}
 
 \usepackage{csquotes}
 
@@ -154,14 +155,14 @@
 
 \begin{abstract}
     Since the inception of Bitcoin in 2008, we have witnessed continuous growth in the Bitcoin and blockchain space.
-    As the number of individual Cryptocurrencies rises, interoperability between them becomes a critical topic, for instance, to allow for decentralized coin exchange.
-    By utilizing smart contracts or script constructs available on most blockchain systems, connecting two Cryptocurrencies is possible via so-called Atomic Swaps.
+    As the number of individual cryptocurrencies rises, interoperability between them becomes a critical topic, for instance, to allow for decentralized coin exchange.
+    By utilizing smart contracts or script constructs available on most blockchain systems, connecting two cryptocurrencies is possible via so-called Atomic Swaps.
     However, for the currencies focusing on privacy enhancements, no such capabilities exist.\\
-    This thesis explores the Mimblewimble protocol, a construction of an exceptionally efficient Privacy-enhancing Cryptocurrency.
+    This thesis explores the Mimblewimble protocol, a construction of an exceptionally efficient Privacy-enhancing cryptocurrency.
     By building on other authors' previous work, we formalize different kinds of Mimblewimble transactions that allow for shared coin ownership and simple contracts and prove their security and correctness.
     We improve on the protocol's security model by identifying and resolving a weakness in prior formalizations.
     Utilizing our advanced transaction protocols, we manage to design an Atomic Swap protocol for Mimblewimble based systems built solely with cryptographic primitives.
-    We further formalize an Atomic Swap protocol between Bitcoin and Grin, a Mimblewimble based Cryptocurrency.
+    We further formalize an Atomic Swap protocol between Bitcoin and Grin, a Mimblewimble based cryptocurrency.
     We then implement a proof of concept in the programming language Rust, which we successfully deploy and evaluate on the Bitcoin and Grin testnets.
 \end{abstract}
 

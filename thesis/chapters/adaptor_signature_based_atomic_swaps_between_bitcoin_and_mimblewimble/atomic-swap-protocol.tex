@@ -1,9 +1,9 @@
-With the outlined Contract Mimblewimble Transaction Scheme from~\cref{def:atom:apt-ext-mw-tx-scheme} and protocols from~\cref{sec:atom:protocols}, we can now construct an Atomic Swap protocol with another Cryptocurrency.
-This thesis will explain a swap with Bitcoin, as at present, Bitcoin is the most widely adopted Cryptocurrency.
+With the outlined Contract Mimblewimble Transaction Scheme from~\cref{def:atom:apt-ext-mw-tx-scheme} and protocols from~\cref{sec:atom:protocols}, we can now construct an Atomic Swap protocol with another cryptocurrency.
+This thesis will explain a swap with Bitcoin, as at present, Bitcoin is the most widely adopted cryptocurrency.
 To abstract away from the details of different Bitcoin implementations, we define here the minimal DPT functions that we require for our Atomic Swap.
 These functionalities are inherent to the Bitcoin functionality and thus supported in all implementations.
 We define the following three DPT functions $(\procLockAddrId, \procVerifyLockId, \procSpendBtcId)$.
-\begin{itemize}
+\begin{asparaitem}
     \item $(\varScriptPubKey) \opFunResult \procLockAddr{\varPubKeyAlice}{\varPubKeyBob}{\varStatement}{\varTime}$:
     The locking script function lets Bob construct a Bitcoin script only spendable by Alice if she receives the discrete logarithm $\varWit$ of $\varStatement$ with $\varStatement \opEqNoQ \funGen{\varWit}$.
     Additionally, the procedure requires Bob's public key $\varPubKeyBob$ and a timelock $\varTime$ (given as a block number) as input, allowing Bob to reclaim his funds after some time if the Atomic Swap was not completed successfully.
@@ -23,10 +23,10 @@ We define the following three DPT functions $(\procLockAddrId, \procVerifyLockId
     The spend Bitcoin functionality is a wrapper around the $\procBuildTransactionId, \procSignTransactionId$ defined in~\cref{subsec:pre:bitcointx}.
     It constructs and signs a transaction spending the UTXOs given in $\varInputs$ and creates the fresh UTXOs in $\varOutputs$.
     It returns a signed transaction which then can be broadcast.
-\end{itemize}
+\end{asparaitem}
 
 
-In the following, we describe the phases of an Atomic Swap protocol executed between two parties, one owning funds on a Bitcoin-like Cryptocurrency and the other on a Mimblewimble based one.
+In the following, we describe the phases of an Atomic Swap protocol executed between two parties, one owning funds on a Bitcoin-like cryptocurrency and the other on a Mimblewimble based one.
 As both of the currently most prominent implementations of the Mimblewimble protocol operate on the secp256k1 elliptic curve (which is also the curve that Bitcoin uses), we, therefore, assume a secp256k1-based implementation of the Mimblewimble protocol.
 For a Mimblewimble based implementation that operates on a different curve, additional considerations would have to be made to guarantee the protocol's security.
 In the setup phase~\cref{subsec:atom:setup}, the two parties agree on the swap parameters: the exchange rates, the amount being swapped and the timeout for the refunding.
@@ -45,13 +45,13 @@ We assume Alice owns Mimblewimble coins $\funArray{\varSpendableCoin}$ with the 
 Bitcoin locked in some UTXO $\varUTXO$ with a value of $\varValueBtc$ and secret spending key $\varSecKey_{btc}$.
 Before the protocol can start, the two parties must agree on the value they want to swap, the exchange rate of the currencies, and a time after which we should cancel the swap.
 After agreeing, the following variables are defined and known by both Alice and Bob:
-\begin{itemize}
+\begin{asparaitem}
     \item $\varSecParam$ A security parameter.
     \item $\varAmountBtc$ The amount of Bitcoin Bob will swap to Alice.
     \item $\varAmountMW$ The amount of the Mimblewimble coin Alice will swap to Bob.
     \item $\varTimeBTC$ The locktime as a block height for the Bitcoin side.
     \item $\varTimeMW$ The locktime as a block height for the Mimblewimble side.
-\end{itemize}
+\end{asparaitem}
 We collect this shared variables in an initial swap state $\varSwpState$:
 \[ \varSwpState \opAssign \{ \varSecParam, \varAmountBtc, \varAmountMW, \varTimeBTC, \varTimeMW \} \]
 

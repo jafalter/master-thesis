@@ -5,14 +5,14 @@
 \urldef\urlprtwo\url{https://github.com/mimblewimble/grin-wallet/pull/557}
 \urldef\urljsonrpc\url{https://www.jsonrpc.org/}
 
-We have developed a prototype implementation\footnote{\urlgithub} of the Atomic Swap protocol outlined in~\cref{sec:atom:atomic-swap} in the Rust programming language between Bitcoin and the Grin Cryptocurrency.
+We have developed a prototype implementation\footnote{\urlgithub} of the Atomic Swap protocol outlined in~\cref{sec:atom:atomic-swap} in the Rust programming language between Bitcoin and the Grin cryptocurrency.
 On the Grin side, we have been using the official grin-wallet\footnote{\urlgrinwallet} library, on the Bitcoin side, the rust-bitcoin\footnote{\urlrustbitcoin} library for transaction creation, signing, etc.
-We choose the programming language Rust because the official libraries available for the Grin Cryptocurrency are also written in Rust.
+We choose the programming language Rust because the official libraries available for the Grin cryptocurrency are also written in Rust.
 We discovered two shortcomings in the grin-wallet library during development, so we used our local forked version of this library to address those shortcomings.
 We then submitted both changes to the library as pull requests.\footnote{\urlprone}\footnote{\urlprtwo}
 Our implementation sends JSON-RPC\footnote{\urljsonrpc} requests to a locally running Bitcoin Core and Grin Core node to query blockchain state, submit, and verify transactions.
 The developed program is executable via the command line and accepts the following commands:
-\begin{itemize}
+\begin{asparaitem}
     \item \textbf{init}: The init command is run during the setup phase of the Atomic Swap.
     It creates a new swap slate consisting of a public file containing information about the offered currency, exchange rate, connection details, and other general parameters and a private file in which secret keys and nonce values are stored.
     The creator can share the public file with an interested party to execute a swap.
@@ -35,7 +35,7 @@ The developed program is executable via the command line and accepts the followi
     The accepting party will execute the command while the offering party is listening on a TCP server.
     Running the cancel protocol is only allowed as soon as the timeout has been hit on both blockchains.
     Trying to run the command earlier will result in an error.
-\end{itemize}
+\end{asparaitem}
 
 \section{Implementation Bitcoin side}\label{sec:ImplementationBtc}
 

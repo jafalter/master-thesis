@@ -9,7 +9,7 @@ The reader can see a concrete implementation in~\cref{fig:schnorr}.
 The Signature Scheme is called Schnorr Signature Scheme, first defined in~\cite{schnorr1989efficient} and valued for its simplicity and extensively analyzed security.
 Due to being patented, its practical use originally was limited.
 However, since the patent expired in 2008, the Signature Scheme sees increasing use in practical applications.
-Cryptocurrencies such as Grin and Beam now use Schnorr as their primary Signature Scheme.
+cryptocurrencies such as Grin and Beam now use Schnorr as their primary Signature Scheme.
 Also, Bitcoin is planning to add Schnorr signatures as an alternative to the currently used ECDSA signatures. \footnote{\urlbiptaproot}
 \begin{figure}
     \begin{center}
@@ -44,7 +44,7 @@ As shown in~\cref{fig:schnorr}, $\procVerfId$, line 3, we need to show that $\fu
 As $\varS$ is calculated as $\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey$ ($\procSignId$, line 4), when generator $\varG$ is raised to $\varS$, we get $\funGen{\varNonce \opAddScalar \varSchnorrChallenge \opTimesScalar \varSecKey}$ which we can transform into $\funGen{\varNonce} \opAddPoint \funGen{\varSecKey \opTimesScalar \varSchnorrChallenge}$, and finally into $\varRand \opAddPoint \opPointScalar{\varPubKey}{\varSchnorrChallenge}$ which is the same as the right side of the equation.
 
 From the regular Schnorr Signature Scheme, we now provide an instantiation for the two-party case defined in~\cref{def:sig:two-party-sig}.
-Note that this two-party variant of the scheme is what is currently implemented in the Mimblewimble based Cryptocurrencies and will provide a basis from which we can then build an instantiation for the Two-Party Fixed Witness Adaptor Signature Scheme.
+Note that this two-party variant of the scheme is what is currently implemented in the Mimblewimble based cryptocurrencies and will provide a basis from which we can then build an instantiation for the Two-Party Fixed Witness Adaptor Signature Scheme.
 
 First, we define an auxiliary function $\procSetupCtxId$ to use for the instantiation:
 

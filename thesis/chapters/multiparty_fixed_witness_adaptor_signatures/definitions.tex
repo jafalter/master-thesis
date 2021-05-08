@@ -1,6 +1,6 @@
 A Two-Party Signature Scheme is an extension of a Signature Scheme shown in~\cref{def:pre:signature-scheme}, which allows us to distribute signature generation for a composite public key shared between two parties Alice and Bob.
 Alice and Bob want to collaborate to generate a signature valid under the composite public key $\varPubKey \opAssign \varPubKeyAlice \opAddPoint \varPubKeyBob$ without revealing their secret keys to each other.
-The definition below was constructed with the goal in mind of formalizing exactly what is currently implemented and used in Mimblewimble based Cryptocurrencies.
+The definition below was constructed with the goal in mind of formalizing exactly what is currently implemented and used in Mimblewimble based cryptocurrencies.
 
 \begin{definition}[Two-Party Signature Scheme]
     \label{def:sig:two-party-sig}
@@ -8,7 +8,7 @@ The definition below was constructed with the goal in mind of formalizing exactl
     A \emph{Two-Party Signature Scheme $\varSigSchemeMP$} extends a Signature Scheme $\varSigScheme$ with a tuple of protocols and algorithms\\
     ($\procKeyGenPtId, \procSignPrtId , \procVerfPtSigId, \procFinSigId)$ defined as follows:
 
-    \begin{itemize}
+    \begin{asparaitem}
         \item $((\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext), (\varSecKeyBob, \varPubKeyBob, \varNonceBob, \varSigContext)) \opFunResult \procKeyGenPt{\varSecParam}{\varSecParam}$: The distributed key generation protocol takes as input the security parameter from both Alice and Bob.
         It returns the tuple $(\varSecKeyAlice, \varPubKeyAlice, \varNonceAlice, \varSigContext)$ to Alice (similar to Bob) where $(\varSecKeyAlice, \varPubKeyAlice)$ is a pair of private and corresponding public keys, $\varNonceAlice$ a secret nonce and $\varSigContext$ is the signature context containing parameters shared between Alice and Bob.
         We introduce $\varSigContext$ for the participants to share and update parameters with each other during the protocol execution.
@@ -22,7 +22,7 @@ The definition below was constructed with the goal in mind of formalizing exactl
 
         \item $\varSigFin \opFunResult \procFinSig{\varSigAlice}{\varSigBob}$: The finalize signature algorithm is a DPT function that takes as input two shares of the signatures and combines them into a final signature valid under the composite public key $\varPubKey \opEqNoQ \varPubKeyAlice \opAddPoint \varPubKeyBob$.
 
-    \end{itemize}
+    \end{asparaitem}
 
 \end{definition}
 
@@ -38,7 +38,7 @@ From~\cref{def:sig:two-party-sig}, we now derive a Two-Party Adaptor Signature S
 
     \[ \varSigSchemeApt \opAssign (\varSigSchemeMP \opConc \procAptSigId \opConc \procVerifyAptSigId \opConc \procExtWitId) \]
 
-    \begin{itemize}
+    \begin{asparaitem}
         \item $\varSigAptAlice \opFunResult \procAptSig{\varSigAlice}{\varWit}$: The mask signature algorithm is a DPT function that takes as input a partial signature $\varSigAlice$ and a secret witness value $\varWit$.
         The procedure will output a masked partial signature $\varSigAptAlice$ that can be verified to contain $\varWit$ using the $\procVerifyAptSigId$ function without revealing $\varWit$.
 
@@ -48,7 +48,7 @@ From~\cref{def:sig:two-party-sig}, we now derive a Two-Party Adaptor Signature S
         \item $\varWit \opFunResult \procExtWit{\varSigFin}{\varSigAlice}{\varSigAptBob}$: The witness extraction algorithm is a DPT function that lets Alice extract the secret witness $\varWit$ after having learned the final composite signature $\varSigFin$.
         As input, it expects the partial signatures $\varSigAlice$ and $\varSigAptBob$ shared between the participants during protocol execution and the final composite signature $\varSigFin$.
         Consequently, only protocol participants knowing the partial signatures exchanged during the protocol can run this algorithm.
-    \end{itemize}
+    \end{asparaitem}
 \end{definition}
 
 Similar to how it is defined in~\cite{aumayr2020bitcoinchannels}, additionally to regular Correctness, as described  in~\cref{def:pre:signature-scheme}, we require our Signature Scheme to satisfy Adaptor Signature Correctness.

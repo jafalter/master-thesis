@@ -71,16 +71,16 @@ Additionally, a transaction consists of a version number and a locktime field wh
 
 A transaction is valid if the following conditions are fulfilled:
 
-\begin{itemize}
+\begin{asparaitem}
     \item The total value of inputs is greater than or equal to the total value of outputs.
     \item For all $\varUTXO \opIn \varBtcInputs$ $\procVerfUTXO{\varUTXO} \opEqNoQ 1$ must hold.
     \item All input UTXOs have not been spent before.
     \item If a locktime $\varTime$ is given, the Bitcoin blockchain's current block needs to be higher or equal $\varTime$.
-\end{itemize}
+\end{asparaitem}
 
 \begin{definition}[Bitcoin Transaction Scheme]
     We define a Bitcoin Transaction Scheme as a tuple of two DPT functions $(\procBuildTransactionId, \procVerfTransactionId)$ and the PPT function $\procSignTransactionId$.
-    \begin{itemize}
+    \begin{asparaitem}
         \item $\varBtcTx \opFunResult \procBuildTransaction{\varBtcInputs}{\varBtcOutpus}{\varVersion}{\varTime}$: The transaction building algorithm is a DPT function that takes as input a set of unspent transaction outputs $\varBtcInputs$, a collection of newly created transaction outputs $\varBtcOutpus$ a version number $\varVersion$ and an optional locking time $\varTime$.
         The algorithm will output an unsigned transaction $\varBtcTx$.
         \item $\funStar{\varBtcTx} \opFunResult \procSignTransaction{\varBtcTx}{\funArray{\varScriptSig}}$: The transaction
@@ -90,7 +90,7 @@ A transaction is valid if the following conditions are fulfilled:
         \item $\{ 1,0 \} \opFunResult \procVerfTransaction{\varBtcTx}$: The verification algorithm is a DPT function taking as input a transaction $\varBtcTx$ outputting 1 on a successful verification or 0 otherwise.
         The function will check the well-balancedness of the transaction, verify the unlocking scripts, locktime and scan through the blockchain if all inputs are indeed unspent.
         Note that any public verifier with access to the blockchain ledger and $\varBtcTx$ is able to perform the verification.
-    \end{itemize}
+    \end{asparaitem}
 \end{definition}
 
 We now outline two common structures of Bitcoin outputs the P2PK/P2PKH and the P2SH outputs.
@@ -98,7 +98,7 @@ We now outline two common structures of Bitcoin outputs the P2PK/P2PKH and the P
 \subsubsection{P2PK, P2PKH\label{sec:pre:bitcoin:p2pk}}
 
 P2PK stands for Pay-to-Public-Key, and P2PKH for Pay-to-Public-Key-Hash.
-In \removepms{this}\newpms{the former} type of output $\varScriptPubKey$ will be constructed such that its value unlocks if a correct signature is provided in $\varScriptSig$ for a corresponding public key $\varPubKey$.
+In the former type of output $\varScriptPubKey$ will be constructed such that its value unlocks if a correct signature is provided in $\varScriptSig$ for a corresponding public key $\varPubKey$.
 P2PKH is an update to this script in which the $\varScriptPubKey$ contains a hashed version of the public key $\varPubKey$ instead of the public key itself.
 To spend a P2PKH output, one has to provide the unhashed public key in addition to a valid signature.
 This type of output is the most commonly used output in the Bitcoin blockchain to transfer value from one participant to another.
@@ -108,7 +108,7 @@ These addresses can be handed out to request a payment from somebody.
 
 \subsubsection{P2SH} \label{sec:pre:bitcoin:p2sh}
 
-If more advanced spending conditions, such as multi-signature, are required, P2SH (Pay-to-script-hash), introduced in 2012, is a way to implement those in a space-efficient and straightforward \removepms{matter}\newpms{manner}.
+If more advanced spending conditions, such as multi-signature, are required, P2SH (Pay-to-script-hash), introduced in 2012, is a way to implement those in a space-efficient and straightforward manner.
 Here the locking condition $\varScriptPubKey$ does not contain a script but instead the hash of a script.
 Upon spending, the spender has to provide the original script and the unlocking requirements for the script itself.
 Upon verification, the provided script's hash will be computed and compared with the value given in the locking condition.

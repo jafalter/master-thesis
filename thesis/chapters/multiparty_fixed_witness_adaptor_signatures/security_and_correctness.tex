@@ -140,7 +140,7 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$, which were
     We have to prove two cases: Alice is the corrupted party and one in which Bob is the corrupted party.
     
     \textbf{Alice is corrupted: } Simulator $\cnstSimulator$ works as follows:
-    \begin{enumerate}
+    \begin{asparaenum}
         \item $\cnstSimulator$ invokes $\cnstAdversary$, receives and saves $(\varSecKeyAlice, \varPubKeyAlice)$, as well as $(\varNonceAlice, \varRandAlice)$ that $\cnstAdversary$ sends to $\procZKfId{\cnstRelation}$.
         \item Next $\cnstSimulator$ receives the message $(\varSigContext, \funStar{\varPubKeyAlice}, \funStar{\varRandAlice})$ as sent to Bob by $\cnstAdversary$.
         If $\funStar{\varPubKeyAlice} \opNotEq \varPubKeyAlice$ or $\funStar{\varRandAlice} \opNotEq \varRandAlice$, $\cnstSimulator$ externally sends $\cnstAbort$ to the TTP computing $\procDSignId$ and outputs whatever $\cnstAdversary$ outputs, otherwise he will send the inputs $(\varMsg, \varSecKeyAlice, \varNonceAlice)$ and receive back $(\varSigFin, \varPubKey)$.
@@ -158,7 +158,7 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$, which were
         \item After having done the calculations $\cnstSimulator$ is able to send $\varSigContext, \varSigBob, \varPubKeyBob$ to $\cnstAdversary$ as if coming from Bob.
         \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation}$ and $\procZKfId{\cnstRelation}$ (as the verifier) $\cnstSimulator$ checks equality with $\varPubKeyBob$ (respective $\varRandBob$) and thereafter sends back either 0 or 1.
         \item Eventually $\cnstSimulator$ will receive $\funStar{\varSigAlice}$ from $\cnstAdversary$ and finally output whatever $\cnstAdversary$ outputs.
-    \end{enumerate}
+    \end{asparaenum}
 
     We now show that the joint output distribution in the ideal model with $\cnstSimulator$ is identically distributed to the joint distribution in a real execution in the $\procZKfId{\cnstRelation}$-hybrid model with $\cnstAdversary$.
     We consider three phases :
@@ -168,7 +168,7 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$, which were
     \textbf{(3)} Alice sends $\varPubKeyBob$ and $\varRandBob$ to $\procZKfId{\cnstRelation}$ as the verifier and $\varSigAlice$ to Bob.
     Finally, we will have to show that the simulators output is indistinguishable from that of $\cnstAdversary$.
 
-    \begin{itemize}
+    \begin{asparaitem}
         \item \textit{Phase 1} Since $\cnstAdversary$ is required to be deterministic, the distribution is identical to what one would expect in an actual execution.
         \item \textit{Phase 2} As $\cnstSimulator$ managed to calculate Bobs $\varSigBob, \varPubKeyBob, \varRandBob$, as if they would be expected in a real execution from the final $(\varSigFin, \varPubKey)$, we can conclude that the transcript of this phase must be computationally indistinguishable from a real transcript.
         \item \textit{Phase 3} The messages sent by the deterministic $\cnstAdversary$  have to be identically distributed to a real execution.
@@ -176,12 +176,12 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$, which were
         \item Regarding the protocol output, we note that if the adversary deviates from the protocol specification, the simulator will notice it, halt, and output whatever $\cnstAdversary$ outputs.
         If $\cnstAdversary$ behaves correctly, $\cnstSimulator$ will play the protocol until the end and finally output whatever $\cnstAdversary$ outputs.
         So both in the case that $\cnstAdversary$ acts honestly and if he does not, $\cnstAdversary$'s and $\cnstSimulator$'s outputs will be indistinguishable.
-    \end{itemize}
+    \end{asparaitem}
 
     We have shown that the distributions of transcript messages are indistinguishable in every phase of the protocol if Alice is corrupted.
 
     \textbf{Bob is corrupted: } Simulator $\cnstSimulator$ works as follows:
-    \begin{enumerate}
+    \begin{asparaenum}
         \item $\cnstSimulator$ starts by sampling $\varSecKeyAlice, \varNonceAlice \sample \cnstIntegersPrimeWithoutZero{*}$ and proceeds by setting up the initial signature context as defined by the protocol:
         \begin{gather*}
             \varSigContext \opAssign \{ \varPubKey \opAssign 1, \varRand \opAssign 1 \} \\
@@ -200,9 +200,9 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$, which were
         He verifies the values sent to him by comparing them with $\varPubKeyBob$ and $\varRandBob$ from its memory.
         If the simulator finds the values invalid, or if he doesn't receive any values at all, he will send $\cnstAbort$ to the TTP and output whatever $\cnstAdversary$ outputs.
         \item $\cnstSimulator$ calculates $\varSigAlice \opFunResult \procSignPrt{\varMsg}{\varSecKeyAlice}{\varNonceAlice}{\varSigContext}$ as defined in the protocol and then sends it to $\cnstAdversary$ as if coming from Alice and finally outputs whatever $\cnstAdversary$ outputs.
-    \end{enumerate}
+    \end{asparaenum}
     Again we argue why the transcript is indistinguishable from the real one for each of the three phases laid out before:
-    \begin{itemize}
+    \begin{asparaitem}
         \item \textit{Phase 1: } The values $(\varPubKeyAlice, \varRandAlice)$ sent by $\cnstSimulator$ to $\cnstAdversary$ only depend on Alice's input parameters (and to some extent on the public elliptic curve parameters).
         As $\cnstAdversary$ does not know $\varPubKeyAlice$ or $\varRandAlice$ yet, he has no way of determining for two public keys, $\varPubKeyAlice, \funStar{\varPubKeyAlice}$, which is the correct one (other than guessing).
         \item \textit{Phase 2: } When $\cnstAdversary$ calls $\procZKfId{\cnstRelation}$ with the proper parameters sent to him, he will still receive 1 back, or 0 otherwise, which is the same as would be expected in an actual execution.
@@ -219,7 +219,7 @@ Assume we have two key pairs $\varKeyPairAlice$ and $\varKeyPairBob$, which were
         \item If $\cnstAdversary$ behaves dishonestly at any point of the protocol, then the simulator will notice, sent $\cnstAbort$ to the TTP, and output whatever $\cnstAdversary$ outputs.
         If the adversary behaves as defined in the protocol specification, the protocol will be played until the end, after which $\cnstSimulator$ again outputs whatever $\cnstAdversary$ outputs.
         Therefore, in any case, the outputs must be indistinguishable from the adversary's output in a real execution.
-    \end{itemize}
+    \end{asparaitem}
 
     We have managed to show that in the case that Bob is corrupted, the transcript is indistinguishable from a real transcript.
     Therefore, we can conclude that the transcript output will be indistinguishable from a real one in all cases and have thereby proven that the protocol $\procDSignId$ is secure in the $\procZKfId{\cnstRelation}$-model and theorem \cref{lem:sig:dsign} must hold.
@@ -291,7 +291,7 @@ The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj}.
     We prove that the transcript is indistinguishable in case Alice is corrupted as well as in the case that Bob is corrupted.
 
     \textbf{Alice is corrupted: } Simulator $\cnstSimulator$ works as follows:
-    \begin{enumerate}
+    \begin{asparaenum}
         \item $\cnstSimulator$ invokes $\cnstAdversary$.
         When $\cnstAdversary$ internally calls $\procZKfId{\cnstRelation}$ and $\procZKfId{\cnstRelation}$ $\cnstSimulator$ saves $(\varSecKeyAlice, \varPubKeyAlice)$ and $(\varNonceAlice, \varRandBob)$ to its memory.
         \item $\cnstSimulator$ receives $(\varSigContext, \funStar{\varPubKeyAlice}, \funStar{\varPubKeyBob})$ from $\cnstAdversary$.
@@ -313,7 +313,7 @@ The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj}.
         \item $\cnstSimulator$ sends $(\varSigAptBob, \varSigContext, \varPubKeyBob, \varStatement \opAssign \funGen{\varWit})$ as if coming from Bob.
         \item When $\cnstAdversary$ calls $\procZKfId{\cnstRelation}$ the simulator compares the parameters send by $\cnstAdversary$ to the real one, in case he sent a invalid value $\cnstSimulator$ returns 0, otherwise 1.
         \item $\cnstSimulator$ receives $\funStar{\varSigAlice}$ from $\cnstAdversary$ and in any case outputs whatever $\cnstAdversary$ outputs.
-    \end{enumerate}
+    \end{asparaenum}
 
     The phases are similar to the ones defined in \cref{prf:sig:two-party-security}, with the only two adjustments being that a) in Phase 2 Bob additionally sends $\varStatement$ to Alice and b) we introduce a new Phase 4 in which Bob sends $\varSigFin$ to Alice.
     Yet for the sake of completeness, we write the full proof in the following:
@@ -326,7 +326,7 @@ The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj}.
     Finally, again we have to show that the simulator's protocol output is equivalent to $\cnstAdversary$'s expected execution.
 
     We now again argue why the transcript of each phase has to be indistinguishable from a real transcript:
-    \begin{itemize}
+    \begin{asparaitem}
         \item \textit{Phase 1:} As $\cnstAdversary$ is required to be deterministic, we can conclude that this phase's transcript must be indistinguishable from a real transcript.
         \item \textit{Phase 2:} In this phase, $\cnstSimulator$ sends $\varStatement \opAssign \funGen{\varWit}$ to $\cnstAdversary$ for which the simulator received $\varWit$ from the TTP, therefore it will resamble the value that would have been expected in a real execution.
         \item \textit{Phase 3:} The transcript in this phase must be indistinguishable for the same reasons already laid out in Phase 1.
@@ -336,12 +336,12 @@ The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj}.
         \item In that case that $\cnstAdversary$ behaves dishonestly and at any time of the protocol by sending invalid (or no) values to the simulator, he will detect this, abort the further protocol execution, and output whatever $\cnstAdversary$ outputs.
         Similarly, in the case that $\cnstAdversary$ behaves honestly, the protocol is played until the end, after which $\cnstSimulator$ outputs whatever $\cnstAdversary$ outputs.
         So in both cases, the outputs will be equivalent to what is expected in a real execution.
-    \end{itemize}
+    \end{asparaitem}
 
     We have shown that in the case that Alice is corrupt, $\cnstSimulator$'s simulated transcript is indeed distributed equally to a real execution and is thereby computationally indistinguishable.
 
     \textbf{Bob is corrupted: } Simulator $\cnstSimulator$ works as follows:
-    \begin{enumerate}
+    \begin{asparaenum}
         \item $\cnstSimulator$ starts by sampling $\varSecKeyAlice, \varNonceAlice \sample \cnstIntegersPrimeWithoutZero{*}$ and proceeds by setting up the initial signature context as described in the protocol:
         \begin{gather*}
             \varSigContext \opAssign \{ \varPubKey \opAssign 1, \varRand \opAssign 1 \} \\
@@ -360,10 +360,10 @@ The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj}.
         If the equality checks succeed, $\cnstSimulator$ sends $\cnstContinue$ to the TTP, otherwise he sends $\cnstAbort$ and outputs whatever $\cnstAdversary$ outputs.
         \item The simulator now calculates $\varSigAlice$ as defined by the protocol using the $\procSignPrtId$ procedure and sends the result to $\cnstAdversary$ as if coming from Alice.
         \item Finally $\cnstSimulator$ will receive $\funStar{\varSigFin}$ from $\cnstAdversary$ and in any case output whatever $\cnstAdversary$ outputs.
-    \end{enumerate}
+    \end{asparaenum}
     
     Again we argue why the transcript is indistinguishable in phases 1--4:
-    \begin{itemize}
+    \begin{asparaitem}
         \item \textit{Phase 1:} As argued in \cref{prf:sig:two-party-security}, in this phase, the adversary will receive some public, nonce Commitment, and signature context.
         As he does not know Alice's actual inputs, he has no way of knowing if the values received are the correct ones fitting with Alice's inputs, other than by guessing.
         \item \textit{Phase 2:} As argued before, with the hash function modeled in the random oracle, its output is expected to be randomly distributed.
@@ -375,7 +375,7 @@ The adjusted protocol can be seen in \cref{fig:sig:daptsign-adj}.
         $\varSigAlice$ must be indistinguishable from a real execution because it was calculated by $\cnstSimulator$ exactly as of protocol definition.
         \item \textit{Phase 4:} In this phase, $\cnstSimulator$ is expected to receive $\funStar{\varSigFin}$ from $\cnstAdversary$ after which $\cnstSimulator$ will output whatever $\cnstAdversary$ outputs, which must be indistinguishable from a real execution because of the deterministic adversary.
         \item Again, in both the case that $\cnstAdversary$ deviates from protocol specification and follows it, $\cnstSimulator$ will output whatever $\cnstAdversary$ outputs, therefore being equal to the expected output from $\cnstAdversary$ in an actual execution.
-    \end{itemize}
+    \end{asparaitem}
 
     We have shown that the transcript produced by $\cnstSimulator$ in an ideal world with access to a TTP computing $\procDAptSignId$ is indistinguishable from a transcript produced during a real execution both in the case that Alice and that Bob is corrupted.
     By managing to show this, we have proven that the protocol is secure in $\procZKfId{\cnstRelation}$-model and~\cref{lem:sig:daptsign} therefore holds.

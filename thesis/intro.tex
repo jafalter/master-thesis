@@ -237,7 +237,7 @@ Note that many enhancements exist for these functionalities and the documentatio
 \section{Tips}
 
 Since \TeX\ and its successors do not employ a \gls{wysiwyg} editing scheme, several guidelines improve the readability of the source content:
-\begin{itemize}
+\begin{asparaitem}
 \item Each sentence in the source text should start with a new line.
       This helps not only the user navigation through the text, but also enables revision control systems (e.g. \gls{svn}, Git) to show the exact changes authored by different users.
       Paragraphs are separated by one (or more) empty lines.
@@ -245,7 +245,7 @@ Since \TeX\ and its successors do not employ a \gls{wysiwyg} editing scheme, sev
 \item In most cases, the explicit use of whitespace (e.g. by adding \verb|\hspace{4em}| or \verb|\vspace{1.5cm}|) violates typographic guidelines and rules.
       Explicit formatting should only be employed as a last resort and, most likely, better ways to achieve the desired layout can be found by a quick web search.
 \item The use of bold or italic text is generally not supported by typographic considerations and the semantically meaningful \verb|\emph{|\texttt{$\dots$}\verb|}| should be used.
-\end{itemize}
+\end{asparaitem}
 
 The predominant application of the \LaTeX\ system is the generation of \gls{pdf} files via the \textsc{Pdf}\LaTeX\ binaries.
 In the current version of \textsc{Pdf}\LaTeX, it is possible that absolute file paths and user account names are embedded in the final \gls{pdf} document.

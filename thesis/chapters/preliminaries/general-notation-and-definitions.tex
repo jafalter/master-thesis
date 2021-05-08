@@ -9,19 +9,18 @@ We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed
 
 \todo[inline]{When you want to put a reference to where you get a definition from, I would just put it at the side of the name of the definition }
 \begin{definition}[Hard Relation~\cite{aumayr2020bitcoinchannels}]\label{def:pre:hard-relation}
-    Given a language $\varLanguage \opAssign \funList{\varStatement \opForWhich \exists \varWit \text{ s.t. } (\varWit,\varStatement) \opIn \cnstRelation}$ then the relation $\cnstRelation$ is
-    considered hard if the following three properties hold:
-    \begin{enumerate}
+    Given a language $\varLanguage \opAssign \funList{\varStatement \opForWhich \exists \varWit \text{ s.t. } (\varWit,\varStatement) \opIn \cnstRelation}$ then the relation $\cnstRelation$ is considered hard if the following three properties hold:
+    \begin{asparaenum}
         \item $(\varWit, \varStatement) \opFunResult \procGenR{\varSecParam}$ is a $\cnstPolyTime$ sampling algorithm which outputs a statement/witness of the form $(\varWit, \varStatement) \opIn \cnstRelation$.
         \item Relation $\cnstRelation$ is poly-time decidable.
         \item For all $\cnstPolyTime$ adversaries $\cnstAdversary$ the probability of finding $\varWit$ given $\varStatement$ is negligible.
-    \end{enumerate}
+    \end{asparaenum}
 \end{definition}
 
 \begin{definition}[Discrete Logarithm]\label{def:pre:discretelog}
-    We define the discrete logarithm in a group $\cnstGroup$ of a point $\varH$ as the \removepms{number}\newpms{integer} $\varN$ such that for the groups generator $\varG$ the following holds:
-    \[ \funGen{\varM} \opEqNoQ \varH \] \todo{should be $\VarN$ instead of $\VarM$?}
-    The discrete logarithm is a hard relation as defined in~\cref{def:pre:hard-relation}.
+    We define the discrete logarithm in a group $\cnstGroup$ of a point $\varH$ as the integer $\varN$ such that for the groups generator $\varG$ the following holds:
+    \[ \funGen{\varN} \opEqNoQ \varH \]
+    \textit{Discrete logarithm assumption:} Given the tuple $(\varH,\varG)$ such that $\varH \opEqNoQ \funGen{\varN}$ one can compute $\varN$ only with negligible probability which makes ($\varH, \varN$) a hard relation as of~\cref{def:pre:hard-relation}.
 \end{definition}
 
 \todo[inline]{The discrete logarithm is not a hard relation. The hard relation is given by the discrete logarithm assumption (also called discrete logarithm problem). That is, an adversary $A$ given the tuple $(g, h)$ such that $h = g^n$ can compute $n$ only with negligible probability.}
@@ -30,28 +29,26 @@ We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed
     A Signature Scheme $\varSigScheme$ is a tuple of algorithms $(\procSetupId \opSeperate \procSignId \opSeperate \procVerfId)$ defined as follows:~\cite{goldwasser1988digital}
     \[ \varSigScheme = (\procSetupId \opSeperate \procSignId \opSeperate \procVerfId) \]
 
-    \begin{itemize}
+    \begin{asparaitem}
         \item $\varKeyPair \opFunResult \procSetup{\varSecParam}$: The keygen function creates a keypair $\varKeyPair$, the public key $\varPubKey$ can be distributed to the verifier(s) and the secret key $\varSecKey$ has to be kept private. \\
         \item $\varSignature \opFunResult \procSign{\varMsg}{\varSecKey}$: The signing algoritm creates a signature under the message $\varMsg$, which can be verified with the respective public key $\varPubKey$.
         As an input it takes a message $\varMsg$ and the secret key $\varSecKey$ of the signer.
         \item $\cnstTrueorFalse \opFunResult \procVerf{\varMsg}{\varSignature}{\varPubKey}$: The verification function allows a verifier, knowing the signature $\varSignature$, message $\varMsg$, and the provers public key $\varPubKey$ to verify the validity of the signature.
-    \end{itemize}
+    \end{asparaitem}
 
     A valid Signature Scheme has to fulfill two security properties:
-    \begin{itemize}
+    \begin{asparaitem}
         \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold with overwhelming probability: $\procVerf{\varPubKey}{\procSign{\varSecKey}{\varMsg}}{\varMsg} \opEqNoQ 1$
-        \item Unforgeability (\cnstEUFCMA): Informally the existential unforgeability under chosen message attacks holds if attacker $\cnstAdversary$ cannot forge a valid signature for a chosen message.
-        More formally, for a polytime adversary $\cnstAdversary$, message $\varMsg$, and public key $\varPubKey$ the following must hold:
-        \[ \varSignature \opFunResult \cnstAdversary(\varMsg, \varPubKey), \; \varProbability(\procVerf{\varMsg}{\varSignature}{\varPubKey} \opEqNoQ 1) \opSmEq \funNegl{\cdot} \]
-    \end{itemize}
+        \item Unforgeability (\cnstEUFCMA): Informally the existential unforgeability under chosen message attacks holds if attacker $\cnstAdversary$ with access to a signing oracle $\procSignOracleId$ cannot forge a valid signature for a chosen message.
+        More formally, for a polytime adversary $\cnstAdversary$, message $\varMsg$, and public key $\varPubKey$, with access to the oracle $\varSignature \opFunResult \procSignOracle{\varMsg}{\varPubKey}$ that stores all signed messaged in a list $\funList{\varMsg_1,..\varMsg_n}$ the following must hold:
+        \[ \varSignature \opFunResult \cnstAdversary(\funStar{\varMsg}, \varPubKey), \; \funStar{\varMsg} \opNotIn \funList{\varMsg_1,..\varMsg_n}, \; \varProbability(\procVerf{\varMsg}{\varSignature}{\varPubKey} \opEqNoQ 1) \opSmEq \funNegl{\cdot} \]
+    \end{asparaitem}
 \end{definition}
-
-\todo[inline]{This definition is not complete. The adversary has access to signing oracle as well.}
 
 \begin{definition}[Cryptographic Hash Function]\label{def:pre:hash-function}
     A cryptographic hash function $\cnstHash$ is defined as $\funHash{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$ ~\cite{al2011cryptographic}.
     A secure hashing function has to fulfill the following security properties:
-    \begin{itemize}
+    \begin{asparaitem}
         \item Collision-Resistance (CR): Collision-Resistance means that it is computationally infeasible to find two inputs $\varInput_1$ and $\varInput_2$ such that
         $\funHash{\varInput_1} \opEqNoQ \funHash{\varInput_2}$ with $\varInput_1 \opNotEq \varInput_2$.
         \item Pre-image Resistance (Pre): In a hash function $\cnstHash$ that fulfills Pre-image Resistance it is infeasible to recover the original input $\varInput$ from its hash output $\funHash{\varInput}$.
@@ -59,35 +56,33 @@ We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed
         \item 2nd Pre-image Resistance (Sec):  This property is similar to Collision-Resistance and is sometimes referred to as \textit{Weak Collision-Resistance}.
         Given such a hash function $\cnstHash$ and an input $\varInput$, it should be infeasible to find a different input $\funStar{\varInput}$ such that $\varInput \opNotEq \funStar{\varInput}$
         and $\funHash{\varInput} \opEqNoQ \funHash{\funStar{\varInput}}$.
-    \end{itemize}
+    \end{asparaitem}
     The relation between the input $\varInput$ and the output $\funHash{\varInput}$ is a hard relation as defined in~\cref{def:pre:hard-relation}.
 \end{definition}
 
 \begin{definition}[Commitment Scheme]\label{def:pre:commitment}
     A cryptographic Commitment Scheme $\varCommitScheme$ is defined by a pair of functions $(\procSetupComId, \procCommitId)$~\cite{bunz2018bulletproofs}.
-    \begin{itemize}
+    \begin{asparaitem}
         \item $\varCommitParams \opFunResult \procSetupCom{\varSecParam}$: The setup procedure is a DPT function, it takes as input a security parameter $\varSecParam$ and outputs public parameters $\varPublicParam$.
         Depending on $\varPublicParam$ we define a input space $\varInputSpace_{\varPublicParam}$, a randomness space $\varRandSpace_{\varPublicParam}$ and a Commitment space $\varCommitSpace_{\varPublicParam}$.
-        \item $\varCommitment \opFunResult \procCommit{\varInput}{\varNonce}$ The commit routine is DPT function that takes an arbitrary input $\varInput \opIn \varInputSpace_{\varPublicParam}$, a random value $\varNonce \opIn \varRandSpace_{\varPublicParam}$ and
+        \item $\varCommitment \opFunResult \procCommit{\varInput}{\varNonceAlt}$ The commit routine is DPT function that takes an arbitrary input $\varInput \opIn \varInputSpace_{\varPublicParam}$, a random nonce value $\varNonceAlt \opIn \varRandSpace_{\varPublicParam}$ and
         generates an output $\varCommitment \opIn \varCommitSpace_{\varPublicParam}$.
-    \end{itemize}
-
-	\todo[inline]{I find confusing that you are using $n$ in $1^n$ as well as input for commit. }
+    \end{asparaitem}
 
     Secure Commitments must fulfill the \emph{Binding} and \emph{Hiding} security properties:
-    \begin{itemize}
+    \begin{asparaitem}
         \item \textit{Binding:} If a Commitment Scheme is binding it must hold that for all $\cnstPolyTime$ adversaries $\cnstAdversary$ given a valid input $\varInput \opIn \varInputSpace_{\varPublicParam}$
-        and randomness $\varNonce \opIn \varRandSpace_{\varPublicParam}$ the probabilty of finding a $\funStar{\varInput} \opNotEq \varInput$ and a $\funStar{\varNonce}$ with
-        $\procCommit{\varInput}{\varNonce} \opEqNoQ \procCommit{\funStar{\varInput}}{\funStar{\varNonce}}$ is negligible.
-        \item \textit{Hiding:} For a $\cnstPolyTime$ adversary $\cnstAdversary$, Commitment inputs $\varInput_0, \varInput_1 \opIn \varInputSpace_{\varPublicParam}$ randomness $\varNonce \opIn
-       \varRandSpace_{\varPublicParam}$ and a Commitment output $\varCommitment \opAssign \procCommit{\varInput_{\varB}, \varNonce}$ the probabilty of the adversary choosing the correct $\varB$ out of $\{0,1\}$
-        must not be higher then $\frac{1}{2} + \funNegl{\varProbability}$. \todo{What is $\varProbability$ here?}
-    \end{itemize}
+        and randomness $\varNonceAlt \opIn \varRandSpace_{\varPublicParam}$ the probabilty of finding a $\funStar{\varInput} \opNotEq \varInput$ and a $\funStar{\varNonceAlt}$ with
+        $\procCommit{\varInput}{\varNonceAlt} \opEqNoQ \procCommit{\funStar{\varInput}}{\funStar{\varNonceAlt}}$ is negligible.
+        \item \textit{Hiding:} For a $\cnstPolyTime$ adversary $\cnstAdversary$, Commitment inputs $\varInput_0, \varInput_1 \opIn \varInputSpace_{\varPublicParam}$ randomness $\varNonceAlt \opIn
+       \varRandSpace_{\varPublicParam}$ and a Commitment output $\varCommitment \opAssign \procCommit{\varInput_{\varB}, \varNonceAlt}$ the probabilty of the adversary choosing the correct $\varB$ out of $\{0,1\}$
+        must not be higher then $\frac{1}{2} + \funNegl{\cdot}$.
+    \end{asparaitem}
 \end{definition}
 
 \begin{definition}[Additive Homomorphic Commitment Scheme]\label{def:pre:homo-com}
     A Commitment Scheme as defined in~\cref{def:pre:commitment} is said to be addtive homomorphic if the following holds~\cite{bunz2018bulletproofs}
-    \[ \procCommit{\varInput_1}{\varNonce_1} \opAddPoint \procCommit{\varInput_2}{\varNonce_2} \opEqNoQ \procCommit{\varInput_1 \opAddScalar \varInput_2}{\varNonce_1 \opAddScalar \varNonce_2} \]
+    \[ \procCommit{\varInput_1}{\varNonceAlt_1} \opAddPoint \procCommit{\varInput_2}{\varNonceAlt_2} \opEqNoQ \procCommit{\varInput_1 \opAddScalar \varInput_2}{\varNonceAlt_1 \opAddScalar \varNonceAlt_2} \]
 \end{definition}
 
 
@@ -99,17 +94,15 @@ This can be achieved as follows:
     $\varCommitSpace_{\varPublicParam} \opAssign \cnstGroup$ of order $\varPrime \opSeperate \varInputSpace_{\varPublicParam} \opSeperate \varRandSpace_{\varPublicParam} \opAssign \cnstIntegersPrime{\varPrime}$.
     The procedures $(\procSetupComId, \procCommitId)$ are then instantiated as:
     \begin{gather*}
-        \varCommitParams \opFunResult \procSetupComPed{\varG}{\varH} \opAssign \varG, \varH \opFunResult (\varG, \varH)\\ \todo{what is $(\varG, \varH)$?}
-        \varCommitment \opFunResult \procCommit{\varInput}{\varNonce} \opAssign \funGen{\varNonce} \funGenH{\varInput}\\
+        \varCommitParams \opFunResult \procSetupComPed{\varG_1}{\varG_2} \opAssign \varG \opAssign \varG_1, \varH \opAssign \varG_1  \\
+        \varCommitment \opFunResult \procCommit{\varInput}{\varNonceAlt} \opAssign \funGen{\varNonceAlt} \funGenH{\varInput}\\
     \end{gather*}
-    An instantiation of the Pedersen Commitment Scheme must pick two adjacent generators $\varG$, $\varH$ for the setup to be secure in terms of hiding and binding.
+    An instantiation of the Pedersen Commitment Scheme must pick two adjacent generators $\varG_1$, $\varG_2$ for the setup routine to be secure in terms of hiding and binding.
     Formally adjacent means that there exists a hard relation between $\varG$ and $\varH$ in terms of the discrete logarithm~\cref{def:pre:discretelog}.
 So no $\varX$ is known such that $\varH \opEqNoQ \funGen{x}$.
-    In practice, this is often achieved by hashing $\varG$ and using the hash output as $\varH$. \todo{Mention that this is a special hash function that outputs a group element at random instead of a random value. }
+    In practice, this is often achieved by hashing $\varG$ with a special hash function that outputs a group element as $\varH$.
 
 \end{definition}
-
-
 
 \todo[inline]{Here you are switching the topic a little, going from primitives to your security analysis technique. I would introduce this change in text or even create another subsection}
 
@@ -121,7 +114,7 @@ The following definitions are based on a tutorial paper on simulation proofs by 
 The adversary $\cnstAdversary$ either controls $\varParty{1}$ or $\varParty{2}$.
 The ideal execution $\cnstIdeal$ relies on the assumption that we have access to a trusted third party (TTP) and proceeds in the following steps:
 
-\begin{enumerate}
+\begin{asparaenum}
     \item \textbf{Inputs:} The input of $\varParty{1}$ is $\varX$, and the input of $\varParty{2}$ is $\varY$.
     Both parties get an additional auxiliary input $\varZ$.
     We note that we can generalize the concept to functions that require multiple inputs or even functions which do not require any input.
@@ -137,7 +130,7 @@ The ideal execution $\cnstIdeal$ relies on the assumption that we have access to
     \item \textbf{Adversary Instructs Trusted Party:} $\cnstAdversary$ now again has the option of sending $\cnstAbort$ to the trusted third party to stop the execution.
     Otherwise, it may send $\cnstContinue$ which means the output $\cnstFunction_1(\funStar{\varX}, \funStar{\varY})$ (respective $\cnstFunction_2(\funStar{\varX}, \funStar{\varY})$) will be delivered to the honest party.
     \item \textbf{Outputs:} The honest party outputs the answer of the trusted third party. The malicious party may output an arbitrary function of its input, the auxiliary string $\varZ$, or the answer for the trusted party.
-\end{enumerate}
+\end{asparaenum}
 
 Let $\cnstAdversary$ be a non-uniform PPT algorithm, and $\varI \opIn \{1,2\}$ be the corrupted party's index.
 We then denote $\cnstIdeal_{\cnstFunction, \styleFunction{P}(\varZ), \varI}(\varX, \varZ)$ as the ideal execution of $\cnstFunction$ on inputs $(\varX, \varY)$ with auxiliary input $\varZ$ to $\cnstAdversary$ and security param $\varSecParam$ defined as the output pair of the honest party and $\cnstAdversary$ from the ideal execution.
