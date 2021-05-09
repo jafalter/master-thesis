@@ -50,9 +50,7 @@ To make it evaluate to false, one would have to push the number 0 to the stack.
 If \textit{OP\_IF} evaluates to true, we execute the refunding code.
 \textit{OP\_CHECKLOCKTIMEVERIFY} will cause the script to fail unless the nLockTime on the transaction is equal or greater than the value passed in \textit{<refund\_time>}.
 This condition makes sure that this part of the script will only be executable after a specific time, such that refunding is not possible prematurely (Note here that one has to set the nLockTime of the transaction, which guarantees that it can only be mined after a particular time).
-If the $\text{OP\_IF}$ evaluates to false, we execute the script's redemption path in which Alice needs to provide a valid signature under her public key and the statement $\varStatement$.
-
-\todo[inline]{What is exactly the statement? I have not seen it before.}
+If the $\text{OP\_IF}$ evaluates to false, we execute the script's redemption path in which Alice needs to provide a valid signature under her public key and the statement $\varStatement$ to Bobs witness value $\varWit$.
 
 \begin{figure}
     \begin{center}
@@ -97,11 +95,12 @@ Therefore depends on the current network load and the miner's fee included with 
 It is unavoidable to estimate fees according to the current network load and the Atomic Swap timeout in a practical setting.
 Otherwise, a redeeming transaction may stay unconfirmed until the timeout expires.
 Then the second party could try to refund the locked funds with a higher fee, outspending the redeeming transaction.
-Another time-consuming process of our implementation is the validation of locked funds on the Bitcoin side.
-The reason for that is that for importing a new address into a Bitcoin Core node, one has to rescan the blockchain, which can take up to an hour.
-To reduce this time, it is possible to import the address without performing a rescan.
-However, if the funding transaction was mined in a block before the import command was executed, the transaction would be missed, and the address would therefore appear empty.\todo{I will emphasize that this is sth about how Bitcoin wallet handles the addresses, nothing to do with your protocol/design.}
-A faster solution would be, for instance, to use the API of a block explorer such as \todo{such as?? :P I would write the name apart from the footnote itself :)}\footnote{\url{https://blockstream.info/}}.
+Another time-consuming process that we noticed when running our implementation is the validation of locked funds on the Bitcoin side.
+The reason for this comes from the way Bitcoin wallets handle the importing of new funds.
+When importing a new address into a Bitcoin Core node, one has to rescan the blockchain, a process that can take up to one hour or longer.
+it would be possible to import the address without performing a rescan.
+However, if the funding transaction was mined in a block before we execute the import command, we would miss the transaction, and the address would therefore appear empty.
+A faster solution would be, for instance, to use the API of a block explorer such as Blockstream.info\footnote{\url{https://blockstream.info/}}.
 However, this would introduce a trusted third party to the protocol, which is generally to be avoided.
 
 
