@@ -20,7 +20,7 @@ We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed
 \begin{definition}[Discrete Logarithm]\label{def:pre:discretelog}
     We define the discrete logarithm in a group $\cnstGroup$ of a point $\varH$ as the integer $\varN$ such that for the groups generator $\varG$ the following holds:
     \[ \funGen{\varN} \opEqNoQ \varH \]
-    \textit{Discrete logarithm assumption:} Given the tuple $(\varH,\varG)$ such that $\varH \opEqNoQ \funGen{\varN}$ one can compute $\varN$ only with negligible probability which makes ($\varH, \varN$) a hard relation as of~\cref{def:pre:hard-relation}.
+    \textit{Discrete logarithm assumption:} Given the tuple $(\varH,\varG)$ such that $\varH \opEqNoQ \funGen{\varN}$, one can compute $\varN$ only with negligible probability, which makes ($\varH, \varN$) a hard relation as of~\cref{def:pre:hard-relation}.
 \end{definition}
 
 \todo[inline]{The discrete logarithm is not a hard relation. The hard relation is given by the discrete logarithm assumption (also called discrete logarithm problem). That is, an adversary $A$ given the tuple $(g, h)$ such that $h = g^n$ can compute $n$ only with negligible probability.}
@@ -104,9 +104,9 @@ So no $\varX$ is known such that $\varH \opEqNoQ \funGen{x}$.
 
 \end{definition}
 
-\todo[inline]{Here you are switching the topic a little, going from primitives to your security analysis technique. I would introduce this change in text or even create another subsection}
+\subsubsection{Security proofs}
 
-To prove our protocols' security, we define the notion of security in the presence of malicious adversaries, which may deviate from the protocol arbitrarily.
+To prove security of our protocols, we define the notion of security in the presence of malicious adversaries, which may deviate from the protocol arbitrarily.
 To construct the definition, we must first explain two terms: $\cnstIdeal$, the execution in the ideal model and $\cnstReal$, and the real model's execution.
 The following definitions are based on a tutorial paper on simulation proofs by Yehuda Lindell~\cite{lindell2017simulate}.
 
