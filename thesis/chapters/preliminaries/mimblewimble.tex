@@ -120,10 +120,10 @@ Jedusor Tom Elvis originally envisioned the following two-step process to build 
     \pseudocode[codesize=\scriptsize]{
         \textbf{Alice} \< \< \< \< \textbf{Bob} \\ [][\hline]
         \< \< \< \< \\
-        \text{ Select $\varCoinInp$ of value $\varValue \geq \varFundValue$ } \< \< \< \< \\
-        \text{ Create $\varCoinOutAlice$ of value $\varValue \opSub \varFundValue$} \< \< \< \< \\
-        \text{ $\varExcess_{A} \opAssign \sum{\varCoinOutAlice} \opSub \sum{\varCoinInp}$ } \\
-        \text{ $(-\varFundValue \opSeperate \varKey)$ opening to $\varExcess_{A}$ } \< \< \< \< \\
+        \text{ Select $\varCoinInp$ with value $\varValue \geq \varFundValue$ and blinding factor $\varBlindingFactor_i$ } \< \< \< \< \\
+        \text{ Create $\varCoinOutAlice$ of value $\varValue \opSub \varFundValue$ with blinding factor $\varBlindingFactor_o$} \< \< \< \< \\
+        \text{ We then have $\varExcess_{A} \opAssign \sum{\varCoinOutAlice} \opSub \sum{\varCoinInp}$ } \\
+        \text{ $\varKey \opAssign \varBlindingFactor_i \opSub \varBlindingFactor_o$ together with $-\varFundValue$ is then the opening to $\varExcess_{A}$ } \\
         \text{ Create range-proof $\varProof$ for $\varCoinOutAlice$ } \< \< \< \< \\
         \< \sendmessageright{ top=$(-\varFundValue \opSeperate \varKey) \opSeperate \varProof$ } \< \< \< \\
         \< \< \< \< \text{Create $\varCoinOut^B$ with value $\varFundValue$ and keys $(\varKeySt_i)$ } \\
@@ -134,11 +134,9 @@ Jedusor Tom Elvis originally envisioned the following two-step process to build 
     }
     \caption{Original transaction building process\label{fig:txOriginal}}
 \end{figure}
-\todo[inline]{In this figure, what is $x$ and where does it come from?}
 
-
-\todo[inline]{The attack that you show below is known before? (if so, please put reference). Or did you come up with it? If so, then write that explicity in the text (maybe even make this a (sub)section on its own to highlight that.  }
-This protocol, however, turned out to be insecure as it is vulnerable to the following attack:
+This protocol, however, turned out to be insecure as shown by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}. \\
+It is vulnerable to the following attack:
 The receiver could spend Alice's change coins $\varCoinOut^A$ by reverting the transaction.
 Doing this would give the sender his coins back, however as the sender might not have the keys for his spent outputs anymore, the coins could then be lost.
 
