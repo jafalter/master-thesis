@@ -15,7 +15,7 @@ scriptPubKey).
 Unspent means the output has not yet been spent, and its funds are available to be redeemed by the owner.
 To unlock this value, one must provide a script fulfilling the locking condition, referred to as scriptSig.
 In the most common case, the lock condition will fulfill by giving a valid signature under a public key.
-This type of construction is referred to as a P2PK or P2PKH output, which we will see in more detail in section~\cref{sec:pre:bitcoin:p2pk}.
+This type of construction is referred to as a P2PK or P2PKH output, which we will see in more detail in~\cref{sec:pre:bitcoin:p2pk}.
 However, more complex conditions, such we shall see in~\cref{sec:pre:bitcoin:p2sh}, are possible.
 
 \begin{definition}[Unspent Transaction Output - UTXO] An unspent transaction output is a data structure consisting of a locking condition $\varScriptPubKey$, a value expressed in Bitcoin $\varValue$ and an unlocking script $\varScriptSig$ which is initially empty and has to be provided by the owner when spending the UTXO in a transaction.

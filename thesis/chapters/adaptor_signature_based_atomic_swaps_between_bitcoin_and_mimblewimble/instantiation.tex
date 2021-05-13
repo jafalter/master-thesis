@@ -43,7 +43,7 @@ In~\cref{fig:inst-mw-tx-1} and~\cref{fig:inst-mw-tx-2}, we provide an instantiat
 In the $\procSendCoinsId$ function the sender creates his change output coin, which is the difference between the value stored in his input coins and the value transferred to a receiver.
 He sets up the signature context with his parameters and gets a pre-transaction $\varPreTx$, newly created spendable output coin $\varSpendableCoinAlice$, and a signing key $\varSecKeyAlice$ and secret nonce $\varNonceAlice$ as output.
 The pre-transaction can then be sent to a receiver.
-Note that, as we have already explained earlier, our instantiation differs from the one described by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} in that the sender does not yet sign the transaction during $\procSendCoinsId$, because we are using a Two-Party Signature Scheme~\cref{def:sig:two-party-sig} instead of an aggregatable signature scheme~\cref{def:atom:aggsig}.
+Note that, as we have already explained earlier, our instantiation differs from the one described by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} in that the sender does not yet sign the transaction during $\procSendCoinsId$, because we are using a Two-Party Signature Scheme (see~\cref{def:sig:two-party-sig}) instead of an aggregatable signature scheme (see~\cref{def:atom:aggsig}).
 
 In $\procRecvCoinsId$, the receiver of a pre-transaction will verify the senders proof $\varProofBob$, create his output coin $\varCoinOutBob$, add his parameters to the signature context and then create his partial signature $\varSigBob$.
 The function returns an updated version of the pre-transaction $\varPreTx$ that the receiver can send back to the sender, and the newly created spendable output $\varSpendableCoinBob$.

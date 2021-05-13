@@ -76,7 +76,7 @@ The participants have to call the functionality in the same order.
 That means if the prover first sends the pair $(\varWit_1, \varStatement_1)$ and then $(\varWit_2, \varStatement_2)$ the verifier needs first to send $\varStatement_1$ and then $\varStatement_2$.
 
 \paragraph{Proof idea:} To construct our simulation proof in the hybrid model, we make some adjustments to the $\procDSignId$ protocol utilizing the capabilities of the $\procZKfId{\cnstRelation}$ functionality.
-The adjusted protocol can be seen in figure \cref{fig:sig:dsign-adj} with the newly added lines marked in blue.
+The adjusted protocol can be seen in~\cref{fig:sig:dsign-adj} with the newly added lines marked in blue.
 We note here that by making those adjustments to the original protocol, we now no longer prove security of the original protocol but rather the adjusted one.
 This circumstance does not mean that the original protocol is insecure.
 Still, if one wants to implement a version of the protocol proven to be secure, it should include the calls added in the adjusted protocol.

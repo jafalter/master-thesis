@@ -102,7 +102,7 @@ We shorten the prover's call to provide $\varSpendableCoin$ because it is a wrap
 $\cnstRelation_2*$ is the same as $\cnstRelation_2$ just for a list of secrets inputs $\funArray{(\varBlindingFactor, \varValue)}$ and its list of Commitments $\funArray{\varCommitment}$.
 Again to shorten the prover's calls we simplify the call to $\procZkf{\cnstRelation_2*}{\funArray{\varSpendableCoin}}$.
 
-\textbf{Proof Idea}: We extend the protocol $\procDBuildMwTxId$ instantiated in ~\cref{sec:atom:protocols} with the following calls to the zero-knowledge proof of knowledge functionalities as depicted in~\cref{fig:atom:hybrid-dbuild}.
+\textbf{Proof Idea}: We extend the protocol $\procDBuildMwTxId$ instantiated in~\cref{sec:atom:protocols} with the following calls to the zero-knowledge proof of knowledge functionalities as depicted in~\cref{fig:atom:hybrid-dbuild}.
 Again as already pointed out in the previous section, we must make adjustments to the protocol to prove their security.
 That, in turn, does not mean that the original protocols are insecure.
 We add calls to make a security proof of this sort possible.
@@ -437,12 +437,12 @@ We extend our model including the $\procDSignId$ protocol, proven to be secure i
             Bob \< \< \< \< Carol \\
             \cdots \\
             \color{blue} \procZkf{\cnstRelation_2}{(\varCoinShared, (\varFundValue, \funStar{\varBlindingFactorBob}))} \\
-            \< \sendmessageright*[3cm]{\varPreTx, \varCoinShared} \< \\
+            \< \sendmessageright*[2cm]{\varPreTx, \varCoinShared} \< \\
             \< \< \< \< \color{blue} \pcif \procZkf{\cnstRelation_2}{\varCoinShared} \opEqNoQ 0 \\
             \< \< \< \< \color{blue} \t \pcreturn \cnstFalsum \\
             \< \< \< \< \cdots \\
             \< \< \< \< \color{blue} \procZkf{\cnstRelation_1}{(\varSecKeyCarol, \funGen{\varSecKeyCarol})} \\
-            \< \sendmessageleft*[3cm]{\funStarAlt{\varPreTx}, \funGen{\varSecKeyCarol}} \< \\
+            \< \sendmessageleft*[2cm]{\funStarAlt{\varPreTx}, \funGen{\varSecKeyCarol}} \< \\
             \color{blue} \pcif \procZkf{\cnstRelation_1}{\funGen{\varSecKeyCarol}} \opEqNoQ 0 \\
             \t \color{blue} \pcreturn \cnstFalsum \\
             \cdots \< \< \< \< \cdots \\

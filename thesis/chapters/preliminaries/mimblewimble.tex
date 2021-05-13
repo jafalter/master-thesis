@@ -1,12 +1,15 @@
 \urldef\urlmwbreak\url{https://github.com/bogatyy/grin-linkability}
+\urldef\urlmwresearch\url{https://tinyurl.com/3e6bca5z}
 
 This section will outline the fundamental properties of the protocols employed in Mimblewimble, which are relevant for the thesis and particularly the Atomic Swap protocol constructed in~\cref{ch:atomicswap}.
 The Mimblewimble protocol is an outline for a privacy-enhancing cryptocurrency that achieves Confidential Transactions as of~\cref{def:pre:privacy:conf-tx}.
-If the protocol also achieves Transaction Unlinkability~\cref{def:pre:privacy:tx-unlink}, is not fully clear.
-One can argue that Transaction merging~(see \cref{sec:pre:mimblewimble:merge})\todo{putting the section without any parenthesis or context breaks the reading flow. What about adding (see section x.y)?} together with Cut-through~\cref{par:pre:mimblewimble:cut} should make transactions unlinkable.
-However, one author managed to link a large amount of Mimblewimble transactions in a practical setting using well-connected network nodes that attempt to sniff original transactions before they are merged\footnote{\urlmwbreak}.
-
-\todo[inline]{Then what? why are you using Mimblewimble? Should we just not care about this as it is not privacy-preserving? (I am just asking this because could be one of the questions of the reviewer :P )}
+If the protocol also achieves Transaction Unlinkability (see~\cref{def:pre:privacy:tx-unlink}) is not fully clear.
+One can argue that Transaction merging~(see \cref{sec:pre:mimblewimble:merge}) and Cut-through (see~\cref{par:pre:mimblewimble:cut}) should make transactions unlinkable.
+However, one author managed to link many Mimblewimble transactions in a practical setting using well-connected network nodes that attempt to sniff original transactions before they are merged\footnote{\urlmwbreak}.
+This known attack vector is called Flashlight Attack and has also been discussed by Ian Miers in~\cite{miers2019blockchain}.
+The Grin website currently lists this as an open research problem.\footnote{\urlmwresearch}.
+However, even though the possibility of such an attack exists, it is still highly impracticable.
+Compared to Bitcoin, in which linking of transactions usually is trivial, the Mimblewimble protocol still offers substantial privacy improvements.
 
 \subsubsection{Transaction Structure} \label{subsec:pre:mimblwimble-tx}
 
@@ -54,25 +57,24 @@ Assume we have the following two transactions:
     \varTx_0 \opAssign (\varSupply_0 \opSeperate \varCoinInp^0 \opSeperate \varCoinOut^0 \opSeperate (\funList{\varProof_0} \opSeperate \funList{\varExcess_0} \opSeperate \funList{\varSignature_0}) )\\
     \varTx_1 \opAssign (\varSupply_1 \opSeperate \varCoinInp^1 \opSeperate \varCoinOut^1 \opSeperate (\funList{\varProof_1} \opSeperate \funList{\varExcess_1} \opSeperate \funList{\varSignature_1}) )\\
 \end{gather*}
-Then we can build a single merged transaction:
-\[ \varTx_m \opAssign (\varSupply_0 \opAddScalar \varSupply_1 \opSeperate \varCoinInp^0 \opConc \varCoinInp^1,\:\varCoinOut^0 \opConc \varCoinOut^1 \opSeperate (\funList{\varProof_0} \opConc \funList{\varProof_1} \opSeperate
+Then we can build a single merged transaction by concatenating the list of inputs, outputs, proofs, excess values, and signatures.
+Using $\opConc$ as the concatenation symbol, the merged transaction looks as follows:
+\[ \varTx_m \opAssign (\varSupply_0 \opAddScalar \varSupply_1 \opSeperate (\varCoinInp^0 \opConc \varCoinInp^1), \: (\varCoinOut^0 \opConc \varCoinOut^1) \opSeperate (\funList{\varProof_0} \opConc \funList{\varProof_1} \opSeperate
 \funList{\varExcess_0} \opConc \funList{\varExcess_1} \opSeperate \funList{\varSignature_0} \opConc \funList{\varSignature_1}) \]
 We can easily deduce that if $\varTx_0$ and $\varTx_1$ are valid, it must follow that $\varTx_m$ is valid:\\
 If $\varTx_0$ and $\varTx_1$ are valid as of~\cref{def:pre:tx-mw-validity}, that means $\varCoinInp^0 \opSub \varCoinOut^0 \opSub \funGenH{\varSupply_0} \opEqNoQ \varExcess_0 \opSeperate \funList{\varProof_0}$ contains valid range proofs for the outputs $\varCoinOut^0$ and $\funList{\varSignature_0}$ contains a valid signature to $\varExcess_0 \opSub \funGenH{\varSupply_0}$ as the public key.
 The same must hold for $\varTx_1$.
 
 Then it follows that
-\[ \varCoinInp^0 \opConc \varCoinInp^1 \opSub \varCoinOut^0 \opConc \varCoinOut^1 \opSub \funGenH{\varSupply_0 \opAddScalar \varSupply_1} \opEqNoQ \varExcess_0 \opAddPoint \varExcess_1  \]
+\[ \sum (\varCoinInp^0 \opConc \varCoinInp^1) \opAddPoint \sum (\varCoinOut^0 \opConc \varCoinOut^1)^{-1} \opAddPoint {(\funGenH{\varSupply_0 \opAddScalar \varSupply_1})}^{-1} \opEqNoQ \varExcess_0 \opAddPoint \varExcess_1  \]
 $\funList{\varProof_0} \opConc \funList{\varProof_1}$ must contain valid range proofs for the output coins and $\funList{\varSignature_0} \opConc \funList{\varSignature_1}$ must contain valid signatures to the respective excess points, which makes $\varTx_m$ a valid transaction.
-
-\todo[inline]{What does the symbol $\opSeperate$ means? You have not defined it before}
 
 \paragraph{Subset Problem} \label{par:pre:mimblewimble:subset}
 A subtle problem arises with the way transactions are merged in Mimblewimble.
 From the construction shown earlier, it is possible to reconstruct the original separate transactions from a merged one, which can be a privacy issue.
 Given a set of inputs, outputs, and kernels, a subset of these will recombine to reconstruct one of the valid transaction which was aggregated since kernel excess values are not combined.
 Recall the merged transaction from earlier:
-\[ \varTx_m \opAssign (\varSupply_0 \opAddScalar \varSupply_1 \opSeperate \varCoinInp^0 \opConc \varCoinInp^1,\:\varCoinOut^0 \opConc \varCoinOut^1 \opSeperate (\funList{\varProof_0} \opConc \funList{\varProof_1}) \opSeperate
+\[ \varTx_m \opAssign (\varSupply_0 \opAddScalar \varSupply_1 \opSeperate (\varCoinInp^0 \opConc \varCoinInp^1),\:(\varCoinOut^0 \opConc \varCoinOut^1) \opSeperate (\funList{\varProof_0} \opConc \funList{\varProof_1}) \opSeperate
 \funList{\varExcess_0} \opConc \funList{\varExcess_1} \opSeperate \funList{\varSignature_0} \opConc \funList{\varSignature_1}) \]
 Since the attacker has access to both $\varExcess_0$ and $\varExcess_1$ as well as $\varSignature_0$ and $\varSignature_1$, he can simply try different combinations of input values $\funStar{\funList{\varCoinInp}}$ and output values $\funStar{\funList{\varCoinOut}}$ until he finds a combination under which the transaction is valid with $\varExcess_0, \varSignature_0$ or $\varExcess_1, \varSignature_1$.
 Thereby the attacker was able to reconstruct one of the original transactions from which $\varTx_m$ was constructed.
@@ -141,11 +143,12 @@ The receiver could spend Alice's change coins $\varCoinOut^A$ by reverting the t
 Doing this would give the sender his coins back, however as the sender might not have the keys for his spent outputs anymore, the coins could then be lost.
 
 In detail, this reverting transaction would look like this:
-\[ \varTx_{rv} \opAssign (0 \opSeperate \varCoinOut^A \opConc \varCoinOut^B \opSeperate \varCoinInp \opSeperate (\varProof_{rv} \opSeperate \varExcess_{rv} \opSeperate \varSignature_{rv}) ) \]
+\[ \varTx_{rv} \opAssign (0 \opSeperate (\varCoinOut^A \opConc \varCoinOut^B) \opSeperate \varCoinInp \opSeperate (\varProof_{rv} \opSeperate \varExcess_{rv} \opSeperate \varSignature_{rv}) ) \]
 So, in essence, it is exactly the reverse of the previous transaction.
 Again remembering the construction of the excess value of this construction would look like this:
-\[ \varExcess_{rv} \opAssign \sum{\varCoinOut^A \opConc \varCoinOut^B \opSub \varCoinInp} \]
-The key $\varKey$ originally sent by Alice to Bob is a valid opening to $\sum{\varCoinInp} \opSub \sum{\varCoinOut^A}$. With the inverse of this key $\varKey_{inv}$ we get the opening to $\sum{\varCoinOut^A \opSub \varCoinInp}$.
+\[ \varExcess_{rv} \opAssign \sum{(\varCoinOut^A \opConc \varCoinOut^B) \opAddPoint \varCoinInp^{-1}} \]
+The key $\varKey$ originally sent by Alice to Bob is a valid opening to $\sum{\varCoinInp} \opSub \sum{\varCoinOut^A}$.
+With the inverse of this key $\varKey_{inv}$ we get the opening to $\sum{(\varCoinOut^A \opSub \varCoinInp)}$.
 Now, all Bob has to do is add his key $\funStar{\varKey}$ to get:
 \[ \varKey_{rv} \opAssign -\varKey \opAddScalar \funStar{\varKey} \]
 which is the opening to $\varExcess_{rv}$.

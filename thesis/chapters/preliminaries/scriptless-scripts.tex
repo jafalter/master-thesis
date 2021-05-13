@@ -1,8 +1,8 @@
 In 2017 Andrew Poelstra presented a concept called Scriptless Scripts that achieves the execution of primitive contracts only by the use of standard cryptographic tools such as digital signatures.~\cite{poelstra2017scriptless}
 The most prominent Scriptless Script is the Adaptor Signature Scheme which has been fully formalized and proven to be secure for Schnorr and ECDSA by Aumayr et al. in~\cite{aumayr2020bitcoinchannels}.
-Scriptless Scripts are helpful for cryptocurrencies that lack scripting functionality, as is the case in Mimblewimble based systems.
+Scriptless Scripts are helpful for cryptocurrencies that lack scripting functionality, as is the case in Mimblewimble-based systems.
 It also helps to replace script-based approaches with improvements in privacy as well as efficiency, shown in a paper by Christoph Egger et al.~\cite{egger2019atomic}.
-In~\cref{ch:fixedwitnesssignatures}, we will leverage the Adaptor Signature Scheme concept together with a Two-Party Signature Scheme to build a scriptless Atomic Swap protocol applicable for Mimblewimble based cryptocurrencies.
+In~\cref{ch:fixedwitnesssignatures}, we will leverage the Adaptor Signature Scheme concept together with a Two-Party Signature Scheme to build a scriptless Atomic Swap protocol applicable for Mimblewimble-based cryptocurrencies.
 The Adaptor Signature Scheme is a two-step process:
 A signer first computes a pre-signature that can be completed only by a party knowing a certain secret witness value $\varWit$ from a hard relation $(\varWit, \varStatement) \opIn \cnstRelation$.
 After the pre-signature is completed into the final one, it must then be possible to extract $\varWit$ given the final and the pre-signature.
@@ -19,4 +19,5 @@ We here repeat the definition of an Adaptor Signature Scheme found by Aumayr et 
     \end{asparaitem}
 \end{definition}
 
-\todo[inline]{I would add here the security notions as well so that the reader can relate them with the one that you define later for your 2-party adaptor signature}
+For an Adaptor Signature Scheme to be secure it must be aEUF-CMA secure, pre-signature adaptable and witness extractable.
+All three of these properties are defined by Aumayr et al. in~\cite{aumayr2020bitcoinchannels}.

@@ -5,9 +5,9 @@ $\cnstIntegersPrimeWithoutZero{\varPrime}$ is $\cnstIntegersPrime{\varPrime} \op
 $\varG \opSeperate \varH$ are adjacent generators in $\cnstGroup$, where adjacent means the discrete logarithm of $\varH$ regarding $\varG$ is not known.
 Exponentiation stands for repeated application of the group operation.
 We define the group operation between two curve points as $\funGen{\varScA} \opAddPoint \funGen{\varScB} \opEqNoQ \funGen{\varScA \opAddScalar \varScB}$.
-We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed between multiple parties) as $\styleProtocol{protocol(\cdot)}$ \todo[inline]{Visually, the notation for function and protocol are not easy to distinguish. Is it easy to change to make it more different?}
+For a list of group points ($\varCommitment_{list} \opEqNoQ \funArray{\varCommitment_1,\varCommitment_2,\cdots,\varCommitment_n}$) we write $\sum \varCommitment_{list}$ as the application of the group operations between the individual points of the list like $\varCommitment_1 \opAddPoint \varCommitment_2 \cdots \varCommitment_n$.
+We write procedures as $\styleFunction{function(\varInput)}$ and protocols (executed between two parties) as $\styleProtocol{protocol<(\varInput_a),(\varInput_b)>}$ where $\varInput_a$ is the input of the first party and $\varInput_b$ of the second.
 
-\todo[inline]{When you want to put a reference to where you get a definition from, I would just put it at the side of the name of the definition }
 \begin{definition}[Hard Relation~\cite{aumayr2020bitcoinchannels}]\label{def:pre:hard-relation}
     Given a language $\varLanguage \opAssign \funList{\varStatement \opForWhich \exists \varWit \text{ s.t. } (\varWit,\varStatement) \opIn \cnstRelation}$ then the relation $\cnstRelation$ is considered hard if the following three properties hold:
     \begin{asparaenum}
@@ -23,10 +23,8 @@ We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed
     \textit{Discrete logarithm assumption:} Given the tuple $(\varH,\varG)$ such that $\varH \opEqNoQ \funGen{\varN}$, one can compute $\varN$ only with negligible probability, which makes ($\varH, \varN$) a hard relation as of~\cref{def:pre:hard-relation}.
 \end{definition}
 
-\todo[inline]{The discrete logarithm is not a hard relation. The hard relation is given by the discrete logarithm assumption (also called discrete logarithm problem). That is, an adversary $A$ given the tuple $(g, h)$ such that $h = g^n$ can compute $n$ only with negligible probability.}
-
-\begin{definition}[Signature Scheme]\label{def:pre:signature-scheme}
-    A Signature Scheme $\varSigScheme$ is a tuple of algorithms $(\procSetupId \opSeperate \procSignId \opSeperate \procVerfId)$ defined as follows:~\cite{goldwasser1988digital}
+\begin{definition}[Signature Scheme~\cite{goldwasser1988digital}]\label{def:pre:signature-scheme}
+    A Signature Scheme $\varSigScheme$ is a tuple of algorithms $(\procSetupId \opSeperate \procSignId \opSeperate \procVerfId)$ defined as follows:
     \[ \varSigScheme = (\procSetupId \opSeperate \procSignId \opSeperate \procVerfId) \]
 
     \begin{asparaitem}
@@ -45,8 +43,8 @@ We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed
     \end{asparaitem}
 \end{definition}
 
-\begin{definition}[Cryptographic Hash Function]\label{def:pre:hash-function}
-    A cryptographic hash function $\cnstHash$ is defined as $\funHash{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$ ~\cite{al2011cryptographic}.
+\begin{definition}[Cryptographic Hash Function~\cite{al2011cryptographic}]\label{def:pre:hash-function}
+    A cryptographic hash function $\cnstHash$ is defined as $\funHash{\varInput} \rightarrow \cnstBinary{\varN}$ for some fixed number $\varN$ and some input $\varInput$.
     A secure hashing function has to fulfill the following security properties:
     \begin{asparaitem}
         \item Collision-Resistance (CR): Collision-Resistance means that it is computationally infeasible to find two inputs $\varInput_1$ and $\varInput_2$ such that
@@ -60,8 +58,8 @@ We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed
     The relation between the input $\varInput$ and the output $\funHash{\varInput}$ is a hard relation as defined in~\cref{def:pre:hard-relation}.
 \end{definition}
 
-\begin{definition}[Commitment Scheme]\label{def:pre:commitment}
-    A cryptographic Commitment Scheme $\varCommitScheme$ is defined by a pair of functions $(\procSetupComId, \procCommitId)$~\cite{bunz2018bulletproofs}.
+\begin{definition}[Commitment Scheme~\cite{bunz2018bulletproofs}]\label{def:pre:commitment}
+    A cryptographic Commitment Scheme $\varCommitScheme$ is defined by a pair of functions $(\procSetupComId, \procCommitId)$.
     \begin{asparaitem}
         \item $\varCommitParams \opFunResult \procSetupCom{\varSecParam}$: The setup procedure is a DPT function, it takes as input a security parameter $\varSecParam$ and outputs public parameters $\varPublicParam$.
         Depending on $\varPublicParam$ we define a input space $\varInputSpace_{\varPublicParam}$, a randomness space $\varRandSpace_{\varPublicParam}$ and a Commitment space $\varCommitSpace_{\varPublicParam}$.
@@ -80,15 +78,15 @@ We write procedures as $\styleFunction{function(\cdot)}$ and protocols (executed
     \end{asparaitem}
 \end{definition}
 
-\begin{definition}[Additive Homomorphic Commitment Scheme]\label{def:pre:homo-com}
-    A Commitment Scheme as defined in~\cref{def:pre:commitment} is said to be addtive homomorphic if the following holds~\cite{bunz2018bulletproofs}
+\begin{definition}[Additive Homomorphic Commitment Scheme~\cite{bunz2018bulletproofs}]\label{def:pre:homo-com}
+    A Commitment Scheme as described in~\cref{def:pre:commitment} is said to be addtive homomorphic if the following holds
     \[ \procCommit{\varInput_1}{\varNonceAlt_1} \opAddPoint \procCommit{\varInput_2}{\varNonceAlt_2} \opEqNoQ \procCommit{\varInput_1 \opAddScalar \varInput_2}{\varNonceAlt_1 \opAddScalar \varNonceAlt_2} \]
 \end{definition}
 
 
 
 \begin{definition}[Pedersen Commitment Scheme]\label{def:pre:pedersen}
-    A \emph{Pedersen Commitment Scheme} is an instance of a Commitment Scheme as defined in~\cref{def:pre:commitment} that has the additive homomorphic property as defined in~\cref{def:pre:homo-com}.
+    A \emph{Pedersen Commitment Scheme} is an instance of a Commitment Scheme as described in~\cref{def:pre:commitment} that has the additive homomorphic property as shown in~\cref{def:pre:homo-com}.
 
 This can be achieved as follows:
     $\varCommitSpace_{\varPublicParam} \opAssign \cnstGroup$ of order $\varPrime \opSeperate \varInputSpace_{\varPublicParam} \opSeperate \varRandSpace_{\varPublicParam} \opAssign \cnstIntegersPrime{\varPrime}$.
@@ -98,7 +96,7 @@ This can be achieved as follows:
         \varCommitment \opFunResult \procCommit{\varInput}{\varNonceAlt} \opAssign \funGen{\varNonceAlt} \funGenH{\varInput}\\
     \end{gather*}
     An instantiation of the Pedersen Commitment Scheme must pick two adjacent generators $\varG_1$, $\varG_2$ for the setup routine to be secure in terms of hiding and binding.
-    Formally adjacent means that there exists a hard relation between $\varG$ and $\varH$ in terms of the discrete logarithm~\cref{def:pre:discretelog}.
+    Formally adjacent means that there exists a hard relation between $\varG$ and $\varH$ in terms of the discrete logarithm (see~\cref{def:pre:discretelog}).
 So no $\varX$ is known such that $\varH \opEqNoQ \funGen{x}$.
     In practice, this is often achieved by hashing $\varG$ with a special hash function that outputs a group element as $\varH$.
 
@@ -139,10 +137,10 @@ We then denote $\cnstIdeal_{\cnstFunction, \styleFunction{P}(\varZ), \varI}(\var
 In this model, a real two-party protocol $\varProtocol$ is executed, but the adversary $\cnstAdversary$ sens alls messages in place of the corrupted party and may follow an arbitrary polynomial-time strategy.
 Then the real execution of the two-party protocol $\varProtocol$ between $\varParty{1}$ and $\varParty{2}$ on inputs $(\varX, \varY)$ and auxiliary input $\varZ$ to $\cnstAdversary$ and security parameter $\varSecParam$ is denoted by $\cnstReal_{\cnstFunction, \styleFunction{P}(\varZ), \varI}(\varX, \varZ)$ and is defined as the output pair of the honest party and the adversary $\cnstAdversary$ from the real execution of $\varProtocol$.
 
-\begin{definition}[Security in the Malicious Setting]\label{subsec:pre:security}
+\begin{definition}[Security in the Malicious Setting~\cite{lindell2017simulate}]\label{subsec:pre:security}
     We say a two-party protocol $\varProtocol$ securely computes a function $\cnstFunction$ with aborts and inputs $(\varX, \varY)$ in the malicious setting if for every non-uniform PPT adversary $\cnstAdversary$ in the real model, there exists a non-uniform PPT algorithm $\cnstSimulator$, refered to as simulator, such that
     \[
         \{ \cnstIdeal_{\cnstFunction, \cnstSimulator(\varZ), \varI}(\varX, \varZ) \opCompInd \cnstReal_{\cnstFunction, \cnstAdversary(\varZ), \varI}(\varX, \varZ) \}
     \]
-    where $\funAbs{\varX} \opEqNoQ \funAbs{\varY}$ and $\varZ \opEqNoQ \styleFunction{poly(\funAbs{x})}$ and $\opCompInd$ means computationally indistinguishable~\cite{lindell2017simulate}.
+    where $\funAbs{\varX} \opEqNoQ \funAbs{\varY}$ and $\varZ \opEqNoQ \styleFunction{poly(\funAbs{x})}$ and $\opCompInd$ means computationally indistinguishable.
 \end{definition}
