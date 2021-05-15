@@ -1,0 +1,25 @@
+\urldef{\urlmonero}\url{https://www.getmonero.org/}
+
+\paragraph{Related Work.} Maurice Herlihy~\cite{herlihy2018atomic} describes how hashed timelock contracts can be leveraged to build Atomic Swaps between cryptocurrencies that have at least some basic scripting capabilities.
+In a hashed timelock contract, the hash pre-image $\varX$ of $\styleVariable{h} \opEqNoQ \funHash{\varX}$, where $\funHash{\cdot}$ is a hash function, serves as the secret contract value that makes the swap possible.
+Fuchsbauer et al. conduct a complete security analysis of the Mimblewimble protocol, which forms the basis for~\cref{ch:fixedwitnesssignatures}.
+Betarte et al.~\cite{betarte2019towards} work towards making implementations of the Mimblewimble protocol formally verifiable.
+In 2016 Andrew Poelstra published his specification of the Mimblewimble protocol in~\cite{poelstra2016mimblewimble} and has managed to expand on the ideas posted in the original writing~\cite{jedusor2016mimblewimble} by Jedusor.
+In the following year, Poelstra further introduced the notion of Scriptless Scripts~\cite{poelstra2017scriptless}, showing how one can build primitive contracts just by using cryptography alone.
+Poelstra's ideas were formalized as Adaptor signatures as a standalone cryptographic primitive by Aumayr et al. in~\cite{aumayr2020bitcoinchannels}.
+Poelstra's insights on Scriptless Scripts and the formalization by Aumayr et al. together form the basis for our construction of the Two-Party Fixed Witness Adaptor Signature Scheme in~\cref{ch:fixedwitnesssignatures}.\\
+Joël Gugger constructs a cross-chain Atomic Swap between Monero and Bitcoin in~\cite{gugger2020bitcoin}.
+Just like Mimblewimble-based crypto coins, Monero\footnote{\urlmonero} is a privacy-enhancing cryptocurrency that lacks scripting capabilities and even lacks timelocking capabilities (which do exist in Mimblewimble).
+An extensive introduction into the Monero protocol can be found in the Zero to Monero Paper~\cite{alonso2020zero}.
+In Gugger's protocol, the Monero funds are locked in an address shared between the two trading parties.
+On the Bitcoin side, funds are locked so that spending them will reveal the missing key for the Monero side, therefore unlocking the Monero funds for the second party.
+The author was forced to make some special considerations since the two cryptocurrencies operate on two different elliptic curves.
+Apoorvaa Deshpande and Maurice Herlihy define the privacy properties of an Atomic Swap protocol and demonstrate the privacy improvements brought upon by using Adaptor Signatures.~\cite{deshpande2020privacy}
+
+\paragraph{Future Research.} Erkan Tairi et al. have demonstrated in~\cite{tairi2019a2l} how to construct Payment channel hubs as a solution to scalability issues of blockchain technologies.
+With their approach relying solely on Scriptless Scripts, it would be interesting to explore the feasibility of such a construction on a Mimblewimble-based cryptocurrency by utilizing the contract transactions outlined in our research.
+A. Faz-Hernandez et al. examine the possibility of hash functions that output an elliptic curve point for multiple elliptic curves, including secp256k1~\cite{hernandez2020hashing}.
+Based on this work, one could research if more elaborate contracts such as hashed timelock contracts are made possible on Mimblewimble with such a hash function.
+Such a solution could help solve the difficulties that arise when the two cryptocurrencies between which the exchange happens operate on different curves as seen in the work, by Joël Gugger~\cite{gugger2020bitcoin}.
+Finally, another interesting research topic would be the construction of a cross-chain Atomic Swap between two cryptocurrencies both lacking scripting functionality.
+For instance by combining our protocol with the construction by Gugger~\cite{gugger2020bitcoin} to build Atomic Swaps between Monero and a Mimblewimble-based cryptocurrency.
