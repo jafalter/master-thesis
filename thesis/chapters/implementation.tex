@@ -4,14 +4,28 @@
 \urldef\urlprone\url{https://github.com/mimblewimble/grin-wallet/pull/565}
 \urldef\urlprtwo\url{https://github.com/mimblewimble/grin-wallet/pull/557}
 \urldef\urljsonrpc\url{https://www.jsonrpc.org/}
+\urldef\urlrpbytes\url{https://tinyurl.com/auv2bnmy}
+\urldef\urlbpjs\url{https://github.com/jafalter/bulletproof-js}
+\urldef\urlgrnswp\url{https://github.com/vault713/grinswap}
 
-We have developed a prototype implementation\footnote{\urlgithub} of the Atomic Swap protocol outlined in~\cref{sec:atom:atomic-swap} in the Rust programming language between Bitcoin and the Grin cryptocurrency.
-On the Grin side, we have been using the official grin-wallet\footnote{\urlgrinwallet} library, on the Bitcoin side, the rust-bitcoin\footnote{\urlrustbitcoin} library for transaction creation, signing, etc.
+We have developed an open-source prototype implementation\footnote{\urlgithub} of the Atomic Swap protocol outlined in~\cref{sec:atom:atomic-swap} in the Rust programming language between Bitcoin and the Grin cryptocurrency.
+On the Grin side, we have been using the official grin-wallet\footnote{\urlgrinwallet}.
+On the Bitcoin side, the rust-bitcoin\footnote{\urlrustbitcoin} library for the basic wallet functionality.
 We choose the programming language Rust because the official libraries available for the Grin cryptocurrency are also written in Rust.
+Before implementing the Swapping protocol, we first had to implement the transaction protocols outlined in~\cref{sec:atom:protocols}, which also required the implementing a Schnorr-based version of our Two-Party Fixed Witness Signature Scheme shown in~\cref{sec:sig:schnorr-inst}.
+The most challenging part of this task was to make our construction and especially the transactions output compatible with the main library, such that miners would accept our transactions.
+In achieving this, it was necessary to analyze the transaction structure built by the official library and occasionally ask questions to the Grin developers.
+On the Bitcoin side of the Swap, we had to implement the locking script, unlocking and refunding transaction.
+A particular challenge was getting the sigScript into the correct format such that the signed Bitcoin transactions would verify and be accepted by the network.
 We discovered two shortcomings in the grin-wallet library during development, so we used our local forked version of this library to address those shortcomings.
 We then submitted both changes to the library as pull requests.\footnote{\urlprone}\footnote{\urlprtwo}
+During development, we actively engaged with the Grin community and the maintainers of the Rust Bitcoin library.
 Our implementation sends JSON-RPC\footnote{\urljsonrpc} requests to a locally running Bitcoin Core and Grin Core node to query blockchain state, submit, and verify transactions.
-The developed program is executable via the command line and accepts the following commands:
+Communication between the two parties happens via a TCP channel.
+As a preparational step for this thesis, we investigated the bulletproof library used by the Grin source code, which included a complete byte analysis of the bulletproof output\footnote{\urlrpbytes} that also got merged to the official Grin documentation.
+Furthermore, we built the first ever complete implementation of bulletproofs range proofs in plain Javascript and made it available to the public on Github\footnote{\urlbpjs}.
+\\ \\
+The developed Atomic Swap program is executable via the command line and accepts the following commands:
 \begin{asparaitem}
     \item \textbf{init}: The init command is run during the setup phase of the Atomic Swap.
     It creates a new swap slate consisting of a public file containing information about the offered currency, exchange rate, connection details, and other general parameters and a private file in which secret keys and nonce values are stored.
@@ -74,8 +88,8 @@ If the $\text{OP\_IF}$ evaluates to false, we execute the script's redemption pa
 \section{Implementation Grin side}\label{sec:ImplementationGrin}
 
 On the Grin side, we have implemented the three transaction protocols specified in~\cref{sec:atom:protocols}.
-Communication between the transacting parties happens via a TCP channel.
-For implementing two-party bulletproof range proofs, we used the implementation of grinswap\footnote{https://github.com/vault713/grinswap}, which runs a three-round protocol between the two parties using the secp256k1-zkp\footnote{https://github.com/mimblewimble/secp256k1-zkp} library for bulletproof computation.
+Again all communication between the transacting parties happens via a secure TCP channel.
+For creating two-party bulletproof range proofs, we used the implementation of grinswap\footnote{\urlgrnswp}, which runs a three-round protocol between the two parties using the secp256k1-zkp\footnote{\url{https://github.com/mimblewimble/secp256k1-zkp}} library for bulletproof computation.
 
 As already laid out in~\cref{sec:atom:atomic-swap}, to lock the Mimblewimble side's funds, the two parties first engage in a $\procDSharedOutputMwTxId$, and then a time-locked $\procDSharedInpMwTxId$ transaction refunding the coins to the original owner.
 The timelock on the Grin side can be achieved by setting the transaction's respective kernel feature.
@@ -102,6 +116,3 @@ it would be possible to import the address without performing a rescan.
 However, if the funding transaction was mined in a block before we execute the import command, we would miss the transaction, and the address would therefore appear empty.
 A faster solution would be, for instance, to use the API of a block explorer such as Blockstream.info\footnote{\url{https://blockstream.info/}}.
 However, this would introduce a trusted third party to the protocol, which is generally to be avoided.
-
-
-\todo[inline]{I think this section is well written. But it is a pity that it does not show all the work that you had to do to make the overall implementation work. Perhaps you want to go in a bit more detail about what was implemented in the libraries itself and what you had to implement yourself. For the latter point, maybe you can explain also what challenges you had and how you overcame them. Additionally, you might want to say that the implementation is open source, that you engaged with the community, etc...}
