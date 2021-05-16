@@ -1,12 +1,21 @@
 \urldef{\urluniswp}\url{https://uniswap.org/}
 
-This thesis aimed to improve interoperability between privacy-enhancing cryptocurrencies and regular cryptocurrencies, allowing for the listing of more privacy-enhancing currencies on decentralized exchanges such as Uniswap.\footnote{\urluniswp}
-We have achieved this goal by constructing an Atomic Swap protocol between Bitcoin and a Mimblewimble-based cryptocurrency.
-Similar to Joël Gugger, who constructed an Atomic Swap protocol between Bitcoin and the Monero cryptocurrency in~\cite{gugger2020bitcoin}, we leveraged a Scriptless Scripts approach that was derived from Andrew Poelstra's inital work~\cite{poelstra2017scriptless} and the Adaptor Signature Scheme~\cite{aumayr2020bitcoinchannels} by Auymayr et al.
-We further managed to prove Correctness and Security in the malicious setting for four different types of Mimblewimble transactions that allow for the distribution of Mimblewimble coins between multiple keys and the execution of simple contracts, based on our own secure and correct two-party version of the Adaptor Signature Scheme.
-We pointed out a weakness in the security analysis of the Mimblewimble protocol done by Fuchsbauer et al. in~\cite{fuchsbauer2019aggregate}, which we have fixed by introducing the notion of Two-Party Signature Schemes into their model.
-\todo[inline]{Pedro: I would like to go with you again through this. Please remind me in the next call}
-
-While two-party signatures are prone to Rogue-key attacks, we demonstrate the infeasibility of such an attack in the Mimblewimble protocol.
-
+This thesis aimed to investigate the possibilities of building an Atomic Swap protocol without relying on scripting or smart contract features.
+Defining such a protocol is critical for improving the interoperability between privacy-enhancing cryptocurrencies that lack those features and other crypto assets.
+Enabling interoperability means that one can integrate those currencies into decentralized exchanges such as Uniswap\footnote{\urluniswp}.
+This is especially important because privacy-enhancing cryptocurrencies often can not be listed on centralized exchanges due to regulatory requirements.\footnote{\url{https://tinyurl.com/bf42xxpj}}\\
+In~\cref{ch:fixedwitnesssignatures}, we described a Schnorr-based two-party variant of the Adaptor Signature Scheme, a concept first formalized by Aumayr et al. in~\cite{aumayr2020bitcoinchannels} and proved its correctness and security.
+This Signature Scheme can be used to build simple contracts in a two-party setting that are based solely on cryptography.
+The final signatures are regular Schnorr signatures.
+Therefore they can be used in any system built on the Schnorr Signature Scheme.\\
+\Cref{ch:atomicswap} started out by formalizing four different types of Mimblewimble transaction schemes and laid out two-party protocols for their construction.
+We have proven that our transactions are compatible with the formal definitions of the Mimblewimble system found by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate}.
+We presented the hypothetical Transaction Sniff Attack (see~\cref{subsec:atom:tx-sniff-atk}), which allows an adversary to steal funds if the channel between the honest transaction sender and receiver would be broken.
+We then showed that substituting the notion of an Aggregatable Signature Scheme with a Two-Party Signature Scheme prevents this attack and improves Mimblewimble's security model.
+Furthermore, we investigated the possibility of rogue-key attacks in a Mimblewimble-based system and have demonstrated the infeasibility of such an attack in~\cref{subsec:atom:rogue}.
+The chapter concluded by presenting a complete Atomic Swap protocol between Bitcoin and a Mimblewimble-based cryptocurrency using the transaction schemes defined before.
+Running this protocol allows two parties to securely swap funds between the two blockchains without the need for a trusted intermediary.\\
+In~\cref{ch:implementation}, we presented our open-source proof of concept of the Atomic Swap protocol described in the previous chapter.
+We successfully evaluated our implementation by deploying and executing it on the testnets of the two cryptocurrencies.
+Developers can build upon our solution to provide trustless swaps between a Bitcoin and a Mimblewimble-based cryptocurrency to their users.
 
