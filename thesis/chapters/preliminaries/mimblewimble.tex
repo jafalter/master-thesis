@@ -23,7 +23,7 @@ In pratice $\langle 0, 2^{64} -1 \rangle$ is used in the most prominent implemen
 
 A Mimblewimble transaction consists of $\varCoinInp \opAssign (\varCoin_1 , \dots , \varCoin_n)$ input coins, $\varCoinOut \opAssign (\varCoin'_1 , \dots , \varCoin'_n)$ output coins, and kernel $\varKernel$, which we will define throughout this section.
 \begin{definition}[Transaction well-balancedness]  \label{def:pre:tx-well-balancedness}
-    A transaction is considered \emph{well-balanced} if for a list of input coins with values $\funArray{\varValue}$, a list of output coins with values $\funArray{\funStar{\varValue}}$, and a fee $\varFee$ $\sum{\funArray{\varValue}} \opSub \sum{\funArray{\funStar{\varValue}}} \opSub \varFee \opEqNoQ 0$, so the sum of all output values and the fee subtracted from the sum of input values has to be 0.
+    A transaction is considered \emph{well-balanced} if for a list of input coins with values $\funArray{\varValue}$, a list of output coins with values $\funArray{\funStar{\varValue}}$, and a fee $\varFee$, $\sum{\funArray{\varValue}} \opSub \sum{\funArray{\funStar{\varValue}}} \opSub \varFee \opEqNoQ 0$, so the sum of all output values and the fee subtracted from the sum of input values is 0.
 \end{definition}
 
 \begin{definition}[Transaction validity] \label{def:pre:tx-mw-validity}
@@ -72,7 +72,7 @@ $\funList{\varProof_0} \opConc \funList{\varProof_1}$ must contain valid range p
 \paragraph{Subset Problem} \label{par:pre:mimblewimble:subset}
 A subtle problem arises with the way transactions are merged in Mimblewimble.
 From the construction shown earlier, it is possible to reconstruct the original separate transactions from a merged one, which can be a privacy issue.
-Given a set of inputs, outputs, and kernels, a subset of these will recombine to reconstruct one of the valid transaction which was aggregated since kernel excess values are not combined.
+Given a set of inputs, outputs, and kernels, a subset of these will recombine to reconstruct one of the valid transactions which was aggregated since kernel excess values are not combined.
 Recall the merged transaction from earlier:
 \[ \varTx_m \opAssign (\varSupply_0 \opAddScalar \varSupply_1 \opSeperate (\varCoinInp^0 \opConc \varCoinInp^1),\:(\varCoinOut^0 \opConc \varCoinOut^1) \opSeperate (\funList{\varProof_0} \opConc \funList{\varProof_1}) \opSeperate
 \funList{\varExcess_0} \opConc \funList{\varExcess_1} \opSeperate \funList{\varSignature_0} \opConc \funList{\varSignature_1}) \]

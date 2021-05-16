@@ -39,7 +39,7 @@ We write procedures as $\styleFunction{function(\varInput)}$ and protocols (exec
         \item Correctness: For all messages $\varMsg$ and valid keypairs $\varKeyPair$ the following must hold with overwhelming probability: $\procVerf{\varPubKey}{\procSign{\varSecKey}{\varMsg}}{\varMsg} \opEqNoQ 1$
         \item Unforgeability (\cnstEUFCMA): Informally the existential unforgeability under chosen message attacks holds if attacker $\cnstAdversary$ with access to a signing oracle $\procSignOracleId$ cannot forge a valid signature for a chosen message.
         More formally, for a polytime adversary $\cnstAdversary$, message $\varMsg$, and public key $\varPubKey$, with access to the oracle $\varSignature \opFunResult \procSignOracle{\varMsg}{\varPubKey}$ that stores all signed messaged in a list $\funList{\varMsg_1,..\varMsg_n}$ the following must hold:
-        \[ \varSignature \opFunResult \cnstAdversary(\funStar{\varMsg}, \varPubKey), \; \funStar{\varMsg} \opNotIn \funList{\varMsg_1,..\varMsg_n}, \; \varProbability(\procVerf{\varMsg}{\varSignature}{\varPubKey} \opEqNoQ 1) \opSmEq \funNegl{\cdot} \]
+        \[ \varSignature \opFunResult \cnstAdversary(\funStar{\varMsg}, \varPubKey), \; \funStar{\varMsg} \opNotIn \funList{\varMsg_1,..\varMsg_n}, \; \varProbability(\procVerf{\funStar{\varMsg}}{\varSignature}{\varPubKey} \opEqNoQ 1) \opSmEq \funNegl{\cdot} \]
     \end{asparaitem}
 \end{definition}
 
@@ -92,7 +92,7 @@ This can be achieved as follows:
     $\varCommitSpace_{\varPublicParam} \opAssign \cnstGroup$ of order $\varPrime \opSeperate \varInputSpace_{\varPublicParam} \opSeperate \varRandSpace_{\varPublicParam} \opAssign \cnstIntegersPrime{\varPrime}$.
     The procedures $(\procSetupComId, \procCommitId)$ are then instantiated as:
     \begin{gather*}
-        \varCommitParams \opFunResult \procSetupComPed{\varG_1}{\varG_2} \opAssign \varG \opAssign \varG_1, \varH \opAssign \varG_1  \\
+        \varCommitParams \opFunResult \procSetupComPed{\varG_1}{\varG_2} \opAssign \varG \opAssign \varG_1, \varH \opAssign \varG_2  \\
         \varCommitment \opFunResult \procCommit{\varInput}{\varNonceAlt} \opAssign \funGen{\varNonceAlt} \funGenH{\varInput}\\
     \end{gather*}
     An instantiation of the Pedersen Commitment Scheme must pick two adjacent generators $\varG_1$, $\varG_2$ for the setup routine to be secure in terms of hiding and binding.
@@ -134,7 +134,7 @@ Let $\cnstAdversary$ be a non-uniform PPT algorithm, and $\varI \opIn \{1,2\}$ b
 We then denote $\cnstIdeal_{\cnstFunction, \styleFunction{P}(\varZ), \varI}(\varX, \varZ)$ as the ideal execution of $\cnstFunction$ on inputs $(\varX, \varY)$ with auxiliary input $\varZ$ to $\cnstAdversary$ and security param $\varSecParam$ defined as the output pair of the honest party and $\cnstAdversary$ from the ideal execution.
 
 \paragraph{Execution in the Real Model} Again let $\cnstAdversary$ be a non-uniform PPT adversary and $\varI \opIn \{1,2\}$ be the corrupted party's index.
-In this model, a real two-party protocol $\varProtocol$ is executed, but the adversary $\cnstAdversary$ sens alls messages in place of the corrupted party and may follow an arbitrary polynomial-time strategy.
+In this model, a real two-party protocol $\varProtocol$ is executed, but the adversary $\cnstAdversary$ sends all messages in place of the corrupted party and may follow an arbitrary polynomial-time strategy.
 Then the real execution of the two-party protocol $\varProtocol$ between $\varParty{1}$ and $\varParty{2}$ on inputs $(\varX, \varY)$ and auxiliary input $\varZ$ to $\cnstAdversary$ and security parameter $\varSecParam$ is denoted by $\cnstReal_{\cnstFunction, \styleFunction{P}(\varZ), \varI}(\varX, \varZ)$ and is defined as the output pair of the honest party and the adversary $\cnstAdversary$ from the real execution of $\varProtocol$.
 
 \begin{definition}[Security in the Malicious Setting~\cite{lindell2017simulate}]\label{subsec:pre:security}

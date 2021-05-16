@@ -8,7 +8,7 @@ In~\cref{ch:fixedwitnesssignatures}, we described a Schnorr-based two-party vari
 This Signature Scheme can be used to build simple contracts in a two-party setting that are based solely on cryptography.
 The final signatures are regular Schnorr signatures.
 Therefore they can be used in any system built on the Schnorr Signature Scheme.\\
-\Cref{ch:atomicswap} started out by formalizing four different types of Mimblewimble transaction schemes and laid out two-party protocols for their construction.
+\Cref{ch:atomicswap} started out with the formalization of four different types of Mimblewimble transaction schemes and laid out two-party protocols for their construction.
 We have proven that our transactions are compatible with the formal definitions of the Mimblewimble system found by Fuchsbauer et al.~\cite{fuchsbauer2019aggregate}.
 We presented the hypothetical Transaction Sniff Attack (see~\cref{subsec:atom:tx-sniff-atk}), which allows an adversary to steal funds if the channel between the honest transaction sender and receiver would be broken.
 We then showed that substituting the notion of an Aggregatable Signature Scheme with a Two-Party Signature Scheme prevents this attack and improves Mimblewimble's security model.

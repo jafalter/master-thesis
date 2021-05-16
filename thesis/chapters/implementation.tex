@@ -11,10 +11,10 @@
 We have developed an open-source prototype implementation\footnote{\urlgithub} of the Atomic Swap protocol outlined in~\cref{sec:atom:atomic-swap} in the Rust programming language between Bitcoin and the Grin cryptocurrency.
 On the Grin side, we have been using the official grin-wallet\footnote{\urlgrinwallet}.
 On the Bitcoin side, the rust-bitcoin\footnote{\urlrustbitcoin} library for the basic wallet functionality.
-We choose the programming language Rust because the official libraries available for the Grin cryptocurrency are also written in Rust.
-Before implementing the Swapping protocol, we first had to implement the transaction protocols outlined in~\cref{sec:atom:protocols}, which also required the implementing a Schnorr-based version of our Two-Party Fixed Witness Signature Scheme shown in~\cref{sec:sig:schnorr-inst}.
-The most challenging part of this task was to make our construction and especially the transactions output compatible with the main library, such that miners would accept our transactions.
-In achieving this, it was necessary to analyze the transaction structure built by the official library and occasionally ask questions to the Grin developers.
+We chose the programming language Rust because the official libraries available for the Grin cryptocurrency are also written in Rust.
+Before implementing the swapping protocol, we first had to implement the transaction protocols outlined in~\cref{sec:atom:protocols}, which also required implementing a Schnorr-based version of our Two-Party Fixed Witness Signature Scheme shown in~\cref{sec:sig:schnorr-inst}.
+The most challenging part of this task was to make our construction and especially the returned transactions compatible with the main library, such that miners would accept them.
+In achieving this, it was necessary to analyze the transaction structure used by the official library and occasionally ask questions to the Grin developers.
 On the Bitcoin side of the Swap, we had to implement the locking script, unlocking and refunding transaction.
 A particular challenge was getting the sigScript into the correct format such that the signed Bitcoin transactions would verify and be accepted by the network.
 We discovered two shortcomings in the grin-wallet library during development, so we used our local forked version of this library to address those shortcomings.
@@ -22,8 +22,8 @@ We then submitted both changes to the library as pull requests.\footnote{\urlpro
 During development, we actively engaged with the Grin community and the maintainers of the Rust Bitcoin library.
 Our implementation sends JSON-RPC\footnote{\urljsonrpc} requests to a locally running Bitcoin Core and Grin Core node to query blockchain state, submit, and verify transactions.
 Communication between the two parties happens via a TCP channel.
-As a preparational step for this thesis, we investigated the bulletproof library used by the Grin source code, which included a complete byte analysis of the bulletproof output\footnote{\urlrpbytes} that also got merged to the official Grin documentation.
-Furthermore, we built the first ever complete implementation of bulletproofs range proofs in plain Javascript and made it available to the public on Github\footnote{\urlbpjs}.
+As a preparational step for this thesis, we investigated the Bulletproofs library used by the Grin source code, which included a complete byte analysis of the range proof output\footnote{\urlrpbytes} that also got merged to the official Grin documentation.
+Furthermore, we built the first ever complete implementation of Bulletproofs range proofs in plain Javascript and made it available to the public on Github\footnote{\urlbpjs}.
 \\ \\
 The developed Atomic Swap program is executable via the command line and accepts the following commands:
 \begin{asparaitem}
@@ -87,15 +87,15 @@ If the $\text{OP\_IF}$ evaluates to false, we execute the script's redemption pa
 
 \section{Implementation Grin side}\label{sec:ImplementationGrin}
 
-On the Grin side, we have implemented the three transaction protocols specified in~\cref{sec:atom:protocols}.
+On the Grin side, we have implemented the transaction protocols specified in~\cref{sec:atom:protocols}.
 Again all communication between the transacting parties happens via a secure TCP channel.
-For creating two-party bulletproof range proofs, we used the implementation of grinswap\footnote{\urlgrnswp}, which runs a three-round protocol between the two parties using the secp256k1-zkp\footnote{\url{https://github.com/mimblewimble/secp256k1-zkp}} library for bulletproof computation.
+For creating two-party Bulletproof range proofs, we used the implementation of grinswap\footnote{\urlgrnswp}, which runs a three-round protocol between the two parties using the secp256k1-zkp\footnote{\url{https://github.com/mimblewimble/secp256k1-zkp}} library for range proof computation.
 
 As already laid out in~\cref{sec:atom:atomic-swap}, to lock the Mimblewimble side's funds, the two parties first engage in a $\procDSharedOutputMwTxId$, and then a time-locked $\procDSharedInpMwTxId$ transaction refunding the coins to the original owner.
 The timelock on the Grin side can be achieved by setting the transaction's respective kernel feature.
 The program saves the refunding transaction to the slate file for later use.
 In the execution phase the $\procDScriptMwTxId$ transaction protocol is run.
-The result is broadcast to the network sending the Grin to its new owner while revealing the witness value $\varWit$ to Alice, who is can now build a valid spending script for the Bitcoin side.
+The result is broadcast to the network sending the Grin to its new owner while revealing the witness value $\varWit$ to Alice, who can now build a valid spending script for the Bitcoin side.
 
 \section{Evaluation}
 

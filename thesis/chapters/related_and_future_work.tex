@@ -2,7 +2,7 @@
 
 \paragraph{Related Work.} Maurice Herlihy~\cite{herlihy2018atomic} describes how hashed timelock contracts can be leveraged to build Atomic Swaps between cryptocurrencies that have at least some basic scripting capabilities.
 In a hashed timelock contract, the hash pre-image $\varX$ of $\styleVariable{h} \opEqNoQ \funHash{\varX}$, where $\funHash{\cdot}$ is a hash function, serves as the secret contract value that makes the swap possible.
-Fuchsbauer et al. conduct a complete security analysis of the Mimblewimble protocol, which forms the basis for~\cref{ch:fixedwitnesssignatures}.
+Fuchsbauer et al.~\cite{fuchsbauer2019aggregate} conduct a complete security analysis of the Mimblewimble protocol, which forms the basis for~\cref{ch:fixedwitnesssignatures}.
 Betarte et al.~\cite{betarte2019towards} work towards making implementations of the Mimblewimble protocol formally verifiable.
 In 2016 Andrew Poelstra published his specification of the Mimblewimble protocol in~\cite{poelstra2016mimblewimble} and has managed to expand on the ideas posted in the original writing~\cite{jedusor2016mimblewimble} by Jedusor.
 In the following year, Poelstra further introduced the notion of Scriptless Scripts~\cite{poelstra2017scriptless}, showing how one can build primitive contracts just by using cryptography alone.
@@ -20,6 +20,6 @@ Apoorvaa Deshpande and Maurice Herlihy define the privacy properties of an Atomi
 With their approach relying solely on Scriptless Scripts, it would be interesting to explore the feasibility of such a construction on a Mimblewimble-based cryptocurrency by utilizing the contract transactions outlined in our research.
 A. Faz-Hernandez et al. examine the possibility of hash functions that output an elliptic curve point for multiple elliptic curves, including secp256k1~\cite{hernandez2020hashing}.
 Based on this work, one could research if more elaborate contracts such as hashed timelock contracts are made possible on Mimblewimble with such a hash function.
-Such a solution could help solve the difficulties that arise when the two cryptocurrencies between which the exchange happens operate on different curves as seen in the work, by Joël Gugger~\cite{gugger2020bitcoin}.
+This solution could also help to solve the difficulties that arise when the two cryptocurrencies between which the exchange happens operate on different curves as is the case in the work by Joël Gugger~\cite{gugger2020bitcoin}.
 Finally, another interesting research topic would be the construction of a cross-chain Atomic Swap between two cryptocurrencies both lacking scripting functionality.
 For instance by combining our protocol with the construction by Gugger~\cite{gugger2020bitcoin} to build Atomic Swaps between Monero and a Mimblewimble-based cryptocurrency.
