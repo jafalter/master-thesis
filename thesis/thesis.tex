@@ -113,7 +113,7 @@
 %
 % Master:
 \setthesis{master}
-\setmasterdegree{master} % dipl. / rer.nat. / rer.soc.oec. / master
+\setmasterdegree{dipl.} % dipl. / rer.nat. / rer.soc.oec. / master
 %
 % Doctor:
 %\setthesis{doctor}
@@ -135,13 +135,15 @@
 % The structure of the thesis has to conform to the guidelines at
 %  https://informatics.tuwien.ac.at/study-services
 
-%\addtitlepage{naustrian} % German title page (not for dissertations at the PhD School).
+\addtitlepage{naustrian} % German title page (not for dissertations at the PhD School).
 \addtitlepage{english} % English title page.
 \addstatementpage
 
-%\begin{danksagung*}
-%\todo{Ihr Text hier.}
-%\end{danksagung*}
+\begin{danksagung*}
+Ich möchte mich bei meinen Betreuern Dr. Pedro Moreno-Sanchez und Univ. Prof. Dr. Matteo Maffei bedanken, die mir während dieser Arbeit wertvolle Hilfestellungen gegeben haben.
+Ich möchte auch Andrew Poelstra und den Grin-Entwicklern (insbesondere Jasper) dafür danken, dass sie mir bei technischen Problemen geholfen haben, die während der Proof-of-Concept-Implementierung auftraten.
+Ein besonderer Dank geht außerdem an Bernhard Abfalter für das Korrekturlesen.
+\end{danksagung*}
 
 \begin{acknowledgements*}
     I wish to show appreciation to my advisors Dr. Pedro Moreno-Sanchez and Univ. Prof. Dr. Matteo Maffei, for providing me with valueable guidance throughout this thesis.
@@ -149,9 +151,9 @@
     Special thanks further go to Bernhard Abfalter for proofreading.
 \end{acknowledgements*}
 
-%%begin{kurzfassung}
-%\todo{Ihr Text hier.}
-%\end{kurzfassung}
+\begin{kurzfassung}
+Seit der Einführung von Bitcoin im Jahr 2008 haben wir ein kontinuierliches Wachstum im Bitcoin- und Blockchain-Bereich erlebt. Da die Anzahl der Kryptowährungen steigt, wird die Interoperabilität zwischen ihnen zu einem interessanten Thema, zum Beispiel um dezentralen Exchange zwischen den Kryptowährungen zu ermöglichen. Durch die Nutzung von Smart Contracts oder Skriptkonstrukten, die auf den meisten Blockchain-Systemen verfügbar sind, ist die Verbindung zweier Kryptowährungen über sogenannte Atomic Swaps möglich. Für Währungen, die sich auf die Verbesserung der Privatsphäre konzentrieren, gibt es jedoch keine solchen Möglichkeiten.\\ Diese Arbeit erforscht das Mimblewimble-Protokoll, eine Konstruktion einer außergewöhnlich effizienten, die Privatsphäre verbessernden Kryptowährung. Aufbauend auf früheren Arbeiten anderer Autoren formalisieren wir verschiedene Arten von Mimblewimble-Transaktionen, die primitive Smart Contracts ermöglichen, und beweisen ihre Sicherheit und Korrektheit. Wir verbessern das Sicherheitsmodell des Protokolls, indem wir eine Schwäche in früheren Formalisierungen identifizieren und beheben. Unter Verwendung unserer fortschrittlichen Transaktionsprotokolle gelingt es uns, ein Atomic-Swap-Protokoll für Mimblewimble-basierte Systeme zu entwerfen, das ausschließlich aus kryptografischen Primitiven aufgebaut ist. Außerdem formalisieren wir ein Atomic Swap-Protokoll zwischen Bitcoin und Grin, einer Mimblewimble-basierten Kryptowährung. Anschließend implementieren wir einen Proof of Concept in der Programmiersprache Rust, den wir erfolgreich in den Testnets von Bitcoin und Grin einsetzen und evaluieren.
+\end{kurzfassung}
 
 \begin{abstract}
     Since the inception of Bitcoin in 2008, we have witnessed continuous growth in the Bitcoin and blockchain space.
